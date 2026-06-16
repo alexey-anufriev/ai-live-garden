@@ -110,6 +110,17 @@ Prefer:
 * simple Java code over clever abstractions;
 * readable simulation behavior over opaque mechanisms.
 
+When changing simulation behavior, the agent should prefer adding or updating
+at least one focused test unless the change is purely documentary or too small
+to test meaningfully.
+
+Good tests should protect observable garden behavior, such as:
+
+* persistent state loading and saving;
+* organism growth, feeding, reproduction, death, or mutation;
+* command-line behavior such as `inspect` and `tick`;
+* rendering or event output that future runs may rely on.
+
 Avoid:
 
 * large rewrites;
