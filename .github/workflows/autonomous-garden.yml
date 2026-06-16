@@ -3,7 +3,7 @@ name: Autonomous Live Garden
 on:
   workflow_dispatch:
   schedule:
-    - cron: "*/8 * * * *"
+    - cron: "8 * * * *"
 
 concurrency:
   group: ai-live-garden-main
@@ -48,10 +48,12 @@ jobs:
       - name: Run Gemini autonomous step
         id: gemini
         uses: google-github-actions/run-gemini-cli@v0.1.22
+        continue-on-error: true
         env:
           GEMINI_CLI_TRUST_WORKSPACE: "true"
         with:
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+          gemini_model: gemini-3.1-flash-lite
           prompt: ${{ steps.gemini_prompt.outputs.text }}
           upload_artifacts: true
 
