@@ -66,47 +66,13 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         int nextCycle = cycle + 1;
         long plantCount = organisms.stream().filter(organism -> organism.type().isPlant()).count();
         long animalCount = organisms.stream().filter(organism -> organism.type().isAnimal()).count();
-        final Environment baseNextEnvironment = environment.next(nextCycle, (int) plantCount, (int) animalCount);
+        Environment nextEnvironment = environment.next(nextCycle, (int) plantCount, (int) animalCount);
         List<GardenEvent> nextEvents = new ArrayList<>(events);
         List<Organism> changed = organisms.stream()
-                .map(organism -> passiveChange(organism, baseNextEnvironment, nextCycle, nextEvents))
+                .map(organism -> passiveChange(organism, nextEnvironment, nextCycle, nextEvents))
                 .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
 
-        List<Organism> beforeFeeding = new ArrayList<>(changed);
         changed = feedingPhase(changed, nextCycle, nextEvents);
-
-        int plantDeaths = 0;
-        int animalDeaths = 0;
-        for (Organism org : beforeFeeding) {
-            boolean survived = false;
-            for (Organism survivor : changed) {
-                if (survivor.id().equals(org.id())) {
-                    survived = true;
-                    break;
-                }
-            }
-            if (!survived) {
-                if (org.type().isPlant()) {
-                    plantDeaths++;
-                } else {
-                    animalDeaths++;
-                }
-            }
-        }
-
-        Environment finalEnvironment = baseNextEnvironment;
-        int nutrientBonus = plantDeaths * 4 + animalDeaths * 8;
-        if (nutrientBonus > 0) {
-            finalEnvironment = new Environment(
-                    baseNextEnvironment.light(),
-                    baseNextEnvironment.moisture(),
-                    baseNextEnvironment.warmth(),
-                    baseNextEnvironment.nutrients() + nutrientBonus
-            );
-            nextEvents.add(new GardenEvent(nextCycle,
-                    "Decaying organic matter enriched the soil nutrients by %d.".formatted(nutrientBonus)));
-        }
-
         ReproductionResult reproduction = reproductionPhase(changed, nextCycle, nextId, nextEvents);
         changed = reproduction.organisms();
         int nextIdentifier = reproduction.nextId();
@@ -118,9 +84,9 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         }
 
         nextEvents.add(new GardenEvent(nextCycle,
-                "The garden becomes %s after cycle %d.".formatted(finalEnvironment.mood(), nextCycle)));
+                "The garden becomes %s after cycle %d.".formatted(nextEnvironment.mood(), nextCycle)));
 
-        return new Garden(nextCycle, nextIdentifier, finalEnvironment, changed, nextEvents);
+        return new Garden(nextCycle, nextIdentifier, nextEnvironment, changed, nextEvents);
     }
 
     /**
@@ -174,24 +140,12 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
 
             int index = preyIndex.get();
             Organism prey = mutable.get(index);
-            if (evaluateHuntSuccess(hunter, prey, cycle)) {
-                int bite = hunter.type() == OrganismType.FOX ? 3 : 2;
-                Organism fedHunter = hunter.withEnergy(hunter.energy() + bite).withTrait("fed-" + cycle);
-                Organism weakenedPrey = prey.withEnergy(prey.energy() - bite);
-                mutable.set(hunterIndex, fedHunter);
-                mutable.set(index, weakenedPrey);
-                events.add(new GardenEvent(cycle, "%s fed on %s.".formatted(hunter.id(), prey.id())));
-            } else {
-                String evasionReason = "evaded the hunt";
-                if (prey.traits().contains("glass-footed")) {
-                    evasionReason = "escaped on glass-footed steps";
-                } else if (prey.traits().contains("shadow-tuned")) {
-                    evasionReason = "slipped into the deep shadows";
-                } else if (prey.curiosity() > hunter.curiosity()) {
-                    evasionReason = "sensed the danger and hid in time";
-                }
-                events.add(new GardenEvent(cycle, "%s tried to hunt %s, but the prey %s.".formatted(hunter.id(), prey.id(), evasionReason)));
-            }
+            int bite = hunter.type() == OrganismType.FOX ? 3 : 2;
+            Organism fedHunter = hunter.withEnergy(hunter.energy() + bite).withTrait("fed-" + cycle);
+            Organism weakenedPrey = prey.withEnergy(prey.energy() - bite);
+            mutable.set(hunterIndex, fedHunter);
+            mutable.set(index, weakenedPrey);
+            events.add(new GardenEvent(cycle, "%s fed on %s.".formatted(hunter.id(), prey.id())));
         }
 
         List<Organism> survivors = new ArrayList<>();
@@ -204,30 +158,6 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         }
         survivors.sort(Comparator.comparing(Organism::id));
         return survivors;
-    }
-
-    private boolean evaluateHuntSuccess(Organism hunter, Organism prey, int cycle) {
-        if (hunter.type() != OrganismType.FOX) {
-            return true;
-        }
-        int baseChance = 65;
-        if (prey.traits().contains("glass-footed")) {
-            baseChance -= 20;
-        }
-        if (prey.traits().contains("shadow-tuned")) {
-            baseChance -= 15;
-        }
-        if (hunter.traits().contains("echo-hunter")) {
-            baseChance += 15;
-        }
-        if (hunter.traits().contains("brighter-sense")) {
-            baseChance += 10;
-        }
-        baseChance += (hunter.curiosity() - prey.curiosity()) * 3;
-        baseChance = Math.clamp(baseChance, 10, 95);
-
-        int check = Math.abs((hunter.id() + prey.id() + cycle).hashCode()) % 100;
-        return check < baseChance;
     }
 
     private Optional<Integer> findPreyIndex(List<Organism> organisms, Organism hunter, int hunterIndex) {
