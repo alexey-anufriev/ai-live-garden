@@ -120,6 +120,13 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         }
 
         maybeDescribeChange(organism, changed, environment, cycle).ifPresent(events::add);
+
+        if (organism.type().isPlant() && !environment.favorsPlants()) {
+            changed = changed.withTrait("stressed");
+        } else if (organism.type().isAnimal() && environment.nutrients() < 25) {
+            changed = changed.withTrait("starving");
+        }
+
         return maybeMutate(changed, cycle, events);
     }
 
