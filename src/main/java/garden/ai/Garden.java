@@ -6,7 +6,17 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Immutable-ish garden snapshot. Methods return new garden instances instead of mutating the current one.
+ * Immutable garden snapshot and rule engine for one digital ecosystem.
+ *
+ * <p>Instances are treated as values: cycle advancement returns a new {@code Garden} with copied organism
+ * and event lists. The simulation rules live here so persistence, rendering, and command-line handling can
+ * stay thin.
+ *
+ * @param cycle completed cycle count
+ * @param nextId next numeric suffix reserved for a newly born organism
+ * @param environment current environmental conditions
+ * @param organisms living organisms sorted by stable identifier after each cycle
+ * @param events recent observable cycle events, capped to keep persistent state compact
  */
 public record Garden(int cycle, int nextId, Environment environment, List<Organism> organisms, List<GardenEvent> events) {
 
@@ -26,6 +36,9 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         this.events = trimEvents(events);
     }
 
+    /**
+     * Creates the deterministic initial garden used when no persistent state exists.
+     */
     public static Garden seed() {
         List<Organism> organisms = List.of(
                 Organism.of("moss-1", OrganismType.MOSS, 9, 1, "shade-loving"),
@@ -41,6 +54,14 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         return new Garden(0, 8, new Environment(50, 64, 43, 58), organisms, events);
     }
 
+    /**
+     * Advances the garden by one cycle.
+     *
+     * <p>The phase order is environmental drift, passive organism changes, feeding, reproduction, emergency
+     * reseeding if every organism dies, then a final cycle summary event.
+     *
+     * @return a new garden snapshot after one completed cycle
+     */
     public Garden nextCycle() {
         int nextCycle = cycle + 1;
         long plantCount = organisms.stream().filter(organism -> organism.type().isPlant()).count();
@@ -68,10 +89,16 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         return new Garden(nextCycle, nextIdentifier, nextEnvironment, changed, nextEvents);
     }
 
+    /**
+     * Counts organisms in the plant kingdom.
+     */
     public long plantCount() {
         return organisms.stream().filter(organism -> organism.type().isPlant()).count();
     }
 
+    /**
+     * Counts herbivores and predators.
+     */
     public long animalCount() {
         return organisms.stream().filter(organism -> organism.type().isAnimal()).count();
     }

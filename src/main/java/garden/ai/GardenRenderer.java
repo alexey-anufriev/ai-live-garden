@@ -3,11 +3,20 @@ package garden.ai;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
+/**
+ * Converts garden snapshots into compact terminal-readable reports.
+ */
 public final class GardenRenderer {
 
     private GardenRenderer() {
     }
 
+    /**
+     * Renders the current environment, organism roster, and most recent events.
+     *
+     * @param garden snapshot to display
+     * @return multiline text suitable for CLI output or logs
+     */
     public static String render(Garden garden) {
         String organisms = garden.organisms().stream()
                 .sorted(Comparator.comparing(Organism::id))

@@ -2,6 +2,16 @@ package garden.ai;
 
 import java.nio.file.Path;
 
+/**
+ * Command-line entry point for inspecting or advancing the persistent garden.
+ *
+ * <p>Supported forms include:
+ * <pre>{@code
+ * inspect
+ * tick --steps 3
+ * tick --state data/garden-state.txt
+ * }</pre>
+ */
 public final class Main {
 
     private Main() {

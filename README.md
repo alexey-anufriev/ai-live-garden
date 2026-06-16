@@ -43,6 +43,17 @@ mvn package
 java -jar target/ai-live-garden-0.1.0-SNAPSHOT.jar
 ```
 
+## Java code map
+
+The Java implementation is deliberately small and dependency-light:
+
+- `Main` is the command-line entry point. It supports `inspect` to render the current snapshot without saving, and `tick` to advance and persist the garden. Use `--steps N` to control cycle count and `--state path/to/file` to use an alternate snapshot.
+- `Garden` is the immutable world snapshot and owns the ecosystem rules for each cycle: environmental drift, passive growth/metabolism, feeding, death, reproduction, mutation, and event trimming.
+- `Organism`, `OrganismType`, `Environment`, and `GardenEvent` are the core value model. They keep state validation close to the data and expose small helper methods used by the simulation rules.
+- `Simulation` advances either the seed garden or an existing loaded garden for a fixed number of cycles.
+- `GardenStateStore` is the persistence boundary for `data/garden-state.txt`. Its line-oriented format is intended to remain readable in git diffs and easy for future agents to evolve.
+- `GardenRenderer` turns a garden snapshot into the terminal text shown by local commands and autonomous runs.
+
 ## Repository memory
 
 The agent should treat the repository itself as memory:

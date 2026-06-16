@@ -19,6 +19,9 @@ public final class GardenStateStore {
     private GardenStateStore() {
     }
 
+    /**
+     * Loads a garden snapshot from disk or returns {@link Garden#seed()} when the file does not exist.
+     */
     public static Garden loadOrCreate(Path path) {
         if (!Files.exists(path)) {
             return Garden.seed();
@@ -30,6 +33,9 @@ public final class GardenStateStore {
         }
     }
 
+    /**
+     * Writes a garden snapshot, creating parent directories when needed.
+     */
     public static void save(Path path, Garden garden) {
         try {
             if (path.getParent() != null) {
@@ -41,6 +47,9 @@ public final class GardenStateStore {
         }
     }
 
+    /**
+     * Serializes a garden snapshot into the committed line-oriented state format.
+     */
     public static String format(Garden garden) {
         StringBuilder builder = new StringBuilder();
         builder.append("# AI Live Garden persistent state\n");

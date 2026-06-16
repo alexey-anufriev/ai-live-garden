@@ -13,6 +13,14 @@ public record Environment(int light, int moisture, int warmth, int nutrients) {
         nutrients = clamp(nutrients);
     }
 
+    /**
+     * Produces the deterministic environmental drift for one cycle.
+     *
+     * @param cycle upcoming cycle number
+     * @param plantCount number of plants currently competing for nutrients
+     * @param animalCount number of animals contributing decay and disturbance
+     * @return the next normalized environment
+     */
     public Environment next(int cycle, int plantCount, int animalCount) {
         int lightDelta = cycle % 2 == 0 ? 3 : -2;
         int moistureDelta = cycle % 3 == 0 ? 4 : -1;
@@ -21,6 +29,9 @@ public record Environment(int light, int moisture, int warmth, int nutrients) {
         return new Environment(light + lightDelta, moisture + moistureDelta, warmth + warmthDelta, nutrients + nutrientDelta);
     }
 
+    /**
+     * Returns a compact human-facing label for rendering and event text.
+     */
     public String mood() {
         if (moisture > 68 && light > 52 && nutrients > 50) {
             return "lush";
@@ -37,6 +48,9 @@ public record Environment(int light, int moisture, int warmth, int nutrients) {
         return "balanced";
     }
 
+    /**
+     * Indicates whether current conditions are favorable enough for ordinary plant growth.
+     */
     public boolean favorsPlants() {
         return light >= 45 && moisture >= 45 && nutrients >= 35;
     }
