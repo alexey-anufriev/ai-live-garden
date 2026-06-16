@@ -27,6 +27,10 @@ The garden is becoming a small persistent ecosystem rather than a reset-only dem
 - `Simulation` advances an existing `Garden` instead of always starting from `Garden.seed()`.
 - `Garden` contains the current ecosystem rules.
 
+## Ecosystem diversity
+
+Describe the current plants, animals, predators, decomposers, environmental forces, and relationships between them.
+
 ## Open threads
 
 - Make predator/prey interactions less destructive if the ecosystem collapses too quickly.

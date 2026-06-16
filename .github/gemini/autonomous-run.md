@@ -6,7 +6,7 @@ Process:
 
 1. Read `AGENTS.md`, `GEMINI.md`, `README.md`, `agent/state.md`, `agent/requests.md`, recent journal entries, and the latest available summaries under `agent/summaries/`.
 2. Inspect the current Java/Maven codebase and the persistent garden snapshot in `data/garden-state.txt`.
-3. Choose exactly one small coherent next task.
+3. Choose exactly one small coherent next task. When choosing a task, consider whether the change can increase the garden's ecological diversity, interdependence, or long-term behavioral depth without adding disconnected complexity.
 4. If the chosen task requires a new dependency, external tool, CI change, protected file change, network integration, or expanded permission, do not perform it directly. Record a request in `agent/requests.md` and choose a smaller task that fits the current constraints.
 5. Make the change.
 6. Run `mvn test` if possible.

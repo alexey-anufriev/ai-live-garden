@@ -51,6 +51,25 @@ Good evolution may include:
 * compressing recent evolution into summaries under `agent/summaries/`;
 * improving the persistent garden state model and simulation rules without fabricating arbitrary state changes.
 
+## Biodiversity and ecosystem depth
+
+The garden should gradually become more diverse, but diversity should mean more than adding new organism names.
+
+Prefer ecological depth:
+
+* organisms with distinct roles;
+* relationships between plants, animals, predators, decomposers, spores, roots, and environmental forces;
+* food chains and resource competition;
+* symbiosis, decay, reproduction, migration, dormancy, mutation, and adaptation;
+* traits that affect behavior over time;
+* visible consequences in the persistent garden state.
+
+New species or organism types are welcome when they create new behavior or relationships.
+
+Avoid adding many disconnected entities that do not interact with the existing garden.
+
+A good change should make the ecosystem feel more alive, interconnected, or surprising while preserving coherence.
+
 ## Required behavior on every run
 
 The agent must:
