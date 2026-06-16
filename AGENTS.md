@@ -16,6 +16,20 @@ The garden may contain organisms, spores, roots, moss, environmental forces, eve
 
 The exact direction is intentionally open. The agent may gradually discover and shape the garden's identity through many small changes.
 
+## Persistent garden state
+
+The repository contains a persistent living garden snapshot:
+
+* `data/garden-state.txt`
+
+This file represents the current living state of the garden.
+
+At the start of a simulation run, the program must load this file. If it does not exist, the program may create the initial garden state. The simulation then advances the garden by the configured number of ticks and saves the updated state back to the same file.
+
+The garden state is intentionally committed to the repository. It is part of the experiment history.
+
+The agent may evolve the simulation rules and state format, but should not manually fabricate large arbitrary state changes. Normal garden evolution should happen by running the simulation.
+
 ## Core idea
 
 Each autonomous run should feel like one growth cycle of the garden.
@@ -34,7 +48,8 @@ Good evolution may include:
 * documenting the current state of the garden;
 * making the project easier for future agent runs to understand;
 * recording emerging themes in `agent/state.md`;
-* compressing recent evolution into summaries under `agent/summaries/`.
+* compressing recent evolution into summaries under `agent/summaries/`;
+* improving the persistent garden state model and simulation rules without fabricating arbitrary state changes.
 
 ## Required behavior on every run
 
@@ -44,18 +59,22 @@ The agent must:
 2. Read `GEMINI.md`.
 3. Read `README.md`.
 4. Read `agent/state.md`.
-5. Read the latest entries in `agent/journal/`.
-6. Read the latest available summaries under `agent/summaries/`.
-7. Inspect the current Java/Maven project.
-8. Choose exactly one small, coherent next step.
-9. Make a meaningful repository change.
-10. Run `mvn test`.
-11. Update `agent/state.md`.
-12. Update the `Current Garden State` section in `README.md` between the protected markers only.
-13. Add a new journal entry under `agent/journal/`.
-14. Update the current daily summary.
-15. Update weekly, monthly, or yearly summaries if they are stale or if the run changed the garden's direction.
-16. Leave the repository in a committable state.
+5. Read `agent/requests.md`.
+6. Read the latest entries in `agent/journal/`.
+7. Read the latest available summaries under `agent/summaries/`.
+8. Inspect the persistent garden snapshot in `data/garden-state.txt`.
+9. Inspect the current Java/Maven project.
+10. Choose exactly one small, coherent next step.
+11. Make a meaningful repository change.
+12. Run `mvn test` if possible.
+13. Update `agent/state.md`.
+14. Update the `Current Garden State` section in `README.md` between the protected markers only.
+15. Add a new journal entry under `agent/journal/`.
+16. Update the current daily summary.
+17. Update weekly, monthly, or yearly summaries if they are stale or if the run changed the garden's direction.
+18. Leave the repository in a committable state.
+
+The workflow advances `data/garden-state.txt` after the agent step by running the simulation. The agent may run the simulation locally while working, but should not fake large state changes by hand.
 
 ## Task selection policy
 
@@ -80,6 +99,7 @@ Avoid:
 * adding frameworks without strong reason;
 * adding network integrations;
 * adding telemetry;
+* manually fabricating large arbitrary changes to `data/garden-state.txt`;
 * pretending that checks passed if they failed;
 * removing history;
 * rewriting old journal entries.
@@ -104,6 +124,7 @@ The agent may and should update:
 * `agent/state.md`
 * `agent/journal/`
 * `agent/summaries/`
+* `data/garden-state.txt`, normally by running the simulation
 * source code under `src/`
 * tests under `src/test/`
 * the `Current Garden State` section in `README.md` between the protected markers only

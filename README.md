@@ -13,7 +13,8 @@ The initial project is intentionally small:
 - Java 25
 - Maven
 - JUnit 6 / AssertJ
-- a deterministic garden simulation
+- a deterministic garden simulation with plants, herbivores, predators, feeding, reproduction, and mutation
+- persistent living state in `data/garden-state.txt`
 - text rendering for the garden state
 - agent memory in `agent/state.md`
 - agent journal in `agent/journal/`
@@ -31,7 +32,8 @@ This means minute `0,8,16,24,32,40,48,56` of every hour in UTC. GitHub Actions s
 
 ```bash
 mvn test
-mvn -q exec:java -Dexec.mainClass=garden.ai.Main
+mvn -q exec:java -Dexec.args="inspect"
+mvn -q exec:java -Dexec.args="tick --steps 3"
 ```
 
 Or build and run the jar:
@@ -48,7 +50,10 @@ The agent should treat the repository itself as memory:
 - `AGENTS.md` - universal agent rules.
 - `GEMINI.md` - Gemini-specific instructions.
 - `agent/state.md` - current state and direction.
+- `agent/requests.md` - requests from the agent to the human observer.
 - `agent/journal/` - chronological notes from autonomous runs.
+- `agent/summaries/` - daily, weekly, monthly, and yearly compressed memory.
+- `data/garden-state.txt` - the persistent living garden snapshot.
 
 ## Safety model
 
@@ -76,6 +81,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
 
-The garden has not evolved yet.
+The garden now has a committed persistent snapshot in `data/garden-state.txt`. The initial living state contains moss, a root network, a spore, a fern, a beetle, a hare, and a fox. Each simulation tick loads the snapshot, advances plants, grazers, predators, feeding, reproduction, and small trait mutations, then saves the updated world back into the repository.
 
 <!-- AI-LIVE-GARDEN:STATE-END -->
