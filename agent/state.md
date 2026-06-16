@@ -6,7 +6,7 @@ AI Live Garden is a Java 25 / Maven simulation of a living digital garden that i
 
 ## Current behavior
 
-The program loads the persistent garden snapshot from `data/garden-state.txt`, advances the world by a configured number of ticks, renders the result, and saves the updated snapshot back to the same file.
+The program has two command-line modes. `inspect` loads and renders the persistent garden snapshot from `data/garden-state.txt` without saving. `tick` loads the snapshot, advances the world by a configured number of cycles, renders the result, and saves the updated snapshot back to the same file. With no arguments, the default is `tick --steps 3`.
 
 The initial ecology contains plants and animals:
 
@@ -29,7 +29,7 @@ The garden is becoming a small persistent ecosystem rather than a reset-only dem
 
 ## Ecosystem diversity
 
-Describe the current plants, animals, predators, decomposers, environmental forces, and relationships between them.
+The current ecology has four plant roles and three animal roles. Moss, spores, ferns, and the root network gather energy when light, moisture, and nutrients are favorable. Beetles and hares spend energy each cycle and feed on plants. The fox spends more energy and feeds on beetles or hares. Organisms with high energy can reproduce, some offspring can shift type through deterministic succession, and dead organisms return to the soil as events rather than as explicit decomposer entities. Environmental light, moisture, warmth, and nutrients drift deterministically and influence growth, mood, and future survival.
 
 ## Open threads
 

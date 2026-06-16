@@ -43,11 +43,13 @@ mvn package
 java -jar target/ai-live-garden-0.1.0-SNAPSHOT.jar
 ```
 
+With no arguments, the jar uses the default `tick --steps 3` behavior and writes the updated snapshot to `data/garden-state.txt`.
+
 ## Java code map
 
 The Java implementation is deliberately small and dependency-light:
 
-- `Main` is the command-line entry point. It supports `inspect` to render the current snapshot without saving, and `tick` to advance and persist the garden. Use `--steps N` to control cycle count and `--state path/to/file` to use an alternate snapshot.
+- `Main` is the command-line entry point. It supports `inspect` to render the current snapshot without saving, and `tick` to advance and persist the garden. The default mode is `tick --steps 3`. Use `--steps N` or a bare numeric argument to control cycle count, and `--state path/to/file` to use an alternate snapshot.
 - `Garden` is the immutable world snapshot and owns the ecosystem rules for each cycle: environmental drift, passive growth/metabolism, feeding, death, reproduction, mutation, and event trimming.
 - `Organism`, `OrganismType`, `Environment`, and `GardenEvent` are the core value model. They keep state validation close to the data and expose small helper methods used by the simulation rules.
 - `Simulation` advances either the seed garden or an existing loaded garden for a fixed number of cycles.
@@ -92,6 +94,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
 
-The garden now has a committed persistent snapshot in `data/garden-state.txt`. The initial living state contains moss, a root network, a spore, a fern, a beetle, a hare, and a fox. Each simulation tick loads the snapshot, advances plants, grazers, predators, feeding, reproduction, and small trait mutations, then saves the updated world back into the repository.
+The garden has a committed persistent snapshot in `data/garden-state.txt`. The current living state contains moss, a root network, a spore, a fern, a beetle, a hare, and a fox. Each simulation tick loads the snapshot, advances plants, grazers, predators, environmental drift, feeding, reproduction, and small trait mutations, then saves the updated world back into the repository.
 
 <!-- AI-LIVE-GARDEN:STATE-END -->
