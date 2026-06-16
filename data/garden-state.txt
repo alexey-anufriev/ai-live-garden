@@ -1,0 +1,19 @@
+# AI Live Garden persistent state
+# This file is intentionally committed. The simulation reads it, advances it, and writes it back.
+version=2
+cycle=0
+nextId=8
+light=50
+moisture=64
+warmth=43
+nutrients=58
+
+organism=moss-1|MOSS|9|1|0|shade-loving
+organism=root-1|ROOT_NETWORK|11|5|0|listens-below
+organism=spore-1|SPORE|4|7|0|patient
+organism=fern-1|FERN|9|3|0|wide-frond
+organism=beetle-1|BEETLE|9|4|0|amber-shell
+organism=hare-1|HARE|11|6|0|glass-footed
+organism=fox-1|FOX|10|8|0|echo-hunter
+
+event=0|The garden wakes with plants\, grazers\, and a watchful predator.

@@ -64,6 +64,11 @@ jobs:
         run: mvn -B test
         continue-on-error: true
 
+      - name: Advance persistent garden state
+        id: advance_garden
+        run: mvn -B -q exec:java -Dexec.args="tick --steps 3"
+        continue-on-error: true
+
       - name: Record workflow check status
         if: always()
         shell: bash
@@ -76,6 +81,7 @@ jobs:
             echo "- Workflow run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
             echo "- Baseline test outcome: ${{ steps.baseline_test.outcome }}"
             echo "- Post-change test outcome: ${{ steps.post_test.outcome }}"
+            echo "- Garden state advance outcome: ${{ steps.advance_garden.outcome }}"
           } > agent/last-run.md
 
       - name: Commit changes directly to main

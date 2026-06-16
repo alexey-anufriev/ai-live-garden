@@ -6,13 +6,17 @@ public final class Simulation {
     }
 
     public static Garden run(int cycles) {
+        return advance(Garden.seed(), cycles);
+    }
+
+    public static Garden advance(Garden garden, int cycles) {
         if (cycles < 0) {
             throw new IllegalArgumentException("cycles must not be negative");
         }
-        Garden garden = Garden.seed();
+        Garden current = garden;
         for (int i = 0; i < cycles; i++) {
-            garden = garden.nextCycle();
+            current = current.nextCycle();
         }
-        return garden;
+        return current;
     }
 }

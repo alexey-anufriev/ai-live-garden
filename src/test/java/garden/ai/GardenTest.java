@@ -1,27 +1,55 @@
 package garden.ai;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
+import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class GardenTest {
 
     @Test
-    void seedGardenStartsWithThreeOrganisms() {
+    void seedGardenStartsWithPlantsAndAnimals() {
         Garden garden = Garden.seed();
 
         assertThat(garden.cycle()).isZero();
-        assertThat(garden.organisms().size()).isEqualTo(3);
+        assertThat(garden.organisms()).hasSize(7);
+        assertThat(garden.plantCount()).isGreaterThan(0);
+        assertThat(garden.animalCount()).isGreaterThan(0);
         assertThat(garden.events()).isNotEmpty();
     }
 
     @Test
-    void nextCycleAdvancesGardenAndKeepsOrganisms() {
+    void nextCycleAdvancesPersistentWorldAndKeepsItAlive() {
         Garden garden = Garden.seed().nextCycle();
 
         assertThat(garden.cycle()).isEqualTo(1);
-        assertThat(garden.organisms().size()).isEqualTo(3);
+        assertThat(garden.organisms()).isNotEmpty();
         assertThat(garden.events()).anySatisfy(event -> assertThat(event.cycle()).isEqualTo(1));
+    }
+
+    @Test
+    void simulationCanContinueFromExistingGarden() {
+        Garden garden = Simulation.advance(Garden.seed(), 3);
+        Garden continued = Simulation.advance(garden, 2);
+
+        assertThat(continued.cycle()).isEqualTo(5);
+        assertThat(continued.organisms()).isNotEmpty();
+    }
+
+    @Test
+    void stateStoreRoundTripsGarden(@TempDir Path tempDir) {
+        Path stateFile = tempDir.resolve("garden-state.txt");
+        Garden original = Simulation.advance(Garden.seed(), 2);
+
+        GardenStateStore.save(stateFile, original);
+        Garden loaded = GardenStateStore.loadOrCreate(stateFile);
+
+        assertThat(loaded.cycle()).isEqualTo(original.cycle());
+        assertThat(loaded.nextId()).isEqualTo(original.nextId());
+        assertThat(loaded.environment()).isEqualTo(original.environment());
+        assertThat(loaded.organisms()).hasSameSizeAs(original.organisms());
     }
 
     @Test
@@ -31,6 +59,8 @@ class GardenTest {
 
         assertThat(rendered).contains("AI Live Garden");
         assertThat(rendered).contains("Cycle: 2");
+        assertThat(rendered).contains("Environment:");
+        assertThat(rendered).contains("Balance:");
         assertThat(rendered).contains("Organisms:");
         assertThat(rendered).contains("Recent events:");
     }

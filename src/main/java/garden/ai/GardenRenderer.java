@@ -15,7 +15,7 @@ public final class GardenRenderer {
                 .collect(Collectors.joining(System.lineSeparator()));
 
         String recentEvents = garden.events().stream()
-                .skip(Math.max(0, garden.events().size() - 5))
+                .skip(Math.max(0, garden.events().size() - 8))
                 .map(event -> "- cycle %d: %s".formatted(event.cycle(), event.description()))
                 .collect(Collectors.joining(System.lineSeparator()));
 
@@ -24,7 +24,8 @@ public final class GardenRenderer {
                 ==============
 
                 Cycle: %d
-                Environment: light=%d moisture=%d warmth=%d mood=%s
+                Environment: light=%d moisture=%d warmth=%d nutrients=%d mood=%s
+                Balance: plants=%d animals=%d total=%d
 
                 Organisms:
                 %s
@@ -36,7 +37,11 @@ public final class GardenRenderer {
                 garden.environment().light(),
                 garden.environment().moisture(),
                 garden.environment().warmth(),
+                garden.environment().nutrients(),
                 garden.environment().mood(),
+                garden.plantCount(),
+                garden.animalCount(),
+                garden.organisms().size(),
                 organisms,
                 recentEvents
         );
