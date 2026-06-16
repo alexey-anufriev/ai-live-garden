@@ -3,14 +3,24 @@ package garden.ai;
 import java.nio.file.Path;
 
 /**
- * Command-line entry point for inspecting or advancing the persistent garden.
+ * Command-line entry point for inspecting or advancing the persistent garden state.
  *
- * <p>Supported forms include:
+ * <p>Supported commands:
  * <pre>{@code
  * inspect
+ * tick
  * tick --steps 3
+ * tick 5
  * tick --state data/garden-state.txt
+ * tick --steps 10 --state data/garden-state.txt
  * }</pre>
+ *
+ * <p>When no arguments are provided, the command defaults to {@code tick --steps 3}.
+ * The {@code inspect} command reads and renders the current garden without changing it.
+ * The {@code tick} command loads the current state, advances the simulation, and saves
+ * the updated state back to disk.
+ *
+ * @param args command-line arguments controlling the command, step count, and state file
  */
 public final class Main {
 
