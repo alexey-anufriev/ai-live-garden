@@ -1,0 +1,94 @@
+name: Autonomous Live Garden
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/8 * * * *"
+
+concurrency:
+  group: ai-live-garden-main
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  evolve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 42
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "25"
+          cache: maven
+
+      - name: Baseline test
+        id: baseline_test
+        run: mvn -B test
+        continue-on-error: true
+
+      - name: Build Gemini prompt
+        id: gemini_prompt
+        shell: bash
+        run: |
+          {
+            echo 'text<<EOF'
+            cat .github/gemini/autonomous-run.md
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Run Gemini autonomous step
+        id: gemini
+        uses: google-github-actions/run-gemini-cli@v0.1.22
+        with:
+          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+          prompt: ${{ steps.gemini_prompt.outputs.text }}
+          upload_artifacts: true
+
+      - name: Restore protected files
+        shell: bash
+        run: |
+          git restore AGENTS.md GEMINI.md .github || true
+          git clean -fd .github || true
+
+      - name: Test after Gemini changes
+        id: post_test
+        run: mvn -B test
+        continue-on-error: true
+
+      - name: Record workflow check status
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p agent
+          {
+            echo "# Last Autonomous Workflow Run"
+            echo
+            echo "- UTC: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo "- Workflow run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo "- Baseline test outcome: ${{ steps.baseline_test.outcome }}"
+            echo "- Post-change test outcome: ${{ steps.post_test.outcome }}"
+          } > agent/last-run.md
+
+      - name: Commit changes directly to main
+        if: always()
+        shell: bash
+        run: |
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git config user.name "ai-live-garden[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add .
+            git commit -m "feat: autonomous garden evolution $(date -u +'%Y-%m-%dT%H:%MZ')"
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          else
+            echo "No changes to commit."
+          fi
