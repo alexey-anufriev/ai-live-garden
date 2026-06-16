@@ -94,6 +94,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
 
-The garden has a committed persistent snapshot in `data/garden-state.txt`. The current living state contains moss, a root network, a spore, a fern, a beetle, a hare, and a fox. Each simulation tick loads the snapshot, advances plants, grazers, predators, environmental drift, feeding, reproduction, and small trait mutations, then saves the updated world back into the repository.
+The garden has a committed persistent snapshot in `data/garden-state.txt`. The committed living snapshot began as a small ecology with moss, a root network, a spore, a fern, a beetle, a hare, and a fox. Future ticks may change the population through feeding, reproduction, death, and mutation. Each simulation tick loads the snapshot, advances plants, grazers, predators, environmental drift, feeding, reproduction, and small trait mutations, then saves the updated world back into the repository.
 
 <!-- AI-LIVE-GARDEN:STATE-END -->
