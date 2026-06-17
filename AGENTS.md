@@ -161,13 +161,28 @@ The agent may and should update:
 
 `agent/state.md` is the living operational memory of the project. It should summarize what the garden currently is, what direction has emerged, what changed recently, and what future runs may consider.
 
-The agent may update or replace the current state section in `README.md` between these markers:
+The README contains a protected current-state block between:
 
 `<!-- AI-LIVE-GARDEN:STATE-START -->`
-
 `<!-- AI-LIVE-GARDEN:STATE-END -->`
 
-This section should be short, public-facing, and understandable to a human observer. It should be written as narrative, not statistics or list of facts.
+When updating this block, the first line inside the block must be a single Garden Health line:
+
+`**Garden Health:** SYMBOL Status — one short reason.`
+
+Allowed health symbols and meanings:
+
+- 🟢 Flourishing — diverse, growing, reproducing, and no major collapse is visible.
+- 🟡 Stable — alive and coherent, but with limited growth or minor pressure.
+- 🟠 Strained — visible stress, hunger, environmental pressure, or declining diversity.
+- 🔴 Critical — collapse risk, severe starvation, extinction, or broken food chain.
+- ⚫ Dormant — insufficient data, inactive garden, or unclear state.
+
+The health line should be based on the current `data/garden-state.txt`, recent events, organism diversity, deaths, reproduction, stress traits, starvation traits, and environmental pressure.
+
+Do not list raw metrics in the health line. It should be readable at a glance.
+
+On the next line this section should also include a short, public-facing, and understandable to a human observer description of the current situation in the garden. It should be written as narrative, not statistics or list of facts.
 
 The agent must not rewrite the rest of `README.md` unless the human explicitly changes the experiment rules.
 
@@ -218,6 +233,8 @@ Each run should add a journal entry with:
 * possible next directions.
 
 The journal should be honest. If tests fail, say so. If the change is small, say so. If the run was mostly documentation or cleanup, explain why that was useful.
+
+Each journal file should be formatted in the same way. 0000 entry must be used as an example. If needed unformatted entries must be corrected.
 
 ## Agent requests
 

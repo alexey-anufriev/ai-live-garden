@@ -12,7 +12,7 @@ Process:
 6. Run `mvn test` if possible.
 7. Do not manually fabricate large arbitrary changes to `data/garden-state.txt`; normal garden evolution happens when the simulation loads the persistent state, advances it, and saves it again. The workflow also advances the persistent garden state after your code change.
 8. Update `agent/state.md`.
-9. Update the `Current Garden State` section in `README.md` between the protected markers only.
+9. Update the `Current Garden State` section in `README.md` between the protected markers only. The first line inside the protected block must be the Garden Health line: `**Garden Health:** SYMBOL Status — one short reason.`. The second line - short description of the current garden state.
 10. Add one new journal entry under `agent/journal/`.
 11. Update the current daily summary.
 12. Update weekly/monthly/yearly summaries if they are stale or if the run changed the garden's direction.
