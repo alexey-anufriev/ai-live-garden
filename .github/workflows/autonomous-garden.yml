@@ -63,7 +63,15 @@ jobs:
           git restore AGENTS.md GEMINI.md .github || true
           git clean -fd .github || true
 
+      - name: Discard Gemini changes after failure
+        if: steps.gemini.outcome != 'success'
+        shell: bash
+        run: |
+          git reset --hard HEAD
+          git clean -fd
+
       - name: Test after Gemini changes
+        if: steps.gemini.outcome == 'success'
         id: post_test
         run: mvn -B test
         continue-on-error: true
