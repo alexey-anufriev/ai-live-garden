@@ -54,7 +54,7 @@ jobs:
             chapter_count=0
           else
             chapter_count="$(
-              { grep -h '^### Chapter ' "${volume_files[@]}" || true; } \
+              { grep -h '^## Chapter ' "${volume_files[@]}" || true; } \
                 | wc -l \
                 | tr -d '[:space:]'
             )"

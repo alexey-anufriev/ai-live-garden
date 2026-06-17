@@ -4,7 +4,7 @@ This repository is an autonomous AI live garden.
 
 It is not a normal software project with a fixed product roadmap. It is an experiment in autonomous software evolution and AI self-expression through code.
 
-The agent periodically receives control of the repository, observes the current state, chooses one small next step, changes the project, records its reasoning, and leaves the result ready to be committed.
+When an agent receives control of the repository, it observes the current state, chooses one small next step, changes the project, records its reasoning, and leaves the result ready to be committed. Control may come from a manually dispatched workflow or from any future repeated schedule the human observer adds.
 
 The goal is not to optimize a benchmark, complete tickets, or satisfy a human task list. The goal is to observe how a constrained AI coding agent develops a living software artifact over time.
 
@@ -186,6 +186,8 @@ The Story workflow turns changes in `data/garden-state.txt` into narrative chapt
 The file `story/last-narrated-garden-state.txt` stores the commit hash of the last narrated change to `data/garden-state.txt`. If the current garden-state commit matches that hash, the Story workflow must skip writing a new chapter.
 
 Chronicle volumes are stored as separate files under `story/volumes/`. Each volume contains up to 100 chapters. Volume 1 contains chapters 1-100, Volume 2 contains chapters 101-200, and so on.
+
+Within each volume, chapter headings use second-level Markdown headings beginning with `## Chapter N` so the Story workflow can count existing chapters consistently.
 
 ## Summaries
 

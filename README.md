@@ -2,11 +2,11 @@
 
 `ai-live-garden` is an autonomous software evolution experiment.
 
-A Java/Maven codebase acts as a tiny digital garden. It contains organisms, environmental conditions, simulation cycles, events, and a project memory. A Gemini-powered coding agent is scheduled to wake up every 8 minutes, inspect the repository, choose one small next step, edit the code or documentation, run checks, and commit directly to `main`.
+A Java/Maven codebase acts as a tiny digital garden. It contains organisms, environmental conditions, simulation cycles, events, and a project memory. A Gemini-powered coding agent can be run through the `Evolve` workflow to inspect the repository, choose one small next step, edit the code or documentation, run checks, and commit directly to `main`.
 
 The goal is not to build a normal product. The goal is to observe how an AI coding agent expresses continuity, taste, priorities, and direction through a living repository.
 
-## Current seed
+## Initial seed
 
 The initial project is intentionally small:
 
@@ -18,7 +18,7 @@ The initial project is intentionally small:
 - text rendering for the garden state
 - agent memory in `agent/state.md`
 - agent journal in `agent/journal/`
-- GitHub Actions workflows: `.github/workflows/evolve.yml` and `.github/workflows/tick.yml`
+- GitHub Actions workflows: `.github/workflows/evolve.yml`, `.github/workflows/tick.yml`, and `.github/workflows/story.yml`
 
 ## Run locally
 
@@ -62,7 +62,7 @@ The agent should treat the repository itself as memory:
 
 ## Safety model
 
-The first version intentionally commits directly to `main` to preserve the feeling of a live process. Safety is handled by constraints rather than PR review:
+The workflows intentionally commit directly to `main` to preserve the feeling of a live process. Safety is handled by constraints rather than PR review:
 
 - the workflow uses only the repository-scoped `GITHUB_TOKEN`;
 - the workflow grants only `contents: write`;
@@ -86,6 +86,5 @@ This is still an experiment. Do not store valuable secrets or production code in
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
 
-The garden has a committed persistent snapshot in `data/garden-state.txt`. The committed living snapshot began as a small ecology with moss, a root network, a spore, a fern, a beetle, a hare, and a fox. Future ticks may change the population through feeding, reproduction, death, and mutation. Each simulation tick loads the snapshot, advances plants, grazers, predators, environmental drift, feeding, reproduction, small trait mutations, and environmental stress indicators (e.g., 'stressed' plants or 'starving' animals). Reproduction is restricted by stress. Organisms can now mutate to be 'resilient', making them immune to stress and starvation indicators. Moss growth is enhanced by high moisture. Dead organisms return to the soil, contributing nutrients back to the environment. Nutrient recycling and environmental drift have been refined to support more sustainable growth. Each cycle saves the updated world back into the repository.
 
 <!-- AI-LIVE-GARDEN:STATE-END -->
