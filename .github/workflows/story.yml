@@ -1,9 +1,9 @@
 name: Story
 
 on:
-  workflow_dispatch:
   schedule:
-    - cron: "57 21 * * *"
+    - cron: '57 21 * * *'
+  workflow_dispatch:
 
 concurrency:
   group: ai-live-garden-main
