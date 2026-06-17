@@ -69,6 +69,9 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         long rootNetworkCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK).count();
         Environment nextEnvironment = environment.next(nextCycle, (int) plantCount, (int) animalCount, (int) rootNetworkCount);
         List<GardenEvent> nextEvents = new ArrayList<>(events);
+        if (nextEnvironment.nutrients() < environment.nutrients()) {
+            nextEvents.add(new GardenEvent(nextCycle, "Nutrients are depleted by the plant population."));
+        }
         List<Organism> changed = organisms.stream()
                 .map(organism -> passiveChange(organism, nextEnvironment, nextCycle, nextEvents))
                 .collect(java.util.stream.Collectors.toCollection(ArrayList::new));

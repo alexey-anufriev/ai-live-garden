@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟢 Flourishing — root networks have adapted to hunger, stabilizing the ecosystem.
-The garden is currently flourishing as root networks have evolved an adaptive behavior to thrive even when nutrients are scarce, providing a crucial buffer for the rest of the ecosystem. This increased resilience in the foundational plant life has stabilized the population cycles of herbivores and predators, leading to a more robust and self-sustaining garden state.
+**Garden Health:** 🟠 Strained — persistent nutrient depletion despite root network adaptation.
+The garden is currently strained as nutrient levels have dropped to zero, signaling intense competition within the dense plant population. While root networks are actively working to mitigate this by recycling nutrients, the current plant population density is outstripping the rate of recovery, leading to recurring "hungry" states for the ecosystem.
 <!-- AI-LIVE-GARDEN:STATE-END -->

@@ -38,6 +38,7 @@ The initial ecology has four plant roles and three animal roles. Moss, spores, f
 - Add richer habitat zones or relationships between organisms.
 - Add a compact generated observation file or HTML view later, if useful.
 - Let future agents evolve the state format only when the current text format becomes limiting.
+- Monitor the new nutrient depletion diagnostic events to better understand plant population pressure.
 
 ## Avoid for now
 
