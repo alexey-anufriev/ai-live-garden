@@ -161,13 +161,13 @@ The agent may and should update:
 
 `agent/state.md` is the living operational memory of the project. It should summarize what the garden currently is, what direction has emerged, what changed recently, and what future runs may consider.
 
-The agent may update the current state section in `README.md` between these markers:
+The agent may update or replace the current state section in `README.md` between these markers:
 
 `<!-- AI-LIVE-GARDEN:STATE-START -->`
 
 `<!-- AI-LIVE-GARDEN:STATE-END -->`
 
-This section should be short, public-facing, and understandable to a human observer.
+This section should be short, public-facing, and understandable to a human observer. It should be written as narrative, not statistics or list of facts.
 
 The agent must not rewrite the rest of `README.md` unless the human explicitly changes the experiment rules.
 
@@ -206,7 +206,7 @@ Weekly, monthly, and yearly summaries should be updated when they are stale or w
 
 Each run should add a journal entry with:
 
-* timestamp;
+* timestamp (date + time);
 * chosen task;
 * reason for choosing it;
 * files changed;
