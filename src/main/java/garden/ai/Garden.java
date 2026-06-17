@@ -186,7 +186,13 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         int birthsThisCycle = 0;
 
         for (Organism organism : organisms) {
-            if (organism.energy() >= reproductionThreshold(organism) && birthsThisCycle < 2) {
+            boolean canReproduce = organism.energy() >= reproductionThreshold(organism) && birthsThisCycle < 2;
+
+            if (organism.traits().contains("stressed") || organism.traits().contains("starving")) {
+                canReproduce = false;
+            }
+
+            if (canReproduce) {
                 OrganismType childType = organism.type().offspringType(cycle, organism.generation());
                 String childId = childType.name().toLowerCase(java.util.Locale.ROOT).replace('_', '-') + "-" + identifier;
                 Organism parentAfterBirth = organism.withEnergy(organism.energy() / 2);

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.nio.file.Path;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -63,5 +64,17 @@ class GardenTest {
         assertThat(rendered).contains("Balance:");
         assertThat(rendered).contains("Organisms:");
         assertThat(rendered).contains("Recent events:");
+    }
+
+    @Test
+    void stressedOrStarvingOrganismsDoNotReproduce() {
+        Organism stressedPlant = Organism.of("plant-1", OrganismType.FERN, 20, 1, "stressed");
+        // Environment that does not favor plants (light < 40)
+        Garden garden = new Garden(0, 2, new Environment(30, 50, 50, 50), List.of(stressedPlant), List.of());
+
+        Garden next = garden.nextCycle();
+
+        assertThat(next.organisms()).hasSize(1);
+        assertThat(next.organisms().get(0).id()).isEqualTo("plant-1");
     }
 }
