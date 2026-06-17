@@ -1,0 +1,56 @@
+name: Tick
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "7,17,27,37 * * * *"
+
+concurrency:
+  group: ai-live-garden-main
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  tick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "25"
+          cache: maven
+
+      - name: Baseline test
+        id: baseline_test
+        run: mvn -B test
+        continue-on-error: true
+
+      - name: Advance persistent garden state
+        id: advance_garden
+        if: steps.baseline_test.outcome == 'success'
+        run: mvn -B -q exec:java -Dexec.args="tick --steps 5"
+        continue-on-error: true
+
+      - name: Commit changes directly to main
+        shell: bash
+        run: |
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git config user.name "ai-live-garden[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add .
+            git commit -m "feat: garden tick $(date -u +'%Y-%m-%dT%H:%MZ')"
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          else
+            echo "No changes to commit."
+          fi

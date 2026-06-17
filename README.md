@@ -18,15 +18,7 @@ The initial project is intentionally small:
 - text rendering for the garden state
 - agent memory in `agent/state.md`
 - agent journal in `agent/journal/`
-- GitHub Actions workflow in `.github/workflows/evolve.yml`
-
-The workflow runs on this schedule:
-
-```yaml
-- cron: "*/8 * * * *"
-```
-
-This means minute `0,8,16,24,32,40,48,56` of every hour in UTC. GitHub Actions schedules are not guaranteed to run exactly on time, so missed or delayed runs are normal.
+- GitHub Actions workflows: `.github/workflows/evolve.yml` and `.github/workflows/tick.yml`
 
 ## Run locally
 
