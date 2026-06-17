@@ -29,7 +29,7 @@ The garden is becoming a small persistent ecosystem rather than a reset-only dem
 
 ## Ecosystem diversity
 
-The current ecology has four plant roles and three animal roles. Moss, spores, ferns, and the root network gather energy when light, moisture, and nutrients are favorable. Beetles and hares spend energy each cycle and feed on plants. The fox spends more energy and feeds on beetles or hares. Organisms with high energy can reproduce, some offspring can shift type through deterministic succession, and dead organisms return to the soil as events rather than as explicit decomposer entities. Environmental light, moisture, warmth, and nutrients drift deterministically and influence growth, mood, and future survival.
+The current ecology has four plant roles and three animal roles. Moss, spores, ferns, and the root network gather energy when light, moisture, and nutrients are favorable. Moss now grows more efficiently in high moisture. Beetles and hares spend energy each cycle and feed on plants. The fox spends more energy and feeds on beetles or hares. Organisms with high energy can reproduce, some offspring can shift type through deterministic succession, and dead organisms return to the soil as events rather than as explicit decomposer entities. Environmental light, moisture, warmth, and nutrients drift deterministically and influence growth, mood, and future survival.
 
 ## Open threads
 

@@ -77,4 +77,17 @@ class GardenTest {
         assertThat(next.organisms()).hasSize(1);
         assertThat(next.organisms().get(0).id()).isEqualTo("plant-1");
     }
+
+    @Test
+    void mossGrowsFasterInHighMoisture() {
+        Organism moss = Organism.of("moss-1", OrganismType.MOSS, 10, 1, "test");
+        // Environment that favors plants (default 50) and high moisture (70)
+        Environment env = new Environment(50, 70, 50, 50);
+        Garden garden = new Garden(0, 2, env, List.of(moss), List.of());
+
+        Garden next = garden.nextCycle();
+
+        // Passive change growth: 2 (favorsPlants) + 1 (moisture > 60) = 3
+        assertThat(next.organisms().get(0).energy()).isEqualTo(13);
+    }
 }
