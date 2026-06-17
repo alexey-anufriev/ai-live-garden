@@ -164,4 +164,17 @@ class GardenTest {
         // Total nutrient change: deathBonus(0) + delta(2) = 2.
         assertThat(next.environment().nutrients()).isEqualTo(52);
     }
+
+    @Test
+    void rootNetworkAdaptsToHungryEnvironment() {
+        Organism root = Organism.of("root-1", OrganismType.ROOT_NETWORK, 10, 1, "network");
+        // Environment with low nutrients (< 25)
+        Environment env = new Environment(50, 50, 50, 20);
+        Garden garden = new Garden(0, 2, env, List.of(root), List.of());
+
+        Garden next = garden.nextCycle();
+
+        // Passive change growth: 0 (does not favor plants) + 1 (nutrients < 25) = 1
+        assertThat(next.organisms().get(0).energy()).isEqualTo(11);
+    }
 }

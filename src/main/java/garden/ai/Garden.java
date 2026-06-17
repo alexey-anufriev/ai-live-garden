@@ -115,6 +115,9 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             if (organism.type() == OrganismType.ROOT_NETWORK && environment.nutrients() > 45) {
                 growth += 1;
             }
+            if (organism.type() == OrganismType.ROOT_NETWORK && environment.nutrients() < 25) {
+                growth += 1;
+            }
             if (organism.type() == OrganismType.MOSS && environment.moisture() > 60) {
                 growth += 1;
             }
