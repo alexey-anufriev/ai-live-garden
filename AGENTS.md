@@ -173,6 +173,18 @@ The agent must not rewrite the rest of `README.md` unless the human explicitly c
 
 `agent/journal/` is append-only history. Do not delete, rename, or rewrite previous journal entries.
 
+## Narrative chronicle
+
+The repository may contain a narrative chronicle under `story/`.
+
+The chronicle is maintained by the Story workflow, not by the normal Evolve workflow.
+
+The Evolve agent may read the chronicle for continuity, but must not modify files under `story/`.
+
+The Story workflow turns changes in `data/garden-state.txt` into narrative chapters grounded in actual garden events.
+
+The file `story/last-narrated-garden-state.txt` stores the commit hash of the last narrated change to `data/garden-state.txt`. If the current garden-state commit matches that hash, the Story workflow must skip writing a new chapter.
+
 ## Summaries
 
 The agent may update rolling summaries:

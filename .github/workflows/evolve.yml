@@ -60,8 +60,8 @@ jobs:
       - name: Restore protected files
         shell: bash
         run: |
-          git restore AGENTS.md GEMINI.md .github || true
-          git clean -fd .github || true
+          git restore AGENTS.md GEMINI.md .github story || true
+          git clean -fd .github story || true
 
       - name: Discard Gemini changes after failure
         if: steps.gemini.outcome != 'success'

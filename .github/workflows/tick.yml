@@ -3,7 +3,7 @@ name: Tick
 on:
   workflow_dispatch:
   schedule:
-    - cron: "7,17,27,37 * * * *"
+    - cron: "17,27,37 * * * *"
 
 concurrency:
   group: ai-live-garden-main

@@ -1,0 +1,160 @@
+name: Story
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "57 21 * * *"
+
+concurrency:
+  group: ai-live-garden-main
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  story:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Prepare story context
+        id: story_context
+        shell: bash
+        run: |
+          mkdir -p story
+
+          current_state_commit="$(git log -1 --format=%H -- data/garden-state.txt)"
+
+          if [[ -f story/last-narrated-garden-state.txt ]]; then
+            last_narrated_commit="$(cat story/last-narrated-garden-state.txt | tr -d '[:space:]')"
+          else
+            last_narrated_commit=""
+          fi
+
+          echo "Current garden-state commit: $current_state_commit"
+          echo "Last narrated garden-state commit: ${last_narrated_commit:-none}"
+
+          if [[ -n "$last_narrated_commit" && "$last_narrated_commit" == "$current_state_commit" ]]; then
+            echo "No new garden-state commit to narrate."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+          echo "current_state_commit=$current_state_commit" >> "$GITHUB_OUTPUT"
+
+          chapter_count="$(grep -c '^## Chapter ' story/chronicles-of-ai-garden.md || true)"
+          next_chapter=$((chapter_count + 1))
+
+          echo "next_chapter=$next_chapter" >> "$GITHUB_OUTPUT"
+
+          {
+            echo "# Story Context"
+            echo
+            echo "Requested chapter number: $next_chapter"
+            echo
+            echo "The chapter title must be generated from the actual garden events."
+            echo
+
+            if [[ -n "$last_narrated_commit" ]]; then
+              echo "## Previous narrated garden snapshot"
+              echo
+              echo '```text'
+              git show "$last_narrated_commit:data/garden-state.txt" || true
+              echo '```'
+              echo
+              echo "## Garden-state diff since last narrated commit"
+              echo
+              echo '```diff'
+              git diff "$last_narrated_commit" "$current_state_commit" -- data/garden-state.txt || true
+              echo '```'
+              echo
+            else
+              echo "## Previous narrated garden snapshot"
+              echo
+              echo "No previous narrated snapshot exists. Write the opening chapter of the chronicle."
+              echo
+            fi
+
+            echo "## Current garden snapshot"
+            echo
+            echo '```text'
+            cat data/garden-state.txt
+            echo '```'
+            echo
+            echo "## Recent current events"
+            echo
+            echo '```text'
+            grep '^event=' data/garden-state.txt | tail -120 || true
+            echo '```'
+            echo
+            echo "## Existing chronicle"
+            echo
+            echo '```md'
+            cat story/chronicles-of-ai-garden.md
+            echo '```'
+          } > story/context.md
+
+          {
+            echo 'text<<EOF'
+            cat .github/gemini/daily-story.md
+            echo
+            echo
+            cat story/context.md
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Run Gemini chronicler
+        id: gemini_story
+        if: steps.story_context.outputs.skip != 'true'
+        uses: google-github-actions/run-gemini-cli@v0.1.22
+        continue-on-error: true
+        env:
+          GEMINI_CLI_TRUST_WORKSPACE: "true"
+        with:
+          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+          gemini_model: gemini-3.1-flash-lite
+          prompt: ${{ steps.story_context.outputs.text }}
+          upload_artifacts: true
+
+      - name: Restore protected files
+        if: steps.story_context.outputs.skip != 'true'
+        shell: bash
+        run: |
+          git restore AGENTS.md GEMINI.md .github data/garden-state.txt || true
+          git clean -fd .github || true
+
+      - name: Update narrated garden-state commit
+        if: steps.story_context.outputs.skip != 'true' && steps.gemini_story.outcome == 'success'
+        shell: bash
+        run: |
+          echo "${{ steps.story_context.outputs.current_state_commit }}" > story/last-narrated-garden-state.txt
+          rm -f story/context.md
+
+      - name: Discard story changes after failure
+        if: steps.story_context.outputs.skip != 'true' && steps.gemini_story.outcome != 'success'
+        shell: bash
+        run: |
+          git restore story || true
+          git clean -fd story || true
+
+      - name: Commit story
+        if: steps.story_context.outputs.skip != 'true'
+        shell: bash
+        run: |
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git config user.name "ai-live-garden[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add story
+            git commit -m "docs: extend garden chronicle $(date -u +'%Y-%m-%d')"
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          else
+            echo "No story changes to commit."
+          fi
