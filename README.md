@@ -85,6 +85,5 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-
-
+The garden is a living system where environmental pressures now govern reproduction, keeping populations in check. Organisms can adapt through a resilient trait to withstand harsh conditions, but this advantage is balanced by an increased metabolic cost, ensuring no single trait leads to total dominance in the changing ecosystem.
 <!-- AI-LIVE-GARDEN:STATE-END -->

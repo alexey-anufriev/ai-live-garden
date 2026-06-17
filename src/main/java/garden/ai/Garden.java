@@ -120,9 +120,16 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             if (organism.type() == OrganismType.SPORE && environment.light() < 45) {
                 changed = changed.withCuriosity(changed.curiosity() + 2);
             }
+            if (changed.traits().contains("resilient")) {
+                growth -= 1;
+            }
             changed = changed.withEnergy(changed.energy() + growth);
         } else {
-            changed = changed.withEnergy(changed.energy() - organism.type().metabolism())
+            int metabolism = organism.type().metabolism();
+            if (changed.traits().contains("resilient")) {
+                metabolism += 1;
+            }
+            changed = changed.withEnergy(changed.energy() - metabolism)
                     .withCuriosity(changed.curiosity() + (cycle % 4 == 0 ? 1 : 0));
         }
 

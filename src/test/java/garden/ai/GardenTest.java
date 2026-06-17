@@ -93,6 +93,28 @@ class GardenTest {
         assertThat(nextAnimal.organisms().get(0).traits()).doesNotContain("starving");
     }
 
+    @Test
+    void resilientAnimalsHaveHigherMetabolism() {
+        // HARE has metabolism 1. With resilient, should be 2.
+        Organism resilientAnimal = Organism.of("animal-1", OrganismType.HARE, 10, 1, "resilient");
+        // Environment favorable to prevent starving
+        Garden garden = new Garden(0, 2, new Environment(50, 50, 50, 50), List.of(resilientAnimal), List.of());
+        Garden next = garden.nextCycle();
+        // 10 - 2 = 8
+        assertThat(next.organisms().get(0).energy()).isEqualTo(8);
+    }
+
+    @Test
+    void resilientPlantsHaveLowerGrowth() {
+        // FERN has growth 2 (in favorable env). With resilient, should be 1.
+        Organism resilientPlant = Organism.of("plant-1", OrganismType.FERN, 10, 1, "resilient");
+        // Environment favorable for plants
+        Garden garden = new Garden(0, 2, new Environment(50, 50, 50, 50), List.of(resilientPlant), List.of());
+        Garden next = garden.nextCycle();
+        // 10 + 1 = 11
+        assertThat(next.organisms().get(0).energy()).isEqualTo(11);
+    }
+
 
     @Test
     void mossGrowsFasterInHighMoisture() {
