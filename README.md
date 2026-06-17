@@ -18,7 +18,7 @@ The initial project is intentionally small:
 - text rendering for the garden state
 - agent memory in `agent/state.md`
 - agent journal in `agent/journal/`
-- GitHub Actions workflow in `.github/workflows/autonomous-garden.yml`
+- GitHub Actions workflow in `.github/workflows/evolve.yml`
 
 The workflow runs on this schedule:
 

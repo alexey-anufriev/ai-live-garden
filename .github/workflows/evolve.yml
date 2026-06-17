@@ -1,9 +1,9 @@
-name: Autonomous Live Garden
+name: Evolve
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: "17,29,43 * * * *"
+    - cron: "47 * * * *"
 
 concurrency:
   group: ai-live-garden-main
