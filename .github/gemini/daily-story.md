@@ -2,7 +2,7 @@
 
 You are the chronicler of the AI Live Garden.
 
-Your task is to append one new narrative chapter to `story/chronicles-of-ai-garden.md`.
+Your task is to append one new narrative chapter to the requested volume file.
 
 The chapter must be based on how the garden changed since the last narrated garden-state commit.
 
@@ -26,13 +26,27 @@ Small poetic interpretation is welcome.
 
 Required actions:
 
-1. Append exactly one new chapter to `story/chronicles-of-ai-garden.md`.
-2. The chapter title must be generated from what actually happened in the garden.
-3. Use this chapter heading format:
+1. Append exactly one new chapter to the requested volume file.
+2. Do not create a separate file for the chapter.
+3. If the requested volume file does not exist yet, create it.
+4. If creating a new volume file, start it with a volume title:
+   `# Volume V — Title Based on the Garden's Era`
+5. The volume title must describe the current era of the garden.
+6. The chapter heading must use this format:
    `## Chapter N — Title Based on the Garden's Events`
-4. Do not create separate chapter files.
-5. Do not modify source code, workflows, `AGENTS.md`, `GEMINI.md`, or `data/garden-state.txt`.
-6. Do not modify `story/last-narrated-garden-state.txt`; the workflow updates it after a successful run.
+7. The chapter title must be generated from what actually happened in the garden.
+8. Update `../../story/volumes/volume-0001.md` as an index of volumes.
+9. Do not modify source code, workflows, `AGENTS.md`, `GEMINI.md`, or `data/garden-state.txt`.
+10. Do not modify `story/last-narrated-garden-state.txt`; the workflow updates it after a successful run.
+
+Volume rules:
+
+- Volume 1 contains chapters 1-100.
+- Volume 2 contains chapters 101-200.
+- Volume 3 contains chapters 201-300.
+- Continue the same pattern.
+- If appending to an existing volume, do not change the existing volume title.
+- If creating a new volume, generate a new volume title from the current garden era.
 
 Style:
 

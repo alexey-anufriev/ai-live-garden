@@ -185,6 +185,8 @@ The Story workflow turns changes in `data/garden-state.txt` into narrative chapt
 
 The file `story/last-narrated-garden-state.txt` stores the commit hash of the last narrated change to `data/garden-state.txt`. If the current garden-state commit matches that hash, the Story workflow must skip writing a new chapter.
 
+Chronicle volumes are stored as separate files under `story/volumes/`. Each volume contains up to 100 chapters. Volume 1 contains chapters 1-100, Volume 2 contains chapters 101-200, and so on.
+
 ## Summaries
 
 The agent may update rolling summaries:

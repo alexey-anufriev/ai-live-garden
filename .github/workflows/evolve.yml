@@ -1,5 +1,5 @@
 name: Evolve
-run-name: "Evolve - ${{ inputs.triggered_at || github.run_number }}"
+run-name: "Evolve - ${{ github.run_number }}"
 
 on:
   workflow_dispatch:
