@@ -72,21 +72,25 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
                 .map(organism -> passiveChange(organism, nextEnvironment, nextCycle, nextEvents))
                 .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
 
-        changed = feedingPhase(changed, nextCycle, nextEvents);
-        ReproductionResult reproduction = reproductionPhase(changed, nextCycle, nextId, nextEvents);
-        changed = reproduction.organisms();
+        FeedingResult feeding = feedingPhase(changed, nextCycle, nextEvents);
+        
+        // Add nutrients based on deaths
+        Environment environmentWithNutrients = nextEnvironment.withNutrients(feeding.deaths());
+        
+        ReproductionResult reproduction = reproductionPhase(feeding.organisms(), nextCycle, nextId, nextEvents);
+        List<Organism> finalChanged = reproduction.organisms();
         int nextIdentifier = reproduction.nextId();
-
-        if (changed.isEmpty()) {
-            changed.add(Organism.of("moss-" + nextIdentifier, OrganismType.MOSS, 5, 1, "emergency-seed"));
+        
+        if (finalChanged.isEmpty()) {
+            finalChanged.add(Organism.of("moss-" + nextIdentifier, OrganismType.MOSS, 5, 1, "emergency-seed"));
             nextEvents.add(new GardenEvent(nextCycle, "A last emergency moss seed appeared to keep the garden alive."));
             nextIdentifier++;
         }
-
+        
         nextEvents.add(new GardenEvent(nextCycle,
-                "The garden becomes %s after cycle %d.".formatted(nextEnvironment.mood(), nextCycle)));
-
-        return new Garden(nextCycle, nextIdentifier, nextEnvironment, changed, nextEvents);
+                "The garden becomes %s after cycle %d.".formatted(environmentWithNutrients.mood(), nextCycle)));
+        
+        return new Garden(nextCycle, nextIdentifier, environmentWithNutrients, finalChanged, nextEvents);
     }
 
     /**
@@ -133,7 +137,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         return maybeMutate(changed, cycle, events);
     }
 
-    private List<Organism> feedingPhase(List<Organism> organisms, int cycle, List<GardenEvent> events) {
+    private FeedingResult feedingPhase(List<Organism> organisms, int cycle, List<GardenEvent> events) {
         List<Organism> mutable = new ArrayList<>(organisms);
         mutable.sort(Comparator.comparing((Organism organism) -> organism.type().kingdom().ordinal())
                 .thenComparing(Organism::id));
@@ -158,16 +162,21 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             events.add(new GardenEvent(cycle, "%s fed on %s.".formatted(hunter.id(), prey.id())));
         }
 
+        int deaths = 0;
         List<Organism> survivors = new ArrayList<>();
         for (Organism organism : mutable) {
             if (organism.energy() > 0) {
                 survivors.add(organism);
             } else {
                 events.add(new GardenEvent(cycle, "%s returned to the soil.".formatted(organism.id())));
+                deaths++;
             }
         }
         survivors.sort(Comparator.comparing(Organism::id));
-        return survivors;
+        return new FeedingResult(survivors, deaths);
+    }
+
+    private record FeedingResult(List<Organism> organisms, int deaths) {
     }
 
     private Optional<Integer> findPreyIndex(List<Organism> organisms, Organism hunter, int hunterIndex) {

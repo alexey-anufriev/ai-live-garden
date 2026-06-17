@@ -90,4 +90,22 @@ class GardenTest {
         // Passive change growth: 2 (favorsPlants) + 1 (moisture > 60) = 3
         assertThat(next.organisms().get(0).energy()).isEqualTo(13);
     }
+
+    @Test
+    void deathsIncreaseNutrients() {
+        // An organism that will die (no energy)
+        Organism doomed = Organism.of("beetle-1", OrganismType.BEETLE, 1, 1, "doomed");
+        // Environment with 50 nutrients
+        Environment env = new Environment(50, 50, 50, 50);
+        Garden garden = new Garden(0, 2, env, List.of(doomed), List.of());
+
+        Garden next = garden.nextCycle();
+
+        // Deaths: 1. Nutrients should increase by 1, plus whatever the normal drift is.
+        // The nutrient drift is: 1 + animalCount / 3 - plantCount / 4
+        // Initial plantCount: 0, animalCount: 1.
+        // Delta = 1 + 1/3 - 0/4 = 1.
+        // Total nutrient change: deathBonus(1) + delta(1) = 2.
+        assertThat(next.environment().nutrients()).isEqualTo(52);
+    }
 }

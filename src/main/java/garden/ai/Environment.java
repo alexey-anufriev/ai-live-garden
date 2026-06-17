@@ -55,6 +55,13 @@ public record Environment(int light, int moisture, int warmth, int nutrients) {
         return light >= 45 && moisture >= 45 && nutrients >= 35;
     }
 
+    /**
+     * Returns a new environment with updated nutrients.
+     */
+    public Environment withNutrients(int bonus) {
+        return new Environment(light, moisture, warmth, nutrients + bonus);
+    }
+
     private static int clamp(int value) {
         return Math.clamp(value, 0, 100);
     }
