@@ -25,7 +25,7 @@ public record Environment(int light, int moisture, int warmth, int nutrients) {
         int lightDelta = cycle % 2 == 0 ? 3 : -2;
         int moistureDelta = cycle % 3 == 0 ? 4 : -1;
         int warmthDelta = cycle % 5 == 0 ? -3 : 2;
-        int nutrientDelta = 1 + animalCount / 3 - plantCount / 4;
+        int nutrientDelta = 2 + animalCount / 2 - plantCount / 5;
         return new Environment(light + lightDelta, moisture + moistureDelta, warmth + warmthDelta, nutrients + nutrientDelta);
     }
 
@@ -52,7 +52,7 @@ public record Environment(int light, int moisture, int warmth, int nutrients) {
      * Indicates whether current conditions are favorable enough for ordinary plant growth.
      */
     public boolean favorsPlants() {
-        return light >= 45 && moisture >= 45 && nutrients >= 35;
+        return light >= 45 && moisture >= 45 && nutrients >= 30;
     }
 
     /**

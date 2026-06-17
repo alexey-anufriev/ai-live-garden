@@ -102,10 +102,10 @@ class GardenTest {
         Garden next = garden.nextCycle();
 
         // Deaths: 1. Nutrients should increase by 1, plus whatever the normal drift is.
-        // The nutrient drift is: 1 + animalCount / 3 - plantCount / 4
+        // The nutrient drift is: 2 + animalCount / 2 - plantCount / 5
         // Initial plantCount: 0, animalCount: 1.
-        // Delta = 1 + 1/3 - 0/4 = 1.
-        // Total nutrient change: deathBonus(1) + delta(1) = 2.
-        assertThat(next.environment().nutrients()).isEqualTo(52);
+        // Delta = 2 + 0/2 - 0/5 = 2.
+        // Total nutrient change: deathBonus(1) + delta(2) = 3.
+        assertThat(next.environment().nutrients()).isEqualTo(53);
     }
 }
