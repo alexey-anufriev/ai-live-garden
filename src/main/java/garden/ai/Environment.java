@@ -21,11 +21,11 @@ public record Environment(int light, int moisture, int warmth, int nutrients) {
      * @param animalCount number of animals contributing decay and disturbance
      * @return the next normalized environment
      */
-    public Environment next(int cycle, int plantCount, int animalCount) {
+    public Environment next(int cycle, int plantCount, int animalCount, int rootNetworkCount) {
         int lightDelta = cycle % 2 == 0 ? 3 : -2;
         int moistureDelta = cycle % 3 == 0 ? 4 : -1;
         int warmthDelta = cycle % 5 == 0 ? -3 : 2;
-        int nutrientDelta = 2 + animalCount / 2 - plantCount / 5;
+        int nutrientDelta = 2 + animalCount / 2 - plantCount / 5 + rootNetworkCount / 2;
         return new Environment(light + lightDelta, moisture + moistureDelta, warmth + warmthDelta, nutrients + nutrientDelta);
     }
 

@@ -66,7 +66,8 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         int nextCycle = cycle + 1;
         long plantCount = organisms.stream().filter(organism -> organism.type().isPlant()).count();
         long animalCount = organisms.stream().filter(organism -> organism.type().isAnimal()).count();
-        Environment nextEnvironment = environment.next(nextCycle, (int) plantCount, (int) animalCount);
+        long rootNetworkCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK).count();
+        Environment nextEnvironment = environment.next(nextCycle, (int) plantCount, (int) animalCount, (int) rootNetworkCount);
         List<GardenEvent> nextEvents = new ArrayList<>(events);
         List<Organism> changed = organisms.stream()
                 .map(organism -> passiveChange(organism, nextEnvironment, nextCycle, nextEvents))

@@ -1,0 +1,7 @@
+- chosen task: Introduce ROOT_NETWORK nutrient recovery.
+- reason for choosing it: The garden was consistently in a "hungry" state (nutrients=0). ROOT_NETWORK organisms were already in the system, and giving them a functional role in nutrient recovery adds ecological depth and improves system balance.
+- files changed: src/main/java/garden/ai/Environment.java, src/main/java/garden/ai/Garden.java, src/test/java/garden/ai/GardenTest.java, agent/state.md, README.md
+- checks run: mvn test
+- result of mvn test: BUILD SUCCESS
+- observations: ROOT_NETWORK organisms now help in nutrient cycling, which should help mitigate total nutrient depletion in future cycles.
+- possible next directions: Monitor if this change stabilizes the garden. If still hungry, consider other nutrient sources or reducing nutrient demand of some organisms.

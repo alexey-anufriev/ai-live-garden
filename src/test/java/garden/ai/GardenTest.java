@@ -140,10 +140,28 @@ class GardenTest {
         Garden next = garden.nextCycle();
 
         // Deaths: 1. Nutrients should increase by 1, plus whatever the normal drift is.
-        // The nutrient drift is: 2 + animalCount / 2 - plantCount / 5
-        // Initial plantCount: 0, animalCount: 1.
-        // Delta = 2 + 0/2 - 0/5 = 2.
+        // The nutrient drift is: 2 + animalCount / 2 - plantCount / 5 + rootNetworkCount / 2
+        // Initial plantCount: 0, animalCount: 1, rootNetworkCount: 0.
+        // Delta = 2 + 1/2 - 0/5 + 0/2 = 2.
         // Total nutrient change: deathBonus(1) + delta(2) = 3.
         assertThat(next.environment().nutrients()).isEqualTo(53);
+    }
+
+    @Test
+    void rootNetworkIncreasesNutrients() {
+        // One root network
+        Organism root = Organism.of("root-1", OrganismType.ROOT_NETWORK, 10, 1, "network");
+        // Environment with 50 nutrients
+        Environment env = new Environment(50, 50, 50, 50);
+        Garden garden = new Garden(0, 2, env, List.of(root), List.of());
+
+        Garden next = garden.nextCycle();
+
+        // Deaths: 0.
+        // The nutrient drift is: 2 + animalCount / 2 - plantCount / 5 + rootNetworkCount / 2
+        // Initial plantCount: 1, animalCount: 0, rootNetworkCount: 1.
+        // Delta = 2 + 0/2 - 1/5 + 1/2 = 2 - 0 + 0 = 2.
+        // Total nutrient change: deathBonus(0) + delta(2) = 2.
+        assertThat(next.environment().nutrients()).isEqualTo(52);
     }
 }
