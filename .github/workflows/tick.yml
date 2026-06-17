@@ -1,4 +1,5 @@
 name: Tick
+run-name: "Tick - ${{ inputs.triggered_at || github.run_number }}"
 
 on:
   workflow_dispatch:

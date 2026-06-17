@@ -1,4 +1,5 @@
 name: Story
+run-name: "Story - ${{ inputs.triggered_at || github.run_number }}"
 
 on:
   workflow_dispatch:
