@@ -1,8 +1,6 @@
 name: Story
 
 on:
-  schedule:
-    - cron: '57 21 * * *'
   workflow_dispatch:
 
 concurrency:
