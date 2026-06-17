@@ -26,7 +26,7 @@ jobs:
         id: story_context
         shell: bash
         run: |
-          mkdir -p story
+          set -euo pipefail
 
           current_state_commit="$(git log -1 --format=%H -- data/garden-state.txt)"
 
@@ -48,15 +48,51 @@ jobs:
           echo "skip=false" >> "$GITHUB_OUTPUT"
           echo "current_state_commit=$current_state_commit" >> "$GITHUB_OUTPUT"
 
-          chapter_count="$(grep -c '^## Chapter ' story/chronicles-of-ai-garden.md || true)"
+          volume_files=(story/volumes/volume-*.md)
+
+          if [[ ! -e "${volume_files[0]}" ]]; then
+            chapter_count=0
+          else
+            chapter_count="$(
+              { grep -h '^### Chapter ' "${volume_files[@]}" || true; } \
+                | wc -l \
+                | tr -d '[:space:]'
+            )"
+          fi
+
           next_chapter=$((chapter_count + 1))
+          volume_number=$(( ((next_chapter - 1) / 100) + 1 ))
+          volume_file="$(printf "story/volumes/volume-%04d.md" "$volume_number")"
+
+          new_volume="false"
+          if [[ ! -f "$volume_file" ]]; then
+            new_volume="true"
+          fi
 
           echo "next_chapter=$next_chapter" >> "$GITHUB_OUTPUT"
+          echo "volume_number=$volume_number" >> "$GITHUB_OUTPUT"
+          echo "volume_file=$volume_file" >> "$GITHUB_OUTPUT"
+          echo "new_volume=$new_volume" >> "$GITHUB_OUTPUT"
 
           {
             echo "# Story Context"
             echo
             echo "Requested chapter number: $next_chapter"
+            echo "Requested volume number: $volume_number"
+            echo "Requested volume file: \`$volume_file\`"
+            echo "Creates new volume: $new_volume"
+            echo
+
+            if [[ "$new_volume" == "true" ]]; then
+              echo "This chapter starts a new volume."
+              echo "Create the requested volume file and generate a volume title."
+              echo "Also update \`story/chronicles-of-ai-garden.md\` to include a link to the new volume."
+            else
+              echo "This chapter continues an existing volume."
+              echo "Append the chapter to the requested volume file."
+              echo "Do not change the existing volume title."
+            fi
+
             echo
             echo "The chapter title must be generated from the actual garden events."
             echo
@@ -87,17 +123,32 @@ jobs:
             cat data/garden-state.txt
             echo '```'
             echo
+
             echo "## Recent current events"
             echo
             echo '```text'
             grep '^event=' data/garden-state.txt | tail -120 || true
             echo '```'
             echo
-            echo "## Existing chronicle"
+
+            echo "## Chronicle index"
             echo
             echo '```md'
             cat story/chronicles-of-ai-garden.md
             echo '```'
+            echo
+
+            if [[ -f "$volume_file" ]]; then
+              echo "## Current volume so far"
+              echo
+              echo '```md'
+              tail -250 "$volume_file"
+              echo '```'
+            else
+              echo "## Current volume so far"
+              echo
+              echo "This volume does not exist yet."
+            fi
           } > story/context.md
 
           {
