@@ -184,6 +184,24 @@ class GardenTest {
     }
 
     @Test
+    void rootNetworkIncreasesNutrientsEvenMoreWhenVeryHungry() {
+        // One root network
+        Organism root = Organism.of("root-1", OrganismType.ROOT_NETWORK, 10, 1, "network");
+        // Environment with 5 nutrients (very hungry)
+        Environment env = new Environment(50, 50, 50, 5);
+        Garden garden = new Garden(0, 2, env, List.of(root), List.of());
+
+        Garden next = garden.nextCycle();
+
+        // Deaths: 0.
+        // The nutrient drift is: 2 + animalCount / 2 - plantCount / 5 + rootNetworkCount * 8
+        // Initial plantCount: 1, animalCount: 0, rootNetworkCount: 1.
+        // Delta = 2 + 0/2 - 1/5 + 1*8 = 2 - 0 + 8 = 10.
+        // Total nutrient change: deathBonus(0) + delta(10) = 10.
+        assertThat(next.environment().nutrients()).isEqualTo(15);
+    }
+
+    @Test
     void rootNetworkAdaptsToHungryEnvironment() {
         Organism root = Organism.of("root-1", OrganismType.ROOT_NETWORK, 10, 1, "network");
         // Environment with low nutrients (< 25) - set to 15 to ensure it stays < 25 after growth
