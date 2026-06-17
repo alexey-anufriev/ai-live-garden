@@ -3,7 +3,7 @@ name: Autonomous Live Garden
 on:
   workflow_dispatch:
   schedule:
-    - cron: "8 * * * *"
+    - cron: "17,29,43 * * * *"
 
 concurrency:
   group: ai-live-garden-main
