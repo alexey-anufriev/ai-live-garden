@@ -128,9 +128,9 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
 
         maybeDescribeChange(organism, changed, environment, cycle).ifPresent(events::add);
 
-        if (organism.type().isPlant() && !environment.favorsPlants()) {
+        if (organism.type().isPlant() && !environment.favorsPlants() && !changed.traits().contains("resilient")) {
             changed = changed.withTrait("stressed");
-        } else if (organism.type().isAnimal() && environment.nutrients() < 25) {
+        } else if (organism.type().isAnimal() && environment.nutrients() < 25 && !changed.traits().contains("resilient")) {
             changed = changed.withTrait("starving");
         }
 
@@ -245,7 +245,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
     }
 
     private String mutationTrait(int cycle, Organism organism) {
-        String[] traits = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned"};
+        String[] traits = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient"};
         int index = Math.floorMod(organism.id().hashCode() + cycle + organism.generation(), traits.length);
         return traits[index];
     }

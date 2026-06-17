@@ -79,6 +79,22 @@ class GardenTest {
     }
 
     @Test
+    void resilientOrganismsDoNotGetStressedOrStarving() {
+        Organism resilientPlant = Organism.of("plant-1", OrganismType.FERN, 20, 1, "resilient");
+        // Environment that does not favor plants (light < 40)
+        Garden gardenPlant = new Garden(0, 2, new Environment(30, 50, 50, 50), List.of(resilientPlant), List.of());
+        Garden nextPlant = gardenPlant.nextCycle();
+        assertThat(nextPlant.organisms().get(0).traits()).doesNotContain("stressed");
+
+        Organism resilientAnimal = Organism.of("animal-1", OrganismType.HARE, 20, 1, "resilient");
+        // Environment with low nutrients (< 25)
+        Garden gardenAnimal = new Garden(0, 2, new Environment(50, 50, 50, 20), List.of(resilientAnimal), List.of());
+        Garden nextAnimal = gardenAnimal.nextCycle();
+        assertThat(nextAnimal.organisms().get(0).traits()).doesNotContain("starving");
+    }
+
+
+    @Test
     void mossGrowsFasterInHighMoisture() {
         Organism moss = Organism.of("moss-1", OrganismType.MOSS, 10, 1, "test");
         // Environment that favors plants (default 50) and high moisture (70)

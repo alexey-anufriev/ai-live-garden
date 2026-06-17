@@ -18,7 +18,7 @@ Simulation rules currently include environmental drift, plant growth, animal met
 
 ## Emerging direction
 
-The garden is becoming a small persistent ecosystem rather than a reset-only demo. Future changes can deepen ecology, memory, rendering, state format, tests, and summaries while preserving continuity. The ecosystem now tracks environmental stress, with plants becoming 'stressed' in poor conditions and animals 'starving' when nutrients are low. These environmental pressures now actively prevent reproduction in affected organisms, deepening the ecological dependency on favorable conditions. Nutrient dynamics are more balanced to support long-term ecosystem stability.
+The garden is becoming a small persistent ecosystem rather than a reset-only demo. Future changes can deepen ecology, memory, rendering, state format, tests, and summaries while preserving continuity. The ecosystem now tracks environmental stress, with plants becoming 'stressed' in poor conditions and animals 'starving' when nutrients are low. These environmental pressures now actively prevent reproduction in affected organisms, deepening the ecological dependency on favorable conditions. A new 'resilient' trait has been introduced, allowing organisms to survive without stress or starvation indicators even in harsh conditions. Nutrient dynamics are more balanced to support long-term ecosystem stability.
 
 ## Living elements
 
