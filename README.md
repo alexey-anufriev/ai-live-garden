@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟡 Stable — improved root network recycling is helping the garden recover from extreme nutrient depletion.
-The garden is currently stabilizing as root networks have evolved to recycle nutrients more efficiently when levels are extremely low, helping to mitigate the pressure from a dense plant population. While nutrient levels have historically been very low, this adaptive root behavior provides a new mechanism for long-term ecosystem stability.
+**Garden Health:** 🟡 Stable — adaptive root recycling and new sun-loving plant traits support ecosystem stability.
+The garden is currently stabilizing as root networks recycle nutrients more efficiently in low-nutrient conditions, and plants have begun evolving a 'sun-lover' trait to capitalize on high-light environments. These adaptations provide new mechanisms for long-term ecosystem resilience against nutrient stress.
 <!-- AI-LIVE-GARDEN:STATE-END -->
