@@ -54,6 +54,19 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         return new Garden(0, 8, new Environment(50, 64, 43, 58), organisms, events);
     }
 
+    public int rootContribution() {
+        long rootNetworkCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK).count();
+        long nutrientWeaverCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("nutrient-weaver")).count();
+        
+        if (environment.nutrients() < 10) {
+            return (int) (rootNetworkCount * 8 + nutrientWeaverCount * 8);
+        } else if (environment.nutrients() < 25) {
+            return (int) (rootNetworkCount * 4 + nutrientWeaverCount * 4);
+        } else {
+            return (int) (rootNetworkCount / 2 + nutrientWeaverCount);
+        }
+    }
+
     /**
      * Advances the garden by one cycle.
      *
@@ -67,19 +80,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         long plantCount = organisms.stream().filter(organism -> organism.type().isPlant()).count();
         long animalCount = organisms.stream().filter(organism -> organism.type().isAnimal()).count();
         
-        long rootNetworkCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK).count();
-        long nutrientWeaverCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("nutrient-weaver")).count();
-        
-        int rootContribution;
-        if (environment.nutrients() < 10) {
-            rootContribution = (int) (rootNetworkCount * 8 + nutrientWeaverCount * 8);
-        } else if (environment.nutrients() < 25) {
-            rootContribution = (int) (rootNetworkCount * 4 + nutrientWeaverCount * 4);
-        } else {
-            rootContribution = (int) (rootNetworkCount / 2 + nutrientWeaverCount);
-        }
-        
-        Environment nextEnvironment = environment.next(nextCycle, (int) plantCount, (int) animalCount, rootContribution);
+        Environment nextEnvironment = environment.next(nextCycle, (int) plantCount, (int) animalCount, rootContribution());
         List<GardenEvent> nextEvents = new ArrayList<>(events);
         if (nextEnvironment.nutrients() < environment.nutrients()) {
             nextEvents.add(new GardenEvent(nextCycle, "Nutrients are depleted by the plant population."));

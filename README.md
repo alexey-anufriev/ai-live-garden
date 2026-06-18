@@ -86,5 +86,5 @@ This is still an experiment. Do not store valuable secrets or production code in
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
 **Garden Health:** 🟠 Strained — persistent hunger persists, but new root adaptations are enhancing nutrient recovery.
-The garden remains under heavy nutrient stress, but a new 'nutrient-weaver' trait has emerged in root networks, enabling them to significantly bolster nutrient recovery when the ecosystem is most starved, creating a new feedback loop for potential long-term stabilization.
+The garden remains under heavy nutrient stress. Root network nutrient contributions are now tracked and rendered, allowing for better observation of the ecosystem's adaptive response to starvation.
 <!-- AI-LIVE-GARDEN:STATE-END -->
