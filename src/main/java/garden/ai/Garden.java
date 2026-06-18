@@ -150,6 +150,10 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         }
 
         maybeDescribeChange(organism, changed, environment, cycle).ifPresent(events::add);
+        
+        if (changed.energy() <= 2 && changed.energy() > 0) {
+            events.add(new GardenEvent(cycle, "%s is at a critical energy level.".formatted(changed.id())));
+        }
 
         if (organism.type().isPlant() && !environment.favorsPlants() && !changed.traits().contains("resilient")) {
             changed = changed.withTrait("stressed");

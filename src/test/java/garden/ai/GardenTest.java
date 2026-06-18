@@ -264,6 +264,19 @@ class GardenTest {
     }
 
     @Test
+    void organismAtCriticalEnergyTriggersEvent() {
+        // An organism with 3 energy. Metabolism for HARE is 1.
+        // After one cycle, energy should be 2.
+        Organism animal = Organism.of("animal-1", OrganismType.HARE, 3, 1, "test");
+        // Environment favorable to prevent starving
+        Garden garden = new Garden(0, 2, new Environment(50, 50, 50, 50), List.of(animal), List.of());
+        Garden next = garden.nextCycle();
+
+        assertThat(next.organisms().get(0).energy()).isEqualTo(2);
+        assertThat(next.events()).anyMatch(e -> e.description().contains("animal-1 is at a critical energy level."));
+    }
+
+    @Test
     void preyWithShadowStepperTraitCanAvoidPredators() {
         Organism predator = Organism.of("fox-1", OrganismType.FOX, 10, 1, "hunter");
         // Prey with shadow-stepper.
