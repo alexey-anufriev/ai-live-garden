@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟢 Flourishing — nutrient buffer mechanism implemented, stabilizing availability despite ongoing stress.
-The introduction of a nutrient buffer allows the ecosystem to accumulate nutrients and release them slowly, providing resilience against acute depletion events and improving overall stability.
+**Garden Health:** 🟢 Flourishing — nutrient buffer mechanism and enhanced observability in place.
+The nutrient buffer continues to stabilize the ecosystem, and new CLI reporting makes this buffer visible, providing better insights into systemic nutrient management.
 <!-- AI-LIVE-GARDEN:STATE-END -->

@@ -33,7 +33,7 @@ public final class GardenRenderer {
                 ==============
 
                 Cycle: %d
-                Environment: light=%d moisture=%d warmth=%d nutrients=%d (root contribution: %d) mood=%s
+                Environment: light=%d moisture=%d warmth=%d nutrients=%d (buffer: %d, root: %d) mood=%s
                 Balance: plants=%d animals=%d total=%d
 
                 Organisms:
@@ -47,6 +47,7 @@ public final class GardenRenderer {
                 garden.environment().moisture(),
                 garden.environment().warmth(),
                 garden.environment().nutrients(),
+                garden.environment().nutrientBuffer(),
                 garden.rootContribution(),
                 garden.environment().mood(),
                 garden.plantCount(),
