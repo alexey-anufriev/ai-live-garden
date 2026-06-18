@@ -1,4 +1,4 @@
-# ai-live-garden
+# AI Live Garden
 
 `ai-live-garden` is an autonomous software evolution experiment.
 
@@ -13,12 +13,35 @@ The initial project is intentionally small:
 - Java 25
 - Maven
 - JUnit 6 / AssertJ
-- a deterministic garden simulation with plants, herbivores, predators, feeding, reproduction, and mutation
+- deterministic garden simulation with plants, herbivores, predators, feeding, reproduction, and mutation
 - persistent living state in `data/garden-state.txt`
 - text rendering for the garden state
 - agent memory in `agent/state.md`
 - agent journal in `agent/journal/`
 - GitHub Actions workflows: `.github/workflows/evolve.yml`, `.github/workflows/tick.yml`, and `.github/workflows/story.yml`
+
+### Java code map
+
+The Java implementation is deliberately small and dependency-light:
+
+- `Main` is the command-line entry point. It supports `inspect` to render the current snapshot without saving, and `tick` to advance and persist the garden. The default mode is `tick --steps 3`. Use `--steps N` or a bare numeric argument to control cycle count, and `--state path/to/file` to use an alternate snapshot.
+- `Garden` is the immutable world snapshot and owns the ecosystem rules for each cycle: environmental drift, passive growth/metabolism, feeding, death, reproduction, mutation, and event trimming.
+- `Organism`, `OrganismType`, `Environment`, and `GardenEvent` are the core value model. They keep state validation close to the data and expose small helper methods used by the simulation rules.
+- `Simulation` advances either the seed garden or an existing loaded garden for a fixed number of cycles.
+- `GardenStateStore` is the persistence boundary for `data/garden-state.txt`. Its line-oriented format is intended to remain readable in git diffs and easy for future agents to evolve.
+- `GardenRenderer` turns a garden snapshot into the terminal text shown by local commands and autonomous runs.
+
+### Repository memory
+
+The agent should treat the repository itself as memory:
+
+- `AGENTS.md` - universal agent rules.
+- `GEMINI.md` - Gemini-specific instructions.
+- `agent/state.md` - current state and direction.
+- `agent/requests.md` - requests from the agent to the human observer.
+- `agent/journal/` - chronological notes from autonomous runs.
+- `agent/summaries/` - daily, weekly, monthly, and yearly compressed memory.
+- `data/garden-state.txt` - the persistent living garden snapshot.
 
 ## Run locally
 
@@ -36,29 +59,6 @@ java -jar target/ai-live-garden-0.1.0-SNAPSHOT.jar
 ```
 
 With no arguments, the jar uses the default `tick --steps 3` behavior and writes the updated snapshot to `data/garden-state.txt`.
-
-## Java code map
-
-The Java implementation is deliberately small and dependency-light:
-
-- `Main` is the command-line entry point. It supports `inspect` to render the current snapshot without saving, and `tick` to advance and persist the garden. The default mode is `tick --steps 3`. Use `--steps N` or a bare numeric argument to control cycle count, and `--state path/to/file` to use an alternate snapshot.
-- `Garden` is the immutable world snapshot and owns the ecosystem rules for each cycle: environmental drift, passive growth/metabolism, feeding, death, reproduction, mutation, and event trimming.
-- `Organism`, `OrganismType`, `Environment`, and `GardenEvent` are the core value model. They keep state validation close to the data and expose small helper methods used by the simulation rules.
-- `Simulation` advances either the seed garden or an existing loaded garden for a fixed number of cycles.
-- `GardenStateStore` is the persistence boundary for `data/garden-state.txt`. Its line-oriented format is intended to remain readable in git diffs and easy for future agents to evolve.
-- `GardenRenderer` turns a garden snapshot into the terminal text shown by local commands and autonomous runs.
-
-## Repository memory
-
-The agent should treat the repository itself as memory:
-
-- `AGENTS.md` - universal agent rules.
-- `GEMINI.md` - Gemini-specific instructions.
-- `agent/state.md` - current state and direction.
-- `agent/requests.md` - requests from the agent to the human observer.
-- `agent/journal/` - chronological notes from autonomous runs.
-- `agent/summaries/` - daily, weekly, monthly, and yearly compressed memory.
-- `data/garden-state.txt` - the persistent living garden snapshot.
 
 ## Safety model
 
