@@ -174,6 +174,9 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             if (changed.traits().contains("metabolic-efficiency")) {
                 metabolism = Math.max(0, metabolism - 1);
             }
+            if (changed.traits().contains("buffer-scavenger") && environment.nutrientBuffer() > 0) {
+                metabolism = Math.max(0, metabolism - 1);
+            }
             changed = changed.withEnergy(changed.energy() - metabolism)
                     .withCuriosity(changed.curiosity() + (cycle % 4 == 0 ? 1 : 0));
         }
@@ -316,7 +319,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
     }
 
     private String mutationTrait(int cycle, Organism organism) {
-        String[] traits = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "rain-collector", "nutrient-finder", "nutrient-efficient", "shadow-stepper", "hardy", "water-seeker", "dormancy", "nutrient-weaver", "metabolic-efficiency", "scavenger", "nutrient-sharer", "buffer-resonator"};
+        String[] traits = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "rain-collector", "nutrient-finder", "nutrient-efficient", "shadow-stepper", "hardy", "water-seeker", "dormancy", "nutrient-weaver", "metabolic-efficiency", "scavenger", "nutrient-sharer", "buffer-resonator", "buffer-scavenger"};
         int index = Math.floorMod(organism.id().hashCode() + cycle + organism.generation(), traits.length);
         return traits[index];
     }

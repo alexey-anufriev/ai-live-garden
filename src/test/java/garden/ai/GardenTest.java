@@ -291,10 +291,10 @@ class GardenTest {
 
         // Feeding: HARE normally gets 2 energy. With scavenger in hungry env, should be 2+1=3.
         // Metabolism for HARE is 1.
-        // Energy: 10 - 1 (metabolism) + 4 (feeding) = 13.
+        // Energy: 10 - 1 (metabolism) + 3 (feeding) = 12.
         assertThat(next.organisms().stream()
                 .filter(o -> o.id().equals("herbivore-1"))
-                .findFirst().get().energy()).isEqualTo(13);
+                .findFirst().get().energy()).isEqualTo(12);
     }
 
     @Test
@@ -409,5 +409,17 @@ class GardenTest {
         Garden nextPlant = gardenPlant.nextCycle();
         // Should not be stressed.
         assertThat(nextPlant.organisms().get(0).traits()).doesNotContain("stressed");
+    }
+
+    @Test
+    void bufferScavengerAnimalsHaveReducedMetabolism() {
+        // HARE has metabolism 1. With buffer-scavenger in hungry conditions (nutrients < 25) and buffer > 0, it should be 1-1=0.
+        Organism scavengerAnimal = Organism.of("animal-1", OrganismType.HARE, 10, 1, "buffer-scavenger");
+        // Environment: nutrients=20 (< 25), buffer=50 (> 0).
+        Environment env = new Environment(50, 50, 50, 20, 50);
+        Garden garden = new Garden(0, 2, env, List.of(scavengerAnimal), List.of());
+        Garden next = garden.nextCycle();
+        // Energy: 10 - 0 = 10.
+        assertThat(next.organisms().get(0).energy()).isEqualTo(10);
     }
 }
