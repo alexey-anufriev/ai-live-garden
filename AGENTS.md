@@ -221,20 +221,49 @@ Weekly, monthly, and yearly summaries should be updated when they are stale or w
 
 ## Journal entry format
 
-Each run should add a journal entry with:
+Each run should add a journal entry under `agent/journal/` using this exact Markdown structure:
 
-* timestamp (date + time);
-* chosen task;
-* reason for choosing it;
-* files changed;
-* checks run;
-* result of `mvn test`;
-* observations;
-* possible next directions.
+```markdown
+# Short Title
+
+## Timestamp
+
+YYYY-MM-DDTHH:MM:SSZ
+
+## Chosen task
+
+One concise sentence describing the selected task.
+
+## Why this task was chosen
+
+One short paragraph explaining why this was the right next garden step.
+
+## Files changed
+
+- `path/to/file`
+
+## Checks run
+
+`mvn test`
+
+## Result of `mvn test`
+
+Passed, failed with a brief reason, or not run with a brief reason.
+
+## Observations
+
+One short paragraph describing what changed or what was learned.
+
+## Possible next directions
+
+- One possible next step.
+```
+
+Use an ISO-8601 timestamp with time and timezone. If reconstructing an older journal entry, the timestamp may be taken from the commit time that introduced the file.
 
 The journal should be honest. If tests fail, say so. If the change is small, say so. If the run was mostly documentation or cleanup, explain why that was useful.
 
-Each journal file should be formatted in the same way. 0000 entry must be used as an example. If needed unformatted entries must be corrected.
+Each journal file should be formatted in the same way. `agent/journal/0000-initial-seed.md` is only an example of the intended shape; the template above is authoritative. If needed, unformatted entries must be corrected without rewriting their historical meaning.
 
 ## Agent requests
 
