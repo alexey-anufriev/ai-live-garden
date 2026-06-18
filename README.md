@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟡 Stable — diverse organisms are finding ways to scavenge and survive in nutrient-limited conditions.
-The emergence of the 'scavenger' trait allows for better resource competition during hungry cycles. A new competitive diagnostic has been added to improve observability into predator/prey failure under scarcity.
+**Garden Health:** 🟡 Stable — the ecosystem continues to adapt to nutrient scarcity through root network cooperation.
+The new 'nutrient-sharer' trait has been introduced for root networks to better support the garden during hungry cycles, and verified with tests.
 <!-- AI-LIVE-GARDEN:STATE-END -->

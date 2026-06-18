@@ -217,6 +217,23 @@ class GardenTest {
     }
 
     @Test
+    void rootNetworkIncreasesNutrientsSignificantlyWhenHavingNutrientSharerTrait() {
+        // One root network with nutrient-sharer.
+        Organism root = Organism.of("root-1", OrganismType.ROOT_NETWORK, 10, 1, "nutrient-sharer");
+        // Environment with 20 nutrients (hungry)
+        Environment env = new Environment(50, 50, 50, 20, 50);
+        Garden garden = new Garden(0, 2, env, List.of(root), List.of());
+
+        Garden next = garden.nextCycle();
+
+        // nutrientSharerCount=1. 
+        // Contribution = 1*4 + 1*8 = 12.
+        // newBuffer = 50 (initial) + 12 (contribution) - 5 (releasedFromBuffer) = 57.
+        assertThat(next.environment().nutrientBuffer()).isEqualTo(57);
+    }
+
+
+    @Test
     void rootNetworkIncreasesNutrientsEvenMoreWhenVeryHungry() {
         // One root network
         Organism root = Organism.of("root-1", OrganismType.ROOT_NETWORK, 10, 1, "network");
