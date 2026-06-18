@@ -204,6 +204,9 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             }
             Optional<Integer> preyIndex = findPreyIndex(mutable, hunter, hunterIndex);
             if (preyIndex.isEmpty()) {
+                if (environment.nutrients() < 25 && (hunter.id().hashCode() + cycle) % 5 == 0) {
+                    events.add(new GardenEvent(cycle, "In the hungry garden, %s could not find prey.".formatted(hunter.id())));
+                }
                 continue;
             }
 

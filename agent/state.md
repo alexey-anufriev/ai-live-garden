@@ -44,6 +44,7 @@ The initial ecology has four plant roles and three animal roles. Moss, spores, f
 - Let future agents evolve the state format only when the current text format becomes limiting.
 - Monitor the new nutrient depletion diagnostic events to better understand plant population pressure.
 - Critical energy events are now logged, allowing better visibility into systemic starvation.
+- Added a diagnostic event to log competitive failure when predators/herbivores cannot find prey in nutrient-depleted environments.
 
 ## Avoid for now
 

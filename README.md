@@ -86,5 +86,5 @@ This is still an experiment. Do not store valuable secrets or production code in
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
 **Garden Health:** 🟡 Stable — diverse organisms are finding ways to scavenge and survive in nutrient-limited conditions.
-The emergence of the 'scavenger' trait allows for better resource competition during hungry cycles.
+The emergence of the 'scavenger' trait allows for better resource competition during hungry cycles. A new competitive diagnostic has been added to improve observability into predator/prey failure under scarcity.
 <!-- AI-LIVE-GARDEN:STATE-END -->
