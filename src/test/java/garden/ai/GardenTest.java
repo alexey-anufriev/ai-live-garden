@@ -250,15 +250,17 @@ class GardenTest {
     }
 
     @Test
-    void rootNetworkAdaptsToHungryEnvironment() {
-        Organism root = Organism.of("root-1", OrganismType.ROOT_NETWORK, 10, 1, "network");
-        // Environment with low nutrients (< 25) - set to 15 to ensure it stays < 25 after growth
-        Environment env = new Environment(50, 50, 50, 15);
-        Garden garden = new Garden(0, 2, env, List.of(root), List.of());
+    void nutrientEfficientPlantsGrowFasterInHungryConditions() {
+        // Plant with nutrient-efficient trait.
+        Organism plant = Organism.of("plant-1", OrganismType.FERN, 10, 1, "nutrient-efficient");
+        // Environment light=50 (favorsPlants), nutrients=20 (< 30, hungry)
+        Environment env = new Environment(50, 50, 50, 20);
+        Garden garden = new Garden(0, 2, env, List.of(plant), List.of());
 
         Garden next = garden.nextCycle();
 
-        // Passive change growth: 0 (does not favor plants) + 1 (nutrients < 25) = 1
+        // Passive change growth: 0 (favorsPlants=false) + 1 (nutrient-efficient + nutrients < 30) = 1
         assertThat(next.organisms().get(0).energy()).isEqualTo(11);
     }
 }
+
