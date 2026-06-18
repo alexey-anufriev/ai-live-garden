@@ -61,6 +61,7 @@ public final class GardenStateStore {
         builder.append("moisture=").append(garden.environment().moisture()).append('\n');
         builder.append("warmth=").append(garden.environment().warmth()).append('\n');
         builder.append("nutrients=").append(garden.environment().nutrients()).append('\n');
+        builder.append("nutrientBuffer=").append(garden.environment().nutrientBuffer()).append('\n');
         builder.append('\n');
 
         for (Organism organism : garden.organisms()) {
@@ -91,6 +92,7 @@ public final class GardenStateStore {
         int moisture = 60;
         int warmth = 42;
         int nutrients = 50;
+        int nutrientBuffer = 50;
         List<Organism> organisms = new ArrayList<>();
         List<GardenEvent> events = new ArrayList<>();
 
@@ -110,6 +112,8 @@ public final class GardenStateStore {
                 warmth = parseIntValue(line, "warmth=");
             } else if (line.startsWith("nutrients=")) {
                 nutrients = parseIntValue(line, "nutrients=");
+            } else if (line.startsWith("nutrientBuffer=")) {
+                nutrientBuffer = parseIntValue(line, "nutrientBuffer=");
             } else if (line.startsWith("organism=")) {
                 organisms.add(parseOrganism(line.substring("organism=".length())));
             } else if (line.startsWith("event=")) {
@@ -123,7 +127,7 @@ public final class GardenStateStore {
         if (nextId < 1) {
             nextId = organisms.size() + 1;
         }
-        return new Garden(cycle, nextId, new Environment(light, moisture, warmth, nutrients), organisms, events);
+        return new Garden(cycle, nextId, new Environment(light, moisture, warmth, nutrients, nutrientBuffer), organisms, events);
     }
 
     private static Organism parseOrganism(String raw) {

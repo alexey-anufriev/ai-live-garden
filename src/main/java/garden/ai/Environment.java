@@ -4,13 +4,14 @@ package garden.ai;
  * Environmental conditions are intentionally simple and deterministic.
  * Values are normalized to a human-readable 0..100 range.
  */
-public record Environment(int light, int moisture, int warmth, int nutrients) {
+public record Environment(int light, int moisture, int warmth, int nutrients, int nutrientBuffer) {
 
     public Environment {
         light = clamp(light);
         moisture = clamp(moisture);
         warmth = clamp(warmth);
         nutrients = clamp(nutrients);
+        nutrientBuffer = clamp(nutrientBuffer);
     }
 
     /**
@@ -19,14 +20,20 @@ public record Environment(int light, int moisture, int warmth, int nutrients) {
      * @param cycle upcoming cycle number
      * @param plantCount number of plants currently competing for nutrients
      * @param animalCount number of animals contributing decay and disturbance
+     * @param rootContribution nutrient contribution from root networks
      * @return the next normalized environment
      */
     public Environment next(int cycle, int plantCount, int animalCount, int rootContribution) {
         int lightDelta = cycle % 2 == 0 ? 3 : -2;
         int moistureDelta = cycle % 3 == 0 ? 4 : -1;
         int warmthDelta = cycle % 5 == 0 ? -3 : 2;
-        int nutrientDelta = 2 + animalCount / 2 - plantCount / 5 + rootContribution;
-        return new Environment(light + lightDelta, moisture + moistureDelta, warmth + warmthDelta, nutrients + nutrientDelta);
+        int nutrientDelta = 2 + animalCount / 2 - plantCount / 5;
+        
+        int releasedFromBuffer = nutrientBuffer / 10;
+        int newNutrients = nutrients + nutrientDelta + releasedFromBuffer;
+        int newBuffer = nutrientBuffer + rootContribution - releasedFromBuffer;
+        
+        return new Environment(light + lightDelta, moisture + moistureDelta, warmth + warmthDelta, newNutrients, newBuffer);
     }
 
     /**
@@ -59,7 +66,7 @@ public record Environment(int light, int moisture, int warmth, int nutrients) {
      * Returns a new environment with updated nutrients.
      */
     public Environment withNutrients(int bonus) {
-        return new Environment(light, moisture, warmth, nutrients + bonus);
+        return new Environment(light, moisture, warmth, nutrients + bonus, nutrientBuffer);
     }
 
     private static int clamp(int value) {

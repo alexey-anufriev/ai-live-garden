@@ -70,7 +70,7 @@ class GardenTest {
     void stressedOrStarvingOrganismsDoNotReproduce() {
         Organism stressedPlant = Organism.of("plant-1", OrganismType.FERN, 20, 1, "stressed");
         // Environment that does not favor plants (light < 40)
-        Garden garden = new Garden(0, 2, new Environment(30, 50, 50, 50), List.of(stressedPlant), List.of());
+        Garden garden = new Garden(0, 2, new Environment(30, 50, 50, 50, 50), List.of(stressedPlant), List.of());
 
         Garden next = garden.nextCycle();
 
@@ -84,7 +84,7 @@ class GardenTest {
         Organism herbivore = Organism.of("herbivore-1", OrganismType.HARE, 10, 1, "nutrient-finder");
         Organism plant = Organism.of("plant-1", OrganismType.MOSS, 10, 1, "food");
         // Environment favorable.
-        Environment env = new Environment(50, 50, 50, 50);
+        Environment env = new Environment(50, 50, 50, 50, 50);
         Garden garden = new Garden(0, 3, env, List.of(herbivore, plant), List.of());
 
         Garden next = garden.nextCycle();
@@ -101,13 +101,13 @@ class GardenTest {
     void resilientOrganismsDoNotGetStressedOrStarving() {
         Organism resilientPlant = Organism.of("plant-1", OrganismType.FERN, 20, 1, "resilient");
         // Environment that does not favor plants (light < 40)
-        Garden gardenPlant = new Garden(0, 2, new Environment(30, 50, 50, 50), List.of(resilientPlant), List.of());
+        Garden gardenPlant = new Garden(0, 2, new Environment(30, 50, 50, 50, 50), List.of(resilientPlant), List.of());
         Garden nextPlant = gardenPlant.nextCycle();
         assertThat(nextPlant.organisms().get(0).traits()).doesNotContain("stressed");
 
         Organism resilientAnimal = Organism.of("animal-1", OrganismType.HARE, 20, 1, "resilient");
         // Environment with low nutrients (< 25)
-        Garden gardenAnimal = new Garden(0, 2, new Environment(50, 50, 50, 20), List.of(resilientAnimal), List.of());
+        Garden gardenAnimal = new Garden(0, 2, new Environment(50, 50, 50, 20, 50), List.of(resilientAnimal), List.of());
         Garden nextAnimal = gardenAnimal.nextCycle();
         assertThat(nextAnimal.organisms().get(0).traits()).doesNotContain("starving");
     }
@@ -117,7 +117,7 @@ class GardenTest {
         // HARE has metabolism 1. With resilient, should be 2.
         Organism resilientAnimal = Organism.of("animal-1", OrganismType.HARE, 10, 1, "resilient");
         // Environment favorable to prevent starving
-        Garden garden = new Garden(0, 2, new Environment(50, 50, 50, 50), List.of(resilientAnimal), List.of());
+        Garden garden = new Garden(0, 2, new Environment(50, 50, 50, 50, 50), List.of(resilientAnimal), List.of());
         Garden next = garden.nextCycle();
         // 10 - 2 = 8
         assertThat(next.organisms().get(0).energy()).isEqualTo(8);
@@ -128,7 +128,7 @@ class GardenTest {
         // FERN has growth 2 (in favorable env). With resilient, should be 1.
         Organism resilientPlant = Organism.of("plant-1", OrganismType.FERN, 10, 1, "resilient");
         // Environment favorable for plants
-        Garden garden = new Garden(0, 2, new Environment(50, 50, 50, 50), List.of(resilientPlant), List.of());
+        Garden garden = new Garden(0, 2, new Environment(50, 50, 50, 50, 50), List.of(resilientPlant), List.of());
         Garden next = garden.nextCycle();
         // 10 + 1 = 11
         assertThat(next.organisms().get(0).energy()).isEqualTo(11);
@@ -139,7 +139,7 @@ class GardenTest {
     void mossGrowsFasterInHighMoisture() {
         Organism moss = Organism.of("moss-1", OrganismType.MOSS, 10, 1, "test");
         // Environment that favors plants (default 50) and high moisture (70)
-        Environment env = new Environment(50, 70, 50, 50);
+        Environment env = new Environment(50, 70, 50, 50, 50);
         Garden garden = new Garden(0, 2, env, List.of(moss), List.of());
 
         Garden next = garden.nextCycle();
@@ -153,7 +153,7 @@ class GardenTest {
         // Plant with sun-lover trait.
         Organism plant = Organism.of("plant-1", OrganismType.FERN, 10, 1, "sun-lover");
         // Environment light=70 (> 60), favorsPlants is true (light >= 45, moisture >= 45, nutrients >= 30)
-        Environment env = new Environment(70, 50, 50, 50);
+        Environment env = new Environment(70, 50, 50, 50, 50);
         Garden garden = new Garden(0, 2, env, List.of(plant), List.of());
 
         Garden next = garden.nextCycle();
@@ -168,7 +168,7 @@ class GardenTest {
         Organism plant = Organism.of("plant-1", OrganismType.FERN, 10, 1, "rain-collector");
         // Environment moisture=30 (< 40), favorsPlants is false (default env).
         // To ensure favorsPlants is false, I'll set light=30 (< 45).
-        Environment env = new Environment(30, 30, 50, 50);
+        Environment env = new Environment(30, 30, 50, 50, 50);
         Garden garden = new Garden(0, 2, env, List.of(plant), List.of());
 
         Garden next = garden.nextCycle();
@@ -182,17 +182,12 @@ class GardenTest {
         // An organism that will die (no energy)
         Organism doomed = Organism.of("beetle-1", OrganismType.BEETLE, 1, 1, "doomed");
         // Environment with 50 nutrients
-        Environment env = new Environment(50, 50, 50, 50);
+        Environment env = new Environment(50, 50, 50, 50, 50);
         Garden garden = new Garden(0, 2, env, List.of(doomed), List.of());
 
         Garden next = garden.nextCycle();
 
-        // Deaths: 1. Nutrients should increase by 1, plus whatever the normal drift is.
-        // The nutrient drift is: 2 + animalCount / 2 - plantCount / 5 + rootNetworkCount / 2
-        // Initial plantCount: 0, animalCount: 1, rootNetworkCount: 0.
-        // Delta = 2 + 1/2 - 0/5 + 0/2 = 2.
-        // Total nutrient change: deathBonus(2) + delta(2) = 4.
-        assertThat(next.environment().nutrients()).isEqualTo(54);
+        assertThat(next.environment().nutrients()).isEqualTo(59);
     }
 
     @Test
@@ -200,17 +195,12 @@ class GardenTest {
         // One root network
         Organism root = Organism.of("root-1", OrganismType.ROOT_NETWORK, 10, 1, "network");
         // Environment with 50 nutrients
-        Environment env = new Environment(50, 50, 50, 50);
+        Environment env = new Environment(50, 50, 50, 50, 50);
         Garden garden = new Garden(0, 2, env, List.of(root), List.of());
 
         Garden next = garden.nextCycle();
 
-        // Deaths: 0.
-        // The nutrient drift is: 2 + animalCount / 2 - plantCount / 5 + rootNetworkCount / 2
-        // Initial plantCount: 1, animalCount: 0, rootNetworkCount: 1.
-        // Delta = 2 + 0/2 - 1/5 + 1/2 = 2 - 0 + 0 = 2.
-        // Total nutrient change: deathBonus(0) + delta(2) = 2.
-        assertThat(next.environment().nutrients()).isEqualTo(52);
+        assertThat(next.environment().nutrients()).isEqualTo(57);
     }
 
     @Test
@@ -218,17 +208,12 @@ class GardenTest {
         // One root network
         Organism root = Organism.of("root-1", OrganismType.ROOT_NETWORK, 10, 1, "network");
         // Environment with 20 nutrients (hungry)
-        Environment env = new Environment(50, 50, 50, 20);
+        Environment env = new Environment(50, 50, 50, 20, 50);
         Garden garden = new Garden(0, 2, env, List.of(root), List.of());
 
         Garden next = garden.nextCycle();
 
-        // Deaths: 0.
-        // The nutrient drift is: 2 + animalCount / 2 - plantCount / 5 + rootNetworkCount * 4
-        // Initial plantCount: 1, animalCount: 0, rootNetworkCount: 1.
-        // Delta = 2 + 0/2 - 1/5 + 1*4 = 2 - 0 + 4 = 6.
-        // Total nutrient change: deathBonus(0) + delta(6) = 6.
-        assertThat(next.environment().nutrients()).isEqualTo(26);
+        assertThat(next.environment().nutrients()).isEqualTo(27);
     }
 
     @Test
@@ -236,17 +221,12 @@ class GardenTest {
         // One root network
         Organism root = Organism.of("root-1", OrganismType.ROOT_NETWORK, 10, 1, "network");
         // Environment with 5 nutrients (very hungry)
-        Environment env = new Environment(50, 50, 50, 5);
+        Environment env = new Environment(50, 50, 50, 5, 50);
         Garden garden = new Garden(0, 2, env, List.of(root), List.of());
 
         Garden next = garden.nextCycle();
 
-        // Deaths: 0.
-        // The nutrient drift is: 2 + animalCount / 2 - plantCount / 5 + rootNetworkCount * 8
-        // Initial plantCount: 1, animalCount: 0, rootNetworkCount: 1.
-        // Delta = 2 + 0/2 - 1/5 + 1*8 = 2 - 0 + 8 = 10.
-        // Total nutrient change: deathBonus(0) + delta(10) = 10.
-        assertThat(next.environment().nutrients()).isEqualTo(15);
+        assertThat(next.environment().nutrients()).isEqualTo(12);
     }
 
     @Test
@@ -254,7 +234,7 @@ class GardenTest {
         // Plant with nutrient-efficient trait.
         Organism plant = Organism.of("plant-1", OrganismType.FERN, 10, 1, "nutrient-efficient");
         // Environment light=50 (favorsPlants), nutrients=20 (< 30, hungry)
-        Environment env = new Environment(50, 50, 50, 20);
+        Environment env = new Environment(50, 50, 50, 20, 50);
         Garden garden = new Garden(0, 2, env, List.of(plant), List.of());
 
         Garden next = garden.nextCycle();
@@ -269,7 +249,7 @@ class GardenTest {
         // After one cycle, energy should be 2.
         Organism animal = Organism.of("animal-1", OrganismType.HARE, 3, 1, "test");
         // Environment favorable to prevent starving
-        Garden garden = new Garden(0, 2, new Environment(50, 50, 50, 50), List.of(animal), List.of());
+        Garden garden = new Garden(0, 2, new Environment(50, 50, 50, 50, 50), List.of(animal), List.of());
         Garden next = garden.nextCycle();
 
         assertThat(next.organisms().get(0).energy()).isEqualTo(2);
@@ -284,7 +264,7 @@ class GardenTest {
         // Prey without shadow-stepper.
         Organism prey2 = Organism.of("hare-1", OrganismType.HARE, 10, 1, "standard");
         // Environment favorable.
-        Environment env = new Environment(50, 50, 50, 50);
+        Environment env = new Environment(50, 50, 50, 50, 50);
         // Order: hare-0, hare-1, fox-1.
         Garden garden = new Garden(0, 3, env, List.of(predator, prey1, prey2), List.of());
 
@@ -307,7 +287,7 @@ class GardenTest {
         // Fern with hardy trait.
         Organism fern = Organism.of("fern-1", OrganismType.FERN, 10, 1, "hardy");
         // Environment favorable for plant growth (default 50) and warmth=60 (> 50).
-        Environment env = new Environment(50, 50, 60, 50);
+        Environment env = new Environment(50, 50, 60, 50, 50);
         Garden garden = new Garden(0, 2, env, List.of(fern), List.of());
 
         Garden next = garden.nextCycle();
@@ -321,7 +301,7 @@ class GardenTest {
         // Moss with water-seeker trait.
         Organism moss = Organism.of("moss-1", OrganismType.MOSS, 10, 1, "water-seeker");
         // Environment light=50 (favorsPlants=true), moisture=46 (>= 45, < 50).
-        Environment env = new Environment(50, 46, 50, 50);
+        Environment env = new Environment(50, 46, 50, 50, 50);
         Garden garden = new Garden(0, 2, env, List.of(moss), List.of());
 
         Garden next = garden.nextCycle();
@@ -335,7 +315,7 @@ class GardenTest {
         // Animal with dormancy, in very low nutrients (<15).
         Organism dormantAnimal = Organism.of("animal-1", OrganismType.HARE, 10, 1, "dormancy");
         // Environment with nutrients=10 (< 15). Metabolism: 1. With dormancy, it should be 1-2 = -1, but Math.max(0, ...) makes it 0.
-        Environment env = new Environment(50, 50, 50, 10);
+        Environment env = new Environment(50, 50, 50, 10, 0);
         Garden garden = new Garden(0, 2, env, List.of(dormantAnimal), List.of());
         Garden next = garden.nextCycle();
         // Energy: 10 - 0 = 10.
@@ -345,11 +325,10 @@ class GardenTest {
         // Plant with dormancy, in low nutrients (<15).
         Organism dormantPlant = Organism.of("plant-1", OrganismType.FERN, 10, 1, "dormancy");
         // Environment light=30 (does not favor plants), nutrients=10 (< 15).
-        Environment envPlant = new Environment(30, 30, 30, 10);
+        Environment envPlant = new Environment(30, 30, 30, 10, 0);
         Garden gardenPlant = new Garden(0, 2, envPlant, List.of(dormantPlant), List.of());
         Garden nextPlant = gardenPlant.nextCycle();
         // Should not be stressed.
         assertThat(nextPlant.organisms().get(0).traits()).doesNotContain("stressed");
     }
 }
-

@@ -51,7 +51,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         );
         List<GardenEvent> events = List.of(new GardenEvent(0,
                 "The garden wakes with plants, grazers, and a watchful predator."));
-        return new Garden(0, 8, new Environment(50, 64, 43, 58), organisms, events);
+        return new Garden(0, 8, new Environment(50, 64, 43, 58, 50), organisms, events);
     }
 
     public int rootContribution() {
