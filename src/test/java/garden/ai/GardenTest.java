@@ -329,5 +329,27 @@ class GardenTest {
         // Passive change growth: 2 (favorsPlants) + 1 (water-seeker + moisture < 50) = 3
         assertThat(next.organisms().get(0).energy()).isEqualTo(13);
     }
+
+    @Test
+    void dormantOrganismsAreResilientAndEfficientInHunger() {
+        // Animal with dormancy, in very low nutrients (<15).
+        Organism dormantAnimal = Organism.of("animal-1", OrganismType.HARE, 10, 1, "dormancy");
+        // Environment with nutrients=10 (< 15). Metabolism: 1. With dormancy, it should be 1-2 = -1, but Math.max(0, ...) makes it 0.
+        Environment env = new Environment(50, 50, 50, 10);
+        Garden garden = new Garden(0, 2, env, List.of(dormantAnimal), List.of());
+        Garden next = garden.nextCycle();
+        // Energy: 10 - 0 = 10.
+        assertThat(next.organisms().get(0).energy()).isEqualTo(10);
+        assertThat(next.organisms().get(0).traits()).doesNotContain("starving");
+
+        // Plant with dormancy, in low nutrients (<15).
+        Organism dormantPlant = Organism.of("plant-1", OrganismType.FERN, 10, 1, "dormancy");
+        // Environment light=30 (does not favor plants), nutrients=10 (< 15).
+        Environment envPlant = new Environment(30, 30, 30, 10);
+        Garden gardenPlant = new Garden(0, 2, envPlant, List.of(dormantPlant), List.of());
+        Garden nextPlant = gardenPlant.nextCycle();
+        // Should not be stressed.
+        assertThat(nextPlant.organisms().get(0).traits()).doesNotContain("stressed");
+    }
 }
 

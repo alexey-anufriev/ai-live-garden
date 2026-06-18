@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟠 Strained — persistent hunger in the ecosystem, with plant species diversifying their environmental adaptations to survive.
-The garden continues to adapt to the persistent nutrient scarcity, with moss species now developing 'water-seeker' traits to better capitalize on lower moisture conditions, further diversifying the strategies plants use to cope with an increasingly challenging environment.
+**Garden Health:** 🟠 Strained — persistent hunger in the ecosystem, with organisms developing specialized survival strategies to cope.
+The garden remains under heavy nutrient stress, but a new 'dormancy' trait has emerged, allowing organisms to drastically reduce metabolic costs and remain immune to stress/starvation in extreme hunger, helping them endure the ecosystem's most challenging periods.
 <!-- AI-LIVE-GARDEN:STATE-END -->

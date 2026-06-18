@@ -151,6 +151,9 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             if (changed.traits().contains("resilient")) {
                 metabolism += 1;
             }
+            if (changed.traits().contains("dormancy") && environment.nutrients() < 15) {
+                metabolism = Math.max(0, metabolism - 2);
+            }
             changed = changed.withEnergy(changed.energy() - metabolism)
                     .withCuriosity(changed.curiosity() + (cycle % 4 == 0 ? 1 : 0));
         }
@@ -161,9 +164,12 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             events.add(new GardenEvent(cycle, "%s is at a critical energy level.".formatted(changed.id())));
         }
 
-        if (organism.type().isPlant() && !environment.favorsPlants() && !changed.traits().contains("resilient")) {
+        boolean isResilient = changed.traits().contains("resilient");
+        boolean isDormant = changed.traits().contains("dormancy") && environment.nutrients() < 15;
+
+        if (organism.type().isPlant() && !environment.favorsPlants() && !isResilient && !isDormant) {
             changed = changed.withTrait("stressed");
-        } else if (organism.type().isAnimal() && environment.nutrients() < 25 && !changed.traits().contains("resilient")) {
+        } else if (organism.type().isAnimal() && environment.nutrients() < 25 && !isResilient && !isDormant) {
             changed = changed.withTrait("starving");
         }
 
@@ -284,7 +290,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
     }
 
     private String mutationTrait(int cycle, Organism organism) {
-        String[] traits = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "rain-collector", "nutrient-finder", "nutrient-efficient", "shadow-stepper", "hardy", "water-seeker"};
+        String[] traits = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "rain-collector", "nutrient-finder", "nutrient-efficient", "shadow-stepper", "hardy", "water-seeker", "dormancy"};
         int index = Math.floorMod(organism.id().hashCode() + cycle + organism.generation(), traits.length);
         return traits[index];
     }
