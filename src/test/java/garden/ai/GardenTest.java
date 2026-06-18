@@ -301,5 +301,19 @@ class GardenTest {
             assertThat(fedOnStandard).isTrue();
         }
     }
+
+    @Test
+    void hardyFernsGrowFasterInWarmConditions() {
+        // Fern with hardy trait.
+        Organism fern = Organism.of("fern-1", OrganismType.FERN, 10, 1, "hardy");
+        // Environment favorable for plant growth (default 50) and warmth=60 (> 50).
+        Environment env = new Environment(50, 50, 60, 50);
+        Garden garden = new Garden(0, 2, env, List.of(fern), List.of());
+
+        Garden next = garden.nextCycle();
+
+        // Passive change growth: 2 (favorsPlants) + 1 (hardy + warmth > 50) = 3
+        assertThat(next.organisms().get(0).energy()).isEqualTo(13);
+    }
 }
 

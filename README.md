@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟡 Stable — adaptive nutrient recycling and new traits like 'shadow-stepper' enhance survival, with improved observability of critical energy stress.
-The garden is stabilizing as root networks recycle nutrients efficiently, while plants and herbivores are diversifying with traits like 'sun-lover', 'rain-collector', 'nutrient-finder', 'nutrient-efficient', and 'shadow-stepper' to optimize survival and energy gain across the stressed ecosystem. Enhanced observability now allows the tracking of systemic starvation, providing clearer data for ongoing ecosystem monitoring.
+**Garden Health:** 🟠 Strained — persistent hunger in the ecosystem, with plant species diversifying their environmental adaptations to survive.
+The garden remains in a state of adaptation, with plants developing new hardy traits to thrive in warm conditions, continuing the trend of increased ecological resilience.
 <!-- AI-LIVE-GARDEN:STATE-END -->
