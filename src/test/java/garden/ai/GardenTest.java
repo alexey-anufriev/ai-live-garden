@@ -337,6 +337,30 @@ class GardenTest {
     }
 
     @Test
+    void gentleFeederAnimalsFeedLessDestructively() {
+        // Herbivore with gentle-feeder trait.
+        Organism herbivore = Organism.of("herbivore-1", OrganismType.HARE, 10, 1, "gentle-feeder");
+        Organism plant = Organism.of("plant-1", OrganismType.MOSS, 10, 1, "food");
+        // Environment favorable.
+        Environment env = new Environment(50, 50, 50, 50, 50);
+        Garden garden = new Garden(0, 3, env, List.of(herbivore, plant), List.of());
+
+        Garden next = garden.nextCycle();
+
+        // Feeding: HARE normally gets 2 energy. With gentle-feeder, should be 2-1=1.
+        // Metabolism for HARE is 1.
+        // Energy: 10 - 1 (metabolism) + 1 (feeding) = 10.
+        assertThat(next.organisms().stream()
+                .filter(o -> o.id().equals("herbivore-1"))
+                .findFirst().get().energy()).isEqualTo(10);
+        
+        // Prey should have lost only 1 energy. 10 initial + 2 growth - 1 bite = 11.
+        assertThat(next.organisms().stream()
+                .filter(o -> o.id().equals("plant-1"))
+                .findFirst().get().energy()).isEqualTo(11);
+    }
+
+    @Test
     void hardyFernsGrowFasterInWarmConditions() {
         // Fern with hardy trait.
         Organism fern = Organism.of("fern-1", OrganismType.FERN, 10, 1, "hardy");

@@ -54,5 +54,5 @@ The initial ecology has four plant roles and three animal roles. Moss, spores, f
 - Do not rewrite the whole simulation in one run.
 - Introduced the 'scavenger' trait for animals to improve survival in nutrient-poor conditions.
 - Updated feeding phase logic and mutation list.
-- Introduced the 'buffer-scavenger' trait for animals to improve their resilience in nutrient-poor conditions by allowing them to reduce metabolic costs when the nutrient buffer is active.
+- Introduced the 'gentle-feeder' trait for animals to reduce their bite size during feeding, making predator/prey interactions less destructive and more sustainable.
 - Introduced the 'buffer-resonator' trait, allowing plants to harness the nutrient buffer in times of extreme scarcity.

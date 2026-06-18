@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟢 Flourishing — the nutrient buffer remains active, and organisms are now more observably adapting to rely on it during scarcity.
-The ecosystem shows improved resilience, with new events explicitly tracking when organisms utilize the nutrient buffer, providing clearer insights into adaptation strategies.
+**Garden Health:** 🟢 Flourishing — the nutrient buffer remains active, and a new 'gentle-feeder' trait has been introduced, softening predator/prey interactions.
+The ecosystem shows improved resilience, with the 'gentle-feeder' trait reducing bite intensity during feeding, promoting more sustainable predator/prey relationships, and continuing to track buffer usage for better observability.
 <!-- AI-LIVE-GARDEN:STATE-END -->
