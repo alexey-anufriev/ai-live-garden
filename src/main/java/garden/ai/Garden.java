@@ -158,6 +158,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             }
             if (changed.traits().contains("buffer-resonator") && environment.nutrientBuffer() > 0) {
                 growth += 1;
+                events.add(new GardenEvent(cycle, "%s utilized the nutrient buffer.".formatted(changed.id())));
             }
             if (changed.traits().contains("resilient")) {
                 growth -= 1;
@@ -176,6 +177,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             }
             if (changed.traits().contains("buffer-scavenger") && environment.nutrientBuffer() > 0) {
                 metabolism = Math.max(0, metabolism - 1);
+                events.add(new GardenEvent(cycle, "%s utilized the nutrient buffer.".formatted(changed.id())));
             }
             changed = changed.withEnergy(changed.energy() - metabolism)
                     .withCuriosity(changed.curiosity() + (cycle % 4 == 0 ? 1 : 0));

@@ -422,4 +422,29 @@ class GardenTest {
         // Energy: 10 - 0 = 10.
         assertThat(next.organisms().get(0).energy()).isEqualTo(10);
     }
+
+    @Test
+    void bufferResonatorPlantsLogUsageEvent() {
+        // Plant with buffer-resonator trait.
+        Organism plant = Organism.of("plant-1", OrganismType.FERN, 10, 1, "buffer-resonator");
+        // Environment favorsPlants=false, nutrients=0, buffer=50 (>0).
+        Environment env = new Environment(30, 30, 30, 0, 50);
+        Garden garden = new Garden(0, 2, env, List.of(plant), List.of());
+
+        Garden next = garden.nextCycle();
+
+        assertThat(next.events()).anyMatch(e -> e.description().contains("plant-1 utilized the nutrient buffer."));
+    }
+
+    @Test
+    void bufferScavengerAnimalsLogUsageEvent() {
+        // Animal with buffer-scavenger trait.
+        Organism animal = Organism.of("animal-1", OrganismType.HARE, 10, 1, "buffer-scavenger");
+        // Environment nutrients=20 (< 25), buffer=50 (> 0).
+        Environment env = new Environment(50, 50, 50, 20, 50);
+        Garden garden = new Garden(0, 2, env, List.of(animal), List.of());
+        Garden next = garden.nextCycle();
+
+        assertThat(next.events()).anyMatch(e -> e.description().contains("animal-1 utilized the nutrient buffer."));
+    }
 }

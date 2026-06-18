@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟢 Flourishing — the new 'buffer-scavenger' trait allows animals to survive better during scarcity, complementing the plant 'buffer-resonator' trait.
-The ecosystem now exhibits improved cross-species adaptation to scarcity, with animals demonstrating survival capability by utilizing the nutrient buffer, as verified by new simulation tests.
+**Garden Health:** 🟢 Flourishing — the nutrient buffer remains active, and organisms are now more observably adapting to rely on it during scarcity.
+The ecosystem shows improved resilience, with new events explicitly tracking when organisms utilize the nutrient buffer, providing clearer insights into adaptation strategies.
 <!-- AI-LIVE-GARDEN:STATE-END -->
