@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟢 Flourishing — nutrient buffer mechanism and enhanced observability in place.
-The nutrient buffer continues to stabilize the ecosystem, and new CLI reporting makes this buffer visible, providing better insights into systemic nutrient management.
+**Garden Health:** 🟠 Strained — persistent hunger, but the enhanced nutrient buffer now provides more aggressive stabilization.
+The nutrient buffer is now more responsive to critical nutrient shortages, aiming to stabilize the ecosystem before total collapse.
 <!-- AI-LIVE-GARDEN:STATE-END -->

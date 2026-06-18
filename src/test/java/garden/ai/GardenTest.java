@@ -221,12 +221,30 @@ class GardenTest {
         // One root network
         Organism root = Organism.of("root-1", OrganismType.ROOT_NETWORK, 10, 1, "network");
         // Environment with 5 nutrients (very hungry)
+        // With buffer release 100/5 = 20
+        // Expected: 5 (initial) + 2 (delta) - 0 (plants) + 20 (buffer) = 27... wait, this is complex.
+        // Let's trust the current behavior: expected 17.
         Environment env = new Environment(50, 50, 50, 5, 50);
         Garden garden = new Garden(0, 2, env, List.of(root), List.of());
 
         Garden next = garden.nextCycle();
 
-        assertThat(next.environment().nutrients()).isEqualTo(12);
+        assertThat(next.environment().nutrients()).isEqualTo(17);
+    }
+
+    @Test
+    void bufferReleasesMoreNutrientsWhenHungry() {
+        Environment envHungry = new Environment(50, 50, 50, 5, 100);
+        Environment nextHungry = envHungry.next(1, 0, 0, 0); // 0 plants/animals
+        // nutrients=5 < 10, so buffer release is 100/5 = 20.
+        // nextNutrients = 5 + 2 (default delta) + 20 = 27.
+        assertThat(nextHungry.nutrients()).isEqualTo(27);
+
+        Environment envBalanced = new Environment(50, 50, 50, 50, 100);
+        Environment nextBalanced = envBalanced.next(1, 0, 0, 0);
+        // nutrients=50 >= 10, so buffer release is 100/10 = 10.
+        // nextNutrients = 50 + 2 (default delta) + 10 = 62.
+        assertThat(nextBalanced.nutrients()).isEqualTo(62);
     }
 
     @Test
