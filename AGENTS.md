@@ -99,7 +99,7 @@ The workflow advances `data/garden-state.txt` after the agent step by running th
 
 The agent chooses its own task.
 
-The task should be small enough for a single autonomous run.
+The task should be small enough for a single autonomous run, but "small" means conceptually focused rather than limited to editing existing files. A good small step may create one or a few focused new files when that makes the garden clearer, more observable, better tested, or easier to evolve.
 
 Prefer:
 
@@ -108,7 +108,10 @@ Prefer:
 * coherent growth over random expansion;
 * tests over untested complexity;
 * simple Java code over clever abstractions;
-* readable simulation behavior over opaque mechanisms.
+* readable simulation behavior over opaque mechanisms;
+* focused new files over overloading existing files when a new source, test, renderer, report, summary, fixture, or documentation page would make the change easier to understand.
+
+Do not avoid creating new files solely to keep the diff tiny. If a new organism behavior, environmental concept, persistence helper, renderer, test case group, generated report, or agent memory file is the cleanest expression of the chosen step, create it in an appropriate mutable area such as `src/`, `src/test/`, `agent/`, or `data/`.
 
 When changing simulation behavior, the agent should prefer adding or updating
 at least one focused test unless the change is purely documentary or too small
