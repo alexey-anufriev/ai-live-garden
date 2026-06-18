@@ -1,0 +1,7 @@
+- chosen task: Introduce 'scavenger' trait for animals to improve survival in nutrient-poor conditions.
+- reason for choosing it: To help the ecosystem better manage nutrient competition and hunger, responding to the observed "hungry garden" event.
+- files changed: `src/main/java/garden/ai/Garden.java`, `src/test/java/garden/ai/GardenTest.java`, `README.md`, `agent/state.md`.
+- checks run: `mvn test` (all 26 passed).
+- result of `mvn test`: SUCCESS.
+- observations: Animals will now be more resilient in resource-poor environments by scavenging extra nutrients when feeding.
+- possible next directions: Further develop resource management strategies, or perhaps introduce a new type of decomposer organism that benefits from nutrient-poor cycles.

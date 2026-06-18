@@ -50,3 +50,5 @@ The initial ecology has four plant roles and three animal roles. Moss, spores, f
 - Do not add dependencies just to serialize state unless needed.
 - Do not manually fabricate large changes to `data/garden-state.txt`; advance it through the simulation.
 - Do not rewrite the whole simulation in one run.
+- Introduced the 'scavenger' trait for animals to improve survival in nutrient-poor conditions.
+- Updated feeding phase logic and mutation list.

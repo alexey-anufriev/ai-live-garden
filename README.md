@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟠 Strained — persistent hunger, but organisms are beginning to adapt metabolic strategies.
-The nutrient buffer and the newly emerged 'metabolic-efficiency' trait in animals are helping the ecosystem survive despite systemic nutrient limitations.
+**Garden Health:** 🟡 Stable — diverse organisms are finding ways to scavenge and survive in nutrient-limited conditions.
+The emergence of the 'scavenger' trait allows for better resource competition during hungry cycles.
 <!-- AI-LIVE-GARDEN:STATE-END -->

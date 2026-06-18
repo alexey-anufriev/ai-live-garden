@@ -262,6 +262,25 @@ class GardenTest {
     }
 
     @Test
+    void scavengerAnimalsFeedMoreEfficientlyInHungryConditions() {
+        // Herbivore with scavenger trait.
+        Organism herbivore = Organism.of("herbivore-1", OrganismType.HARE, 10, 1, "scavenger");
+        Organism plant = Organism.of("plant-1", OrganismType.MOSS, 10, 1, "food");
+        // Environment hungry (<25).
+        Environment env = new Environment(50, 50, 50, 20, 50);
+        Garden garden = new Garden(0, 3, env, List.of(herbivore, plant), List.of());
+
+        Garden next = garden.nextCycle();
+
+        // Feeding: HARE normally gets 2 energy. With scavenger in hungry env, should be 2+1=3.
+        // Metabolism for HARE is 1.
+        // Energy: 10 - 1 (metabolism) + 3 (feeding) = 12.
+        assertThat(next.organisms().stream()
+                .filter(o -> o.id().equals("herbivore-1"))
+                .findFirst().get().energy()).isEqualTo(12);
+    }
+
+    @Test
     void organismAtCriticalEnergyTriggersEvent() {
         // An organism with 3 energy. Metabolism for HARE is 1.
         // After one cycle, energy should be 2.
