@@ -8,23 +8,25 @@ import java.util.Set;
  */
 public enum OrganismType {
 
-    MOSS("moss cluster", Kingdom.PLANT, 1, Set.of()),
-    ROOT_NETWORK("curious root network", Kingdom.PLANT, 2, Set.of()),
-    SPORE("dormant spore", Kingdom.PLANT, 1, Set.of()),
-    FERN("listening fern", Kingdom.PLANT, 2, Set.of()),
-    BEETLE("amber beetle", Kingdom.HERBIVORE, 1, Set.of(MOSS, SPORE, FERN)),
-    HARE("glass hare", Kingdom.HERBIVORE, 1, Set.of(MOSS, FERN, SPORE)),
-    FOX("echo fox", Kingdom.PREDATOR, 2, Set.of(BEETLE, HARE));
+    MOSS("moss cluster", Kingdom.PLANT, 1, 2, Set.of()),
+    ROOT_NETWORK("curious root network", Kingdom.PLANT, 2, 4, Set.of()),
+    SPORE("dormant spore", Kingdom.PLANT, 1, 1, Set.of()),
+    FERN("listening fern", Kingdom.PLANT, 2, 3, Set.of()),
+    BEETLE("amber beetle", Kingdom.HERBIVORE, 1, 2, Set.of(MOSS, SPORE, FERN)),
+    HARE("glass hare", Kingdom.HERBIVORE, 1, 5, Set.of(MOSS, FERN, SPORE)),
+    FOX("echo fox", Kingdom.PREDATOR, 2, 8, Set.of(BEETLE, HARE));
 
     private final String displayName;
     private final Kingdom kingdom;
     private final int metabolism;
+    private final int nutrientValue;
     private final Set<OrganismType> prey;
 
-    OrganismType(String displayName, Kingdom kingdom, int metabolism, Set<OrganismType> prey) {
+    OrganismType(String displayName, Kingdom kingdom, int metabolism, int nutrientValue, Set<OrganismType> prey) {
         this.displayName = displayName;
         this.kingdom = kingdom;
         this.metabolism = metabolism;
+        this.nutrientValue = nutrientValue;
         this.prey = prey;
     }
 
@@ -47,6 +49,13 @@ public enum OrganismType {
      */
     public int metabolism() {
         return metabolism;
+    }
+
+    /**
+     * Nutrient value contributed to the soil upon death.
+     */
+    public int nutrientValue() {
+        return nutrientValue;
     }
 
     /**

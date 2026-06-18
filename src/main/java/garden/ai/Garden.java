@@ -92,7 +92,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         FeedingResult feeding = feedingPhase(changed, nextCycle, nextEvents);
         
         // Add nutrients based on deaths
-        Environment environmentWithNutrients = nextEnvironment.withNutrients(feeding.deaths());
+        Environment environmentWithNutrients = nextEnvironment.withNutrients(feeding.totalNutrientContribution());
         
         ReproductionResult reproduction = reproductionPhase(feeding.organisms(), nextCycle, nextId, nextEvents);
         List<Organism> finalChanged = reproduction.organisms();
@@ -217,21 +217,21 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             events.add(new GardenEvent(cycle, "%s fed on %s.".formatted(hunter.id(), prey.id())));
         }
 
-        int deaths = 0;
+        int totalNutrientContribution = 0;
         List<Organism> survivors = new ArrayList<>();
         for (Organism organism : mutable) {
             if (organism.energy() > 0) {
                 survivors.add(organism);
             } else {
-                events.add(new GardenEvent(cycle, "%s returned to the soil.".formatted(organism.id())));
-                deaths++;
+                events.add(new GardenEvent(cycle, "%s (%d nutrients) returned to the soil.".formatted(organism.id(), organism.type().nutrientValue())));
+                totalNutrientContribution += organism.type().nutrientValue();
             }
         }
         survivors.sort(Comparator.comparing(Organism::id));
-        return new FeedingResult(survivors, deaths);
+        return new FeedingResult(survivors, totalNutrientContribution);
     }
 
-    private record FeedingResult(List<Organism> organisms, int deaths) {
+    private record FeedingResult(List<Organism> organisms, int totalNutrientContribution) {
     }
 
     private Optional<Integer> findPreyIndex(List<Organism> organisms, Organism hunter, int hunterIndex) {

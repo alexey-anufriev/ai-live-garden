@@ -191,8 +191,8 @@ class GardenTest {
         // The nutrient drift is: 2 + animalCount / 2 - plantCount / 5 + rootNetworkCount / 2
         // Initial plantCount: 0, animalCount: 1, rootNetworkCount: 0.
         // Delta = 2 + 1/2 - 0/5 + 0/2 = 2.
-        // Total nutrient change: deathBonus(1) + delta(2) = 3.
-        assertThat(next.environment().nutrients()).isEqualTo(53);
+        // Total nutrient change: deathBonus(2) + delta(2) = 4.
+        assertThat(next.environment().nutrients()).isEqualTo(54);
     }
 
     @Test

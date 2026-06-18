@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟠 Strained — persistent hunger persists, but new root adaptations are enhancing nutrient recovery.
-The garden remains under heavy nutrient stress. Root network nutrient contributions are now tracked and rendered, allowing for better observation of the ecosystem's adaptive response to starvation.
+**Garden Health:** 🟠 Strained — persistent hunger persists, but refined nutrient recycling and root adaptations are enhancing recovery observability.
+The garden remains under heavy nutrient stress. Root network nutrient contributions and organism-specific decay contributions are now explicitly tracked and rendered, allowing for better observation of the ecosystem's adaptive response to starvation.
 <!-- AI-LIVE-GARDEN:STATE-END -->

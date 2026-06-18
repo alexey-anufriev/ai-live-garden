@@ -27,6 +27,7 @@ The garden is becoming a small persistent ecosystem rather than a reset-only dem
 - `Simulation` advances an existing `Garden` instead of always starting from `Garden.seed()`.
 - `Garden` contains the current ecosystem rules.
 - `GardenRenderer.java` now explicitly renders the root network's nutrient contribution.
+- Nutrient recycling now accounts for the specific nutrient value of decaying organisms, improving ecosystem observability.
 
 ## Ecosystem diversity
 - Ecosystem diversity:
