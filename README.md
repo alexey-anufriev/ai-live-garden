@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟠 Strained — persistent hunger, but the enhanced nutrient buffer now provides more aggressive stabilization.
-The nutrient buffer is now more responsive to critical nutrient shortages, aiming to stabilize the ecosystem before total collapse.
+**Garden Health:** 🟠 Strained — persistent hunger, but organisms are beginning to adapt metabolic strategies.
+The nutrient buffer and the newly emerged 'metabolic-efficiency' trait in animals are helping the ecosystem survive despite systemic nutrient limitations.
 <!-- AI-LIVE-GARDEN:STATE-END -->

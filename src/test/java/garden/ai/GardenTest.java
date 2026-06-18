@@ -329,6 +329,17 @@ class GardenTest {
     }
 
     @Test
+    void animalsWithMetabolicEfficiencyHaveLowerMetabolism() {
+        // HARE has metabolism 1. With metabolic-efficiency, it should be 1-1=0.
+        Organism efficientAnimal = Organism.of("animal-1", OrganismType.HARE, 10, 1, "metabolic-efficiency");
+        // Environment favorable to prevent starving
+        Garden garden = new Garden(0, 2, new Environment(50, 50, 50, 50, 50), List.of(efficientAnimal), List.of());
+        Garden next = garden.nextCycle();
+        // 10 - 0 = 10
+        assertThat(next.organisms().get(0).energy()).isEqualTo(10);
+    }
+
+    @Test
     void dormantOrganismsAreResilientAndEfficientInHunger() {
         // Animal with dormancy, in very low nutrients (<15).
         Organism dormantAnimal = Organism.of("animal-1", OrganismType.HARE, 10, 1, "dormancy");
