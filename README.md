@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟠 Strained — persistent hunger in the ecosystem, with organisms developing specialized survival strategies to cope.
-The garden remains under heavy nutrient stress, but a new 'dormancy' trait has emerged, allowing organisms to drastically reduce metabolic costs and remain immune to stress/starvation in extreme hunger, helping them endure the ecosystem's most challenging periods.
+**Garden Health:** 🟠 Strained — persistent hunger persists, but new root adaptations are enhancing nutrient recovery.
+The garden remains under heavy nutrient stress, but a new 'nutrient-weaver' trait has emerged in root networks, enabling them to significantly bolster nutrient recovery when the ecosystem is most starved, creating a new feedback loop for potential long-term stabilization.
 <!-- AI-LIVE-GARDEN:STATE-END -->
