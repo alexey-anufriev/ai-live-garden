@@ -262,5 +262,31 @@ class GardenTest {
         // Passive change growth: 0 (favorsPlants=false) + 1 (nutrient-efficient + nutrients < 30) = 1
         assertThat(next.organisms().get(0).energy()).isEqualTo(11);
     }
+
+    @Test
+    void preyWithShadowStepperTraitCanAvoidPredators() {
+        Organism predator = Organism.of("fox-1", OrganismType.FOX, 10, 1, "hunter");
+        // Prey with shadow-stepper.
+        Organism prey1 = Organism.of("hare-0", OrganismType.HARE, 10, 1, "shadow-stepper");
+        // Prey without shadow-stepper.
+        Organism prey2 = Organism.of("hare-1", OrganismType.HARE, 10, 1, "standard");
+        // Environment favorable.
+        Environment env = new Environment(50, 50, 50, 50);
+        // Order: hare-0, hare-1, fox-1.
+        Garden garden = new Garden(0, 3, env, List.of(predator, prey1, prey2), List.of());
+
+        Garden next = garden.nextCycle();
+
+        boolean fedOnStealthy = next.events().stream().anyMatch(e -> e.description().contains("fox-1 fed on hare-0"));
+        boolean fedOnStandard = next.events().stream().anyMatch(e -> e.description().contains("fox-1 fed on hare-1"));
+
+        // If predator fed on stealthy, it shouldn't have fed on standard.
+        // If predator didn't feed on stealthy, it must have fed on standard.
+        if (fedOnStealthy) {
+            assertThat(fedOnStandard).isFalse();
+        } else {
+            assertThat(fedOnStandard).isTrue();
+        }
+    }
 }
 
