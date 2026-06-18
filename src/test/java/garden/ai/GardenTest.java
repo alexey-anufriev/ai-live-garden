@@ -291,10 +291,10 @@ class GardenTest {
 
         // Feeding: HARE normally gets 2 energy. With scavenger in hungry env, should be 2+1=3.
         // Metabolism for HARE is 1.
-        // Energy: 10 - 1 (metabolism) + 3 (feeding) = 12.
+        // Energy: 10 - 1 (metabolism) + 4 (feeding) = 13.
         assertThat(next.organisms().stream()
                 .filter(o -> o.id().equals("herbivore-1"))
-                .findFirst().get().energy()).isEqualTo(12);
+                .findFirst().get().energy()).isEqualTo(13);
     }
 
     @Test
@@ -373,6 +373,20 @@ class GardenTest {
         Garden next = garden.nextCycle();
         // 10 - 0 = 10
         assertThat(next.organisms().get(0).energy()).isEqualTo(10);
+    }
+
+    @Test
+    void bufferResonatorPlantsGrowWhenNutrientsAreZero() {
+        // Plant with buffer-resonator trait.
+        Organism plant = Organism.of("plant-1", OrganismType.FERN, 10, 1, "buffer-resonator");
+        // Environment favorsPlants=false, nutrients=0, buffer=50 (>0).
+        Environment env = new Environment(30, 30, 30, 0, 50);
+        Garden garden = new Garden(0, 2, env, List.of(plant), List.of());
+
+        Garden next = garden.nextCycle();
+
+        // Passive change growth: 0 (favorsPlants=false) + 1 (buffer-resonator + nutrients==0 + buffer>0) = 1
+        assertThat(next.organisms().get(0).energy()).isEqualTo(11);
     }
 
     @Test
