@@ -175,6 +175,9 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             int index = preyIndex.get();
             Organism prey = mutable.get(index);
             int bite = hunter.type() == OrganismType.FOX ? 3 : 2;
+            if (hunter.traits().contains("nutrient-finder")) {
+                bite += 1;
+            }
             Organism fedHunter = hunter.withEnergy(hunter.energy() + bite).withTrait("fed-" + cycle);
             Organism weakenedPrey = prey.withEnergy(prey.energy() - bite);
             mutable.set(hunterIndex, fedHunter);
@@ -265,7 +268,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
     }
 
     private String mutationTrait(int cycle, Organism organism) {
-        String[] traits = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "rain-collector"};
+        String[] traits = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "rain-collector", "nutrient-finder"};
         int index = Math.floorMod(organism.id().hashCode() + cycle + organism.generation(), traits.length);
         return traits[index];
     }

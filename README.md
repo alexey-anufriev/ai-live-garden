@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟡 Stable — adaptive nutrient recycling and new plant traits like 'sun-lover' and 'rain-collector' support ecosystem resilience.
-The garden is stabilizing as root networks recycle nutrients efficiently, while plants are diversifying with traits like 'sun-lover' and 'rain-collector' to optimize survival across varying light and moisture levels. These adaptations provide new mechanisms for long-term ecosystem resilience.
+**Garden Health:** 🟡 Stable — adaptive nutrient recycling and new plant traits like 'sun-lover', 'rain-collector', and 'nutrient-finder' support ecosystem resilience.
+The garden is stabilizing as root networks recycle nutrients efficiently, while plants and herbivores are diversifying with traits like 'sun-lover', 'rain-collector', and 'nutrient-finder' to optimize survival and energy gain across the stressed ecosystem. These adaptations provide new mechanisms for long-term ecosystem resilience.
 <!-- AI-LIVE-GARDEN:STATE-END -->

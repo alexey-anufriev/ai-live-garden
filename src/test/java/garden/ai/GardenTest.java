@@ -79,6 +79,25 @@ class GardenTest {
     }
 
     @Test
+    void herbivoreWithNutrientFinderTraitFeedsMoreEfficiently() {
+        // Herbivore with nutrient-finder trait.
+        Organism herbivore = Organism.of("herbivore-1", OrganismType.HARE, 10, 1, "nutrient-finder");
+        Organism plant = Organism.of("plant-1", OrganismType.MOSS, 10, 1, "food");
+        // Environment favorable.
+        Environment env = new Environment(50, 50, 50, 50);
+        Garden garden = new Garden(0, 3, env, List.of(herbivore, plant), List.of());
+
+        Garden next = garden.nextCycle();
+
+        // Feeding: HARE normally gets 2 energy. With nutrient-finder, should be 2+1=3.
+        // Metabolism for HARE is 1.
+        // Energy: 10 - 1 (metabolism) + 3 (feeding) = 12.
+        assertThat(next.organisms().stream()
+                .filter(o -> o.id().equals("herbivore-1"))
+                .findFirst().get().energy()).isEqualTo(12);
+    }
+
+    @Test
     void resilientOrganismsDoNotGetStressedOrStarving() {
         Organism resilientPlant = Organism.of("plant-1", OrganismType.FERN, 20, 1, "resilient");
         // Environment that does not favor plants (light < 40)
