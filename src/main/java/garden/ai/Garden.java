@@ -127,6 +127,9 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             if (changed.traits().contains("sun-lover") && environment.light() > 60) {
                 growth += 1;
             }
+            if (changed.traits().contains("rain-collector") && environment.moisture() < 40) {
+                growth += 1;
+            }
             if (organism.type() == OrganismType.SPORE && environment.light() < 45) {
                 changed = changed.withCuriosity(changed.curiosity() + 2);
             }
@@ -262,7 +265,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
     }
 
     private String mutationTrait(int cycle, Organism organism) {
-        String[] traits = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover"};
+        String[] traits = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "rain-collector"};
         int index = Math.floorMod(organism.id().hashCode() + cycle + organism.generation(), traits.length);
         return traits[index];
     }

@@ -144,6 +144,21 @@ class GardenTest {
     }
 
     @Test
+    void rainCollectorPlantsGrowFasterInDryConditions() {
+        // Plant with rain-collector trait.
+        Organism plant = Organism.of("plant-1", OrganismType.FERN, 10, 1, "rain-collector");
+        // Environment moisture=30 (< 40), favorsPlants is false (default env).
+        // To ensure favorsPlants is false, I'll set light=30 (< 45).
+        Environment env = new Environment(30, 30, 50, 50);
+        Garden garden = new Garden(0, 2, env, List.of(plant), List.of());
+
+        Garden next = garden.nextCycle();
+
+        // Passive change growth: 0 (favorsPlants=false) + 1 (rain-collector + moisture < 40) = 1
+        assertThat(next.organisms().get(0).energy()).isEqualTo(11);
+    }
+
+    @Test
     void deathsIncreaseNutrients() {
         // An organism that will die (no energy)
         Organism doomed = Organism.of("beetle-1", OrganismType.BEETLE, 1, 1, "doomed");
