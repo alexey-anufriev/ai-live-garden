@@ -315,5 +315,19 @@ class GardenTest {
         // Passive change growth: 2 (favorsPlants) + 1 (hardy + warmth > 50) = 3
         assertThat(next.organisms().get(0).energy()).isEqualTo(13);
     }
+
+    @Test
+    void waterSeekerMossGrowsFasterInDryConditions() {
+        // Moss with water-seeker trait.
+        Organism moss = Organism.of("moss-1", OrganismType.MOSS, 10, 1, "water-seeker");
+        // Environment light=50 (favorsPlants=true), moisture=46 (>= 45, < 50).
+        Environment env = new Environment(50, 46, 50, 50);
+        Garden garden = new Garden(0, 2, env, List.of(moss), List.of());
+
+        Garden next = garden.nextCycle();
+
+        // Passive change growth: 2 (favorsPlants) + 1 (water-seeker + moisture < 50) = 3
+        assertThat(next.organisms().get(0).energy()).isEqualTo(13);
+    }
 }
 
