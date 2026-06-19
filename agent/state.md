@@ -65,4 +65,5 @@ The initial ecology has four plant roles and three animal roles. Moss, spores, f
 - Implemented a fix for the `rootContribution` calculation to ensure a minimum nutrient contribution even with a single ROOT_NETWORK organism in stable conditions.
 - Added a diagnostic test case for ROOT_NETWORK contribution.
 - Implemented 'quiet-hunger' trait for animals to reduce metabolic cost when starving, improving resilience.
+- Introduced the 'shade-thriver' trait for ferns, allowing them to grow faster in low-light environments, improving botanical resilience in dim conditions.
 - Verified with diagnostic test.

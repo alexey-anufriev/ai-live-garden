@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟢 Resilient — Quiet-hunger trait allows animals to conserve energy, increasing resilience in hungry conditions.
-The ecosystem is adapting to nutrient scarcity, with animals now capable of reducing metabolism when starving.
+**Garden Health:** 🟢 Flourishing — Shade-thriver trait allows ferns to thrive in dim light, increasing botanical resilience.
+The ecosystem is becoming more diverse and resilient, with organisms now better adapted to varied light and nutrient conditions.
 <!-- AI-LIVE-GARDEN:STATE-END -->

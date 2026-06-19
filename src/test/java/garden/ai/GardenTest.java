@@ -425,6 +425,21 @@ class GardenTest {
     }
 
     @Test
+    void shadeThriverFernsGrowFasterInShade() {
+        // FERN with shade-thriver trait.
+        Organism fern = Organism.of("fern-1", OrganismType.FERN, 10, 1, "shade-thriver");
+        // Environment light=30 (< 40), favorsPlants is false (default 50, but I set light=30).
+        Environment env = new Environment(30, 50, 50, 50, 50);
+        Garden garden = new Garden(0, 2, env, List.of(fern), List.of());
+
+        Garden next = garden.nextCycle();
+
+        // Passive change growth: 0 (favorsPlants=false) + 2 (shade-thriver + light < 40) = 2
+        assertThat(next.organisms().get(0).energy()).isEqualTo(12);
+        assertThat(next.events()).anyMatch(e -> e.description().contains("fern-1 thrived in the shade."));
+    }
+
+    @Test
     void hardyFernsGrowFasterInWarmConditions() {
         // Fern with hardy trait.
         Organism fern = Organism.of("fern-1", OrganismType.FERN, 10, 1, "hardy");
