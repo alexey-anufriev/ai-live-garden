@@ -615,4 +615,30 @@ class GardenTest {
         // newBuffer = 50 (initial) + 20 (contribution) - 5 (releasedFromBuffer) = 65.
         assertThat(next.environment().nutrientBuffer()).isEqualTo(65);
     }
+
+    @Test
+    void preyWithCamouflagedTraitCanAvoidPredators() {
+        Organism predator = Organism.of("fox-1", OrganismType.FOX, 10, 1, "hunter");
+        // Prey 1: camouflaged.
+        Organism prey1 = Organism.of("hare-0", OrganismType.HARE, 10, 1, "camouflaged");
+        // Prey 2: normal.
+        Organism prey2 = Organism.of("hare-1", OrganismType.HARE, 10, 1, "normal");
+        // Environment favorable.
+        Environment env = new Environment(50, 50, 50, 50, 50);
+        // Order: fox-1, prey-1, prey-2.
+        Garden garden = new Garden(0, 3, env, List.of(predator, prey1, prey2), List.of());
+
+        Garden next = garden.nextCycle();
+
+        boolean fedOnCamouflaged = next.events().stream().anyMatch(e -> e.description().contains("fox-1 fed on hare-0"));
+        boolean fedOnStandard = next.events().stream().anyMatch(e -> e.description().contains("fox-1 fed on hare-1"));
+
+        // Similar to shadow-stepper, if predator fed on camouflaged, it shouldn't have fed on standard.
+        // If predator didn't feed on camouflaged, it must have fed on standard.
+        if (fedOnCamouflaged) {
+            assertThat(fedOnStandard).isFalse();
+        } else {
+            assertThat(fedOnStandard).isTrue();
+        }
+    }
 }

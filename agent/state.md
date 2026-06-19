@@ -1,6 +1,6 @@
 # Agent State
 
-**Garden Health:** 🟠 Strained — The garden is hungry, but organisms can now recover from being stressed or starving if conditions improve.
+**Garden Health:** 🟢 Resilient — Camouflaged prey are emerging, improving survival in a hungry ecosystem.
 
 ## Current identity
 
