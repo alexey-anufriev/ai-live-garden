@@ -28,13 +28,21 @@ public final class GardenRenderer {
                 .map(event -> "- cycle %d: %s".formatted(event.cycle(), event.description()))
                 .collect(Collectors.joining(System.lineSeparator()));
 
+        long moss = garden.organisms().stream().filter(o -> o.type() == OrganismType.MOSS).count();
+        long roots = garden.organisms().stream().filter(o -> o.type() == OrganismType.ROOT_NETWORK).count();
+        long spores = garden.organisms().stream().filter(o -> o.type() == OrganismType.SPORE).count();
+        long ferns = garden.organisms().stream().filter(o -> o.type() == OrganismType.FERN).count();
+        long beetles = garden.organisms().stream().filter(o -> o.type() == OrganismType.BEETLE).count();
+        long hares = garden.organisms().stream().filter(o -> o.type() == OrganismType.HARE).count();
+        long foxes = garden.organisms().stream().filter(o -> o.type() == OrganismType.FOX).count();
+
         return """
                 AI Live Garden
                 ==============
 
                 Cycle: %d
                 Environment: light=%d moisture=%d warmth=%d nutrients=%d (buffer: %d, root: %d) mood=%s
-                Balance: plants=%d animals=%d total=%d
+                Balance: plants=%d (Moss: %d, Roots: %d, Spores: %d, Ferns: %d) animals=%d (Beetles: %d, Hares: %d, Foxes: %d) total=%d
 
                 Organisms:
                 %s
@@ -51,7 +59,9 @@ public final class GardenRenderer {
                 garden.rootContribution(),
                 garden.environment().mood() + (garden.environment().mood().equals("hungry") ? " (" + garden.environment().diagnostic() + ")" : ""),
                 garden.plantCount(),
+                moss, roots, spores, ferns,
                 garden.animalCount(),
+                beetles, hares, foxes,
                 garden.organisms().size(),
                 organisms,
                 recentEvents

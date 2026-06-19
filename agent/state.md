@@ -29,17 +29,19 @@ The project is currently more of a botanical survival system than a balanced foo
 
 Source of truth: `data/garden-state.txt`.
 
-The current snapshot is cycle 1000 with light 100, moisture 99, warmth 97, nutrients 0, and nutrient buffer 100.
+The current snapshot is cycle 1015 with light 98, moisture 99, warmth 97, nutrients 0, and nutrient buffer 100.
 
 Active organisms:
 
-- 1569 moss
-- 397 ferns
+- 1595 moss
+- 401 ferns
 - 12 root networks
 - 1 spore
 - 0 herbivores or predators visible in the persistent state
 
 Recent events show a hungry garden, continued moss reproduction, root networks gathering energy, and new mutations on moss and roots. The ecosystem is alive and productive, but it is heavily plant-dominated and the animal chain has collapsed for now.
+
+Population breakdown is now available in `inspect` output.
 
 ## Current Behavior
 
@@ -75,7 +77,7 @@ Good next steps would clarify whether animals can re-enter the live state, wheth
 - Investigate whether herbivores and predators can naturally recover from the current plant-only snapshot.
 - Consider a small, tested mechanism for animal reintroduction, dormancy, migration, or seed-bank-like recovery if the food chain remains extinct.
 - Monitor whether plant reproduction and root-buffer support are creating a permanent nutrient-zero equilibrium.
-- Improve observability around type counts, extinctions, and recovery chances so collapse is easier to see from `inspect`.
+- (Resolved) Improve observability around type counts, extinctions, and recovery chances so collapse is easier to see from `inspect`.
 - Keep future ecosystem changes focused on relationships and feedback loops, not isolated trait names.
 
 ## Avoid For Now

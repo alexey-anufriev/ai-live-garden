@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟢 Flourishing — Moisture-retainer trait introduced, stabilizing dry periods.
-The ecosystem is becoming more diverse and resilient, with moss now able to buffer moisture levels.
+**Garden Health:** 🟢 Flourishing — Population breakdown added to renderer for better observability.
+The ecosystem remains stable but plant-dominated, with observability improved to monitor population distribution.
 <!-- AI-LIVE-GARDEN:STATE-END -->
