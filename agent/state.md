@@ -45,6 +45,7 @@ The initial ecology has four plant roles and three animal roles. Moss, spores, f
 - Add richer habitat zones or relationships between organisms.
 - Add a compact generated observation file or HTML view later, if useful.
 - Let future agents evolve the state format only when the current text format becomes limiting.
+- Summary files are append-only memory with templates in `agent/templates/`. Future daily, weekly, monthly, and yearly summary updates should append dated entries or recovery sections instead of replacing earlier text. Active summary retention is enforced by `scripts/archive-summaries.sh` in the Evolve workflow.
 - Monitor the impact of the 'nutrient-recycler' trait on the nutrient buffer stability during cycles of high productivity.
 - Critical energy events are now logged, allowing better visibility into systemic starvation.
 - Added a diagnostic event to log high population pressure when nutrients are low (<10) and plant count is high (>200), improving observability of systemic nutrient strain.

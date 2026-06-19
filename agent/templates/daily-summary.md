@@ -1,0 +1,11 @@
+# Daily Summary: {{YYYY-MM-DD}}
+
+## Entries
+
+### {{TIMESTAMP_ISO_8601}} - {{SHORT_TITLE}}
+
+{{ONE_OR_TWO_PARAGRAPHS_COMPRESSING_TODAYS_CHANGE}}
+
+## Direction
+
+{{SHORT_SYNTHESIS_OF_THE_DAY_SO_FAR}}

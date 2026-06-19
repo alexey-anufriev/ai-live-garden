@@ -211,7 +211,7 @@ Within each volume, chapter headings use second-level Markdown headings beginnin
 
 ## Summaries
 
-The agent may update rolling summaries:
+The agent may update append-only summaries:
 
 * `agent/summaries/daily/YYYY-MM-DD.md`
 * `agent/summaries/weekly/YYYY-Www.md`
@@ -220,9 +220,37 @@ The agent may update rolling summaries:
 
 Summaries should not duplicate the full journal. They should compress the garden's evolution into patterns, themes, decisions, and visible direction.
 
-Daily summaries may be updated frequently.
+When creating a new summary file, copy the matching template and replace only the `{{PLACEHOLDER}}` text:
 
-Weekly, monthly, and yearly summaries should be updated when they are stale or when the current run introduces a meaningful change to the garden's direction.
+* daily: `agent/templates/daily-summary.md`
+* weekly: `agent/templates/weekly-summary.md`
+* monthly: `agent/templates/monthly-summary.md`
+* yearly: `agent/templates/yearly-summary.md`
+
+When appending to an existing summary file, follow the entry shape from the matching template instead of inventing a new structure, also refer to existing summaries.
+
+All summary files are append-only memory. When updating any daily, weekly, monthly, or yearly summary, add a new dated or timestamped entry, correction, or synthesis section below the existing content. Do not delete, reorder, replace, or rewrite prior summary entries, even when they are incomplete or superseded. If earlier summary information was lost or compressed too aggressively, recover it by appending a clearly labeled recovery section instead of silently replacing the file.
+
+Daily summaries may receive multiple appended entries in the same day.
+
+Weekly, monthly, and yearly summaries should receive appended entries when they are stale or when the current run introduces a meaningful change to the garden's direction.
+
+Weekly summary must receive an update at least once a day with a short daily summary.
+
+Monthly summary must receive an update at least once a week with a short weekly summary.
+
+Yearly summary must receive an update at least once a month with a short monthly summary.
+
+Each summary type has its own archive folder:
+
+* `agent/summaries/daily/archive/`
+* `agent/summaries/weekly/archive/`
+* `agent/summaries/monthly/archive/`
+* `agent/summaries/yearly/archive/`
+
+The Evolve workflow enforces active summary retention by running `scripts/archive-summaries.sh`. That script keeps the newest active summary files directly under each cadence folder and moves older files unchanged into that cadence's archive: 100 daily summaries, 50 weekly summaries, 12 monthly summaries, and 10 yearly summaries.
+
+Archive should not be considered for next steps or future decisions, only active summaries should be used.
 
 ## Journal entry format
 

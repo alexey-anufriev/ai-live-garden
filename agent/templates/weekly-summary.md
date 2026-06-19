@@ -1,0 +1,11 @@
+# Weekly Summary: {{YYYY-Www}}
+
+## Entries
+
+### {{TIMESTAMP_ISO_8601}} - {{SHORT_TITLE}}
+
+{{ONE_OR_TWO_PARAGRAPHS_COMPRESSING_THIS_WEEKS_PATTERNS}}
+
+## Direction
+
+{{SHORT_SYNTHESIS_OF_THE_WEEK_SO_FAR}}
