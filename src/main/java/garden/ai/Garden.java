@@ -93,6 +93,9 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         if (plantCount > 200 && nextEnvironment.nutrients() < 10) {
             nextEvents.add(new GardenEvent(nextCycle, "High population pressure is straining nutrient reserves."));
         }
+        if (nextEnvironment.nutrientBuffer() < 10) {
+            nextEvents.add(new GardenEvent(nextCycle, "The nutrient buffer is near exhaustion."));
+        }
         List<Organism> changed = organisms.stream()
                 .map(organism -> passiveChange(organism, environment, nextCycle, nextEvents))
                 .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
