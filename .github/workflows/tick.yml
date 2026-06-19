@@ -32,13 +32,10 @@ jobs:
       - name: Baseline test
         id: baseline_test
         run: mvn -B test
-        continue-on-error: true
 
       - name: Advance persistent garden state
         id: advance_garden
-        if: steps.baseline_test.outcome == 'success'
         run: mvn -B -q exec:java -Dexec.args="tick --steps 5"
-        continue-on-error: true
 
       - name: Commit changes directly to main
         shell: bash
