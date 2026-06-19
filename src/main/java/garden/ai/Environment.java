@@ -29,7 +29,7 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
         int warmthDelta = cycle % 5 == 0 ? -3 : 2;
         int nutrientDelta = 2 + animalCount / 2 - plantCount / 5;
         
-        int releaseRate = nutrients < 10 ? 5 : 10;
+        int releaseRate = nutrients < 5 ? 2 : (nutrients < 10 ? 5 : 10);
         int releasedFromBuffer = nutrientBuffer / releaseRate;
         int newNutrients = nutrients + nutrientDelta + releasedFromBuffer;
         int newBuffer = nutrientBuffer + rootContribution - releasedFromBuffer;

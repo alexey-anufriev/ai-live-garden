@@ -1,5 +1,7 @@
 # Agent State
 
+**Garden Health:** RECOVERING Status — Buffer release mechanism enhanced for extreme hunger.
+
 ## Current identity
 
 AI Live Garden is a Java 25 / Maven simulation of a living digital garden that is evolved by an autonomous coding agent.
