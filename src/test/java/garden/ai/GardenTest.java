@@ -529,6 +529,21 @@ class GardenTest {
     }
 
     @Test
+    void bufferTapperPlantsGrowFasterInExtremeHunger() {
+        // Plant with buffer-tapper trait.
+        Organism plant = Organism.of("plant-1", OrganismType.FERN, 10, 1, "buffer-tapper");
+        // Environment favorsPlants=false, nutrients=2 (< 5), buffer=50 (>0).
+        Environment env = new Environment(30, 30, 30, 2, 50);
+        Garden garden = new Garden(0, 2, env, List.of(plant), List.of());
+
+        Garden next = garden.nextCycle();
+
+        // Passive change growth: 0 (favorsPlants=false) + 2 (buffer-tapper + nutrients<5 + buffer>0) = 2
+        assertThat(next.organisms().get(0).energy()).isEqualTo(12);
+        assertThat(next.events()).anyMatch(e -> e.description().contains("plant-1 tapped the nutrient buffer."));
+    }
+
+    @Test
     void rootNetworkWithBufferOptimizerIncreasesBufferContribution() {
         // One root network with buffer-optimizer.
         Organism root = Organism.of("root-1", OrganismType.ROOT_NETWORK, 10, 1, "buffer-optimizer");

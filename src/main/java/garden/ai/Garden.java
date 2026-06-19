@@ -94,7 +94,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             nextEvents.add(new GardenEvent(nextCycle, "High population pressure is straining nutrient reserves."));
         }
         List<Organism> changed = organisms.stream()
-                .map(organism -> passiveChange(organism, nextEnvironment, nextCycle, nextEvents))
+                .map(organism -> passiveChange(organism, environment, nextCycle, nextEvents))
                 .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
 
         FeedingResult feeding = feedingPhase(changed, nextCycle, nextEvents);
@@ -162,6 +162,10 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             }
             if (changed.traits().contains("nutrient-efficient") && environment.nutrients() < 30) {
                 growth += 1;
+            }
+            if (changed.traits().contains("buffer-tapper") && environment.nutrients() < 5 && environment.nutrientBuffer() > 0) {
+                growth += 2;
+                events.add(new GardenEvent(cycle, "%s tapped the nutrient buffer.".formatted(changed.id())));
             }
             if (changed.traits().contains("buffer-resonator") && environment.nutrientBuffer() > 0) {
                 growth += 1;
@@ -347,7 +351,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
     }
 
     private String mutationTrait(int cycle, Organism organism) {
-        String[] traits = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "rain-collector", "nutrient-finder", "nutrient-efficient", "shadow-stepper", "hardy", "water-seeker", "dormancy", "nutrient-weaver", "metabolic-efficiency", "scavenger", "nutrient-sharer", "buffer-resonator", "buffer-scavenger", "nutrient-hoarder", "nutrient-scout", "soil-master", "deep-rooting", "buffer-optimizer"};
+        String[] traits = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "rain-collector", "nutrient-finder", "nutrient-efficient", "shadow-stepper", "hardy", "water-seeker", "dormancy", "nutrient-weaver", "metabolic-efficiency", "scavenger", "nutrient-sharer", "buffer-resonator", "buffer-scavenger", "nutrient-hoarder", "nutrient-scout", "soil-master", "deep-rooting", "buffer-optimizer", "buffer-tapper"};
         int index = Math.floorMod(organism.id().hashCode() + cycle + organism.generation(), traits.length);
         return traits[index];
     }
