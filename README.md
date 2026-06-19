@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟢 Flourishing — Population breakdown added to renderer for better observability.
-The ecosystem remains stable but plant-dominated, with observability improved to monitor population distribution.
+**Garden Health:** 🟡 Restoring — Attempting to reintroduce animal life to the ecosystem.
+The ecosystem remains plant-dominated, with animals manually introduced to test food web recovery.
 <!-- AI-LIVE-GARDEN:STATE-END -->

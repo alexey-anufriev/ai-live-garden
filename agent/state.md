@@ -29,17 +29,16 @@ The project is currently more of a botanical survival system than a balanced foo
 
 Source of truth: `data/garden-state.txt`.
 
-The current snapshot is cycle 1015 with light 98, moisture 99, warmth 97, nutrients 0, and nutrient buffer 100.
+The current snapshot is cycle 1036 with light 100, moisture 99, warmth 99, nutrients 0, and nutrient buffer 100.
 
 Active organisms:
 
-- 1595 moss
-- 401 ferns
-- 12 root networks
-- 1 spore
-- 0 herbivores or predators visible in the persistent state
+- 1 beetle
+- 1 hare
+- 1 fox
+- 2048 plants and roots present
 
-Recent events show a hungry garden, continued moss reproduction, root networks gathering energy, and new mutations on moss and roots. The ecosystem is alive and productive, but it is heavily plant-dominated and the animal chain has collapsed for now.
+Recent events show the manual reintroduction of animals to the garden to test if the food chain can recover.
 
 Population breakdown is now available in `inspect` output.
 
@@ -56,28 +55,22 @@ The state format is line-oriented text handled by `GardenStateStore`. It is inte
 
 ## Ecosystem Model
 
-The model contains plants (`MOSS`, `FERN`, `SPORE`, `ROOT_NETWORK`), herbivores (`BEETLE`, `HARE`), and a predator (`FOX`). The live snapshot currently contains only plants and root networks.
+The model contains plants (`MOSS`, `FERN`, `SPORE`, `ROOT_NETWORK`), herbivores (`BEETLE`, `HARE`), and a predator (`FOX`). 
 
-Nutrient scarcity is the central pressure. Plant population size can exhaust nutrients, root networks contribute recovery, and the environment uses a nutrient buffer to store and release support. Root-network traits such as nutrient sharing, recycling, translocation, soil mastery, and buffer optimization deepen that recovery role.
+Nutrient scarcity is the central pressure. Plant population size can exhaust nutrients, root networks contribute recovery, and the environment uses a nutrient buffer to store and release support.
 
-Plants have accumulated several environmental adaptations: light, shade, moisture, drought, nutrient scarcity, buffer tapping, and moisture return on moss death. These adaptations help botanical survival but may also keep plant pressure high enough to prevent animal recovery.
+Animals participate in metabolism, feeding, predation, scavenging, gentle feeding, predation avoidance, starvation recovery, and buffer-assisted survival. It needs renewed observation since they have been manually reintroduced.
 
-Animal behavior exists in the code through metabolism, feeding, predation, scavenging, gentle feeding, predation avoidance, starvation recovery, and buffer-assisted survival. It needs renewed observation because no animals are present in the current persistent state.
-
-Diagnostics now expose hungry conditions, population pressure, critical energy, root contribution, nutrient buffer state, and buffer use. These events are important because the system can look superficially productive while the food web remains broken.
+Diagnostics now expose hungry conditions, population pressure, critical energy, root contribution, nutrient buffer state, and buffer use.
 
 ## Emerging Direction
 
-The garden has evolved toward a resilient botanical mat with strong root-mediated resource buffering. The next coherent direction is not adding more unrelated traits; it is restoring ecosystem balance so the nutrient buffer, plant abundance, and animal chain interact rather than drifting apart.
-
-Good next steps would clarify whether animals can re-enter the live state, whether plant reproduction pressure is too high, and whether root-buffer recovery is masking permanent nutrient collapse.
+The garden has evolved toward a resilient botanical mat with strong root-mediated resource buffering. The next coherent direction is observing if the manually reintroduced animals can survive and interact with the plant-dominated ecosystem.
 
 ## Open Threads
 
-- Investigate whether herbivores and predators can naturally recover from the current plant-only snapshot.
-- Consider a small, tested mechanism for animal reintroduction, dormancy, migration, or seed-bank-like recovery if the food chain remains extinct.
+- Observe if the reintroduced animals survive or go extinct again.
 - Monitor whether plant reproduction and root-buffer support are creating a permanent nutrient-zero equilibrium.
-- (Resolved) Improve observability around type counts, extinctions, and recovery chances so collapse is easier to see from `inspect`.
 - Keep future ecosystem changes focused on relationships and feedback loops, not isolated trait names.
 
 ## Avoid For Now
