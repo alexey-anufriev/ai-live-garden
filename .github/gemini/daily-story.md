@@ -35,7 +35,7 @@ Required actions:
 6. The chapter heading must use this format:
    `## Chapter N — Title Based on the Garden's Events`
 7. The chapter title must be generated from what actually happened in the garden.
-8. Update `../../story/volumes/volume-0001.md` as an index of volumes.
+8. Update `story/chronicles-of-ai-garden.md` as the index of volumes.
 9. Do not modify source code, workflows, `AGENTS.md`, `GEMINI.md`, or `data/garden-state.txt`.
 10. Do not modify `story/last-narrated-garden-state.txt`; the workflow updates it after a successful run.
 
