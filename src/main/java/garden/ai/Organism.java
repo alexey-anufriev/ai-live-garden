@@ -63,6 +63,18 @@ public record Organism(String id, OrganismType type, int energy, int curiosity, 
     }
 
     /**
+     * Removes a trait if it is present.
+     */
+    public Organism withoutTrait(String trait) {
+        if (!traits.contains(trait)) {
+            return this;
+        }
+        java.util.ArrayList<String> nextTraits = new java.util.ArrayList<>(traits);
+        nextTraits.remove(trait);
+        return new Organism(id, type, energy, curiosity, generation, List.copyOf(nextTraits));
+    }
+
+    /**
      * Adds a trait when it is nonblank, new to the organism, and within the compact trait limit.
      */
     public Organism withTrait(String trait) {

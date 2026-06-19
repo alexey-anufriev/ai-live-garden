@@ -207,10 +207,18 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         boolean isDormant = changed.traits().contains("dormancy") && environment.nutrients() < 15;
         boolean isDeepRooting = changed.traits().contains("deep-rooting") && environment.moisture() < 30;
 
-        if (organism.type().isPlant() && !environment.favorsPlants() && !isResilient && !isDormant && !isDeepRooting) {
-            changed = changed.withTrait("stressed");
-        } else if (organism.type().isAnimal() && environment.nutrients() < 25 && !isResilient && !isDormant) {
-            changed = changed.withTrait("starving");
+        if (organism.type().isPlant()) {
+            if (!environment.favorsPlants() && !isResilient && !isDormant && !isDeepRooting) {
+                changed = changed.withTrait("stressed");
+            } else {
+                changed = changed.withoutTrait("stressed");
+            }
+        } else if (organism.type().isAnimal()) {
+            if (environment.nutrients() < 25 && !isResilient && !isDormant) {
+                changed = changed.withTrait("starving");
+            } else {
+                changed = changed.withoutTrait("starving");
+            }
         }
 
         return maybeMutate(changed, cycle, events);

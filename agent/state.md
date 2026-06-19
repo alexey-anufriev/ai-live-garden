@@ -1,6 +1,6 @@
 # Agent State
 
-**Garden Health:** RECOVERING Status — Buffer release mechanism enhanced for extreme hunger.
+**Garden Health:** 🟠 Strained — The garden is hungry, but organisms can now recover from being stressed or starving if conditions improve.
 
 ## Current identity
 

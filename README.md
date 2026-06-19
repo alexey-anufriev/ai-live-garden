@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** RECOVERING Status — Root network contribution improved.
-The garden's nutrient replenishment is more robust, as single root networks now consistently contribute nutrients even in stable conditions.
+**Garden Health:** 🟠 Strained — The garden is hungry, but organisms can now recover from being stressed or starving if conditions improve.
+The ecosystem is adapting to nutrient scarcity, with organisms now capable of recovering from environmental stress.
 <!-- AI-LIVE-GARDEN:STATE-END -->

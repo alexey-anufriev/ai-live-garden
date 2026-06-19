@@ -91,6 +91,23 @@ class GardenTest {
     }
 
     @Test
+    void stressedOrStarvingOrganismsRecoverWhenConditionsImprove() {
+        // Plant starts stressed.
+        Organism stressedPlant = Organism.of("plant-1", OrganismType.FERN, 10, 1, "stressed");
+        // Environment favors plants (light 50)
+        Garden garden1 = new Garden(0, 2, new Environment(50, 50, 50, 50, 50), List.of(stressedPlant), List.of());
+        Garden next1 = garden1.nextCycle();
+        assertThat(next1.organisms().get(0).traits()).doesNotContain("stressed");
+
+        // Animal starts starving.
+        Organism starvingAnimal = Organism.of("animal-1", OrganismType.HARE, 10, 1, "starving");
+        // Environment nutrients 50 (>= 25)
+        Garden garden2 = new Garden(0, 2, new Environment(50, 50, 50, 50, 50), List.of(starvingAnimal), List.of());
+        Garden next2 = garden2.nextCycle();
+        assertThat(next2.organisms().get(0).traits()).doesNotContain("starving");
+    }
+
+    @Test
     void herbivoreWithNutrientFinderTraitFeedsMoreEfficiently() {
         // Herbivore with nutrient-finder trait.
         Organism herbivore = Organism.of("herbivore-1", OrganismType.HARE, 10, 1, "nutrient-finder");
