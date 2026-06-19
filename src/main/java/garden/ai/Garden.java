@@ -61,16 +61,17 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         long bufferOptimizerCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("buffer-optimizer")).count();
         long soilMasterCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("soil-master")).count();
         long nutrientRecyclerCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("nutrient-recycler")).count();
+        long nutrientTranslocatorCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("nutrient-translocator")).count();
         
         if (environment.nutrients() < 5) {
-            return (int) (rootNetworkCount * 10 + nutrientWeaverCount * 10 + nutrientSharerCount * 20 + bufferOptimizerCount * 20 + soilMasterCount * 30 + nutrientRecyclerCount * 10);
+            return (int) (rootNetworkCount * 10 + nutrientWeaverCount * 10 + nutrientSharerCount * 20 + bufferOptimizerCount * 20 + soilMasterCount * 30 + nutrientRecyclerCount * 10 + nutrientTranslocatorCount * 40);
         } else if (environment.nutrients() < 10) {
-            return (int) (rootNetworkCount * 8 + nutrientWeaverCount * 8 + nutrientSharerCount * 16 + bufferOptimizerCount * 16 + soilMasterCount * 24 + nutrientRecyclerCount * 8);
+            return (int) (rootNetworkCount * 8 + nutrientWeaverCount * 8 + nutrientSharerCount * 16 + bufferOptimizerCount * 16 + soilMasterCount * 24 + nutrientRecyclerCount * 8 + nutrientTranslocatorCount * 32);
         } else if (environment.nutrients() < 25) {
-            return (int) (rootNetworkCount * 4 + nutrientWeaverCount * 4 + nutrientSharerCount * 8 + bufferOptimizerCount * 8 + soilMasterCount * 12 + nutrientRecyclerCount * 4);
+            return (int) (rootNetworkCount * 4 + nutrientWeaverCount * 4 + nutrientSharerCount * 8 + bufferOptimizerCount * 8 + soilMasterCount * 12 + nutrientRecyclerCount * 4 + nutrientTranslocatorCount * 16);
         } else {
             int recyclerBonus = environment.nutrientBuffer() > 50 ? 5 : 2;
-            return (int) (Math.max(1, rootNetworkCount / 2) + nutrientWeaverCount + nutrientSharerCount * 2 + bufferOptimizerCount * 2 + soilMasterCount * 4 + nutrientRecyclerCount * recyclerBonus);
+            return (int) (Math.max(1, rootNetworkCount / 2) + nutrientWeaverCount + nutrientSharerCount * 2 + bufferOptimizerCount * 2 + soilMasterCount * 4 + nutrientRecyclerCount * recyclerBonus + nutrientTranslocatorCount * 4);
         }
     }
 
@@ -364,7 +365,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
     }
 
     private String mutationTrait(int cycle, Organism organism) {
-        String[] traits = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "rain-collector", "nutrient-finder", "nutrient-efficient", "shadow-stepper", "hardy", "water-seeker", "dormancy", "nutrient-weaver", "metabolic-efficiency", "scavenger", "nutrient-sharer", "buffer-resonator", "buffer-scavenger", "nutrient-hoarder", "nutrient-scout", "soil-master", "deep-rooting", "buffer-optimizer", "buffer-tapper"};
+        String[] traits = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "rain-collector", "nutrient-finder", "nutrient-efficient", "shadow-stepper", "hardy", "water-seeker", "dormancy", "nutrient-weaver", "metabolic-efficiency", "scavenger", "nutrient-sharer", "buffer-resonator", "buffer-scavenger", "nutrient-hoarder", "nutrient-scout", "soil-master", "deep-rooting", "buffer-optimizer", "buffer-tapper", "nutrient-translocator"};
         int index = Math.floorMod(organism.id().hashCode() + cycle + organism.generation(), traits.length);
         return traits[index];
     }

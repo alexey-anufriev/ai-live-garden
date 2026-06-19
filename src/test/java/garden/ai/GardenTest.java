@@ -599,4 +599,20 @@ class GardenTest {
         // Contribution = 1 (rootNetwork count / 2 = 0, +1) + 0 + ... + 1*5 (nutrient-recycler bonus=5 because buffer=60>50) = 6.
         assertThat(garden.rootContribution()).isEqualTo(6);
     }
+
+    @Test
+    void rootNetworkWithNutrientTranslocatorIncreasesBufferContributionSignificantly() {
+        // One root network with nutrient-translocator.
+        Organism root = Organism.of("root-1", OrganismType.ROOT_NETWORK, 10, 1, "nutrient-translocator");
+        // Environment with 20 nutrients (hungry, < 25)
+        Environment env = new Environment(50, 50, 50, 20, 50);
+        Garden garden = new Garden(0, 2, env, List.of(root), List.of());
+
+        Garden next = garden.nextCycle();
+
+        // nutrientTranslocatorCount=1. 
+        // Contribution = 1*4 + 1*16 = 20.
+        // newBuffer = 50 (initial) + 20 (contribution) - 5 (releasedFromBuffer) = 65.
+        assertThat(next.environment().nutrientBuffer()).isEqualTo(65);
+    }
 }
