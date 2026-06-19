@@ -70,13 +70,6 @@ The garden has evolved toward a resilient botanical mat with strong root-mediate
 
 Good next steps would clarify whether animals can re-enter the live state, whether plant reproduction pressure is too high, and whether root-buffer recovery is masking permanent nutrient collapse.
 
-## Repository Operations
-
-- `scripts/archive-summaries.sh` enforces active summary retention in the Evolve workflow.
-- CI workflow shell logic has been extracted into reusable scripts under `scripts/`; future workflow changes should prefer small scripts over large inline shell blocks.
-- Summary entries are append-only evidence, while each summary file's `Direction` section is the mutable current synthesis for that period.
-- Archive folders under summary directories are storage only; active summaries and this file should carry current memory.
-
 ## Open Threads
 
 - Investigate whether herbivores and predators can naturally recover from the current plant-only snapshot.
