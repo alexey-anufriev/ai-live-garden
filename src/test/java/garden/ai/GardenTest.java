@@ -216,6 +216,20 @@ class GardenTest {
     }
 
     @Test
+    void rootNetworkIncreasesNutrientsEvenMoreWhenExtremelyHungry() {
+        // One root network
+        Organism root = Organism.of("root-1", OrganismType.ROOT_NETWORK, 10, 1, "network");
+        // Environment with 2 nutrients (extremely hungry)
+        Environment env = new Environment(50, 50, 50, 2, 50);
+        Garden garden = new Garden(0, 2, env, List.of(root), List.of());
+
+        Garden next = garden.nextCycle();
+
+        // 2 (initial nutrients) + 2 (nutrientDelta) + 10 (releasedFromBuffer) = 14.
+        assertThat(next.environment().nutrients()).isEqualTo(14);
+    }
+
+    @Test
     void rootNetworkIncreasesNutrientsSignificantlyWhenHungry() {
         // One root network
         Organism root = Organism.of("root-1", OrganismType.ROOT_NETWORK, 10, 1, "network");
