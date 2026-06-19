@@ -90,6 +90,10 @@ jobs:
             mv "${journal_files[$i]}" agent/journal/archive/
           done
 
+      - name: Archive old summary files
+        shell: bash
+        run: bash scripts/archive-summaries.sh
+
       - name: Record workflow check status
         shell: bash
         run: |
