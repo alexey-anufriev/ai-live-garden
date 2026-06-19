@@ -68,7 +68,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         } else if (environment.nutrients() < 25) {
             return (int) (rootNetworkCount * 4 + nutrientWeaverCount * 4 + nutrientSharerCount * 8 + bufferOptimizerCount * 8 + soilMasterCount * 12);
         } else {
-            return (int) (rootNetworkCount / 2 + nutrientWeaverCount + nutrientSharerCount * 2 + bufferOptimizerCount * 2 + soilMasterCount * 4);
+            return (int) (Math.max(1, rootNetworkCount / 2) + nutrientWeaverCount + nutrientSharerCount * 2 + bufferOptimizerCount * 2 + soilMasterCount * 4);
         }
     }
 

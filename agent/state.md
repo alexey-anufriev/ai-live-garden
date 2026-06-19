@@ -62,5 +62,6 @@ The initial ecology has four plant roles and three animal roles. Moss, spores, f
 - Introduced the 'buffer-resonator' trait, allowing plants to harness the nutrient buffer in times of extreme scarcity.
 - Introduced 'soil-master' trait for root networks, enhancing nutrient recovery in stressed environments.
 - The root network's nutrient contribution boost is now significantly enhanced when nutrients drop below 5, providing a vital lifeline during extreme hunger.
-- Monitoring the impact of the 'buffer-optimizer' trait continues.
-- The garden remains in a hungry state, and this adjustment aims to improve recovery.
+- Implemented a fix for the `rootContribution` calculation to ensure a minimum nutrient contribution even with a single ROOT_NETWORK organism in stable conditions.
+- Added a diagnostic test case for ROOT_NETWORK contribution.
+- The garden is now more efficient at nutrient replenishment.

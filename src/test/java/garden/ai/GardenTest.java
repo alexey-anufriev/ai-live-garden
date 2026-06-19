@@ -110,6 +110,17 @@ class GardenTest {
     }
 
     @Test
+    void singleRootNetworkShouldContributeWhenNutrientsHigh() {
+        Organism root = Organism.of("root-1", OrganismType.ROOT_NETWORK, 10, 1, "test");
+        // Environment with 50 nutrients (>= 25)
+        Environment env = new Environment(50, 50, 50, 50, 50);
+        Garden garden = new Garden(0, 2, env, List.of(root), List.of());
+        
+        // rootContribution: (1 / 2) = 0 due to integer division. It should be > 0.
+        assertThat(garden.rootContribution()).isGreaterThan(0);
+    }
+
+    @Test
     void resilientOrganismsDoNotGetStressedOrStarving() {
         Organism resilientPlant = Organism.of("plant-1", OrganismType.FERN, 20, 1, "resilient");
         // Environment that does not favor plants (light < 40)

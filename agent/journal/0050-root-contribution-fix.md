@@ -1,0 +1,7 @@
+- chosen task: Fix integer division bug in `rootContribution()`.
+- reason: A single `ROOT_NETWORK` organism was contributing 0 nutrients due to integer division when nutrients were >= 25, hindering replenishment sustainability.
+- files changed: `src/main/java/garden/ai/Garden.java`, `src/test/java/garden/ai/GardenTest.java`.
+- checks run: `mvn test`
+- result of `mvn test`: 39 tests passed.
+- observations: Nutrient contribution from root networks is now consistently at least 1 unit, even with a small root network.
+- possible next directions: Continue monitoring the garden's nutrient levels to see if this fix leads to a stable recovery from the current hungry state.
