@@ -64,5 +64,5 @@ The initial ecology has four plant roles and three animal roles. Moss, spores, f
 - The root network's nutrient contribution boost is now significantly enhanced when nutrients drop below 5, providing a vital lifeline during extreme hunger.
 - Implemented a fix for the `rootContribution` calculation to ensure a minimum nutrient contribution even with a single ROOT_NETWORK organism in stable conditions.
 - Added a diagnostic test case for ROOT_NETWORK contribution.
-- Added 'nutrient-translocator' trait for ROOT_NETWORK to increase buffer contribution during nutrient scarcity.
+- Implemented 'quiet-hunger' trait for animals to reduce metabolic cost when starving, improving resilience.
 - Verified with diagnostic test.

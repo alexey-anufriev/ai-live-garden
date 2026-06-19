@@ -500,6 +500,20 @@ class GardenTest {
     }
 
     @Test
+    void animalsWithQuietHungerHaveReducedMetabolismWhenStarving() {
+        // HARE has metabolism 1. With quiet-hunger + starving, metabolism should be 0.
+        Organism hungryAnimal = Organism.of("animal-1", OrganismType.HARE, 10, 1, "quiet-hunger", "starving");
+        // Environment: nutrients=20 (< 25, so starving), favor plants false (light=30 < 45).
+        Environment env = new Environment(30, 30, 30, 20, 0);
+        Garden garden = new Garden(0, 2, env, List.of(hungryAnimal), List.of());
+        
+        Garden next = garden.nextCycle();
+        // Energy: 10 - 0 = 10.
+        assertThat(next.organisms().get(0).energy()).isEqualTo(10);
+        assertThat(next.organisms().get(0).traits()).contains("starving");
+    }
+
+    @Test
     void bufferScavengerAnimalsHaveReducedMetabolism() {
         // HARE has metabolism 1. With buffer-scavenger in hungry conditions (nutrients < 25) and buffer > 0, it should be 1-1=0.
         Organism scavengerAnimal = Organism.of("animal-1", OrganismType.HARE, 10, 1, "buffer-scavenger");

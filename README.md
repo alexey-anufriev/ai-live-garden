@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟢 Resilient — Camouflaged prey are emerging, improving survival in a hungry ecosystem.
-The ecosystem is adapting to nutrient scarcity, with organisms now capable of recovering from environmental stress.
+**Garden Health:** 🟢 Resilient — Quiet-hunger trait allows animals to conserve energy, increasing resilience in hungry conditions.
+The ecosystem is adapting to nutrient scarcity, with animals now capable of reducing metabolism when starving.
 <!-- AI-LIVE-GARDEN:STATE-END -->

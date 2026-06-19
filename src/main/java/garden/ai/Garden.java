@@ -192,6 +192,9 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             if (changed.traits().contains("metabolic-efficiency")) {
                 metabolism = Math.max(0, metabolism - 1);
             }
+            if (changed.traits().contains("quiet-hunger") && changed.traits().contains("starving")) {
+                metabolism = Math.max(0, metabolism - 1);
+            }
             if (changed.traits().contains("buffer-scavenger") && environment.nutrientBuffer() > 0) {
                 metabolism = Math.max(0, metabolism - 1);
                 events.add(new GardenEvent(cycle, "%s utilized the nutrient buffer.".formatted(changed.id())));
