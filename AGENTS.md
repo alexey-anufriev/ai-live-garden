@@ -224,7 +224,9 @@ Weekly, monthly, and yearly summaries should be updated when they are stale or w
 
 ## Journal entry format
 
-Each run should add a journal entry under `agent/journal/` using this exact Markdown structure:
+Each run should add a journal entry under `agent/journal/` by copying `agent/templates/journal-entry.md` to a new numbered journal file and replacing only the `{{PLACEHOLDER}}` text. Do not rename, remove, reorder, or rewrite the headings.
+
+The template is:
 
 ```markdown
 # Short Title
@@ -266,7 +268,7 @@ Use an ISO-8601 timestamp with time and timezone. If reconstructing an older jou
 
 The journal should be honest. If tests fail, say so. If the change is small, say so. If the run was mostly documentation or cleanup, explain why that was useful.
 
-Each journal file should be formatted in the same way. `agent/journal/0000-initial-seed.md` is only an example of the intended shape; the template above is authoritative. If needed, unformatted entries must be corrected without rewriting their historical meaning.
+Each journal file should be formatted in the same way. `agent/templates/journal-entry.md` is authoritative. If needed, unformatted entries must be corrected without rewriting their historical meaning.
 
 ## Agent requests
 

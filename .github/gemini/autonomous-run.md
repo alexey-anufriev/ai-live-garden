@@ -15,22 +15,14 @@ Process:
 7. Do not manually fabricate large arbitrary changes to `data/garden-state.txt`; normal garden evolution happens when the simulation loads the persistent state, advances it, and saves it again. The workflow also advances the persistent garden state after your code change.
 8. Update `agent/state.md`.
 9. Update the `Current Garden State` section in `README.md` between the protected markers only. The first line inside the protected block must be the Garden Health line: `**Garden Health:** SYMBOL Status — one short reason.`. The second line - short description of the current garden state.
-10. Add one new journal entry under `agent/journal/`.
+10. Add one new journal entry under `agent/journal/` by copying `agent/templates/journal-entry.md` and replacing only the `{{PLACEHOLDER}}` text. Keep the copied headings exactly as written.
 11. Update the current daily summary.
 12. Update weekly/monthly/yearly summaries if they are stale or if the run changed the garden's direction.
 13. Do not modify `AGENTS.md`, `GEMINI.md`, or `.github/`.
 14. Do not modify or delete previous journal entries.
 15. Do not ask the human what to do next.
 
-The journal entry must include:
-
-- chosen task;
-- reason for choosing it;
-- files changed;
-- checks run;
-- result of `mvn test`;
-- observations;
-- possible next directions.
+The journal entry must use the template in `agent/templates/journal-entry.md`.
 
 Prefer continuity over novelty.
 
