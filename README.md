@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟢 Flourishing — the nutrient buffer remains active, and a new 'gentle-feeder' trait has been introduced, softening predator/prey interactions.
-The ecosystem shows improved resilience, with the 'gentle-feeder' trait reducing bite intensity during feeding, promoting more sustainable predator/prey relationships, and continuing to track buffer usage for better observability.
+**Garden Health:** 🟢 Flourishing — the nutrient buffer remains active, and a diagnostic for population pressure has been added to improve observability.
+The ecosystem shows improved resilience, with the 'gentle-feeder' trait reducing bite intensity during feeding, and a new diagnostic event tracks when high plant populations strain nutrient reserves, improving observability of systemic nutrient strain.
 <!-- AI-LIVE-GARDEN:STATE-END -->
