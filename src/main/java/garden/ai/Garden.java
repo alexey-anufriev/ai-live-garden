@@ -196,8 +196,9 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
 
         boolean isResilient = changed.traits().contains("resilient");
         boolean isDormant = changed.traits().contains("dormancy") && environment.nutrients() < 15;
+        boolean isDeepRooting = changed.traits().contains("deep-rooting") && environment.moisture() < 30;
 
-        if (organism.type().isPlant() && !environment.favorsPlants() && !isResilient && !isDormant) {
+        if (organism.type().isPlant() && !environment.favorsPlants() && !isResilient && !isDormant && !isDeepRooting) {
             changed = changed.withTrait("stressed");
         } else if (organism.type().isAnimal() && environment.nutrients() < 25 && !isResilient && !isDormant) {
             changed = changed.withTrait("starving");
@@ -344,7 +345,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
     }
 
     private String mutationTrait(int cycle, Organism organism) {
-        String[] traits = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "rain-collector", "nutrient-finder", "nutrient-efficient", "shadow-stepper", "hardy", "water-seeker", "dormancy", "nutrient-weaver", "metabolic-efficiency", "scavenger", "nutrient-sharer", "buffer-resonator", "buffer-scavenger", "nutrient-hoarder", "nutrient-scout", "soil-master"};
+        String[] traits = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "rain-collector", "nutrient-finder", "nutrient-efficient", "shadow-stepper", "hardy", "water-seeker", "dormancy", "nutrient-weaver", "metabolic-efficiency", "scavenger", "nutrient-sharer", "buffer-resonator", "buffer-scavenger", "nutrient-hoarder", "nutrient-scout", "soil-master", "deep-rooting"};
         int index = Math.floorMod(organism.id().hashCode() + cycle + organism.generation(), traits.length);
         return traits[index];
     }
