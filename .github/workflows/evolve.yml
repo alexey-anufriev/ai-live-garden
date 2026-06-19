@@ -32,7 +32,6 @@ jobs:
       - name: Baseline test
         id: baseline_test
         run: mvn -B test
-        continue-on-error: true
 
       - name: Build Gemini prompt
         id: gemini_prompt
@@ -47,7 +46,6 @@ jobs:
       - name: Run Gemini autonomous step
         id: gemini
         uses: google-github-actions/run-gemini-cli@v0.1.22
-        continue-on-error: true
         env:
           GEMINI_CLI_TRUST_WORKSPACE: "true"
         with:
@@ -57,32 +55,21 @@ jobs:
           upload_artifacts: true
 
       - name: Restore protected files
+        if: ${{ !cancelled() }}
         shell: bash
         run: |
-          git restore AGENTS.md GEMINI.md .github story || true
-          git clean -fd .github story || true
-
-      - name: Discard Gemini changes after failure
-        if: steps.gemini.outcome != 'success'
-        shell: bash
-        run: |
-          git reset --hard HEAD
-          git clean -fd
+          git restore AGENTS.md GEMINI.md .github story
+          git clean -fd .github story
 
       - name: Test after Gemini changes
-        if: steps.gemini.outcome == 'success'
         id: post_test
         run: mvn -B test
-        continue-on-error: true
 
       - name: Advance persistent garden state
         id: advance_garden
-        if: steps.gemini.outcome == 'success' && steps.post_test.outcome == 'success'
         run: mvn -B -q exec:java -Dexec.args="tick --steps 3"
-        continue-on-error: true
 
       - name: Record workflow check status
-        if: always()
         shell: bash
         run: |
           mkdir -p agent
@@ -98,7 +85,6 @@ jobs:
           } > agent/last-run.md
 
       - name: Commit changes directly to main
-        if: always()
         shell: bash
         run: |
           if [[ -n "$(git status --porcelain)" ]]; then
