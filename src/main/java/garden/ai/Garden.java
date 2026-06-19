@@ -58,13 +58,14 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         long rootNetworkCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK).count();
         long nutrientWeaverCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("nutrient-weaver")).count();
         long nutrientSharerCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("nutrient-sharer")).count();
+        long bufferOptimizerCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("buffer-optimizer")).count();
         
         if (environment.nutrients() < 10) {
-            return (int) (rootNetworkCount * 8 + nutrientWeaverCount * 8 + nutrientSharerCount * 16);
+            return (int) (rootNetworkCount * 8 + nutrientWeaverCount * 8 + nutrientSharerCount * 16 + bufferOptimizerCount * 16);
         } else if (environment.nutrients() < 25) {
-            return (int) (rootNetworkCount * 4 + nutrientWeaverCount * 4 + nutrientSharerCount * 8);
+            return (int) (rootNetworkCount * 4 + nutrientWeaverCount * 4 + nutrientSharerCount * 8 + bufferOptimizerCount * 8);
         } else {
-            return (int) (rootNetworkCount / 2 + nutrientWeaverCount + nutrientSharerCount * 2);
+            return (int) (rootNetworkCount / 2 + nutrientWeaverCount + nutrientSharerCount * 2 + bufferOptimizerCount * 2);
         }
     }
 
