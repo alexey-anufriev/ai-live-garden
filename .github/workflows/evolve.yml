@@ -36,12 +36,7 @@ jobs:
       - name: Build Gemini prompt
         id: gemini_prompt
         shell: bash
-        run: |
-          {
-            echo 'text<<EOF'
-            cat .github/gemini/autonomous-run.md
-            echo 'EOF'
-          } >> "$GITHUB_OUTPUT"
+        run: scripts/write-output-file.sh text .github/gemini/autonomous-run.md
 
       - name: Run Gemini autonomous step
         id: gemini
@@ -57,9 +52,7 @@ jobs:
       - name: Restore protected files
         if: ${{ !cancelled() }}
         shell: bash
-        run: |
-          git restore AGENTS.md GEMINI.md .github story
-          git clean -fd .github story
+        run: scripts/restore-evolve-protected-files.sh
 
       - name: Test after Gemini changes
         id: post_test
@@ -71,54 +64,24 @@ jobs:
 
       - name: Archive old journal entries
         shell: bash
-        run: |
-          set -euo pipefail
-
-          mkdir -p agent/journal/archive
-          mapfile -t journal_files < <(find agent/journal -maxdepth 1 -type f -name '[0-9][0-9][0-9][0-9]-*.md' | sort)
-          active_count="${#journal_files[@]}"
-
-          if (( active_count <= 100 )); then
-            echo "Active journal entries: ${active_count}; no archive move needed."
-            exit 0
-          fi
-
-          archive_count=$((active_count - 100))
-          echo "Archiving ${archive_count} old journal entries."
-
-          for ((i = 0; i < archive_count; i++)); do
-            mv "${journal_files[$i]}" agent/journal/archive/
-          done
+        run: scripts/archive-journal.sh
 
       - name: Archive old summary files
         shell: bash
-        run: bash scripts/archive-summaries.sh
+        run: scripts/archive-summaries.sh
 
       - name: Record workflow check status
         shell: bash
-        run: |
-          mkdir -p agent
-          {
-            echo "# Last Autonomous Workflow Run"
-            echo
-            echo "- UTC: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
-            echo "- Workflow run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
-            echo "- Baseline test outcome: ${{ steps.baseline_test.outcome }}"
-            echo "- Gemini outcome: ${{ steps.gemini.outcome }}"
-            echo "- Post-change test outcome: ${{ steps.post_test.outcome }}"
-            echo "- Garden state advance outcome: ${{ steps.advance_garden.outcome }}"
-          } > agent/last-run.md
+        env:
+          BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
+          GEMINI_OUTCOME: ${{ steps.gemini.outcome }}
+          POST_TEST_OUTCOME: ${{ steps.post_test.outcome }}
+          ADVANCE_GARDEN_OUTCOME: ${{ steps.advance_garden.outcome }}
+        run: scripts/record-evolve-status.sh
 
       - name: Commit changes directly to main
         shell: bash
-        run: |
-          if [[ -n "$(git status --porcelain)" ]]; then
-            git config user.name "ai-live-garden[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add .
-            git commit -m "feat: autonomous garden evolution $(date -u +'%Y-%m-%dT%H:%MZ')"
-            git pull --rebase origin "${GITHUB_REF_NAME}"
-            git push origin "HEAD:${GITHUB_REF_NAME}"
-          else
-            echo "No changes to commit."
-          fi
+        env:
+          COMMIT_MESSAGE_PREFIX: "feat: autonomous garden evolution"
+          COMMIT_TIMESTAMP_FORMAT: "%Y-%m-%dT%H:%MZ"
+        run: scripts/commit-if-changed.sh .
