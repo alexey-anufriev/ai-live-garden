@@ -586,4 +586,17 @@ class GardenTest {
         // newBuffer = 50 (initial) + 12 (contribution) - 5 (releasedFromBuffer) = 57.
         assertThat(next.environment().nutrientBuffer()).isEqualTo(57);
     }
+
+    @Test
+    void rootNetworkWithNutrientRecyclerIncreasesBufferContributionWhenBufferIsHigh() {
+        // One root network with nutrient-recycler.
+        Organism root = Organism.of("root-1", OrganismType.ROOT_NETWORK, 10, 1, "nutrient-recycler");
+        // Environment with 50 nutrients (>= 25)
+        // Environment with buffer > 50.
+        Environment env = new Environment(50, 50, 50, 50, 60);
+        Garden garden = new Garden(0, 2, env, List.of(root), List.of());
+
+        // Contribution = 1 (rootNetwork count / 2 = 0, +1) + 0 + ... + 1*5 (nutrient-recycler bonus=5 because buffer=60>50) = 6.
+        assertThat(garden.rootContribution()).isEqualTo(6);
+    }
 }

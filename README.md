@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟠 Strained — The garden is hungry, but organisms can now recover from being stressed or starving if conditions improve.
+**Garden Health:** 🟠 Strained — The garden is hungry, organisms have recovery mechanisms, and root networks now recycle nutrients to stabilize the buffer.
 The ecosystem is adapting to nutrient scarcity, with organisms now capable of recovering from environmental stress.
 <!-- AI-LIVE-GARDEN:STATE-END -->
