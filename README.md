@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟢 Flourishing — Shade-thriver trait allows ferns to thrive in dim light, increasing botanical resilience.
-The ecosystem is becoming more diverse and resilient, with organisms now better adapted to varied light and nutrient conditions.
+**Garden Health:** 🟢 Flourishing — Moisture-retainer trait introduced, stabilizing dry periods.
+The ecosystem is becoming more diverse and resilient, with moss now able to buffer moisture levels.
 <!-- AI-LIVE-GARDEN:STATE-END -->

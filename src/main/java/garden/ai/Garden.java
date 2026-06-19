@@ -105,8 +105,9 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
 
         FeedingResult feeding = feedingPhase(changed, nextCycle, nextEvents);
         
-        // Add nutrients based on deaths
-        Environment environmentWithNutrients = nextEnvironment.withNutrients(feeding.totalNutrientContribution());
+        // Add nutrients and moisture based on deaths
+        Environment environmentWithNutrientsAndMoisture = nextEnvironment.withNutrients(feeding.totalNutrientContribution())
+                .withMoisture(feeding.totalMoistureContribution());
         
         ReproductionResult reproduction = reproductionPhase(feeding.organisms(), nextCycle, nextId, nextEvents);
         List<Organism> finalChanged = reproduction.organisms();
@@ -119,9 +120,9 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         }
         
         nextEvents.add(new GardenEvent(nextCycle,
-                "The garden becomes %s after cycle %d.".formatted(environmentWithNutrients.mood(), nextCycle)));
+                "The garden becomes %s after cycle %d.".formatted(environmentWithNutrientsAndMoisture.mood(), nextCycle)));
         
-        return new Garden(nextCycle, nextIdentifier, environmentWithNutrients, finalChanged, nextEvents);
+        return new Garden(nextCycle, nextIdentifier, environmentWithNutrientsAndMoisture, finalChanged, nextEvents);
     }
 
     /**
@@ -272,6 +273,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         }
 
         int totalNutrientContribution = 0;
+        int totalMoistureContribution = 0;
         List<Organism> survivors = new ArrayList<>();
         for (Organism organism : mutable) {
             if (organism.energy() > 0) {
@@ -279,14 +281,19 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             } else {
                 events.add(new GardenEvent(cycle, "%s (%d nutrients) returned to the soil.".formatted(organism.id(), organism.nutrientValue())));
                 totalNutrientContribution += organism.nutrientValue();
+                if (organism.traits().contains("moisture-retainer") && organism.type() == OrganismType.MOSS) {
+                    totalMoistureContribution += 5;
+                    events.add(new GardenEvent(cycle, "%s returned moisture to the soil.".formatted(organism.id())));
+                }
             }
         }
         survivors.sort(Comparator.comparing(Organism::id));
-        return new FeedingResult(survivors, totalNutrientContribution);
-    }
+        return new FeedingResult(survivors, totalNutrientContribution, totalMoistureContribution);
+        }
 
-    private record FeedingResult(List<Organism> organisms, int totalNutrientContribution) {
-    }
+        private record FeedingResult(List<Organism> organisms, int totalNutrientContribution, int totalMoistureContribution) {
+        }
+
 
     private Optional<Integer> findPreyIndex(List<Organism> organisms, Organism hunter, int hunterIndex) {
         boolean nutrientScout = hunter.traits().contains("nutrient-scout");
@@ -373,7 +380,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
     }
 
     private String mutationTrait(int cycle, Organism organism) {
-        String[] traits = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "rain-collector", "nutrient-finder", "nutrient-efficient", "shadow-stepper", "hardy", "water-seeker", "dormancy", "nutrient-weaver", "metabolic-efficiency", "scavenger", "nutrient-sharer", "buffer-resonator", "buffer-scavenger", "nutrient-hoarder", "nutrient-scout", "soil-master", "deep-rooting", "buffer-optimizer", "buffer-tapper", "nutrient-translocator", "camouflaged", "shade-thriver"};
+        String[] traits = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "rain-collector", "nutrient-finder", "nutrient-efficient", "shadow-stepper", "hardy", "water-seeker", "dormancy", "nutrient-weaver", "metabolic-efficiency", "scavenger", "nutrient-sharer", "buffer-resonator", "buffer-scavenger", "nutrient-hoarder", "nutrient-scout", "soil-master", "deep-rooting", "buffer-optimizer", "buffer-tapper", "nutrient-translocator", "camouflaged", "shade-thriver", "moisture-retainer"};
         int index = Math.floorMod(organism.id().hashCode() + cycle + organism.generation(), traits.length);
         return traits[index];
     }
