@@ -54,9 +54,7 @@ jobs:
             chapter_count=0
           else
             chapter_count="$(
-              { grep -h '^## Chapter ' "${volume_files[@]}" || true; } \
-                | wc -l \
-                | tr -d '[:space:]'
+              awk '/^## Chapter / { count++ } END { print count + 0 }' "${volume_files[@]}"
             )"
           fi
 
@@ -73,6 +71,25 @@ jobs:
           echo "volume_number=$volume_number" >> "$GITHUB_OUTPUT"
           echo "volume_file=$volume_file" >> "$GITHUB_OUTPUT"
           echo "new_volume=$new_volume" >> "$GITHUB_OUTPUT"
+
+          emit_bounded_file() {
+            local file="$1"
+            local max_lines="$2"
+            local line_count
+
+            line_count="$(wc -l < "$file" | tr -d '[:space:]')"
+            if (( line_count <= max_lines )); then
+              cat "$file"
+              return
+            fi
+
+            local edge_lines=$((max_lines / 2))
+            sed -n "1,${edge_lines}p" "$file"
+            echo
+            echo "[... omitted $((line_count - (edge_lines * 2))) lines ...]"
+            echo
+            tail -n "$edge_lines" "$file"
+          }
 
           {
             echo "# Story Context"
@@ -98,36 +115,38 @@ jobs:
             echo
 
             if [[ -n "$last_narrated_commit" ]]; then
-              echo "## Previous narrated garden snapshot"
+              echo "## Previous narrated garden context"
               echo
               echo '```text'
-              git show "$last_narrated_commit:data/garden-state.txt" || true
+              git show "$last_narrated_commit:data/garden-state.txt" > "$RUNNER_TEMP/previous-garden-state.txt"
+              emit_bounded_file "$RUNNER_TEMP/previous-garden-state.txt" 120
               echo '```'
               echo
-              echo "## Garden-state diff since last narrated commit"
+              echo "## Bounded garden-state diff since last narrated commit"
               echo
               echo '```diff'
-              git diff "$last_narrated_commit" "$current_state_commit" -- data/garden-state.txt || true
+              git diff --unified=0 --output="$RUNNER_TEMP/garden-state.diff" "$last_narrated_commit" "$current_state_commit" -- data/garden-state.txt
+              sed -n '1,220p' "$RUNNER_TEMP/garden-state.diff"
               echo '```'
               echo
             else
-              echo "## Previous narrated garden snapshot"
+              echo "## Previous narrated garden context"
               echo
               echo "No previous narrated snapshot exists. Write the opening chapter of the chronicle."
               echo
             fi
 
-            echo "## Current garden snapshot"
+            echo "## Current garden context"
             echo
             echo '```text'
-            cat data/garden-state.txt
+            emit_bounded_file data/garden-state.txt 160
             echo '```'
             echo
 
-            echo "## Recent current events"
+            echo "## Recent current state tail"
             echo
             echo '```text'
-            grep '^event=' data/garden-state.txt | tail -120 || true
+            tail -80 data/garden-state.txt
             echo '```'
             echo
 
@@ -142,7 +161,7 @@ jobs:
               echo "## Current volume so far"
               echo
               echo '```md'
-              tail -250 "$volume_file"
+              tail -160 "$volume_file"
               echo '```'
             else
               echo "## Current volume so far"
@@ -164,7 +183,6 @@ jobs:
         id: gemini_story
         if: steps.story_context.outputs.skip != 'true'
         uses: google-github-actions/run-gemini-cli@v0.1.22
-        continue-on-error: true
         env:
           GEMINI_CLI_TRUST_WORKSPACE: "true"
         with:
@@ -174,25 +192,18 @@ jobs:
           upload_artifacts: true
 
       - name: Restore protected files
-        if: steps.story_context.outputs.skip != 'true'
+        if: ${{ !cancelled() && steps.story_context.outputs.skip != 'true' }}
         shell: bash
         run: |
-          git restore AGENTS.md GEMINI.md .github data/garden-state.txt || true
-          git clean -fd .github || true
+          git restore AGENTS.md GEMINI.md .github data/garden-state.txt
+          git clean -fd .github
 
       - name: Update narrated garden-state commit
-        if: steps.story_context.outputs.skip != 'true' && steps.gemini_story.outcome == 'success'
+        if: steps.story_context.outputs.skip != 'true'
         shell: bash
         run: |
           echo "${{ steps.story_context.outputs.current_state_commit }}" > story/last-narrated-garden-state.txt
           rm -f story/context.md
-
-      - name: Discard story changes after failure
-        if: steps.story_context.outputs.skip != 'true' && steps.gemini_story.outcome != 'success'
-        shell: bash
-        run: |
-          git restore story || true
-          git clean -fd story || true
 
       - name: Commit story
         if: steps.story_context.outputs.skip != 'true'
