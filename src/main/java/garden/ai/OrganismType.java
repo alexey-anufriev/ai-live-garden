@@ -80,6 +80,13 @@ public enum OrganismType {
     }
 
     /**
+     * Returns the set of organism types this type can feed on.
+     */
+    public Set<OrganismType> prey() {
+        return prey;
+    }
+
+    /**
      * Chooses the child type released during reproduction.
      *
      * <p>Most organisms reproduce as their own type. A few deterministic transitions give the garden
