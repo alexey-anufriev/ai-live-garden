@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟢 Flourishing — the nutrient buffer remains active, a diagnostic for population pressure is active, and a new 'nutrient-hoarder' trait has been introduced.
-The ecosystem shows improved resilience, with the 'nutrient-hoarder' trait allowing plants to contribute extra nutrients upon death, strengthening the ecosystem's long-term nutrient cycle.
+**Garden Health:** 🟢 Flourishing — the nutrient buffer remains active, a diagnostic for population pressure is active, and the 'nutrient-hoarder' and 'nutrient-scout' traits are interacting.
+The ecosystem shows improved resilience, with 'nutrient-hoarder' plants enriching the nutrient cycle and 'nutrient-scout' predators actively managing those reserves.
 <!-- AI-LIVE-GARDEN:STATE-END -->

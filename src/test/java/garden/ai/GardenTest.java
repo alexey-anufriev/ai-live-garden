@@ -473,6 +473,26 @@ class GardenTest {
     }
 
     @Test
+    void herbivoreWithNutrientScoutTraitPrefersNutrientHoarderPrey() {
+        // Predator with nutrient-scout trait.
+        Organism predator = Organism.of("fox-1", OrganismType.FOX, 10, 1, "nutrient-scout");
+        // Prey 1: normal.
+        Organism prey1 = Organism.of("prey-1", OrganismType.HARE, 10, 1, "normal");
+        // Prey 2: nutrient-hoarder.
+        Organism prey2 = Organism.of("prey-2", OrganismType.HARE, 10, 1, "nutrient-hoarder");
+        // Environment favorable.
+        Environment env = new Environment(50, 50, 50, 50, 50);
+        // Order: fox-1, prey-1, prey-2.
+        Garden garden = new Garden(0, 4, env, List.of(predator, prey1, prey2), List.of());
+
+        Garden next = garden.nextCycle();
+
+        // Predator should have fed on prey-2 (nutrient-hoarder).
+        assertThat(next.events()).anyMatch(e -> e.description().contains("fox-1 fed on prey-2"));
+        assertThat(next.events()).noneMatch(e -> e.description().contains("fox-1 fed on prey-1"));
+    }
+
+    @Test
     void rootNetworkWithBufferOptimizerIncreasesBufferContribution() {
         // One root network with buffer-optimizer.
         Organism root = Organism.of("root-1", OrganismType.ROOT_NETWORK, 10, 1, "buffer-optimizer");
