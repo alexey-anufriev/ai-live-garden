@@ -91,6 +91,14 @@ public record Organism(String id, OrganismType type, int energy, int curiosity, 
         return traits.stream().collect(Collectors.joining(","));
     }
 
+    public int nutrientValue() {
+        int value = type.nutrientValue();
+        if (traits.contains("nutrient-hoarder")) {
+            value += 5;
+        }
+        return value;
+    }
+
     /**
      * Builds the single-line organism description used by {@link GardenRenderer}.
      */

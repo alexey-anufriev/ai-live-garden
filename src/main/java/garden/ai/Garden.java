@@ -248,8 +248,8 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             if (organism.energy() > 0) {
                 survivors.add(organism);
             } else {
-                events.add(new GardenEvent(cycle, "%s (%d nutrients) returned to the soil.".formatted(organism.id(), organism.type().nutrientValue())));
-                totalNutrientContribution += organism.type().nutrientValue();
+                events.add(new GardenEvent(cycle, "%s (%d nutrients) returned to the soil.".formatted(organism.id(), organism.nutrientValue())));
+                totalNutrientContribution += organism.nutrientValue();
             }
         }
         survivors.sort(Comparator.comparing(Organism::id));
@@ -328,7 +328,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
     }
 
     private String mutationTrait(int cycle, Organism organism) {
-        String[] traits = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "rain-collector", "nutrient-finder", "nutrient-efficient", "shadow-stepper", "hardy", "water-seeker", "dormancy", "nutrient-weaver", "metabolic-efficiency", "scavenger", "nutrient-sharer", "buffer-resonator", "buffer-scavenger"};
+        String[] traits = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "rain-collector", "nutrient-finder", "nutrient-efficient", "shadow-stepper", "hardy", "water-seeker", "dormancy", "nutrient-weaver", "metabolic-efficiency", "scavenger", "nutrient-sharer", "buffer-resonator", "buffer-scavenger", "nutrient-hoarder"};
         int index = Math.floorMod(organism.id().hashCode() + cycle + organism.generation(), traits.length);
         return traits[index];
     }
