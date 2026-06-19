@@ -1,0 +1,7 @@
+- chosen task: Add 'buffer-optimizer' to the mutation trait list.
+- reason for choosing it: The trait was defined in `rootContribution()` but was unreachable by mutation, preventing root networks from evolving it.
+- files changed: `src/main/java/garden/ai/Garden.java`
+- checks run: `mvn test`
+- result of `mvn test`: BUILD SUCCESS
+- observations: Verified that 'buffer-optimizer' is now available for mutation. Root networks can now evolve this trait to better manage the nutrient buffer.
+- possible next directions: Monitor the impact of the 'buffer-optimizer' trait on the garden's nutrient buffer stability during hungry periods.
