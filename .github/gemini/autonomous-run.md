@@ -17,8 +17,8 @@ Process:
 9. Update the `Current Garden State` section in `README.md` between the protected markers only. The first line inside the protected block must be the Garden Health line: `**Garden Health:** SYMBOL Status — one short reason.`. The second line - short description of the current garden state.
 10. Add one new journal entry under `agent/journal/` by copying `agent/templates/journal-entry.md` and replacing only the `{{PLACEHOLDER}}` text. Keep the copied headings exactly as written.
 11. Update the current daily summary by appending a timestamped entry. Do not delete, replace, shorten, reorder, or rewrite existing summary content.
-12. Update weekly/monthly/yearly summaries if they are missing or stale, if the run changed the garden's direction or if summary cadence is about to expire (weekly - updated at least at the end of the week, monthly - end of month, yearly - end of year), using append-only entries and append-only direction updates.
-13. Do not modify `AGENTS.md`, `GEMINI.md`, or `.github/`.
+12. Update weekly/monthly/yearly summaries if they are missing or stale, if the run changed the garden's visible behavior or operating assumptions, or if summary cadence is about to expire (weekly - updated at least at the end of the week, monthly - end of month, yearly - end of year), using append-only entries.
+13. Do not modify `AGENTS.md`, `GEMINI.md`, or `.github/` unless the human explicitly asks for an experiment-rule change.
 14. Do not modify or delete previous journal entries.
 15. Do not ask the human what to do next.
 

@@ -218,7 +218,7 @@ The agent may update append-only summaries:
 * `agent/summaries/monthly/YYYY-MM.md`
 * `agent/summaries/yearly/YYYY.md`
 
-Summaries should not duplicate the full journal. They should compress the garden's evolution into patterns, themes, decisions, and visible direction.
+Summaries should not duplicate the full journal. They should compress the garden's evolution into additive entries about patterns, themes, decisions, and visible behavior.
 
 When creating a new summary file, copy the matching template and replace only the `{{PLACEHOLDER}}` text:
 
@@ -231,11 +231,9 @@ When appending to an existing summary file, follow the entry shape from the matc
 
 Summary entries are append-only memory. When updating any daily, weekly, monthly, or yearly summary, add a new dated or timestamped entry or correction below the existing entries. Do not delete, reorder, replace, shorten, compress, or rewrite prior summary entries, even when they are incomplete or superseded. Never replace an existing summary file with a shorter report for the current run. If earlier summary information was lost or compressed too aggressively, recover it by appending a clearly labeled recovery entry instead of silently replacing prior entries.
 
-The `Direction` section in each summary file is also append-only. When the direction changes, append a new timestamped `### TIMESTAMP - Direction update` subsection below existing direction text. Do not rewrite or replace earlier direction prose.
-
 Daily summaries may receive multiple appended entries in the same day.
 
-Weekly, monthly, and yearly summaries should receive appended entries when they are stale or when the current run introduces a meaningful change to the garden's direction.
+Weekly, monthly, and yearly summaries should receive appended entries when they are stale or when the current run introduces a meaningful change to the garden's visible behavior or operating assumptions.
 
 Weekly summary must receive an update at least once a day with a short daily summary.
 
