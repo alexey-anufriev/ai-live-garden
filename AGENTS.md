@@ -229,7 +229,9 @@ When creating a new summary file, copy the matching template and replace only th
 
 When appending to an existing summary file, follow the entry shape from the matching template instead of inventing a new structure, also refer to existing summaries.
 
-All summary files are append-only memory. When updating any daily, weekly, monthly, or yearly summary, add a new dated or timestamped entry, correction, or synthesis section below the existing content. Do not delete, reorder, replace, or rewrite prior summary entries, even when they are incomplete or superseded. If earlier summary information was lost or compressed too aggressively, recover it by appending a clearly labeled recovery section instead of silently replacing the file.
+Summary entries are append-only memory. When updating any daily, weekly, monthly, or yearly summary, add a new dated or timestamped entry or correction below the existing entries. Do not delete, reorder, replace, or rewrite prior summary entries, even when they are incomplete or superseded. If earlier summary information was lost or compressed too aggressively, recover it by appending a clearly labeled recovery entry instead of silently replacing prior entries.
+
+The `Direction` section in each summary file is the current synthesis for that summary period. It must be updated whenever an entry is added, and it may be rewritten in place to reflect the latest visible direction, themes, risks, and decisions.
 
 Daily summaries may receive multiple appended entries in the same day.
 
