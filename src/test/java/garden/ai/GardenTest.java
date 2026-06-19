@@ -11,6 +11,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 class GardenTest {
 
     @Test
+    void environmentDiagnosticProvidesHungerInsight() {
+        Environment stable = new Environment(50, 50, 50, 50, 50);
+        assertThat(stable.diagnostic()).isEqualTo("stable");
+
+        Environment exhausted = new Environment(50, 50, 50, 5, 5);
+        assertThat(exhausted.diagnostic()).isEqualTo("exhausted (low buffer)");
+
+        Environment buffered = new Environment(50, 50, 50, 5, 50);
+        assertThat(buffered.diagnostic()).isEqualTo("buffer-supported (low nutrients)");
+    }
+
+    @Test
     void seedGardenStartsWithPlantsAndAnimals() {
         Garden garden = Garden.seed();
 

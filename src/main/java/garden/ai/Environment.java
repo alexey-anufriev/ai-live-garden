@@ -57,6 +57,19 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
     }
 
     /**
+     * Provides a diagnostic insight when the environment is hungry.
+     */
+    public String diagnostic() {
+        if (nutrients >= 25) {
+            return "stable";
+        }
+        if (nutrientBuffer < 10) {
+            return "exhausted (low buffer)";
+        }
+        return "buffer-supported (low nutrients)";
+    }
+
+    /**
      * Indicates whether current conditions are favorable enough for ordinary plant growth.
      */
     public boolean favorsPlants() {

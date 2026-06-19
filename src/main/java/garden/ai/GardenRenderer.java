@@ -49,7 +49,7 @@ public final class GardenRenderer {
                 garden.environment().nutrients(),
                 garden.environment().nutrientBuffer(),
                 garden.rootContribution(),
-                garden.environment().mood(),
+                garden.environment().mood() + (garden.environment().mood().equals("hungry") ? " (" + garden.environment().diagnostic() + ")" : ""),
                 garden.plantCount(),
                 garden.animalCount(),
                 garden.organisms().size(),

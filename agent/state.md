@@ -26,8 +26,8 @@ The garden is becoming a small persistent ecosystem rather than a reset-only dem
 - `src/main/java/garden/ai/GardenStateStore.java` handles loading and saving the snapshot.
 - `Simulation` advances an existing `Garden` instead of always starting from `Garden.seed()`.
 - `Garden` contains the current ecosystem rules.
-- `GardenRenderer.java` now explicitly renders the root network's nutrient contribution and the nutrient buffer.
-- Nutrient recycling now accounts for the specific nutrient value of decaying organisms, improving ecosystem observability.
+- `GardenRenderer.java` now includes diagnostic information about the cause of "hungry" garden states when they occur.
+- `Environment.java` now provides `diagnostic()` insights when the garden is hungry.
 - The environment now includes a `nutrientBuffer` to stabilize nutrient availability over time.
 
 
