@@ -79,7 +79,7 @@ The agent must:
 3. Read `README.md`.
 4. Read `agent/state.md`.
 5. Read `agent/requests.md`.
-6. Read the latest entries in `agent/journal/`.
+6. Read the latest active entries directly under `agent/journal/`, excluding `agent/journal/archive/`.
 7. Read the latest available summaries under `agent/summaries/`.
 8. Inspect the persistent garden snapshot in `data/garden-state.txt`.
 9. Inspect the current Java/Maven project.
@@ -189,7 +189,9 @@ On the next line this section should also include a short, public-facing, and un
 
 The agent must not rewrite the rest of `README.md` unless the human explicitly changes the experiment rules.
 
-`agent/journal/` is append-only history. Do not delete, rename, or rewrite previous journal entries.
+`agent/journal/` is append-only history. Do not delete or rewrite previous journal entries.
+
+Only the latest 100 journal entries should remain directly under `agent/journal/`. Older entries may be moved unchanged into `agent/journal/archive/` to keep the active journal small. Normal autonomous runs must not read `agent/journal/archive/`; older history should be understood through `agent/state.md` and `agent/summaries/`.
 
 ## Narrative chronicle
 

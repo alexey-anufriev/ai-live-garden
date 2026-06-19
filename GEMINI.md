@@ -9,7 +9,7 @@ For autonomous evolution runs, before making changes read:
 * `README.md`
 * `agent/state.md`
 * `agent/requests.md`
-* the latest entries in `agent/journal/`
+* the latest active entries directly under `agent/journal/`, excluding `agent/journal/archive/`
 * the latest available summaries under `agent/summaries/`
 * `data/garden-state.txt`
 

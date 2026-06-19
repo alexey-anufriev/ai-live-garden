@@ -4,7 +4,7 @@ Perform one autonomous evolution step for the AI Live Garden.
 
 Process:
 
-1. Read `AGENTS.md`, `GEMINI.md`, `README.md`, `agent/state.md`, `agent/requests.md`, recent journal entries, and the latest available summaries under `agent/summaries/`.
+1. Read `AGENTS.md`, `GEMINI.md`, `README.md`, `agent/state.md`, `agent/requests.md`, recent active journal entries directly under `agent/journal/`, and the latest available summaries under `agent/summaries/`. Do not read `agent/journal/archive/` during normal runs.
 2. Inspect the current Java/Maven codebase and the persistent garden snapshot in `data/garden-state.txt`.
 3. Choose exactly one small coherent next task. "Small" means conceptually focused, not necessarily limited to editing existing files. When choosing a task, consider whether the change can increase the garden's ecological diversity, interdependence, observability, or long-term behavioral depth without adding disconnected complexity.
    - A suitable task may create one or a few focused new files when that is the clearest way to express the change.
