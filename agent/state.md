@@ -56,3 +56,4 @@ The initial ecology has four plant roles and three animal roles. Moss, spores, f
 - Updated feeding phase logic and mutation list.
 - Introduced the 'gentle-feeder' trait for animals to reduce their bite size during feeding, making predator/prey interactions less destructive and more sustainable.
 - Introduced the 'buffer-resonator' trait, allowing plants to harness the nutrient buffer in times of extreme scarcity.
+- Introduced 'soil-master' trait for root networks, enhancing nutrient recovery in stressed environments.
