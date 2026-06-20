@@ -83,3 +83,4 @@ The garden has evolved toward a resilient botanical mat with strong root-mediate
 - Do not treat the full nutrient buffer as proof of health while nutrients are zero and animals are absent.
 - Expanded herbivore prey sets to include ROOT_NETWORK to encourage scavenging behaviors in botanical-dominated cycles.
 - Implemented 'nutrient-producer' trait for ROOT_NETWORK to boost soil nutrient levels when scarcity is critical.
+- Added 'nutrient-enricher' trait to organism model to boost nutrient contribution on death.

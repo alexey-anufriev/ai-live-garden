@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** STABLE Status — Nutrient-producer trait implemented to boost botanical soil support.
+**Garden Health:** STABLE Status — Nutrient-enricher trait implemented for organisms.
 High population pressure is straining nutrient reserves, but new trait activated.
 <!-- AI-LIVE-GARDEN:STATE-END -->
