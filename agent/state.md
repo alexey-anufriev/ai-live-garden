@@ -57,7 +57,7 @@ The state format is line-oriented text handled by `GardenStateStore`. It is inte
 
 The model contains plants (`MOSS`, `FERN`, `SPORE`, `ROOT_NETWORK`, `FUNGUS`), herbivores (`BEETLE`, `HARE`), and a predator (`FOX`). 
 
-Nutrient scarcity is the central pressure. Plant population size can exhaust nutrients, root networks contribute recovery, and the environment uses a nutrient buffer to store and release support. Fungi (`FUNGUS`) act as decomposers, contributing directly to the nutrient buffer. The 'nutrient-recycler' trait enables plants to explicitly contribute more nutrients to the soil upon death, aiding in nutrient recycling. The 'sun-seeker' trait allows plants to thrive in high-light conditions, adding a new environmental adaptation.
+Nutrient scarcity is the central pressure. Plant population size can exhaust nutrients, root networks contribute recovery, and the environment uses a nutrient buffer to store and release support. Fungi (`FUNGUS`) act as decomposers, contributing directly to the nutrient buffer. The 'nutrient-recycler' trait enables plants to explicitly contribute more nutrients to the soil upon death, aiding in nutrient recycling. The 'nutrient-decomposer' trait, now available for evolution in `FUNGUS`, significantly increases the nutrient value of organisms upon death, further bolstering decomposition pathways. The 'sun-seeker' trait allows plants to thrive in high-light conditions, adding a new environmental adaptation.
 
 Animals participate in metabolism, feeding, predation, scavenging, gentle feeding, predation avoidance, starvation recovery, buffer-assisted survival, and nutrient absorption. The 'prey-tracker' trait allows animals to prioritize higher-energy prey, increasing foraging efficiency. The 'resource-tracker' trait allows animals to prioritize nutrient-hoarding prey, helping them navigate resource scarcity.
 
@@ -65,7 +65,7 @@ Diagnostics now expose hungry conditions, population pressure, critical energy, 
 
 ## Emerging Direction
 
-The garden has evolved toward a resilient botanical mat with strong root-mediated resource buffering. The next coherent direction is observing if the manually reintroduced animals can survive and interact with the plant-dominated ecosystem, aided by new foraging traits and improved nutrient recycling through the introduction of FUNGUS. Future runs will focus on stabilizing the food web and evaluating whether improved decomposition helps balance nutrient availability in the long term.
+The garden has evolved toward a resilient botanical mat with strong root-mediated resource buffering. Future runs will continue to focus on stabilizing the food web and evaluating whether the newly introduced `nutrient-decomposer` trait for FUNGUS helps balance nutrient availability in the long term, potentially allowing for the successful re-establishment of animal populations.
 
 ## Avoid For Now
 
