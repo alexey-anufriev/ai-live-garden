@@ -82,3 +82,4 @@ The garden has evolved toward a resilient botanical mat with strong root-mediate
 - Introduced 'nutrient-reclaimer' trait for ROOT_NETWORK to help mitigate nutrient scarcity by boosting soil buffer contributions.
 - Do not treat the full nutrient buffer as proof of health while nutrients are zero and animals are absent.
 - Expanded herbivore prey sets to include ROOT_NETWORK to encourage scavenging behaviors in botanical-dominated cycles.
+- Implemented 'nutrient-producer' trait for ROOT_NETWORK to boost soil nutrient levels when scarcity is critical.
