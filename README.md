@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟡 Restoring — Herbivores adapting to nutrient scarcity via new traits.
-The ecosystem remains plant-dominated, with herbivores developing a 'nutrient-absorber' trait to improve survival in low-nutrient cycles.
+**Garden Health:** 🟠 Strained — persistent hunger pressure and nutrient scarcity.
+Cycle 1109, high moss density, and animal fragility; added 'nutrient-synthesizer' trait to root networks to enhance nutrient buffer recovery.
 <!-- AI-LIVE-GARDEN:STATE-END -->
