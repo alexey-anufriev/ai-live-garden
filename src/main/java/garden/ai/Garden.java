@@ -219,6 +219,10 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
                 metabolism = Math.max(0, metabolism - 1);
                 events.add(new GardenEvent(cycle, "%s utilized the nutrient buffer.".formatted(changed.id())));
             }
+            if (changed.traits().contains("buffer-tapper") && environment.nutrients() < 10 && environment.nutrientBuffer() > 0) {
+                changed = changed.withEnergy(changed.energy() + 1);
+                events.add(new GardenEvent(cycle, "%s tapped the nutrient buffer while starving.".formatted(changed.id())));
+            }
             changed = changed.withEnergy(changed.energy() - metabolism)
                     .withCuriosity(changed.curiosity() + (cycle % 4 == 0 ? 1 : 0));
         }

@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** EVOLVING Status — animals are utilizing new survival strategies like cautious feeding to manage energy in the nutrient-scarce environment.
-Added observability for 'cautious-feeder' behavior, logging events when animals skip feeding to conserve energy.
+**Garden Health:** EVOLVING Status — animals are gaining survival strategies in a nutrient-scarce environment.
+Enabled animals with the 'buffer-tapper' trait to tap the nutrient buffer when starving, increasing survival resilience.
 <!-- AI-LIVE-GARDEN:STATE-END -->

@@ -544,6 +544,19 @@ class GardenTest {
     }
 
     @Test
+    void animalsWithBufferTapperTraitGainEnergyWhenStarving() {
+        // HARE has metabolism 1. With buffer-tapper in starving conditions (nutrients < 10) and buffer > 0, it should gain 1 energy.
+        Organism scavengerAnimal = Organism.of("animal-1", OrganismType.HARE, 10, 1, "buffer-tapper");
+        // Environment: nutrients=5 (< 10), buffer=50 (> 0).
+        Environment env = new Environment(50, 50, 50, 5, 50);
+        Garden garden = new Garden(0, 2, env, List.of(scavengerAnimal), List.of());
+        Garden next = garden.nextCycle();
+        // Energy: 10 - 1 (metabolism) + 1 (buffer-tapper) = 10.
+        assertThat(next.organisms().get(0).energy()).isEqualTo(10);
+        assertThat(next.events()).anyMatch(e -> e.description().contains("animal-1 tapped the nutrient buffer while starving."));
+    }
+
+    @Test
     void bufferScavengerAnimalsHaveReducedMetabolism() {
         // HARE has metabolism 1. With buffer-scavenger in hungry conditions (nutrients < 25) and buffer > 0, it should be 1-1=0.
         Organism scavengerAnimal = Organism.of("animal-1", OrganismType.HARE, 10, 1, "buffer-scavenger");
