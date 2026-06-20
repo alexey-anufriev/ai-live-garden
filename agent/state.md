@@ -61,7 +61,7 @@ Nutrient scarcity is the central pressure. Plant population size can exhaust nut
 
 Animals participate in metabolism, feeding, predation, scavenging, gentle feeding, predation avoidance, starvation recovery, buffer-assisted survival, and nutrient absorption. The 'prey-tracker' trait allows animals to prioritize higher-energy prey, increasing foraging efficiency. The 'resource-tracker' trait allows animals to prioritize nutrient-hoarding prey, helping them navigate resource scarcity.
 
-Diagnostics now expose hungry conditions, population pressure, critical energy, root contribution, nutrient buffer state, and buffer use. Hunger diagnostics now explicitly log the target prey types that animals fail to find, and deaths due to starvation are now specifically identified. The 'nutrient-absorber' trait slightly increases herbivore nutrient gain. The 'nutrient-synthesizer' trait allows plants to gain extra energy when nutrients are critically low, aiding survival during starvation periods. The 'predator-focus' trait increases hunting efficiency for the fox predator.
+Diagnostics now expose hungry conditions, population pressure, critical energy, root contribution, nutrient buffer state, and buffer use. Hunger diagnostics now explicitly log the target prey types that animals fail to find, and deaths due to starvation are now specifically identified. The 'prolific' trait reduces the reproduction threshold for animals, encouraging population growth and recovery during periods of stability or after famine. The 'nutrient-synthesizer' trait allows plants to gain extra energy when nutrients are critically low, aiding survival during starvation periods. The 'predator-focus' trait increases hunting efficiency for the fox predator.
 
 ## Emerging Direction
 

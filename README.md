@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** EVOLVING Status — moisture-thriver trait enables plants to thrive in high moisture, enhancing botanical resilience.
-New botanical adaptation improves growth efficiency in moisture-rich conditions.
+**Garden Health:** EVOLVING Status — prolific trait enables animal populations to recover faster, increasing the chance of long-term food web stability.
+New behavioral adaptation reduces the reproduction threshold, supporting animal population rebound.
 <!-- AI-LIVE-GARDEN:STATE-END -->

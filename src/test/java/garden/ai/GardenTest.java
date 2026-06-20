@@ -737,4 +737,16 @@ class GardenTest {
                 .filter(o -> o.id().equals("fox-1"))
                 .findFirst().get().energy()).isEqualTo(12);
     }
+
+    @Test
+    void prolificAnimalsHaveReducedReproductionThreshold() {
+        Organism prolificHare = Organism.of("hare-1", OrganismType.HARE, 13, 1, "prolific");
+        List<Organism> organisms = List.of(prolificHare);
+        Garden garden = new Garden(1, 1, new Environment(50, 50, 50, 50, 50), organisms, List.of());
+
+        // HARE default threshold is 15. Prolific makes it 12.
+        // It has 13 energy. Metabolism 1 reduces it to 12. Should reproduce.
+        Garden next = garden.nextCycle();
+        assertThat(next.organisms().size()).isEqualTo(2);
+    }
 }
