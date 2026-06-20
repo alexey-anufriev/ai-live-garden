@@ -12,8 +12,9 @@ public enum OrganismType {
     ROOT_NETWORK("curious root network", Kingdom.PLANT, 2, 4, Set.of()),
     SPORE("dormant spore", Kingdom.PLANT, 1, 1, Set.of()),
     FERN("listening fern", Kingdom.PLANT, 2, 3, Set.of()),
-    BEETLE("amber beetle", Kingdom.HERBIVORE, 1, 2, Set.of(MOSS, SPORE, FERN, ROOT_NETWORK)),
-    HARE("glass hare", Kingdom.HERBIVORE, 1, 5, Set.of(MOSS, FERN, SPORE, ROOT_NETWORK)),
+    FUNGUS("mycelium network", Kingdom.PLANT, 1, 3, Set.of()),
+    BEETLE("amber beetle", Kingdom.HERBIVORE, 1, 2, Set.of(MOSS, SPORE, FERN, ROOT_NETWORK, FUNGUS)),
+    HARE("glass hare", Kingdom.HERBIVORE, 1, 5, Set.of(MOSS, FERN, SPORE, ROOT_NETWORK, FUNGUS)),
     FOX("echo fox", Kingdom.PREDATOR, 2, 8, Set.of(BEETLE, HARE));
 
     private final String displayName;

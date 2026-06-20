@@ -78,6 +78,11 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         }
     }
 
+    public int fungalContribution() {
+        long fungusCount = organisms.stream().filter(organism -> organism.type() == OrganismType.FUNGUS).count();
+        return (int) (fungusCount * 2);
+    }
+
     /**
      * Advances the garden by one cycle.
      *
@@ -91,7 +96,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         long plantCount = organisms.stream().filter(organism -> organism.type().isPlant()).count();
         long animalCount = organisms.stream().filter(organism -> organism.type().isAnimal()).count();
         
-        Environment nextEnvironment = environment.next(nextCycle, (int) plantCount, (int) animalCount, rootContribution());
+        Environment nextEnvironment = environment.next(nextCycle, (int) plantCount, (int) animalCount, rootContribution(), fungalContribution());
         List<GardenEvent> nextEvents = new ArrayList<>(events);
         if (nextEnvironment.nutrients() < environment.nutrients()) {
             nextEvents.add(new GardenEvent(nextCycle, "Nutrients are depleted by the plant population."));

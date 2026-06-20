@@ -23,7 +23,7 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
      * @param rootContribution nutrient contribution from root networks
      * @return the next normalized environment
      */
-    public Environment next(int cycle, int plantCount, int animalCount, int rootContribution) {
+    public Environment next(int cycle, int plantCount, int animalCount, int rootContribution, int fungalContribution) {
         int lightDelta = cycle % 2 == 0 ? 3 : -2;
         int moistureDelta = cycle % 3 == 0 ? 4 : -1;
         int warmthDelta = cycle % 5 == 0 ? -3 : 2;
@@ -32,7 +32,7 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
         int releaseRate = nutrients < 5 ? 2 : (nutrients < 10 ? 5 : 10);
         int releasedFromBuffer = nutrientBuffer / releaseRate;
         int newNutrients = nutrients + nutrientDelta + releasedFromBuffer;
-        int newBuffer = nutrientBuffer + rootContribution - releasedFromBuffer;
+        int newBuffer = nutrientBuffer + rootContribution + fungalContribution - releasedFromBuffer;
         
         return new Environment(light + lightDelta, moisture + moistureDelta, warmth + warmthDelta, newNutrients, newBuffer);
     }

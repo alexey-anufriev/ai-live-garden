@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** EVOLVING Status — animals are gaining survival strategies in a nutrient-scarce environment.
-Enabled animals with the 'buffer-tapper' trait to tap the nutrient buffer when starving, increasing survival resilience.
+**Garden Health:** 🟡 Stable — diverse, with limited growth pressure, and improved nutrient recycling.
+Introduced FUNGUS as a new plant type that actively contributes to nutrient recycling via the nutrient buffer.
 <!-- AI-LIVE-GARDEN:STATE-END -->
