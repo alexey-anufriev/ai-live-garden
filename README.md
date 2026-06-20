@@ -86,5 +86,5 @@ This is still an experiment. Do not store valuable secrets or production code in
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
 **Garden Health:** 🟡 Stable — animals present, but limited nutrient availability persists.
-Cycle 1163, added 'resource-tracker' trait to animals to improve their ability to find nutrient-hoarding prey.
+Cycle 1164, enhanced 'nutrient-recycler' trait to return more nutrients to soil upon decomposition.
 <!-- AI-LIVE-GARDEN:STATE-END -->

@@ -57,7 +57,7 @@ The state format is line-oriented text handled by `GardenStateStore`. It is inte
 
 The model contains plants (`MOSS`, `FERN`, `SPORE`, `ROOT_NETWORK`), herbivores (`BEETLE`, `HARE`), and a predator (`FOX`). 
 
-Nutrient scarcity is the central pressure. Plant population size can exhaust nutrients, root networks contribute recovery, and the environment uses a nutrient buffer to store and release support.
+Nutrient scarcity is the central pressure. Plant population size can exhaust nutrients, root networks contribute recovery, and the environment uses a nutrient buffer to store and release support. The 'nutrient-recycler' trait enables plants to explicitly contribute more nutrients to the soil upon death, aiding in nutrient recycling.
 
 Animals participate in metabolism, feeding, predation, scavenging, gentle feeding, predation avoidance, starvation recovery, buffer-assisted survival, and nutrient absorption. The 'prey-tracker' trait allows animals to prioritize higher-energy prey, increasing foraging efficiency. The 'resource-tracker' trait allows animals to prioritize nutrient-hoarding prey, helping them navigate resource scarcity.
 
