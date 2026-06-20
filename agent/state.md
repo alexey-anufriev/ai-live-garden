@@ -59,17 +59,17 @@ The model contains plants (`MOSS`, `FERN`, `SPORE`, `ROOT_NETWORK`), herbivores 
 
 Nutrient scarcity is the central pressure. Plant population size can exhaust nutrients, root networks contribute recovery, and the environment uses a nutrient buffer to store and release support.
 
-Animals participate in metabolism, feeding, predation, scavenging, gentle feeding, predation avoidance, starvation recovery, buffer-assisted survival, and nutrient absorption. The 'prey-tracker' trait allows animals to prioritize higher-energy prey, increasing foraging efficiency. It needs renewed observation since they have been manually reintroduced.
+Animals participate in metabolism, feeding, predation, scavenging, gentle feeding, predation avoidance, starvation recovery, buffer-assisted survival, and nutrient absorption. The 'prey-tracker' trait allows animals to prioritize higher-energy prey, increasing foraging efficiency. The 'resource-tracker' trait allows animals to prioritize nutrient-hoarding prey, helping them navigate resource scarcity.
 
 Diagnostics now expose hungry conditions, population pressure, critical energy, root contribution, nutrient buffer state, and buffer use. Hunger diagnostics now explicitly log the target prey types that animals fail to find, and deaths due to starvation are now specifically identified. The 'nutrient-absorber' trait slightly increases herbivore nutrient gain. The 'nutrient-synthesizer' trait allows plants to gain extra energy when nutrients are critically low, aiding survival during starvation periods.
 
 ## Emerging Direction
 
-The garden has evolved toward a resilient botanical mat with strong root-mediated resource buffering. The next coherent direction is observing if the manually reintroduced animals can survive and interact with the plant-dominated ecosystem.
+The garden has evolved toward a resilient botanical mat with strong root-mediated resource buffering. The next coherent direction is observing if the manually reintroduced animals can survive and interact with the plant-dominated ecosystem, aided by new foraging traits.
 
 ## Open Threads
 
-- Observe if the reintroduced animals survive or go extinct again.
+- Observe if the reintroduced animals survive or go extinct again, and if foraging traits like 'resource-tracker' help them thrive.
 - Monitor whether plant reproduction and root-buffer support are creating a permanent nutrient-zero equilibrium.
 - Keep future ecosystem changes focused on relationships and feedback loops, not isolated trait names.
 
