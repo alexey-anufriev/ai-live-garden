@@ -79,5 +79,6 @@ The garden has evolved toward a resilient botanical mat with strong root-mediate
 - Do not add dependencies just to serialize state while the text format remains workable.
 - Do not rewrite the whole simulation in one run.
 - Do not add more standalone traits unless they create a visible relationship or address a current pressure.
+- Introduced 'nutrient-reclaimer' trait for ROOT_NETWORK to help mitigate nutrient scarcity by boosting soil buffer contributions.
 - Do not treat the full nutrient buffer as proof of health while nutrients are zero and animals are absent.
 - Expanded herbivore prey sets to include ROOT_NETWORK to encourage scavenging behaviors in botanical-dominated cycles.

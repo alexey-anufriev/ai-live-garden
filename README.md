@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟡 Unstable — botanical dominance, animals absent, expanding herbivore diet to encourage scavenging.
-Cycle 1217, updated herbivore prey definitions to include ROOT_NETWORK to encourage scavenging.
+**Garden Health:** 🟡 Unstable — nutrient scarcity persistent, introducing 'nutrient-reclaimer' trait to boost botanical soil support.
+Cycle 1235, added 'nutrient-reclaimer' trait for ROOT_NETWORK to enhance nutrient recycling into the soil buffer.
 <!-- AI-LIVE-GARDEN:STATE-END -->

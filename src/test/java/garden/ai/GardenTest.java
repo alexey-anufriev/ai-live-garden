@@ -646,6 +646,22 @@ class GardenTest {
     }
 
     @Test
+    void rootNetworkWithNutrientReclaimerIncreasesBufferContributionSignificantly() {
+        // One root network with nutrient-reclaimer.
+        Organism root = Organism.of("root-1", OrganismType.ROOT_NETWORK, 10, 1, "nutrient-reclaimer");
+        // Environment with 20 nutrients (hungry, < 25)
+        Environment env = new Environment(50, 50, 50, 20, 50);
+        Garden garden = new Garden(0, 2, env, List.of(root), List.of());
+
+        Garden next = garden.nextCycle();
+
+        // nutrientReclaimerCount=1. 
+        // Contribution = 1*4 + 1*10 = 14.
+        // newBuffer = 50 (initial) + 14 (contribution) - 5 (releasedFromBuffer) = 59.
+        assertThat(next.environment().nutrientBuffer()).isEqualTo(59);
+    }
+
+    @Test
     void preyWithCamouflagedTraitCanAvoidPredators() {
         Organism predator = Organism.of("fox-1", OrganismType.FOX, 10, 1, "hunter");
         // Prey 1: camouflaged.
