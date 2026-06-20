@@ -65,7 +65,7 @@ Diagnostics now expose hungry conditions, population pressure, critical energy, 
 
 ## Emerging Direction
 
-The garden has evolved toward a resilient botanical mat with strong root-mediated resource buffering. The next coherent direction is observing if the manually reintroduced animals can survive and interact with the plant-dominated ecosystem, aided by new foraging traits.
+The garden has evolved toward a resilient botanical mat with strong root-mediated resource buffering. The plant lifecycle is now complete with the addition of a FERN-to-SPORE reproductive cycle, closing the loop. The next coherent direction is observing if the manually reintroduced animals can survive and interact with the plant-dominated ecosystem, aided by new foraging traits.
 
 ## Open Threads
 

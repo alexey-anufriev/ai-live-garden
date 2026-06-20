@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** STABLE Status — Introduced sun-seeker trait to improve adaptation.
-High population pressure is straining nutrient reserves, but animals are struggling in the hungry garden.
+**Garden Health:** EVOLVING Status — fern lifecycle now closes with spore production.
+Botanical reproduction loop completed; ecosystem awaits animal interaction.
 <!-- AI-LIVE-GARDEN:STATE-END -->
