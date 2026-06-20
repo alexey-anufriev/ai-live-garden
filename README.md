@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** EVOLVING Status — stealth-hunter trait enables predators to overcome camouflage.
-New predator adaptation improves hunting efficiency in camouflaged ecosystems.
+**Garden Health:** EVOLVING Status — moisture-thriver trait enables plants to thrive in high moisture, enhancing botanical resilience.
+New botanical adaptation improves growth efficiency in moisture-rich conditions.
 <!-- AI-LIVE-GARDEN:STATE-END -->

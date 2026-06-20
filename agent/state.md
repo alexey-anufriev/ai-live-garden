@@ -83,5 +83,5 @@ The garden has evolved toward a resilient botanical mat with strong root-mediate
 - Do not treat the full nutrient buffer as proof of health while nutrients are zero and animals are absent.
 - Expanded herbivore prey sets to include ROOT_NETWORK to encourage scavenging behaviors in botanical-dominated cycles.
 - Implemented 'nutrient-producer' trait for ROOT_NETWORK to boost soil nutrient levels when scarcity is critical.
-- Added 'stealth-hunter' trait to predator model to bypass prey defensive traits like camouflage and shadow-stepper.
+- Added 'moisture-thriver' trait to plant model, allowing plants to thrive (extra growth) in high moisture conditions, enhancing botanical resilience during nutrient scarcity.
 - Improved animal hunger observability by adding descriptive events for starving animals failing to find prey.
