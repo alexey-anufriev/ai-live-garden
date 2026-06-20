@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟡 Stable — animals present, but limited nutrient availability persists.
-Cycle 1199, implemented 'predator-focus' trait to improve hunting efficiency for predators.
+**Garden Health:** 🟡 Unstable — botanical dominance, animals absent, expanding herbivore diet to encourage scavenging.
+Cycle 1217, updated herbivore prey definitions to include ROOT_NETWORK to encourage scavenging.
 <!-- AI-LIVE-GARDEN:STATE-END -->
