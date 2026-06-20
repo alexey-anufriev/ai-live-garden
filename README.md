@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟡 Restoring — Animals reintroduced, with enhanced starvation observability identifying hunger deaths.
-The ecosystem remains plant-dominated, with animals manually introduced to test food web recovery.
+**Garden Health:** 🟡 Restoring — Herbivores adapting to nutrient scarcity via new traits.
+The ecosystem remains plant-dominated, with herbivores developing a 'nutrient-absorber' trait to improve survival in low-nutrient cycles.
 <!-- AI-LIVE-GARDEN:STATE-END -->
