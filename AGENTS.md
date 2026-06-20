@@ -86,7 +86,7 @@ The agent must:
 10. Choose exactly one small, coherent next step.
 11. Make a meaningful repository change.
 12. Run `mvn test` if possible.
-13. Update `agent/state.md`.
+13. Update `agent/state.md` by rewriting stale current-memory sections in place, not by appending a run log.
 14. Update the `Current Garden State` section in `README.md` between the protected markers only.
 15. Add a new journal entry under `agent/journal/`.
 16. Append one entry to the current daily summary.
@@ -163,6 +163,10 @@ The agent may and should update:
 * the `Current Garden State` section in `README.md` between the protected markers only
 
 `agent/state.md` is the living operational memory of the project. It should summarize what the garden currently is, what direction has emerged, what changed recently, and what future runs may consider.
+
+`agent/state.md` is not append-only. It must stay compact and current. Do not add a new bullet for every run, and do not preserve obsolete wording just because it was already present. Rewrite stale sections in place so the file remains readable in one pass.
+
+The `Avoid For Now` section of `agent/state.md` is only for active constraints, known bad ideas, and things future agents should deliberately avoid. Never put completed changes, recent implementation notes, trait announcements, or historical observations in `Avoid For Now`. If a completed change matters for current understanding, fold it into `Current Behavior`, `Ecosystem Model`, or `Emerging Direction`; otherwise put it only in the journal and summaries.
 
 The README contains a protected current-state block between:
 
