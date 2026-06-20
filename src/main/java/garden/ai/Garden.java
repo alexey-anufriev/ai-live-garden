@@ -299,6 +299,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
 
     private Optional<Integer> findPreyIndex(List<Organism> organisms, Organism hunter, int hunterIndex) {
         boolean nutrientScout = hunter.traits().contains("nutrient-scout");
+        boolean preyTracker = hunter.traits().contains("prey-tracker");
 
         java.util.function.Predicate<Organism> isValidPrey = candidate -> {
             if (candidate.energy() <= 0 || !hunter.type().canEat(candidate.type())) return false;
@@ -318,7 +319,25 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             }
         }
 
-        // Pass 2: Look for any valid prey
+        // Pass 2: Look for highest energy prey if hunter is tracker
+        if (preyTracker) {
+            int maxEnergy = -1;
+            int bestIndex = -1;
+            for (int i = 0; i < organisms.size(); i++) {
+                if (i == hunterIndex) continue;
+                Organism candidate = organisms.get(i);
+                if (isValidPrey.test(candidate) && candidate.energy() > maxEnergy) {
+                    maxEnergy = candidate.energy();
+                    bestIndex = i;
+                }
+            }
+            if (bestIndex != -1) {
+                events.add(new GardenEvent(cycle, "%s tracked the most energetic prey.".formatted(hunter.id())));
+                return Optional.of(bestIndex);
+            }
+        }
+
+        // Pass 3: Look for any valid prey
         for (int i = 0; i < organisms.size(); i++) {
             if (i == hunterIndex) continue;
             Organism candidate = organisms.get(i);
@@ -382,7 +401,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
     }
 
     private String mutationTrait(int cycle, Organism organism) {
-        String[] traits = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "rain-collector", "nutrient-finder", "nutrient-efficient", "shadow-stepper", "hardy", "water-seeker", "dormancy", "nutrient-weaver", "metabolic-efficiency", "scavenger", "nutrient-sharer", "buffer-resonator", "buffer-scavenger", "nutrient-hoarder", "nutrient-scout", "soil-master", "deep-rooting", "buffer-optimizer", "buffer-tapper", "nutrient-translocator", "camouflaged", "shade-thriver", "moisture-retainer", "nutrient-absorber", "nutrient-synthesizer"};
+        String[] traits = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "rain-collector", "nutrient-finder", "nutrient-efficient", "shadow-stepper", "hardy", "water-seeker", "dormancy", "nutrient-weaver", "metabolic-efficiency", "scavenger", "nutrient-sharer", "buffer-resonator", "buffer-scavenger", "nutrient-hoarder", "nutrient-scout", "soil-master", "deep-rooting", "buffer-optimizer", "buffer-tapper", "nutrient-translocator", "camouflaged", "shade-thriver", "moisture-retainer", "nutrient-absorber", "nutrient-synthesizer", "prey-tracker"};
         int index = Math.floorMod(organism.id().hashCode() + cycle + organism.generation(), traits.length);
         return traits[index];
     }
