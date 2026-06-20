@@ -189,6 +189,21 @@ class GardenTest {
     }
 
     @Test
+    void sunSeekerPlantsGrowFasterInSun() {
+        // Plant with sun-seeker trait.
+        Organism plant = Organism.of("plant-1", OrganismType.FERN, 10, 1, "sun-seeker");
+        // Environment light=70 (> 60), favorsPlants is true (light >= 45, moisture >= 45, nutrients >= 30)
+        Environment env = new Environment(70, 50, 50, 50, 50);
+        Garden garden = new Garden(0, 2, env, List.of(plant), List.of());
+
+        Garden next = garden.nextCycle();
+
+        // Passive change growth: 2 (favorsPlants) + 1 (sun-seeker + high light) = 3
+        assertThat(next.organisms().get(0).energy()).isEqualTo(13);
+        assertThat(next.events()).anyMatch(e -> e.description().contains("plant-1 thrived in the sunlight."));
+    }
+
+    @Test
     void sunLoverPlantsGrowFasterInSun() {
         // Plant with sun-lover trait.
         Organism plant = Organism.of("plant-1", OrganismType.FERN, 10, 1, "sun-lover");

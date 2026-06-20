@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** STABLE Status — Improved animal hunger observability.
+**Garden Health:** STABLE Status — Introduced sun-seeker trait to improve adaptation.
 High population pressure is straining nutrient reserves, but animals are struggling in the hungry garden.
 <!-- AI-LIVE-GARDEN:STATE-END -->
