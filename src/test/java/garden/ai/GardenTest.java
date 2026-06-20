@@ -670,4 +670,23 @@ class GardenTest {
             assertThat(fedOnStandard).isTrue();
         }
     }
+
+    @Test
+    void predatorWithPredatorFocusTraitFeedsMoreEfficiently() {
+        // FOX with predator-focus trait.
+        Organism predator = Organism.of("fox-1", OrganismType.FOX, 10, 1, "predator-focus");
+        Organism prey = Organism.of("hare-1", OrganismType.HARE, 10, 1, "food");
+        // Environment favorable.
+        Environment env = new Environment(50, 50, 50, 50, 50);
+        Garden garden = new Garden(0, 3, env, List.of(predator, prey), List.of());
+
+        Garden next = garden.nextCycle();
+
+        // Feeding: FOX normally gets 3 energy. With predator-focus, should be 3+1=4.
+        // Metabolism for FOX is 2.
+        // Energy: 10 - 2 (metabolism) + 4 (feeding) = 12.
+        assertThat(next.organisms().stream()
+                .filter(o -> o.id().equals("fox-1"))
+                .findFirst().get().energy()).isEqualTo(12);
+    }
 }
