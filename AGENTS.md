@@ -211,7 +211,7 @@ Within each volume, chapter headings use second-level Markdown headings beginnin
 
 ## Summaries
 
-The agent may update append-only summaries:
+The agent must maintain append-only summaries:
 
 * `agent/summaries/daily/YYYY-MM-DD.md`
 * `agent/summaries/weekly/YYYY-Www.md`
@@ -231,15 +231,35 @@ When appending to an existing summary file, follow the entry shape from the matc
 
 Summary entries are append-only memory. When updating any daily, weekly, monthly, or yearly summary, add a new dated or timestamped entry or correction below the existing entries. Do not delete, reorder, replace, shorten, compress, or rewrite prior summary entries, even when they are incomplete or superseded. Never replace an existing summary file with a shorter report for the current run. If earlier summary information was lost or compressed too aggressively, recover it by appending a clearly labeled recovery entry instead of silently replacing prior entries.
 
-Daily summaries may receive multiple appended entries in the same day.
+Daily summary rule:
 
-Weekly, monthly, and yearly summaries should receive appended entries when they are stale or when the current run introduces a meaningful change to the garden's visible behavior or operating assumptions.
+* Every autonomous run must append one timestamped entry to `agent/summaries/daily/YYYY-MM-DD.md` for the current UTC date.
+* If the daily file does not exist, create it from `agent/templates/daily-summary.md`.
+* Daily summaries may receive multiple appended entries in the same day.
 
-Weekly summary must receive an update at least once a day with a short daily summary.
+Weekly summary rule:
 
-Monthly summary must receive an update at least once a week with a short weekly summary.
+* Weekly summaries are updated only on Monday, during the first autonomous run of that Monday.
+* The Monday weekly entry summarizes the previous ISO week, Monday through Sunday, using the daily summaries for that previous week as source material.
+* The weekly file path must be `agent/summaries/weekly/YYYY-Www.md`, where `YYYY-Www` is the ISO week being summarized, not the current month.
+* If it is not Monday, do not create or update weekly summaries.
+* If the previous ISO week already has a weekly entry, do not append another one.
 
-Yearly summary must receive an update at least once a month with a short monthly summary.
+Monthly summary rule:
+
+* Monthly summaries are updated only on the 1st day of a month, during the first autonomous run of that day.
+* The monthly entry summarizes the previous calendar month, using weekly summaries from that previous month as source material.
+* The monthly file path must be `agent/summaries/monthly/YYYY-MM.md`, where `YYYY-MM` is the previous calendar month.
+* If it is not the 1st day of a month, do not create or update monthly summaries.
+* If the previous calendar month already has a monthly entry, do not append another one.
+
+Yearly summary rule:
+
+* Yearly summaries are updated only on January 1, during the first autonomous run of that day.
+* The yearly entry summarizes the previous calendar year, using monthly summaries from that previous year as source material.
+* The yearly file path must be `agent/summaries/yearly/YYYY.md`, where `YYYY` is the previous calendar year.
+* If it is not January 1, do not create or update yearly summaries.
+* If the previous calendar year already has a yearly entry, do not append another one.
 
 Each summary type has its own archive folder:
 

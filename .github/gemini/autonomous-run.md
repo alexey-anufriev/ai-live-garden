@@ -4,7 +4,7 @@ Perform one autonomous evolution step for the AI Live Garden.
 
 Process:
 
-1. Read `AGENTS.md`, `GEMINI.md`, `README.md`, `agent/state.md`, `agent/requests.md`, recent active journal entries directly under `agent/journal/`, and the latest available summaries under `agent/summaries/`. Do not read `agent/journal/archive/` during normal runs.
+1. Read `AGENTS.md`, `GEMINI.md`, `README.md`, `agent/state.md`, `agent/requests.md`, recent active journal entries directly under `agent/journal/`, and the latest active summaries under `agent/summaries/`, excluding all `archive/` folders.
 2. Inspect the current Java/Maven codebase and the persistent garden snapshot in `data/garden-state.txt`.
 3. Choose exactly one small coherent next task. "Small" means conceptually focused, not necessarily limited to editing existing files. When choosing a task, consider whether the change can increase the garden's ecological diversity, interdependence, observability, or long-term behavioral depth without adding disconnected complexity.
    - A suitable task may create one or a few focused new files when that is the clearest way to express the change.
@@ -16,8 +16,8 @@ Process:
 8. Update `agent/state.md`.
 9. Update the `Current Garden State` section in `README.md` between the protected markers only. The first line inside the protected block must be the Garden Health line: `**Garden Health:** SYMBOL Status — one short reason.`. The second line - short description of the current garden state.
 10. Add one new journal entry under `agent/journal/` by copying `agent/templates/journal-entry.md` and replacing only the `{{PLACEHOLDER}}` text. Keep the copied headings exactly as written.
-11. Update the current daily summary by appending a timestamped entry. Do not delete, replace, shorten, reorder, or rewrite existing summary content.
-12. Update weekly/monthly/yearly summaries if they are missing or stale, if the run changed the garden's visible behavior or operating assumptions, or if summary cadence is about to expire (weekly - updated at least at the end of the week, monthly - end of month, yearly - end of year), using append-only entries.
+11. Update the current daily summary by appending one timestamped entry to `agent/summaries/daily/YYYY-MM-DD.md`. Do not delete, replace, shorten, reorder, or rewrite existing summary content.
+12. Update rollup summaries only when due: weekly only on Monday's first run for the previous ISO week from daily summaries; monthly only on the 1st day of the month for the previous calendar month from weekly summaries; yearly only on January 1 for the previous calendar year from monthly summaries. If a rollup is not due or was already added for that period, do not create or update it.
 13. Do not modify `AGENTS.md`, `GEMINI.md`, or `.github/` unless the human explicitly asks for an experiment-rule change.
 14. Do not modify or delete previous journal entries.
 15. Do not ask the human what to do next.

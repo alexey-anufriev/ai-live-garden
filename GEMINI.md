@@ -10,7 +10,7 @@ For autonomous evolution runs, before making changes read:
 * `agent/state.md`
 * `agent/requests.md`
 * the latest active entries directly under `agent/journal/`, excluding `agent/journal/archive/`
-* the latest available summaries under `agent/summaries/`
+* the latest active summaries under `agent/summaries/`, excluding all `archive/` folders
 * `data/garden-state.txt`
 
 This is a Java 25 / Maven project.
