@@ -61,7 +61,7 @@ Nutrient scarcity is the central pressure. Plant population size can exhaust nut
 
 Animals participate in metabolism, feeding, predation, scavenging, gentle feeding, predation avoidance, starvation recovery, and buffer-assisted survival. It needs renewed observation since they have been manually reintroduced.
 
-Diagnostics now expose hungry conditions, population pressure, critical energy, root contribution, nutrient buffer state, and buffer use. Hunger diagnostics now explicitly log the target prey types that animals fail to find.
+Diagnostics now expose hungry conditions, population pressure, critical energy, root contribution, nutrient buffer state, and buffer use. Hunger diagnostics now explicitly log the target prey types that animals fail to find, and deaths due to starvation are now specifically identified.
 
 ## Emerging Direction
 

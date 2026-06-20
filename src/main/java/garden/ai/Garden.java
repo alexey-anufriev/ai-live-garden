@@ -279,7 +279,8 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             if (organism.energy() > 0) {
                 survivors.add(organism);
             } else {
-                events.add(new GardenEvent(cycle, "%s (%d nutrients) returned to the soil.".formatted(organism.id(), organism.nutrientValue())));
+                String causeOfDeath = organism.traits().contains("starving") ? " succumbed to hunger" : " returned to the soil";
+                events.add(new GardenEvent(cycle, "%s (%d nutrients)%s.".formatted(organism.id(), organism.nutrientValue(), causeOfDeath)));
                 totalNutrientContribution += organism.nutrientValue();
                 if (organism.traits().contains("moisture-retainer") && organism.type() == OrganismType.MOSS) {
                     totalMoistureContribution += 5;

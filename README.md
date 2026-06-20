@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟡 Restoring — Attempting to reintroduce animal life, with improved diagnostics for starvation.
+**Garden Health:** 🟡 Restoring — Animals reintroduced, with enhanced starvation observability identifying hunger deaths.
 The ecosystem remains plant-dominated, with animals manually introduced to test food web recovery.
 <!-- AI-LIVE-GARDEN:STATE-END -->
