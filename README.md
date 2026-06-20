@@ -86,5 +86,5 @@ This is still an experiment. Do not store valuable secrets or production code in
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
 **Garden Health:** EVOLVING Status — animals are utilizing new survival strategies like cautious feeding to manage energy in the nutrient-scarce environment.
-New 'cautious-feeder' behavior improves survival by reducing over-feeding and visibility in well-fed conditions.
+Added observability for 'cautious-feeder' behavior, logging events when animals skip feeding to conserve energy.
 <!-- AI-LIVE-GARDEN:STATE-END -->

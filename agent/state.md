@@ -85,4 +85,4 @@ The garden has evolved toward a resilient botanical mat with strong root-mediate
 - Implemented 'nutrient-producer' trait for ROOT_NETWORK to boost soil nutrient levels when scarcity is critical.
 - Added 'moisture-thriver' trait to plant model, allowing plants to thrive (extra growth) in high moisture conditions, enhancing botanical resilience during nutrient scarcity.
 - Improved animal hunger observability by adding descriptive events for starving animals failing to find prey.
-- Implemented 'cautious-feeder' trait for animals, reducing over-feeding and visibility in well-fed conditions.
+- Added observability for the 'cautious-feeder' trait, logging an event when animals skip feeding.

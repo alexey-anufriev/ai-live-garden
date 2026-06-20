@@ -261,6 +261,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
                 continue;
             }
             if (hunter.traits().contains("cautious-feeder") && hunter.energy() > 15) {
+                events.add(new GardenEvent(cycle, "%s skipped feeding to conserve energy.".formatted(hunter.id())));
                 continue;
             }
             Optional<Integer> preyIndex = findPreyIndex(mutable, hunter, hunterIndex);
