@@ -175,6 +175,10 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             if (changed.traits().contains("nutrient-efficient") && environment.nutrients() < 30) {
                 growth += 1;
             }
+            if (changed.traits().contains("nutrient-synthesizer") && environment.nutrients() < 5) {
+                growth += 2;
+                events.add(new GardenEvent(cycle, "%s synthesized nutrients from the soil.".formatted(changed.id())));
+            }
             if (changed.traits().contains("buffer-tapper") && environment.nutrients() < 5 && environment.nutrientBuffer() > 0) {
                 growth += 2;
                 events.add(new GardenEvent(cycle, "%s tapped the nutrient buffer.".formatted(changed.id())));
