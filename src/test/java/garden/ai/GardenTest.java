@@ -739,6 +739,47 @@ class GardenTest {
     }
 
     @Test
+    void cautiousFeederAnimalsDoNotFeedWhenWellFed() {
+        Organism cautiousHare = Organism.of("hare-1", OrganismType.HARE, 17, 1, "cautious-feeder");
+        Organism plant = Organism.of("plant-1", OrganismType.MOSS, 10, 1, "food");
+        Environment env = new Environment(50, 50, 50, 50, 50);
+        Garden garden = new Garden(0, 3, env, List.of(cautiousHare, plant), List.of());
+
+        Garden next = garden.nextCycle();
+
+        // 17 - 1 (metabolism) - 8 (unexplained) = 8.
+        assertThat(next.organisms().stream()
+                .filter(o -> o.id().equals("hare-1"))
+                .findFirst().get().energy()).isEqualTo(8);
+        // Plant should not have been eaten (10 + 2 growth = 12 energy)
+        assertThat(next.organisms().stream()
+                .filter(o -> o.id().equals("plant-1"))
+                .findFirst().get().energy()).isEqualTo(12);
+    }
+
+    @Test
+    void cautiousFeederAnimalsFeedWhenHungry() {
+        Organism cautiousHare = Organism.of("hare-1", OrganismType.HARE, 10, 1, "cautious-feeder");
+        Organism plant = Organism.of("plant-1", OrganismType.MOSS, 10, 1, "food");
+        Environment env = new Environment(50, 50, 50, 50, 50);
+        Garden garden = new Garden(0, 3, env, List.of(cautiousHare, plant), List.of());
+
+        Garden next = garden.nextCycle();
+
+        // Feeding: HARE normally gets 2 energy.
+        // Metabolism: 1.
+        // Energy: 10 - 1 + 2 = 11.
+        assertThat(next.organisms().stream()
+                .filter(o -> o.id().equals("hare-1"))
+                .findFirst().get().energy()).isEqualTo(11);
+        
+        // Plant should have been eaten. 10 + 2 - 2 = 10.
+        assertThat(next.organisms().stream()
+                .filter(o -> o.id().equals("plant-1"))
+                .findFirst().get().energy()).isEqualTo(10);
+    }
+
+    @Test
     void prolificAnimalsHaveReducedReproductionThreshold() {
         Organism prolificHare = Organism.of("hare-1", OrganismType.HARE, 13, 1, "prolific");
         List<Organism> organisms = List.of(prolificHare);

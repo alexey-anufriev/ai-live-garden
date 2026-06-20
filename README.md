@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** EVOLVING Status — prolific trait enables animal populations to recover faster, increasing the chance of long-term food web stability.
-New behavioral adaptation reduces the reproduction threshold, supporting animal population rebound.
+**Garden Health:** EVOLVING Status — animals are utilizing new survival strategies like cautious feeding to manage energy in the nutrient-scarce environment.
+New 'cautious-feeder' behavior improves survival by reducing over-feeding and visibility in well-fed conditions.
 <!-- AI-LIVE-GARDEN:STATE-END -->
