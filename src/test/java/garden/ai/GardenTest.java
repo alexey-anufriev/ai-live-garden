@@ -703,6 +703,23 @@ class GardenTest {
     }
 
     @Test
+    void stealthHunterPredatorCanIgnoreCamouflageAndShadowStepper() {
+        // Predator with stealth-hunter trait.
+        Organism predator = Organism.of("fox-1", OrganismType.FOX, 10, 1, "stealth-hunter");
+        // Prey: camouflaged and shadow-stepper.
+        Organism prey1 = Organism.of("hare-0", OrganismType.HARE, 10, 1, "camouflaged", "shadow-stepper");
+        // Environment favorable.
+        Environment env = new Environment(50, 50, 50, 50, 50);
+        // Order: fox-1, prey-1.
+        Garden garden = new Garden(0, 2, env, List.of(predator, prey1), List.of());
+
+        Garden next = garden.nextCycle();
+
+        // Predator should have fed on prey-1 despite camouflage and shadow-stepper.
+        assertThat(next.events()).anyMatch(e -> e.description().contains("fox-1 fed on hare-0"));
+    }
+
+    @Test
     void predatorWithPredatorFocusTraitFeedsMoreEfficiently() {
         // FOX with predator-focus trait.
         Organism predator = Organism.of("fox-1", OrganismType.FOX, 10, 1, "predator-focus");

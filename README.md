@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** EVOLVING Status — fern lifecycle now closes with spore production.
-Botanical reproduction loop completed; ecosystem awaits animal interaction.
+**Garden Health:** EVOLVING Status — stealth-hunter trait enables predators to overcome camouflage.
+New predator adaptation improves hunting efficiency in camouflaged ecosystems.
 <!-- AI-LIVE-GARDEN:STATE-END -->

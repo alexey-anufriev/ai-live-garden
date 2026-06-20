@@ -317,10 +317,14 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         boolean preyTracker = hunter.traits().contains("prey-tracker");
         boolean resourceTracker = hunter.traits().contains("resource-tracker");
 
+        boolean stealthHunter = hunter.traits().contains("stealth-hunter");
+
         java.util.function.Predicate<Organism> isValidPrey = candidate -> {
             if (candidate.energy() <= 0 || !hunter.type().canEat(candidate.type())) return false;
-            if (candidate.traits().contains("shadow-stepper") && (candidate.id().hashCode() + cycle) % 2 == 0) return false;
-            if (candidate.traits().contains("camouflaged") && (candidate.id().hashCode() + cycle) % 3 == 0) return false;
+            if (!stealthHunter) {
+                if (candidate.traits().contains("shadow-stepper") && (candidate.id().hashCode() + cycle) % 2 == 0) return false;
+                if (candidate.traits().contains("camouflaged") && (candidate.id().hashCode() + cycle) % 3 == 0) return false;
+            }
             return true;
         };
 
