@@ -80,7 +80,7 @@ The agent must:
 4. Read `agent/state.md`.
 5. Read `agent/requests.md`.
 6. Read the latest active entries directly under `agent/journal/`, excluding `agent/journal/archive/`.
-7. Read the latest available summaries under `agent/summaries/`.
+7. Read the latest active summaries under `agent/summaries/`, excluding all `archive/` folders.
 8. Inspect the persistent garden snapshot in `data/garden-state.txt`.
 9. Inspect the current Java/Maven project.
 10. Choose exactly one small, coherent next step.
@@ -89,8 +89,8 @@ The agent must:
 13. Update `agent/state.md`.
 14. Update the `Current Garden State` section in `README.md` between the protected markers only.
 15. Add a new journal entry under `agent/journal/`.
-16. Update the current daily summary.
-17. Update weekly, monthly, or yearly summaries if they are stale or if the run changed the garden's direction.
+16. Append one entry to the current daily summary.
+17. Update weekly, monthly, or yearly summaries only when their scheduled rollup is due.
 18. Leave the repository in a committable state.
 
 The workflow advances `data/garden-state.txt` after the agent step by running the simulation. The agent may run the simulation locally while working, but should not fake large state changes by hand.
@@ -229,13 +229,15 @@ When creating a new summary file, copy the matching template and replace only th
 
 When appending to an existing summary file, follow the entry shape from the matching template instead of inventing a new structure, also refer to existing summaries.
 
-Summary entries are append-only memory. When updating any daily, weekly, monthly, or yearly summary, add a new dated or timestamped entry or correction below the existing entries. Do not delete, reorder, replace, shorten, compress, or rewrite prior summary entries, even when they are incomplete or superseded. Never replace an existing summary file with a shorter report for the current run. If earlier summary information was lost or compressed too aggressively, recover it by appending a clearly labeled recovery entry instead of silently replacing prior entries.
+Summary entries are append-only memory. For an existing summary file, append-only means the committed file content must remain an exact byte-for-byte prefix of the updated file. When updating any daily, weekly, monthly, or yearly summary, add a new dated or timestamped entry or correction after the final existing line. Do not insert text before prior entries. Do not delete, reorder, replace, shorten, compress, rewrap, rename headings, normalize formatting, or rewrite prior summary entries, even when they are malformed, incomplete, duplicated, or superseded. Never replace an existing summary file with a shorter report for the current run. If earlier summary information was lost, malformed, duplicated, or compressed too aggressively, recover it by appending a clearly labeled correction entry at the end instead of editing prior text.
 
 Daily summary rule:
 
 * Every autonomous run must append one timestamped entry to `agent/summaries/daily/YYYY-MM-DD.md` for the current UTC date.
 * If the daily file does not exist, create it from `agent/templates/daily-summary.md`.
+* If the daily file already exists, do not copy the template over it and do not edit any existing line. Move to the end of the file and append exactly one new `### TIMESTAMP - Short title` entry plus its paragraph.
 * Daily summaries may receive multiple appended entries in the same day.
+* The Evolve workflow validates append-only summaries before committing through the reusable `.github/actions/gemini-validate-repair` action. If an active summary is rewritten, shortened, or deleted, the workflow asks Gemini to repair the summaries and validates again, up to three repair attempts. If the summaries still violate append-only rules after the final attempt, the workflow fails before archiving or committing so no invalid run result is saved.
 
 Weekly summary rule:
 

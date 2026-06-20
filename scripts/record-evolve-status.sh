@@ -12,4 +12,5 @@ mkdir -p agent
   echo "- Gemini outcome: ${GEMINI_OUTCOME}"
   echo "- Post-change test outcome: ${POST_TEST_OUTCOME}"
   echo "- Garden state advance outcome: ${ADVANCE_GARDEN_OUTCOME}"
+  echo "- Summary append-only outcome: ${SUMMARY_APPEND_ONLY_OUTCOME}"
 } > agent/last-run.md
