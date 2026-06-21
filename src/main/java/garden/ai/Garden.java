@@ -313,6 +313,9 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             if (hunter.traits().contains("scavenger") && environment.nutrients() < 25) {
                 bite += 1;
             }
+            if (hunter.traits().contains("nutrient-hoarder")) {
+                bite += 1;
+            }
             if (hunter.type() == OrganismType.FOX && hunter.traits().contains("predator-focus")) {
                 bite += 1;
             }
