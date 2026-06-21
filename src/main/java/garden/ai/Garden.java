@@ -114,8 +114,9 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         if (nextEnvironment.nutrientBuffer() < 10) {
             nextEvents.add(new GardenEvent(nextCycle, "The nutrient buffer is near exhaustion."));
         }
+        int fungalContribution = fungalContribution();
         List<Organism> changed = organisms.stream()
-                .map(organism -> passiveChange(organism, environment, nextCycle, nextEvents))
+                .map(organism -> passiveChange(organism, environment, nextCycle, nextEvents, fungalContribution))
                 .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
 
         FeedingResult feeding = feedingPhase(changed, nextCycle, nextEvents);
@@ -154,7 +155,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         return organisms.stream().filter(organism -> organism.type().isAnimal()).count();
     }
 
-    private Organism passiveChange(Organism organism, Environment environment, int cycle, List<GardenEvent> events) {
+    private Organism passiveChange(Organism organism, Environment environment, int cycle, List<GardenEvent> events, int fungalContribution) {
         Organism changed = organism;
         if (organism.type().isPlant()) {
             int growth = environment.favorsPlants() ? 2 : 0;
@@ -208,6 +209,10 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             if (changed.traits().contains("moisture-thriver") && environment.moisture() > 60) {
                 growth += 2;
                 events.add(new GardenEvent(cycle, "%s thrived in the moisture.".formatted(changed.id())));
+            }
+            if (changed.traits().contains("fungal-feeder") && fungalContribution > 0) {
+                growth += 1;
+                events.add(new GardenEvent(cycle, "%s fed on fungal networks.".formatted(changed.id())));
             }
             if (changed.traits().contains("resilient")) {
                 growth -= 1;
@@ -448,7 +453,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
     }
 
     private String mutationTrait(int cycle, Organism organism) {
-        String[] traits = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "sun-seeker", "rain-collector", "nutrient-finder", "nutrient-efficient", "shadow-stepper", "hardy", "water-seeker", "dormancy", "nutrient-weaver", "metabolic-efficiency", "scavenger", "nutrient-sharer", "buffer-resonator", "buffer-scavenger", "nutrient-hoarder", "nutrient-scout", "soil-master", "deep-rooting", "buffer-optimizer", "buffer-tapper", "nutrient-translocator", "camouflaged", "shade-thriver", "moisture-retainer", "nutrient-absorber", "nutrient-synthesizer", "prey-tracker", "resource-tracker", "predator-focus", "nutrient-reclaimer", "nutrient-producer", "nutrient-enricher", "moisture-thriver", "prolific", "cautious-feeder", "nutrient-decomposer", "fungus-soil-enricher", "fungal-network-connector"};
+        String[] traits = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "sun-seeker", "rain-collector", "nutrient-finder", "nutrient-efficient", "shadow-stepper", "hardy", "water-seeker", "dormancy", "nutrient-weaver", "metabolic-efficiency", "scavenger", "nutrient-sharer", "buffer-resonator", "buffer-scavenger", "nutrient-hoarder", "nutrient-scout", "soil-master", "deep-rooting", "buffer-optimizer", "buffer-tapper", "nutrient-translocator", "camouflaged", "shade-thriver", "moisture-retainer", "nutrient-absorber", "nutrient-synthesizer", "prey-tracker", "resource-tracker", "predator-focus", "nutrient-reclaimer", "nutrient-producer", "nutrient-enricher", "moisture-thriver", "prolific", "cautious-feeder", "nutrient-decomposer", "fungus-soil-enricher", "fungal-network-connector", "fungal-feeder"};
         int index = Math.floorMod(organism.id().hashCode() + cycle + organism.generation(), traits.length);
         return traits[index];
     }

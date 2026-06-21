@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟠 Strained — nutrients are depleted; FUNGUS and ROOT_NETWORK now form an interdependent nutrient-sharing synergy.
-The garden is a plant-dominated survival system, heavily buffered but facing critical nutrient scarcity; FUNGUS organisms now actively contribute more nutrients to the soil when they evolve the 'nutrient-decomposer', 'fungus-soil-enricher', or 'fungal-network-connector' traits, particularly in synergy with root networks.
+**Garden Health:** 🟠 Strained — nutrients are depleted; new 'fungal-feeder' trait allows plants to utilize fungal networks for energy.
+The garden is a plant-dominated survival system, heavily buffered but facing critical nutrient scarcity; FUNGUS and ROOT_NETWORK organisms are forming an interdependent nutrient-sharing synergy, now integrated with plants via the 'fungal-feeder' trait.
 <!-- AI-LIVE-GARDEN:STATE-END -->

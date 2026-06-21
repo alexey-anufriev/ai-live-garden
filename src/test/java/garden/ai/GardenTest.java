@@ -803,4 +803,23 @@ class GardenTest {
         Garden next = garden.nextCycle();
         assertThat(next.organisms().size()).isEqualTo(2);
     }
+
+    @Test
+    void fungalFeederPlantsGainEnergyFromFungalNetworks() {
+        // Plant with fungal-feeder trait.
+        Organism plant = Organism.of("plant-1", OrganismType.FERN, 10, 1, "fungal-feeder");
+        // Add a fungus to provide contribution.
+        Organism fungus = Organism.of("fungus-1", OrganismType.FUNGUS, 10, 1, "standard");
+        // Environment light=50 (favorsPlants), nutrients=50.
+        Environment env = new Environment(50, 50, 50, 50, 50);
+        Garden garden = new Garden(0, 3, env, List.of(plant, fungus), List.of());
+
+        Garden next = garden.nextCycle();
+
+        // Passive change growth: 2 (favorsPlants) + 1 (fungal-feeder + fungus contribution > 0) = 3
+        assertThat(next.organisms().stream()
+                .filter(o -> o.id().equals("plant-1"))
+                .findFirst().get().energy()).isEqualTo(13);
+        assertThat(next.events()).anyMatch(e -> e.description().contains("plant-1 fed on fungal networks."));
+    }
 }
