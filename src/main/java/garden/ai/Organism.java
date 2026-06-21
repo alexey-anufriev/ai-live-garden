@@ -120,6 +120,9 @@ public record Organism(String id, OrganismType type, int energy, int curiosity, 
         if (traits.contains("nutrient-distributor")) {
             value += 4;
         }
+        if (traits.contains("nutrient-sharer")) {
+            value += 3;
+        }
         if (traits.contains("nutrient-storer")) {
             value += 6;
         }
