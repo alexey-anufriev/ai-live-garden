@@ -64,7 +64,7 @@ Diagnostics now expose hungry conditions, population pressure, critical energy, 
 
 ## Emerging Direction
 
-The garden has evolved toward a resilient botanical mat with strong root-mediated resource buffering. Future runs will continue to focus on stabilizing the food web and evaluating whether the newly introduced `nutrient-hoarder` trait for animals helps balance nutrient availability and survival in the long term.
+The garden has evolved toward a resilient botanical mat with strong root-mediated resource buffering. Future runs will continue to focus on stabilizing the food web by examining the impact of the new `nutrient-storer` trait, which allows animals to function as nutrient reservoirs, alongside existing interdependence mechanisms like `nutrient-distributor` and `fungal-symbiote` traits.
 
 ## Avoid For Now
 
