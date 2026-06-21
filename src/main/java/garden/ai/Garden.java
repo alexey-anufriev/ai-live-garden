@@ -80,7 +80,8 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
 
     public int fungalContribution() {
         long fungusCount = organisms.stream().filter(organism -> organism.type() == OrganismType.FUNGUS).count();
-        return (int) (fungusCount * 2);
+        long decomposerCount = organisms.stream().filter(organism -> organism.type() == OrganismType.FUNGUS && organism.traits().contains("nutrient-decomposer")).count();
+        return (int) (fungusCount * 2 + decomposerCount * 3);
     }
 
     /**

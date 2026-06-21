@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟠 Hungry — nutrients are depleted.
-The garden is a plant-dominated survival system, heavily buffered but facing critical nutrient scarcity; FUNGUS organisms can now evolve a nutrient-decomposer trait to improve recycling efficiency.
+**Garden Health:** 🟠 Strained — nutrients are depleted, FUNGUS enhancing nutrient pathways.
+The garden is a plant-dominated survival system, heavily buffered but facing critical nutrient scarcity; FUNGUS organisms now actively contribute more nutrients to the soil when they evolve the 'nutrient-decomposer' trait.
 <!-- AI-LIVE-GARDEN:STATE-END -->
