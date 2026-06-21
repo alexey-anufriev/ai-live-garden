@@ -24,4 +24,14 @@ public class FungalContributionTest {
         // Count: 1 FUNGUS (2), 1 connector (6 bonus) = 8
         assertEquals(8, garden.fungalContribution());
     }
+
+    @Test
+    public void testFungalContributionWithSymbiote() {
+        Organism fungus1 = Organism.of("fungus-1", OrganismType.FUNGUS, 10, 1, "nutrient-decomposer");
+        Organism fern1 = Organism.of("fern-1", OrganismType.FERN, 10, 1, "fungal-symbiote");
+        Garden garden = new Garden(1, 1, new Environment(50, 50, 50, 50, 50), List.of(fungus1, fern1), List.of());
+        
+        // Count: 1 FUNGUS (2), 1 decomposer (3), 1 symbiote (2 bonus) = 7
+        assertEquals(7, garden.fungalContribution());
+    }
 }
