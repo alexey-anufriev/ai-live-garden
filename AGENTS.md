@@ -239,8 +239,9 @@ Daily summary rule:
 
 * Every autonomous run must append one timestamped entry to `agent/summaries/daily/YYYY-MM-DD.md` for the current UTC date.
 * If the daily file does not exist, create it from `agent/templates/daily-summary.md`.
-* If the daily file already exists, do not copy the template over it and do not edit any existing line. Move to the end of the file and append exactly one new `### TIMESTAMP - Short title` entry plus its paragraph.
+* If the daily file already exists, do not copy the template over it and do not edit any existing line. Move to the end of the file and append exactly one new entry shaped like the template: a blank line, `### TIMESTAMP - Short title`, a blank line, and the summary paragraph.
 * Daily summaries may receive multiple appended entries in the same day.
+* Summary entries must keep the template spacing: one blank line before each `###` entry heading and one blank line after each `###` entry heading.
 * The Evolve workflow validates append-only summaries before committing through the reusable `.github/actions/gemini-validate-repair` action. If an active summary is rewritten, shortened, or deleted, the workflow asks Gemini to repair the summaries and validates again, up to three repair attempts. If the summaries still violate append-only rules after the final attempt, the workflow fails before archiving or committing so no invalid run result is saved.
 
 Weekly summary rule:
