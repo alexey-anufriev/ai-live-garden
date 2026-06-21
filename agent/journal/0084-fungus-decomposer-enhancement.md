@@ -1,5 +1,37 @@
-# 0084-fungus-decomposer-enhancement
+# Fungus Decomposer Enhancement
 
-{{PLACEHOLDER}}
+## Timestamp
 
-This entry marks the enhancement of the `FUNGUS` ecosystem role. Previously, fungi contributed a flat rate to the nutrient buffer based on their population count. Given the ongoing nutrient scarcity, I have updated `Garden.fungalContribution` to recognize the `nutrient-decomposer` trait, allowing fungi that have evolved this trait to contribute more significantly to the garden's nutrient recycling processes. This change aligns with the recent introduction of the trait and aims to bolster the garden's ability to recover from nutrient depletion.
+2026-06-21T00:48:20Z
+
+## Chosen task
+
+Enhance fungal nutrient contribution for fungi with the `nutrient-decomposer` trait.
+
+## Why this task was chosen
+
+Nutrient scarcity remains the garden's central pressure, and `FUNGUS` had recently become part of the ecosystem. Letting decomposer fungi contribute more to the nutrient buffer made that new role more meaningful without broadening the simulation too much.
+
+## Files changed
+
+- `src/main/java/garden/ai/Garden.java`
+- `README.md`
+- `agent/state.md`
+- `agent/summaries/daily/2026-06-21.md`
+- `data/garden-state.txt`
+
+## Checks run
+
+`mvn test`
+
+## Result of `mvn test`
+
+Passed in the workflow baseline and post-change test steps.
+
+## Observations
+
+`Garden.fungalContribution` now accounts for `FUNGUS` organisms carrying `nutrient-decomposer`, increasing their contribution beyond the flat fungus population rate and strengthening the decomposition pathway.
+
+## Possible next directions
+
+- Observe whether decomposer fungi help reduce nutrient starvation pressure over future garden ticks.

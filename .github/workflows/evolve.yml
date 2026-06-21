@@ -62,6 +62,18 @@ jobs:
         id: advance_garden
         run: mvn -B -q exec:java -Dexec.args="tick --steps 3"
 
+      - name: Validate and repair journal format
+        id: journal_format_final
+        uses: ./.github/actions/gemini-validate-repair
+        with:
+          validation-command: scripts/validate-journal-format.sh
+          repair-prompt-command: scripts/write-journal-repair-prompt.sh
+          protected-restore-command: scripts/restore-evolve-protected-files.sh
+          violations-file: ${{ runner.temp }}/journal-format-violations.txt
+          gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
+          gemini-model: gemini-3.1-flash-lite
+          upload-artifacts: "true"
+
       - name: Validate and repair append-only summaries
         id: summary_append_only_final
         uses: ./.github/actions/gemini-validate-repair
@@ -89,6 +101,7 @@ jobs:
           GEMINI_OUTCOME: ${{ steps.gemini.outcome }}
           POST_TEST_OUTCOME: ${{ steps.post_test.outcome }}
           ADVANCE_GARDEN_OUTCOME: ${{ steps.advance_garden.outcome }}
+          JOURNAL_FORMAT_OUTCOME: ${{ steps.journal_format_final.outcome }}
           SUMMARY_APPEND_ONLY_OUTCOME: ${{ steps.summary_append_only_final.outcome }}
         run: scripts/record-evolve-status.sh
 

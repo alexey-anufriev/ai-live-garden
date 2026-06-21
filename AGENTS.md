@@ -280,7 +280,7 @@ Archive should not be considered for next steps or future decisions, only active
 
 ## Journal entry format
 
-Each run should add a journal entry under `agent/journal/` by copying `agent/templates/journal-entry.md` to a new numbered journal file and replacing only the `{{PLACEHOLDER}}` text. Do not rename, remove, reorder, or rewrite the headings.
+Each run should add a journal entry under `agent/journal/` by copying `agent/templates/journal-entry.md` to a new numbered journal file and replacing every `{{PLACEHOLDER}}` text with concrete content. Do not leave placeholder text in the file. Do not rename, remove, reorder, or rewrite the headings.
 
 The template is:
 
@@ -325,6 +325,8 @@ Use an ISO-8601 timestamp with time and timezone. If reconstructing an older jou
 The journal should be honest. If tests fail, say so. If the change is small, say so. If the run was mostly documentation or cleanup, explain why that was useful.
 
 Each journal file should be formatted in the same way. `agent/templates/journal-entry.md` is authoritative. If needed, unformatted entries must be corrected without rewriting their historical meaning.
+
+The Evolve workflow validates the changed active journal entry before committing through `.github/actions/gemini-validate-repair`. A journal entry with missing headings, headings in the wrong order, unresolved placeholders, or a malformed timestamp must be repaired before the run can be archived or committed.
 
 ## Agent requests
 
