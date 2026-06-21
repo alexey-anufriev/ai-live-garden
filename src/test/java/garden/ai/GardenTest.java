@@ -74,6 +74,7 @@ class GardenTest {
         assertThat(rendered).contains("Cycle: 2");
         assertThat(rendered).contains("Environment:");
         assertThat(rendered).contains("Balance:");
+        assertThat(rendered).contains("Traits:");
         assertThat(rendered).contains("Organisms:");
         assertThat(rendered).contains("Recent events:");
     }

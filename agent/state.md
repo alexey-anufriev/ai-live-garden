@@ -29,7 +29,7 @@ The project is currently more of a botanical survival system than a balanced foo
 
 Source of truth: `data/garden-state.txt`.
 
-The current snapshot is cycle 1538.
+The current snapshot is cycle 1781.
 
 Active organisms:
 
@@ -38,7 +38,7 @@ Active organisms:
 - 1 fox
 - Numerous moss clusters and root networks
 
-Population breakdown is now available in `inspect` output.
+Population breakdown and trait distribution are now available in `inspect` output.
 
 ## Current Behavior
 

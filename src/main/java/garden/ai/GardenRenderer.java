@@ -1,6 +1,7 @@
 package garden.ai;
 
 import java.util.Comparator;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -36,6 +37,15 @@ public final class GardenRenderer {
         long hares = garden.organisms().stream().filter(o -> o.type() == OrganismType.HARE).count();
         long foxes = garden.organisms().stream().filter(o -> o.type() == OrganismType.FOX).count();
 
+        Map<String, Long> traitCounts = garden.organisms().stream()
+                .flatMap(o -> o.traits().stream())
+                .collect(Collectors.groupingBy(java.util.function.Function.identity(), Collectors.counting()));
+
+        String traitOverview = traitCounts.entrySet().stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .map(e -> e.getKey() + ":" + e.getValue())
+                .collect(Collectors.joining(", "));
+
         return """
                 AI Live Garden
                 ==============
@@ -43,6 +53,7 @@ public final class GardenRenderer {
                 Cycle: %d
                 Environment: light=%d moisture=%d warmth=%d nutrients=%d (buffer: %d, root: %d) mood=%s
                 Balance: plants=%d (Moss: %d, Roots: %d, Spores: %d, Ferns: %d) animals=%d (Beetles: %d, Hares: %d, Foxes: %d) total=%d
+                Traits: %s
 
                 Organisms:
                 %s
@@ -63,6 +74,7 @@ public final class GardenRenderer {
                 garden.animalCount(),
                 beetles, hares, foxes,
                 garden.organisms().size(),
+                traitOverview,
                 organisms,
                 recentEvents
         );
