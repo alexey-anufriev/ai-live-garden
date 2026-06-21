@@ -72,7 +72,7 @@ jobs:
           violations-file: ${{ runner.temp }}/journal-format-violations.txt
           gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
           gemini-model: gemini-3.1-flash-lite
-          upload-artifacts: "true"
+          artifact-name-prefix: journal-format-repair
 
       - name: Validate and repair summary format
         id: summary_format_final
@@ -84,7 +84,7 @@ jobs:
           violations-file: ${{ runner.temp }}/summary-format-violations.txt
           gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
           gemini-model: gemini-3.1-flash-lite
-          upload-artifacts: "true"
+          artifact-name-prefix: summary-format-repair
 
       - name: Validate and repair append-only summaries
         id: summary_append_only_final
@@ -96,7 +96,7 @@ jobs:
           violations-file: ${{ runner.temp }}/summary-append-only-violations.txt
           gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
           gemini-model: gemini-3.1-flash-lite
-          upload-artifacts: "true"
+          artifact-name-prefix: summary-append-only-repair
 
       - name: Archive old journal entries
         shell: bash

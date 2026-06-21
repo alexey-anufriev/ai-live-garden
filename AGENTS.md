@@ -243,6 +243,7 @@ Daily summary rule:
 * Daily summaries may receive multiple appended entries in the same day.
 * Summary entries must keep the template spacing: one blank line before each `###` entry heading and one blank line after each `###` entry heading.
 * The Evolve workflow validates append-only summaries before committing through the reusable `.github/actions/gemini-validate-repair` action. If an active summary is rewritten, shortened, or deleted, the workflow asks Gemini to repair the summaries and validates again, up to three repair attempts. If the summaries still violate append-only rules after the final attempt, the workflow fails before archiving or committing so no invalid run result is saved.
+* Gemini repair attempts in validation loops must not use the upstream Gemini action's built-in artifact upload because it uses a fixed artifact name. The reusable repair action may upload `gemini-artifacts/` separately with a unique artifact name for the validation type and attempt number.
 
 Weekly summary rule:
 

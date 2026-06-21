@@ -23,10 +23,13 @@ inputs:
     required: false
     default: gemini-3.1-flash-lite
   upload-artifacts:
-    description: Whether Gemini repair attempts should upload artifacts.
+    description: Whether to upload uniquely named artifacts for Gemini repair attempts.
     required: false
     default: "true"
-
+  artifact-name-prefix:
+    description: Prefix for repair attempt artifact names. Must be unique per use of this action in a workflow.
+    required: false
+    default: gemini-validate-repair
 runs:
   using: composite
   steps:
@@ -61,7 +64,15 @@ runs:
         gemini_api_key: ${{ inputs.gemini-api-key }}
         gemini_model: ${{ inputs.gemini-model }}
         prompt: ${{ steps.repair_prompt_1.outputs.text }}
-        upload_artifacts: ${{ inputs.upload-artifacts }}
+        upload_artifacts: false
+
+    - name: Upload repair artifacts 1
+      if: ${{ steps.validate_initial.outcome == 'failure' && inputs.upload-artifacts == 'true' }}
+      uses: actions/upload-artifact@v6
+      with:
+        name: ${{ inputs.artifact-name-prefix }}-attempt-1
+        path: gemini-artifacts/
+        if-no-files-found: warn
 
     - name: Restore protected files after repair 1
       if: ${{ steps.validate_initial.outcome == 'failure' && inputs.protected-restore-command != '' && !cancelled() }}
@@ -100,7 +111,15 @@ runs:
         gemini_api_key: ${{ inputs.gemini-api-key }}
         gemini_model: ${{ inputs.gemini-model }}
         prompt: ${{ steps.repair_prompt_2.outputs.text }}
-        upload_artifacts: ${{ inputs.upload-artifacts }}
+        upload_artifacts: false
+
+    - name: Upload repair artifacts 2
+      if: ${{ steps.validate_initial.outcome == 'failure' && steps.validate_after_repair_1.outcome == 'failure' && inputs.upload-artifacts == 'true' }}
+      uses: actions/upload-artifact@v6
+      with:
+        name: ${{ inputs.artifact-name-prefix }}-attempt-2
+        path: gemini-artifacts/
+        if-no-files-found: warn
 
     - name: Restore protected files after repair 2
       if: ${{ steps.validate_initial.outcome == 'failure' && steps.validate_after_repair_1.outcome == 'failure' && inputs.protected-restore-command != '' && !cancelled() }}
@@ -139,7 +158,15 @@ runs:
         gemini_api_key: ${{ inputs.gemini-api-key }}
         gemini_model: ${{ inputs.gemini-model }}
         prompt: ${{ steps.repair_prompt_3.outputs.text }}
-        upload_artifacts: ${{ inputs.upload-artifacts }}
+        upload_artifacts: false
+
+    - name: Upload repair artifacts 3
+      if: ${{ steps.validate_initial.outcome == 'failure' && steps.validate_after_repair_1.outcome == 'failure' && steps.validate_after_repair_2.outcome == 'failure' && inputs.upload-artifacts == 'true' }}
+      uses: actions/upload-artifact@v6
+      with:
+        name: ${{ inputs.artifact-name-prefix }}-attempt-3
+        path: gemini-artifacts/
+        if-no-files-found: warn
 
     - name: Restore protected files after repair 3
       if: ${{ steps.validate_initial.outcome == 'failure' && steps.validate_after_repair_1.outcome == 'failure' && steps.validate_after_repair_2.outcome == 'failure' && inputs.protected-restore-command != '' && !cancelled() }}
