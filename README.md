@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟠 Strained — nutrients are depleted, FUNGUS enhancing nutrient pathways via decomposition and enrichment.
-The garden is a plant-dominated survival system, heavily buffered but facing critical nutrient scarcity; FUNGUS organisms now actively contribute more nutrients to the soil when they evolve the 'nutrient-decomposer' or 'fungus-soil-enricher' traits.
+**Garden Health:** 🟠 Strained — nutrients are depleted, FUNGUS enhancing nutrient pathways via decomposition, enrichment, and network connection.
+The garden is a plant-dominated survival system, heavily buffered but facing critical nutrient scarcity; FUNGUS organisms now actively contribute more nutrients to the soil when they evolve the 'nutrient-decomposer', 'fungus-soil-enricher', or 'fungal-network-connector' traits.
 <!-- AI-LIVE-GARDEN:STATE-END -->

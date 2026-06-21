@@ -29,16 +29,14 @@ The project is currently more of a botanical survival system than a balanced foo
 
 Source of truth: `data/garden-state.txt`.
 
-The current snapshot is cycle 1036 with light 100, moisture 99, warmth 99, nutrients 0, and nutrient buffer 100.
+The current snapshot is cycle 1538.
 
 Active organisms:
 
 - 1 beetle
 - 1 hare
 - 1 fox
-- 2048 plants and roots present
-
-Recent events show the manual reintroduction of animals to the garden to test if the food chain can recover.
+- Numerous moss clusters and root networks
 
 Population breakdown is now available in `inspect` output.
 
@@ -57,7 +55,7 @@ The state format is line-oriented text handled by `GardenStateStore`. It is inte
 
 The model contains plants (`MOSS`, `FERN`, `SPORE`, `ROOT_NETWORK`, `FUNGUS`), herbivores (`BEETLE`, `HARE`), and a predator (`FOX`). 
 
-Nutrient scarcity is the central pressure. Plant population size can exhaust nutrients, root networks contribute recovery, and the environment uses a nutrient buffer to store and release support. Fungi (`FUNGUS`) act as decomposers, contributing directly to the nutrient buffer. The 'nutrient-recycler' trait enables plants to explicitly contribute more nutrients to the soil upon death, aiding in nutrient recycling. The 'nutrient-decomposer' trait, now available for evolution in FUNGUS, significantly increases the nutrient value of organisms upon death and enhances fungal nutrient contribution to the soil, further bolstering decomposition pathways. The new 'fungus-soil-enricher' trait for FUNGUS further enhances soil nutrients, providing an additional mechanism for recovery from nutrient scarcity. The 'sun-seeker' trait allows plants to thrive in high-light conditions, adding a new environmental adaptation.
+Nutrient scarcity is the central pressure. Plant population size can exhaust nutrients, root networks contribute recovery, and the environment uses a nutrient buffer to store and release support. Fungi (`FUNGUS`) act as decomposers, contributing directly to the nutrient buffer. The 'nutrient-recycler' trait enables plants to explicitly contribute more nutrients to the soil upon death, aiding in nutrient recycling. The 'nutrient-decomposer' trait, now available for evolution in FUNGUS, significantly increases the nutrient value of organisms upon death and enhances fungal nutrient contribution to the soil, further bolstering decomposition pathways. The 'fungus-soil-enricher' trait for FUNGUS further enhances soil nutrients, providing an additional mechanism for recovery from nutrient scarcity. The new 'fungal-network-connector' trait for FUNGUS allows fungi to actively increase their nutrient buffer contribution, enhancing the interconnectedness of the ecosystem. The 'sun-seeker' trait allows plants to thrive in high-light conditions, adding a new environmental adaptation.
 
 Animals participate in metabolism, feeding, predation, scavenging, gentle feeding, predation avoidance, starvation recovery, buffer-assisted survival, and nutrient absorption. The 'prey-tracker' trait allows animals to prioritize higher-energy prey, increasing foraging efficiency. The 'resource-tracker' trait allows animals to prioritize nutrient-hoarding prey, helping them navigate resource scarcity.
 
