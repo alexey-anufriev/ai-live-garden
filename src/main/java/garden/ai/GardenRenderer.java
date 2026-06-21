@@ -51,7 +51,7 @@ public final class GardenRenderer {
                 ==============
 
                 Cycle: %d
-                Environment: light=%d moisture=%d warmth=%d nutrients=%d (buffer: %d, root: %d) mood=%s
+                Environment: light=%d moisture=%d warmth=%d nutrients=%d (buffer: %d, root: %d, fungal: %d) mood=%s
                 Balance: plants=%d (Moss: %d, Roots: %d, Spores: %d, Ferns: %d) animals=%d (Beetles: %d, Hares: %d, Foxes: %d) total=%d
                 Traits: %s
 
@@ -68,6 +68,7 @@ public final class GardenRenderer {
                 garden.environment().nutrients(),
                 garden.environment().nutrientBuffer(),
                 garden.rootContribution(),
+                garden.fungalContribution(),
                 garden.environment().mood() + (garden.environment().mood().equals("hungry") ? " (" + garden.environment().diagnostic() + ")" : ""),
                 garden.plantCount(),
                 moss, roots, spores, ferns,

@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🔴 Hungry — Nutrients are critically low, but animals have gained 'nutrient-sharer', 'resourceful-breeder', and 'root-tapper' traits to manage starvation and sustain survival.
-The garden is a plant-dominated survival system, heavily buffered but facing critical nutrient scarcity; FUNGUS and ROOT_NETWORK organisms are forming an interdependent nutrient-sharing synergy, now integrated with plants via the 'fungal-feeder' trait, 'mycorrhizal-booster' symbiosis, and animal traits aiding foraging under scarcity, with animals now utilizing the 'nutrient-hoarder', 'nutrient-storer', 'nutrient-sharer', 'resourceful-breeder', and 'root-tapper' traits to access root-mediated resources and better manage available nutrients. Trait distribution is now explicitly tracked in the `inspect` output.
+**Garden Health:** 🟡 Stable — Fungal and root-mediated nutrient interdependence improved; observability increased.
+The garden persists through careful management of nutrient buffers, with ROOT_NETWORK and FUNGUS interdependencies now explicitly tracked; animals utilize diverse traits like 'nutrient-hoarder', 'nutrient-sharer', and 'root-tapper' to manage scarcity, while FUNGUS organisms now include the 'fungal-enhancer' trait to boost nutrient recovery.
 <!-- AI-LIVE-GARDEN:STATE-END -->
