@@ -85,11 +85,12 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         long soilEnricherCount = organisms.stream().filter(organism -> organism.type() == OrganismType.FUNGUS && organism.traits().contains("fungus-soil-enricher")).count();
         long networkConnectorCount = organisms.stream().filter(organism -> organism.type() == OrganismType.FUNGUS && organism.traits().contains("fungal-network-connector")).count();
         long fungalSymbioteCount = organisms.stream().filter(organism -> organism.type().isPlant() && organism.traits().contains("fungal-symbiote")).count();
+        long fungalAcceleratorCount = organisms.stream().filter(organism -> organism.type() == OrganismType.FUNGUS && organism.traits().contains("fungal-accelerator")).count();
         long rootNetworkCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK).count();
 
         int connectorBonus = (rootNetworkCount > 0) ? 6 : 4;
         
-        return (int) (fungusCount * 2 + decomposerCount * 3 + soilEnricherCount * 5 + networkConnectorCount * connectorBonus + fungalSymbioteCount * 2);
+        return (int) (fungusCount * 2 + decomposerCount * 3 + soilEnricherCount * 5 + networkConnectorCount * connectorBonus + fungalSymbioteCount * 2 + fungalAcceleratorCount * 10);
     }
 
     /**
