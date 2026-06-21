@@ -15,6 +15,8 @@ jobs:
   evolve:
     runs-on: ubuntu-latest
     timeout-minutes: 42
+    env:
+      GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-3.1-flash-lite' }}
 
     steps:
       - name: Checkout repository
@@ -45,7 +47,7 @@ jobs:
           GEMINI_CLI_TRUST_WORKSPACE: "true"
         with:
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
-          gemini_model: gemini-3.1-flash-lite
+          gemini_model: ${{ env.GEMINI_MODEL }}
           prompt: ${{ steps.gemini_prompt.outputs.text }}
           upload_artifacts: true
 
@@ -54,9 +56,17 @@ jobs:
         shell: bash
         run: scripts/restore-evolve-protected-files.sh
 
-      - name: Test after Gemini changes
-        id: post_test
-        run: mvn -B test
+      - name: Validate and repair tests after Gemini changes
+        id: post_test_final
+        uses: ./.github/actions/gemini-validate-repair
+        with:
+          validation-command: scripts/validate-tests.sh
+          repair-prompt-command: scripts/write-test-repair-prompt.sh
+          protected-restore-command: scripts/restore-evolve-protected-files.sh
+          violations-file: ${{ runner.temp }}/post-test-violations.txt
+          gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
+          gemini-model: ${{ env.GEMINI_MODEL }}
+          artifact-name-prefix: post-test-repair
 
       - name: Advance persistent garden state
         id: advance_garden
@@ -71,7 +81,7 @@ jobs:
           protected-restore-command: scripts/restore-evolve-protected-files.sh
           violations-file: ${{ runner.temp }}/journal-format-violations.txt
           gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
-          gemini-model: gemini-3.1-flash-lite
+          gemini-model: ${{ env.GEMINI_MODEL }}
           artifact-name-prefix: journal-format-repair
 
       - name: Validate and repair summary format
@@ -83,7 +93,7 @@ jobs:
           protected-restore-command: scripts/restore-evolve-protected-files.sh
           violations-file: ${{ runner.temp }}/summary-format-violations.txt
           gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
-          gemini-model: gemini-3.1-flash-lite
+          gemini-model: ${{ env.GEMINI_MODEL }}
           artifact-name-prefix: summary-format-repair
 
       - name: Validate and repair append-only summaries
@@ -95,7 +105,7 @@ jobs:
           protected-restore-command: scripts/restore-evolve-protected-files.sh
           violations-file: ${{ runner.temp }}/summary-append-only-violations.txt
           gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
-          gemini-model: gemini-3.1-flash-lite
+          gemini-model: ${{ env.GEMINI_MODEL }}
           artifact-name-prefix: summary-append-only-repair
 
       - name: Archive old journal entries
@@ -111,7 +121,7 @@ jobs:
         env:
           BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
           GEMINI_OUTCOME: ${{ steps.gemini.outcome }}
-          POST_TEST_OUTCOME: ${{ steps.post_test.outcome }}
+          POST_TEST_OUTCOME: ${{ steps.post_test_final.outcome }}
           ADVANCE_GARDEN_OUTCOME: ${{ steps.advance_garden.outcome }}
           JOURNAL_FORMAT_OUTCOME: ${{ steps.journal_format_final.outcome }}
           SUMMARY_FORMAT_OUTCOME: ${{ steps.summary_format_final.outcome }}

@@ -213,6 +213,16 @@ Chronicle volumes are stored as separate files under `story/volumes/`. Each volu
 
 Within each volume, chapter headings use second-level Markdown headings beginning with `## Chapter N` so the Story workflow can count existing chapters consistently.
 
+## Workflow model, quota, and repair
+
+The Evolve workflow uses Gemini through `GEMINI_API_KEY`. The model is configured by the GitHub repository variable `GEMINI_MODEL`; if the variable is unset, the workflow defaults to `gemini-3.1-flash-lite`.
+
+If the main Gemini autonomous step fails because of API quota exhaustion, billing limits, authentication, or provider availability, the run must fail without committing. This is an environment capacity issue, not a garden evolution task. Do not work around it by committing partial changes, removing validation, suppressing errors, or adding unbounded retries. The appropriate actions are to wait for quota reset, reduce run frequency, change `GEMINI_MODEL`, or ask the human to adjust quota, billing, or credentials.
+
+If tests fail after the main Gemini autonomous step, the Evolve workflow may ask Gemini to repair the test failure and retry validation, using the same bounded repair action as the format checks. Repairs must preserve the autonomous run's required journal, summary, state, and README updates. If `mvn -B test` still fails after the final repair attempt, the workflow must fail before advancing, archiving, or committing.
+
+Gemini repair loops consume additional quota and must remain bounded.
+
 ## Summaries
 
 The agent must maintain append-only summaries:
