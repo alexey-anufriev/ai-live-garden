@@ -111,7 +111,7 @@ class GardenTest {
     @Test
     void herbivoreWithNutrientFinderTraitFeedsMoreEfficiently() {
         // Herbivore with nutrient-finder trait.
-        Organism herbivore = Organism.of("herbivore-1", OrganismType.HARE, 10, 1, "nutrient-finder");
+        Organism herbivore = Organism.of("herbivore-1", OrganismType.HARE, 10, 2, "nutrient-finder");
         Organism plant = Organism.of("plant-1", OrganismType.MOSS, 10, 1, "food");
         // Environment favorable.
         Environment env = new Environment(50, 50, 50, 50, 50);
@@ -361,7 +361,7 @@ class GardenTest {
     @Test
     void scavengerAnimalsFeedMoreEfficientlyInHungryConditions() {
         // Herbivore with scavenger trait.
-        Organism herbivore = Organism.of("herbivore-1", OrganismType.HARE, 10, 1, "scavenger");
+        Organism herbivore = Organism.of("herbivore-1", OrganismType.HARE, 10, 2, "scavenger");
         Organism plant = Organism.of("plant-1", OrganismType.MOSS, 10, 1, "food");
         // Environment hungry (<25).
         Environment env = new Environment(50, 50, 50, 20, 50);
@@ -419,7 +419,7 @@ class GardenTest {
     @Test
     void gentleFeederAnimalsFeedLessDestructively() {
         // Herbivore with gentle-feeder trait.
-        Organism herbivore = Organism.of("herbivore-1", OrganismType.HARE, 10, 1, "gentle-feeder");
+        Organism herbivore = Organism.of("herbivore-1", OrganismType.HARE, 10, 2, "gentle-feeder");
         Organism plant = Organism.of("plant-1", OrganismType.MOSS, 10, 1, "food");
         // Environment favorable.
         Environment env = new Environment(50, 50, 50, 50, 50);

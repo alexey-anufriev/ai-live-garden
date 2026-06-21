@@ -64,7 +64,7 @@ Diagnostics now expose hungry conditions, population pressure, critical energy, 
 
 ## Emerging Direction
 
-The garden has evolved toward a resilient botanical mat with strong root-mediated resource buffering. Future runs will continue to focus on stabilizing the food web by examining the impact of the new `nutrient-storer` trait, which allows animals to function as nutrient reservoirs, and the `nutrient-sharer` trait for animals, which allows them to share metabolic burdens when starving, alongside existing interdependence mechanisms like `nutrient-distributor` and `fungal-symbiote` traits.
+The garden has evolved toward a resilient botanical mat with strong root-mediated resource buffering. Future runs will continue to focus on stabilizing the food web by examining the impact of the new `nutrient-storer` trait, which allows animals to function as nutrient reservoirs, the `nutrient-sharer` trait for animals, which allows them to share metabolic burdens when starving, and the `resourceful-breeder` trait, which enables reproduction during nutrient scarcity, alongside existing interdependence mechanisms like `nutrient-distributor` and `fungal-symbiote` traits.
 
 ## Avoid For Now
 
