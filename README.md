@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🔴 Hungry — Plants are thriving but nutrients are severely depleted; 'fungal-symbiote' trait implemented to bolster nutrient cycle interdependence.
-The garden is a plant-dominated survival system, heavily buffered but facing critical nutrient scarcity; FUNGUS and ROOT_NETWORK organisms are forming an interdependent nutrient-sharing synergy, now integrated with plants via the 'fungal-feeder' trait, 'mycorrhizal-booster' symbiosis, and animal traits aiding foraging under scarcity.
+**Garden Health:** 🔴 Hungry — Plants are thriving but nutrients are severely depleted; 'nutrient-pump' trait implemented for ROOT_NETWORK.
+The garden is a plant-dominated survival system, heavily buffered but facing critical nutrient scarcity; FUNGUS and ROOT_NETWORK organisms are forming an interdependent nutrient-sharing synergy, now integrated with plants via the 'fungal-feeder' trait, 'mycorrhizal-booster' symbiosis, and animal traits aiding foraging under scarcity, with ROOT_NETWORK organisms now potentially evolving to actively pump nutrients into the buffer.
 <!-- AI-LIVE-GARDEN:STATE-END -->

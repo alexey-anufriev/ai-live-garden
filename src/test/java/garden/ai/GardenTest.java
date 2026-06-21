@@ -837,4 +837,20 @@ class GardenTest {
                 .findFirst().get().energy()).isEqualTo(13);
         assertThat(next.events()).anyMatch(e -> e.description().contains("plant-1 fed on fungal networks."));
     }
+
+    @Test
+    void rootNetworkWithNutrientPumpIncreasesBufferContributionSignificantly() {
+        // One root network with nutrient-pump.
+        Organism root = Organism.of("root-1", OrganismType.ROOT_NETWORK, 10, 1, "nutrient-pump");
+        // Environment with 20 nutrients (hungry, < 25)
+        Environment env = new Environment(50, 50, 50, 20, 50);
+        Garden garden = new Garden(0, 2, env, List.of(root), List.of());
+
+        Garden next = garden.nextCycle();
+
+        // nutrientPumpCount=1. 
+        // Contribution = 1*4 + 1*24 = 28.
+        // newBuffer = 50 (initial) + 28 (contribution) - 5 (releasedFromBuffer) = 73.
+        assertThat(next.environment().nutrientBuffer()).isEqualTo(73);
+    }
 }
