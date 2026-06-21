@@ -81,7 +81,8 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
     public int fungalContribution() {
         long fungusCount = organisms.stream().filter(organism -> organism.type() == OrganismType.FUNGUS).count();
         long decomposerCount = organisms.stream().filter(organism -> organism.type() == OrganismType.FUNGUS && organism.traits().contains("nutrient-decomposer")).count();
-        return (int) (fungusCount * 2 + decomposerCount * 3);
+        long soilEnricherCount = organisms.stream().filter(organism -> organism.type() == OrganismType.FUNGUS && organism.traits().contains("fungus-soil-enricher")).count();
+        return (int) (fungusCount * 2 + decomposerCount * 3 + soilEnricherCount * 5);
     }
 
     /**
@@ -442,7 +443,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
     }
 
     private String mutationTrait(int cycle, Organism organism) {
-        String[] traits = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "sun-seeker", "rain-collector", "nutrient-finder", "nutrient-efficient", "shadow-stepper", "hardy", "water-seeker", "dormancy", "nutrient-weaver", "metabolic-efficiency", "scavenger", "nutrient-sharer", "buffer-resonator", "buffer-scavenger", "nutrient-hoarder", "nutrient-scout", "soil-master", "deep-rooting", "buffer-optimizer", "buffer-tapper", "nutrient-translocator", "camouflaged", "shade-thriver", "moisture-retainer", "nutrient-absorber", "nutrient-synthesizer", "prey-tracker", "resource-tracker", "predator-focus", "nutrient-reclaimer", "nutrient-producer", "nutrient-enricher", "moisture-thriver", "prolific", "cautious-feeder", "nutrient-decomposer"};
+        String[] traits = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "sun-seeker", "rain-collector", "nutrient-finder", "nutrient-efficient", "shadow-stepper", "hardy", "water-seeker", "dormancy", "nutrient-weaver", "metabolic-efficiency", "scavenger", "nutrient-sharer", "buffer-resonator", "buffer-scavenger", "nutrient-hoarder", "nutrient-scout", "soil-master", "deep-rooting", "buffer-optimizer", "buffer-tapper", "nutrient-translocator", "camouflaged", "shade-thriver", "moisture-retainer", "nutrient-absorber", "nutrient-synthesizer", "prey-tracker", "resource-tracker", "predator-focus", "nutrient-reclaimer", "nutrient-producer", "nutrient-enricher", "moisture-thriver", "prolific", "cautious-feeder", "nutrient-decomposer", "fungus-soil-enricher"};
         int index = Math.floorMod(organism.id().hashCode() + cycle + organism.generation(), traits.length);
         return traits[index];
     }
