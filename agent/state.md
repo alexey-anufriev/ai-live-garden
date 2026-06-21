@@ -63,7 +63,7 @@ Diagnostics now expose hungry conditions, population pressure, critical energy, 
 
 ## Emerging Direction
 
-The garden has evolved toward a resilient botanical mat with strong root-mediated resource buffering. Future runs will continue to focus on stabilizing the food web and evaluating whether the newly introduced `nutrient-decomposer` trait for FUNGUS helps balance nutrient availability in the long term, potentially allowing for the successful re-establishment of animal populations.
+The garden has evolved toward a resilient botanical mat with strong root-mediated resource buffering. Future runs will continue to focus on stabilizing the food web and evaluating whether the newly introduced `nutrient-decomposer` trait for FUNGUS and `nutrient-scrounger` trait for animals help balance nutrient availability and survival in the long term, potentially allowing for the successful re-establishment of animal populations.
 
 ## Avoid For Now
 

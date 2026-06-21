@@ -242,6 +242,10 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
                 changed = changed.withEnergy(changed.energy() + 1);
                 events.add(new GardenEvent(cycle, "%s tapped the nutrient buffer while starving.".formatted(changed.id())));
             }
+            if (changed.traits().contains("nutrient-scrounger") && environment.nutrients() < 25) {
+                changed = changed.withEnergy(changed.energy() + 1);
+                events.add(new GardenEvent(cycle, "%s scrounged for nutrients.".formatted(changed.id())));
+            }
             changed = changed.withEnergy(changed.energy() - metabolism)
                     .withCuriosity(changed.curiosity() + (cycle % 4 == 0 ? 1 : 0));
         }
@@ -287,7 +291,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
                 events.add(new GardenEvent(cycle, "%s skipped feeding to conserve energy.".formatted(hunter.id())));
                 continue;
             }
-            Optional<Integer> preyIndex = findPreyIndex(mutable, hunter, hunterIndex);
+            Optional<Integer> preyIndex = findPreyIndex(mutable, hunter, hunterIndex, events);
             if (preyIndex.isEmpty()) {
                 if (hunter.traits().contains("starving")) {
                     events.add(new GardenEvent(cycle, "%s is desperately searching for prey in the scarce garden.".formatted(hunter.id())));
@@ -343,7 +347,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         }
 
 
-    private Optional<Integer> findPreyIndex(List<Organism> organisms, Organism hunter, int hunterIndex) {
+    private Optional<Integer> findPreyIndex(List<Organism> organisms, Organism hunter, int hunterIndex, List<GardenEvent> events) {
         boolean nutrientScout = hunter.traits().contains("nutrient-scout");
         boolean preyTracker = hunter.traits().contains("prey-tracker");
         boolean resourceTracker = hunter.traits().contains("resource-tracker");
@@ -455,7 +459,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
     }
 
     private String mutationTrait(int cycle, Organism organism) {
-        String[] traits = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "sun-seeker", "rain-collector", "nutrient-finder", "nutrient-efficient", "shadow-stepper", "hardy", "water-seeker", "dormancy", "nutrient-weaver", "metabolic-efficiency", "scavenger", "nutrient-sharer", "buffer-resonator", "buffer-scavenger", "nutrient-hoarder", "nutrient-scout", "soil-master", "deep-rooting", "buffer-optimizer", "buffer-tapper", "nutrient-translocator", "camouflaged", "shade-thriver", "moisture-retainer", "nutrient-absorber", "nutrient-synthesizer", "prey-tracker", "resource-tracker", "predator-focus", "nutrient-reclaimer", "nutrient-producer", "nutrient-enricher", "moisture-thriver", "prolific", "cautious-feeder", "nutrient-decomposer", "fungus-soil-enricher", "fungal-network-connector", "fungal-feeder", "mycorrhizal-booster"};
+        String[] traits = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "sun-seeker", "rain-collector", "nutrient-finder", "nutrient-efficient", "shadow-stepper", "hardy", "water-seeker", "dormancy", "nutrient-weaver", "metabolic-efficiency", "scavenger", "nutrient-sharer", "buffer-resonator", "buffer-scavenger", "nutrient-hoarder", "nutrient-scout", "soil-master", "deep-rooting", "buffer-optimizer", "buffer-tapper", "nutrient-translocator", "camouflaged", "shade-thriver", "moisture-retainer", "nutrient-absorber", "nutrient-synthesizer", "prey-tracker", "resource-tracker", "predator-focus", "nutrient-reclaimer", "nutrient-producer", "nutrient-enricher", "moisture-thriver", "prolific", "cautious-feeder", "nutrient-decomposer", "fungus-soil-enricher", "fungal-network-connector", "fungal-feeder", "mycorrhizal-booster", "nutrient-scrounger"};
         int index = Math.floorMod(organism.id().hashCode() + cycle + organism.generation(), traits.length);
         return traits[index];
     }

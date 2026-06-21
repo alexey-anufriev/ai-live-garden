@@ -805,6 +805,21 @@ class GardenTest {
     }
 
     @Test
+    void nutrientScroungerAnimalsGainEnergyInHungryConditions() {
+        // Herbivore with nutrient-scrounger trait.
+        Organism animal = Organism.of("animal-1", OrganismType.HARE, 10, 1, "nutrient-scrounger");
+        // Environment hungry (<25), nutrients=20.
+        Environment env = new Environment(50, 50, 50, 20, 50);
+        Garden garden = new Garden(0, 2, env, List.of(animal), List.of());
+        Garden next = garden.nextCycle();
+        
+        // HARE metabolism 1.
+        // Energy: 10 - 1 (metabolism) + 1 (nutrient-scrounger) = 10.
+        assertThat(next.organisms().get(0).energy()).isEqualTo(10);
+        assertThat(next.events()).anyMatch(e -> e.description().contains("animal-1 scrounged for nutrients."));
+    }
+
+    @Test
     void fungalFeederPlantsGainEnergyFromFungalNetworks() {
         // Plant with fungal-feeder trait.
         Organism plant = Organism.of("plant-1", OrganismType.FERN, 10, 1, "fungal-feeder");
