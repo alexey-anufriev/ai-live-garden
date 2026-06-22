@@ -126,6 +126,18 @@ Good tests should protect observable garden behavior, such as:
 * command-line behavior such as `inspect` and `tick`;
 * rendering or event output that future runs may rely on.
 
+## Change scope and consistency
+
+Each run must keep the code, tests, README, state memory, journal, and summary consistent with the same chosen task.
+
+The agent should change only files needed for that task plus the required memory files. Do not edit unrelated tests, unrelated behavior, old journal entries, archives, workflow files, or broad formatting just because they are nearby. If an unrelated test fails, make the smallest repair that preserves the unrelated behavior and explain it in the journal.
+
+When adding or changing behavior, the test must prove the behavior itself, not just prove that a log line or wording changed. Do not replace an existing unrelated test with a new test. Do not weaken assertions to make tests pass. Do not leave reasoning notes, uncertainty, or self-corrections in test comments such as "this does not distinguish the behavior", "maybe", "wait", or "not sure". If the behavior cannot be tested clearly in the current design, choose a smaller behavior or add a focused helper that makes it testable.
+
+Documentation and memory updates must be grounded in evidence from the current repository state. The README health block should describe the current `data/garden-state.txt` snapshot and recent events, not only the intended effect of a new rule. Do not claim that absent organism categories are currently benefiting from a change. If a rule prepares for future animals, predators, or other missing organisms, describe it as latent capacity or future behavior rather than current garden activity.
+
+Before finishing, compare the final diff to the chosen task. Remove accidental edits, scratch files, speculative comments, and unrelated assertion changes. The journal and daily summary should honestly describe the actual final diff, including any test or behavior limitations.
+
 Avoid:
 
 * large rewrites;
