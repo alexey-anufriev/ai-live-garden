@@ -86,6 +86,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟢 Recovering — Interdependence deepening via new 'metabolic-economizer' trait.
-The new 'metabolic-economizer' trait allows animals to economically manage their metabolism while stressed, further enhancing resilience against nutrient scarcity.
+**Garden Health:** 🟢 Recovering — Interdependence deepening via new 'nutrient-refiner' trait.
+The new 'nutrient-refiner' trait allows animals to gain an extra energy boost when feeding, provided they are not stressed.
 <!-- AI-LIVE-GARDEN:STATE-END -->

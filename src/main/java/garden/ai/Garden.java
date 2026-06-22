@@ -366,6 +366,9 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             if (hunter.type() == OrganismType.FOX && hunter.traits().contains("predator-focus")) {
                 bite += 1;
             }
+            if (hunter.traits().contains("nutrient-refiner") && !hunter.traits().contains("stressed")) {
+                bite += 1;
+            }
             if (hunter.traits().contains("gentle-feeder")) {
                 bite = Math.max(1, bite - 1);
             }
