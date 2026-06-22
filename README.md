@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟡 Stable — Fungal and root-mediated nutrient interdependence improved; observability increased.
-The garden persists through careful management of nutrient buffers, with ROOT_NETWORK and FUNGUS interdependencies now explicitly tracked; animals utilize diverse traits like 'nutrient-hoarder', 'nutrient-sharer', and 'root-tapper' to manage scarcity, while FUNGUS organisms now include the 'fungal-enhancer' trait to boost nutrient recovery.
+**Garden Health:** 🟢 Flourishing — Herbivore resilience through fungal symbiosis enhanced.
+Fungal networks now provide direct metabolic support to herbivores through the new 'mycelial-scavenger' trait, further integrating animal survival strategies into the flourishing fungal-plant root symbiosis.
 <!-- AI-LIVE-GARDEN:STATE-END -->
