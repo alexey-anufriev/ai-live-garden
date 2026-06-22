@@ -38,7 +38,9 @@ jobs:
       - name: Build Gemini prompt
         id: gemini_prompt
         shell: bash
-        run: scripts/write-output-file.sh text .github/gemini/autonomous-run.md
+        run: |
+          scripts/build-evolve-context.sh "${RUNNER_TEMP}/evolve-context.md"
+          scripts/write-output-file.sh text "${RUNNER_TEMP}/evolve-context.md"
 
       - name: Run Gemini autonomous step
         id: gemini
