@@ -96,6 +96,10 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         return (int) (fungusCount * 2 + decomposerCount * 3 + soilEnricherCount * 5 + networkConnectorCount * connectorBonus + fungalSymbioteCount * 2 + fungalAcceleratorCount * 10 + fungalEnhancerCount * 8 + fungalGardenerCount * 5);
     }
 
+    public int mossContribution() {
+        return organisms.stream().anyMatch(organism -> organism.type() == OrganismType.MOSS) ? 1 : 0;
+    }
+
     /**
      * Advances the garden by one cycle.
      *
@@ -121,8 +125,9 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             nextEvents.add(new GardenEvent(nextCycle, "The nutrient buffer is near exhaustion."));
         }
         int fungalContribution = fungalContribution();
+        int mossContribution = mossContribution();
         List<Organism> changed = organisms.stream()
-                .map(organism -> passiveChange(organism, environment, nextCycle, nextEvents, fungalContribution))
+                .map(organism -> passiveChange(organism, environment, nextCycle, nextEvents, fungalContribution, mossContribution))
                 .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
 
         FeedingResult feeding = feedingPhase(changed, nextCycle, nextEvents);
@@ -162,7 +167,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         return organisms.stream().filter(organism -> organism.type().isAnimal()).count();
     }
 
-    private Organism passiveChange(Organism organism, Environment environment, int cycle, List<GardenEvent> events, int fungalContribution) {
+    private Organism passiveChange(Organism organism, Environment environment, int cycle, List<GardenEvent> events, int fungalContribution, int mossContribution) {
         Organism changed = organism;
         if (organism.type().isPlant()) {
             int growth = environment.favorsPlants() ? 2 : 0;
@@ -244,6 +249,10 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             if (changed.traits().contains("nutrient-sharer") && changed.traits().contains("starving")) {
                 metabolism = Math.max(0, metabolism - 2);
                 events.add(new GardenEvent(cycle, "%s shared metabolic burden while starving.".formatted(changed.id())));
+            }
+            if (changed.traits().contains("moss-harvester") && mossContribution > 0) {
+                metabolism = Math.max(0, metabolism - 1);
+                events.add(new GardenEvent(cycle, "%s harvested nutrients from mosses.".formatted(changed.id())));
             }
             if (changed.traits().contains("mycelial-scavenger") && fungalContribution > 0) {
                 int reduction = 2;
