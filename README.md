@@ -86,6 +86,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟢 Flourishing — Fungal-mycelial interdependence deepened.
-The new 'mycelial-distributor' trait allows animals to contribute nutrients back to the buffer upon death when a fungal network is present, closing the nutrient recycling loop between animals and fungi.
+**Garden Health:** 🟠 Struggling — Animal population recovery attempted via new 'buffer-explorer' trait.
+The new 'buffer-explorer' trait allows animals to reduce metabolism and increase energy gain when interacting with the nutrient buffer, providing a synergistic survival mechanism during periods of nutrient scarcity.
 <!-- AI-LIVE-GARDEN:STATE-END -->

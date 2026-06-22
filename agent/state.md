@@ -16,8 +16,9 @@ This file is the compact current operating memory for future work on the garden.
   - Newly added 'mycelial-scavenger' trait allows herbivores to leverage fungal contribution.
   - Newly added 'mycelial-harvester' trait enhances the metabolism reduction of fungal scavenging.
   - Newly added 'nutrient-reclaimer' trait allows predators to reclaim banked nutrients from prey.
-  - Newly added 'mycelial-distributor' trait allows animals to boost the nutrient buffer upon death when near fungal networks.
+  - Newly added 'mycelial-distributor' trait allows animals to contribute nutrients back to the buffer upon death when near fungal networks.
   - Newly added 'mycelial-resonator' trait allows animals to gain passive metabolic reduction when in proximity to fungal networks.
+  - Newly added 'buffer-explorer' trait allows animals to reduce metabolism and gain additional energy when tapping the nutrient buffer.
 
 ## Immediate Directions
 
