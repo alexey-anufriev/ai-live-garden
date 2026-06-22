@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟢 Flourishing — Herbivore resilience through fungal symbiosis enhanced.
-Fungal networks now provide direct metabolic support to herbivores through the new 'mycelial-scavenger' trait, further integrating animal survival strategies into the flourishing fungal-plant root symbiosis.
+**Garden Health:** 🟢 Flourishing — Predatory nutrient recycling enhanced.
+Predators can now leverage the 'nutrient-reclaimer' trait to recover extra nutrients from prey that possess the 'nutrient-storer' trait, closing the nutrient loop in the food web.
 <!-- AI-LIVE-GARDEN:STATE-END -->

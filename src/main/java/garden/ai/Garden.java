@@ -338,6 +338,10 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             if (hunter.traits().contains("gentle-feeder")) {
                 bite = Math.max(1, bite - 1);
             }
+            if (hunter.traits().contains("nutrient-reclaimer") && prey.traits().contains("nutrient-storer")) {
+                bite += 2;
+                events.add(new GardenEvent(cycle, "%s reclaimed extra nutrients from %s.".formatted(hunter.id(), prey.id())));
+            }
             Organism fedHunter = hunter.withEnergy(hunter.energy() + bite).withTrait("fed-" + cycle);
             Organism weakenedPrey = prey.withEnergy(prey.energy() - bite);
             mutable.set(hunterIndex, fedHunter);

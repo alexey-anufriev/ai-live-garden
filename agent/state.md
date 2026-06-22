@@ -14,6 +14,7 @@ This file is the compact current operating memory for future work on the garden.
   - ROOT_NETWORKs facilitate interdependencies (buffer optimization, nutrient sharing).
   - Animals rely on diverse traits for survival under scarcity (scavenging, hoarding, buffering).
   - Newly added 'mycelial-scavenger' trait allows herbivores to leverage fungal contribution.
+  - Newly added 'nutrient-reclaimer' trait allows predators to reclaim banked nutrients from prey.
 
 ## Immediate Directions
 
