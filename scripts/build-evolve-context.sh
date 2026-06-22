@@ -9,22 +9,17 @@ fi
 output_file="$1"
 mkdir -p "$(dirname "$output_file")"
 
+recent_journal_limit="${EVOLVE_CONTEXT_RECENT_JOURNAL_LIMIT:-8}"
+context_warn_lines="${EVOLVE_CONTEXT_WARN_LINES:-1200}"
+
 latest_files() {
   local limit="$1"
   shift
   find "$@" -maxdepth 1 -type f ! -name ".gitkeep" -print 2>/dev/null | sort -V | tail -n "$limit"
 }
 
-append_file_excerpt() {
-  local path="$1"
-  local max_lines="$2"
-
-  echo "### ${path}"
-  echo
-  echo '```markdown'
-  sed -n "1,${max_lines}p" "$path"
-  echo '```'
-  echo
+count_files() {
+  find "$@" -maxdepth 1 -type f ! -name ".gitkeep" -print 2>/dev/null | wc -l | tr -d '[:space:]'
 }
 
 append_full_file() {
@@ -47,14 +42,27 @@ append_latest_summary() {
   echo "## ${title}"
   echo
   if [[ -n "$file" ]]; then
-    echo "Source: \`${file}\`"
-    echo
-    echo '```markdown'
-    tail -n 80 "$file"
-    echo '```'
+    append_full_file "$file"
   else
     echo "No active ${title,,} file found."
   fi
+  echo
+}
+
+append_context_manifest() {
+  local journal_count
+
+  journal_count="$(count_files "agent/journal")"
+
+  echo "## Context Manifest"
+  echo
+  echo "- Full authoritative templates included: journal entry and daily summary."
+  echo "- Full current memory included: \`agent/state.md\` and \`agent/requests.md\`."
+  echo "- Latest active summary included per cadence: daily, weekly, monthly, yearly when present."
+  echo "- Recent active journal files included fully: latest ${recent_journal_limit} of ${journal_count} directly under \`agent/journal/\`."
+  echo "- Persistent garden state included as a computed digest, not as raw organism lines."
+  echo "- Project source is included as a file index only; inspect exact source files only when needed for the chosen task."
+  echo "- Archive folders are intentionally excluded."
   echo
 }
 
@@ -302,6 +310,7 @@ append_garden_digest() {
   echo "- Do not read \`agent/journal/archive/\` or summary archive folders during a normal run."
   echo "- Do not ask the human what to do next."
   echo
+  append_context_manifest
   echo "## Authoritative Templates"
   echo
   append_full_file "agent/templates/journal-entry.md"
@@ -323,7 +332,7 @@ append_garden_digest() {
   echo
   while IFS= read -r journal; do
     append_full_file "$journal"
-  done < <(latest_files 8 "agent/journal")
+  done < <(latest_files "$recent_journal_limit" "agent/journal")
   echo "## Project Index"
   echo
   echo "### Main Java Files"
@@ -344,3 +353,8 @@ append_garden_digest() {
   echo
   echo "Make the garden slightly more expressive, coherent, observable, or maintainable than before. Leave the repository in a committable state."
 } > "$output_file"
+
+context_line_count="$(wc -l < "$output_file" | tr -d '[:space:]')"
+if (( context_line_count > context_warn_lines )); then
+  echo "Warning: compact evolve context is ${context_line_count} lines, above EVOLVE_CONTEXT_WARN_LINES=${context_warn_lines}." >&2
+fi
