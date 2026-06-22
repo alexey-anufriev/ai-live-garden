@@ -72,7 +72,7 @@ New species or organism types are welcome when they create new behavior or relat
 
 Avoid adding many disconnected entities that do not interact with the existing garden.
 
-A good change should make the ecosystem feel more alive, interconnected, or surprising while preserving coherence.
+A good change should make the ecosystem feel more alive, interconnected, or surprising while preserving coherence. Choose the next task by the value it adds to the garden as a living system: continuity, expressive behavior, understandable state, resilience, evolvability, and observable consequences over time. Prefer changes whose value remains visible beyond the current run.
 
 ## Required behavior on every run
 
@@ -112,6 +112,7 @@ Prefer:
 * continuity over novelty;
 * depth over breadth;
 * coherent growth over random expansion;
+* durable garden value over easy local additions;
 * tests over untested complexity;
 * simple Java code over clever abstractions;
 * readable simulation behavior over opaque mechanisms;

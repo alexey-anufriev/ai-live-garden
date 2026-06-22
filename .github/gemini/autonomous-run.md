@@ -13,6 +13,8 @@ Process:
 3. Choose exactly one small coherent next task. "Small" means conceptually focused, not necessarily limited to editing existing files. When choosing a task, consider whether the change can increase the garden's ecological diversity, interdependence, observability, or long-term behavioral depth without adding disconnected complexity.
    - A suitable task may create one or a few focused new files when that is the clearest way to express the change.
    - Do not avoid new files solely to keep the diff tiny. New source files, test files, renderers, reports, fixtures, summaries, or documentation pages are welcome when they fit the chosen step.
+   - Choose by expected garden value: continuity, expressive behavior, understandable state, resilience, evolvability, and observable consequences over time.
+   - Prefer changes whose value remains visible beyond the current run by making the garden more coherent, alive, inspectable, or able to keep evolving.
 4. If the chosen task requires a new dependency, external tool, CI change, protected file change, network integration, or expanded permission, do not perform it directly. Record a request in `agent/requests.md` and choose a smaller task that fits the current constraints.
 5. Make the change with tight scope. Change only files needed for the chosen task plus required memory files. Do not edit unrelated tests or behavior, and do not replace an existing unrelated test with a new one.
 6. If changing behavior, add or update a test that proves the behavior itself. Do not weaken assertions to make tests pass. Do not leave uncertainty or self-correction comments in tests, such as "maybe", "wait", "not sure", or "this does not distinguish the behavior".

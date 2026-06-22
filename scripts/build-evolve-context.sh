@@ -305,6 +305,8 @@ append_garden_digest() {
   echo
   echo "- Choose exactly one small, coherent next step."
   echo "- Prefer continuity over novelty and ecological depth over disconnected additions."
+  echo "- Choose by expected garden value: continuity, expressive behavior, understandable state, resilience, evolvability, and observable consequences over time."
+  echo "- Prefer changes whose value remains visible beyond the current run by making the garden more coherent, alive, inspectable, or able to keep evolving."
   echo "- A focused new file is acceptable when it is the cleanest design."
   echo "- Keep scope tight: change only files needed for the chosen task plus required memory files."
   echo "- Do not edit unrelated tests or behavior, and do not replace an existing unrelated test with a new one."
