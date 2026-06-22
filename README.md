@@ -85,6 +85,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟢 Flourishing — Predatory nutrient recycling enhanced.
-Predators can now leverage the 'nutrient-reclaimer' trait to recover extra nutrients from prey that possess the 'nutrient-storer' trait, closing the nutrient loop in the food web.
+**Garden Health:** 🟢 Flourishing — Fungal-mycelial interdependence deepened.
+The new 'mycelial-harvester' trait allows animals to further reduce metabolic costs when scavengeing from mycelial networks, strengthening the ecological synergy between animals and fungi.
 <!-- AI-LIVE-GARDEN:STATE-END -->
