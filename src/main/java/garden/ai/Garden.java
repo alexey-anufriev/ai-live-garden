@@ -532,6 +532,9 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         if (organism.traits().contains("resourceful-breeder") && environment.nutrients() < 20) {
             threshold -= 3;
         }
+        if (organism.traits().contains("fungal-nurturer") && fungalContribution() > 0) {
+            threshold -= 3;
+        }
         return threshold;
     }
 
