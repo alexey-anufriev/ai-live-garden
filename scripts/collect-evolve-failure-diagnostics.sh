@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+output_dir="${1:-}"
+if [[ -z "$output_dir" ]]; then
+  echo "Usage: $0 OUTPUT_DIR" >&2
+  exit 2
+fi
+
+mkdir -p "$output_dir"
+
+git status --short > "$output_dir/git-status-short.txt"
+git diff --stat > "$output_dir/git-diff-stat.txt"
+git diff --binary > "$output_dir/git-diff.patch"
+git diff --name-status > "$output_dir/git-diff-name-status.txt"
+git ls-files --others --exclude-standard > "$output_dir/git-untracked-files.txt"
+
+if [[ -s "$output_dir/git-untracked-files.txt" ]]; then
+  mkdir -p "$output_dir/untracked-files"
+  while IFS= read -r path; do
+    if [[ -f "$path" ]]; then
+      mkdir -p "$output_dir/untracked-files/$(dirname "$path")"
+      cp "$path" "$output_dir/untracked-files/$path"
+    fi
+  done < "$output_dir/git-untracked-files.txt"
+fi
+
+if [[ -d target/surefire-reports ]]; then
+  mkdir -p "$output_dir/surefire-reports"
+  cp -R target/surefire-reports/. "$output_dir/surefire-reports/"
+fi
+
+if compgen -G "target/*.dump" > /dev/null || compgen -G "target/*.dumpstream" > /dev/null; then
+  mkdir -p "$output_dir/maven-dumps"
+  cp target/*.dump target/*.dumpstream "$output_dir/maven-dumps/" 2>/dev/null || true
+fi
+
+{
+  echo "# Evolve Failure Diagnostics"
+  echo
+  echo "Generated at: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+  echo
+  echo "## Changed files"
+  echo
+  if [[ -s "$output_dir/git-diff-name-status.txt" ]]; then
+    sed 's/^/- /' "$output_dir/git-diff-name-status.txt"
+  else
+    echo "- No tracked file changes"
+  fi
+  echo
+  echo "## Git status"
+  echo
+  if [[ -s "$output_dir/git-status-short.txt" ]]; then
+    sed 's/^/- /' "$output_dir/git-status-short.txt"
+  else
+    echo "- Clean tracked worktree"
+  fi
+  echo
+  echo "## Untracked files"
+  echo
+  if [[ -s "$output_dir/git-untracked-files.txt" ]]; then
+    sed 's/^/- /' "$output_dir/git-untracked-files.txt"
+  else
+    echo "- None"
+  fi
+} > "$output_dir/README.md"

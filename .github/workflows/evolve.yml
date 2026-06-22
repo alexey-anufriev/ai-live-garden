@@ -116,6 +116,19 @@ jobs:
         shell: bash
         run: scripts/archive-summaries.sh
 
+      - name: Collect failure diagnostics
+        if: ${{ failure() && !cancelled() }}
+        shell: bash
+        run: scripts/collect-evolve-failure-diagnostics.sh "${{ runner.temp }}/evolve-failure-diagnostics"
+
+      - name: Upload failure diagnostics
+        if: ${{ failure() && !cancelled() }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: evolve-failure-diagnostics-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/evolve-failure-diagnostics/
+          if-no-files-found: warn
+
       - name: Record workflow check status
         shell: bash
         env:
