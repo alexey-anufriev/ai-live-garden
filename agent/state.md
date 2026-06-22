@@ -24,6 +24,7 @@ This file is the compact current operating memory for future work on the garden.
   - Newly added 'nutrient-anticipator' trait allows animals to pre-emptively reduce metabolic costs when the nutrient buffer is low.
   - Newly added 'fungal-nurturer' trait allows animals to improve reproduction success when in proximity to fungal networks.
   - Newly added 'mycelial-protector' trait allows animals to gain stronger metabolic reduction when in proximity to fungal networks.
+  - Newly added 'metabolic-economizer' trait allows animals to reduce metabolic costs when stressed.
 
 
 ## Immediate Directions
