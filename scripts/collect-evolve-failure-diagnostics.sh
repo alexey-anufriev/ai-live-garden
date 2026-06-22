@@ -30,6 +30,14 @@ if [[ -d target/surefire-reports ]]; then
   cp -R target/surefire-reports/. "$output_dir/surefire-reports/"
 fi
 
+if [[ -n "${EVOLVE_CONTEXT_FILE:-}" && -f "$EVOLVE_CONTEXT_FILE" ]]; then
+  cp "$EVOLVE_CONTEXT_FILE" "$output_dir/evolve-context.md"
+fi
+
+if [[ -n "${EVOLVE_CONTEXT_METADATA_FILE:-}" && -f "$EVOLVE_CONTEXT_METADATA_FILE" ]]; then
+  cp "$EVOLVE_CONTEXT_METADATA_FILE" "$output_dir/evolve-context.metadata"
+fi
+
 if compgen -G "target/*.dump" > /dev/null || compgen -G "target/*.dumpstream" > /dev/null; then
   mkdir -p "$output_dir/maven-dumps"
   cp target/*.dump target/*.dumpstream "$output_dir/maven-dumps/" 2>/dev/null || true
@@ -62,5 +70,16 @@ fi
     sed 's/^/- /' "$output_dir/git-untracked-files.txt"
   else
     echo "- None"
+  fi
+  echo
+  echo "## Compact context"
+  echo
+  if [[ -f "$output_dir/evolve-context.metadata" ]]; then
+    sed 's/^/- /' "$output_dir/evolve-context.metadata"
+  else
+    echo "- Context metadata not available"
+  fi
+  if [[ -f "$output_dir/evolve-context.md" ]]; then
+    echo "- Full compact context copied to \`evolve-context.md\`"
   fi
 } > "$output_dir/README.md"

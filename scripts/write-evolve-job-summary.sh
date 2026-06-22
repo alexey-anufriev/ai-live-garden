@@ -15,6 +15,24 @@ value_or_dash() {
   fi
 }
 
+metadata_value() {
+  local key="$1"
+  local file="${EVOLVE_CONTEXT_METADATA_FILE:-}"
+
+  if [[ -z "$file" || ! -f "$file" ]]; then
+    echo "-"
+    return
+  fi
+
+  local line
+  line="$(grep -E "^${key}=" "$file" | tail -n 1 || true)"
+  if [[ -z "$line" ]]; then
+    echo "-"
+  else
+    echo "${line#*=}"
+  fi
+}
+
 {
   echo "## Evolve Workflow Summary"
   echo
@@ -38,8 +56,27 @@ value_or_dash() {
   echo "| Failure diagnostics collection | $(value_or_dash "${COLLECT_DIAGNOSTICS_OUTCOME:-}") |"
   echo "| Failure diagnostics upload | $(value_or_dash "${UPLOAD_DIAGNOSTICS_OUTCOME:-}") |"
   echo "| Workflow status record | $(value_or_dash "${RECORD_STATUS_OUTCOME:-}") |"
+  echo "| Change diagnostics collection | $(value_or_dash "${COLLECT_CHANGE_DIAGNOSTICS_OUTCOME:-}") |"
   echo "| Commit | $(value_or_dash "${COMMIT_OUTCOME:-}") |"
   echo
+  echo "## Context Diagnostics"
+  echo
+  echo "- Context lines: $(metadata_value EVOLVE_CONTEXT_LINES)"
+  echo "- Context bytes: $(metadata_value EVOLVE_CONTEXT_BYTES)"
+  echo "- Warning threshold: $(metadata_value EVOLVE_CONTEXT_WARN_LINES)"
+  echo "- Warning threshold exceeded: $(metadata_value EVOLVE_CONTEXT_WARNED)"
+  echo "- Recent journal limit: $(metadata_value EVOLVE_CONTEXT_RECENT_JOURNAL_LIMIT)"
+  echo "- Active journal files: $(metadata_value EVOLVE_CONTEXT_ACTIVE_JOURNAL_COUNT)"
+  echo "- Selected journal files: $(value_or_dash "$(metadata_value EVOLVE_CONTEXT_SELECTED_JOURNALS)")"
+  echo "- Latest daily summary: $(value_or_dash "$(metadata_value EVOLVE_CONTEXT_LATEST_DAILY_SUMMARY)")"
+  echo "- Latest weekly summary: $(value_or_dash "$(metadata_value EVOLVE_CONTEXT_LATEST_WEEKLY_SUMMARY)")"
+  echo "- Latest monthly summary: $(value_or_dash "$(metadata_value EVOLVE_CONTEXT_LATEST_MONTHLY_SUMMARY)")"
+  echo "- Latest yearly summary: $(value_or_dash "$(metadata_value EVOLVE_CONTEXT_LATEST_YEARLY_SUMMARY)")"
+  echo
+  if [[ -n "${EVOLVE_CHANGE_DIAGNOSTICS_FILE:-}" && -f "$EVOLVE_CHANGE_DIAGNOSTICS_FILE" ]]; then
+    cat "$EVOLVE_CHANGE_DIAGNOSTICS_FILE"
+    echo
+  fi
   if [[ "${COLLECT_DIAGNOSTICS_OUTCOME:-}" == "success" || "${UPLOAD_DIAGNOSTICS_OUTCOME:-}" == "success" ]]; then
     echo "Failure diagnostics artifact: \`evolve-failure-diagnostics-${GITHUB_RUN_ATTEMPT:-1}\`."
   elif [[ "${GEMINI_OUTCOME:-}" == "failure" ]]; then

@@ -11,6 +11,8 @@ mkdir -p "$(dirname "$output_file")"
 
 recent_journal_limit="${EVOLVE_CONTEXT_RECENT_JOURNAL_LIMIT:-8}"
 context_warn_lines="${EVOLVE_CONTEXT_WARN_LINES:-1200}"
+metadata_file="${EVOLVE_CONTEXT_METADATA_FILE:-${output_file}.metadata}"
+mkdir -p "$(dirname "$metadata_file")"
 
 latest_files() {
   local limit="$1"
@@ -20,6 +22,10 @@ latest_files() {
 
 count_files() {
   find "$@" -maxdepth 1 -type f ! -name ".gitkeep" -print 2>/dev/null | wc -l | tr -d '[:space:]'
+}
+
+join_lines() {
+  paste -sd ',' - | sed 's/,/, /g'
 }
 
 append_full_file() {
@@ -355,6 +361,26 @@ append_garden_digest() {
 } > "$output_file"
 
 context_line_count="$(wc -l < "$output_file" | tr -d '[:space:]')"
+context_byte_count="$(wc -c < "$output_file" | tr -d '[:space:]')"
 if (( context_line_count > context_warn_lines )); then
   echo "Warning: compact evolve context is ${context_line_count} lines, above EVOLVE_CONTEXT_WARN_LINES=${context_warn_lines}." >&2
 fi
+
+{
+  echo "EVOLVE_CONTEXT_FILE=${output_file}"
+  echo "EVOLVE_CONTEXT_LINES=${context_line_count}"
+  echo "EVOLVE_CONTEXT_BYTES=${context_byte_count}"
+  echo "EVOLVE_CONTEXT_WARN_LINES=${context_warn_lines}"
+  if (( context_line_count > context_warn_lines )); then
+    echo "EVOLVE_CONTEXT_WARNED=true"
+  else
+    echo "EVOLVE_CONTEXT_WARNED=false"
+  fi
+  echo "EVOLVE_CONTEXT_RECENT_JOURNAL_LIMIT=${recent_journal_limit}"
+  echo "EVOLVE_CONTEXT_ACTIVE_JOURNAL_COUNT=$(count_files "agent/journal")"
+  echo "EVOLVE_CONTEXT_SELECTED_JOURNALS=$(latest_files "$recent_journal_limit" "agent/journal" | join_lines)"
+  echo "EVOLVE_CONTEXT_LATEST_DAILY_SUMMARY=$(latest_files 1 "agent/summaries/daily" || true)"
+  echo "EVOLVE_CONTEXT_LATEST_WEEKLY_SUMMARY=$(latest_files 1 "agent/summaries/weekly" || true)"
+  echo "EVOLVE_CONTEXT_LATEST_MONTHLY_SUMMARY=$(latest_files 1 "agent/summaries/monthly" || true)"
+  echo "EVOLVE_CONTEXT_LATEST_YEARLY_SUMMARY=$(latest_files 1 "agent/summaries/yearly" || true)"
+} > "$metadata_file"

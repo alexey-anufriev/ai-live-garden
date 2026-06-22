@@ -38,6 +38,8 @@ jobs:
       - name: Build Gemini prompt
         id: gemini_prompt
         shell: bash
+        env:
+          EVOLVE_CONTEXT_METADATA_FILE: ${{ runner.temp }}/evolve-context.metadata
         run: |
           scripts/build-evolve-context.sh "${RUNNER_TEMP}/evolve-context.md"
           scripts/write-output-file.sh text "${RUNNER_TEMP}/evolve-context.md"
@@ -125,6 +127,9 @@ jobs:
         id: collect_failure_diagnostics
         if: ${{ failure() && !cancelled() }}
         shell: bash
+        env:
+          EVOLVE_CONTEXT_FILE: ${{ runner.temp }}/evolve-context.md
+          EVOLVE_CONTEXT_METADATA_FILE: ${{ runner.temp }}/evolve-context.metadata
         run: scripts/collect-evolve-failure-diagnostics.sh "${{ runner.temp }}/evolve-failure-diagnostics"
 
       - name: Upload failure diagnostics
@@ -148,6 +153,11 @@ jobs:
           SUMMARY_FORMAT_OUTCOME: ${{ steps.summary_format_final.outcome }}
           SUMMARY_APPEND_ONLY_OUTCOME: ${{ steps.summary_append_only_final.outcome }}
         run: scripts/record-evolve-status.sh
+
+      - name: Collect change diagnostics
+        id: collect_change_diagnostics
+        shell: bash
+        run: scripts/collect-evolve-change-diagnostics.sh "${{ runner.temp }}/evolve-change-diagnostics.md"
 
       - name: Commit changes directly to main
         id: commit_changes
@@ -175,5 +185,8 @@ jobs:
           COLLECT_DIAGNOSTICS_OUTCOME: ${{ steps.collect_failure_diagnostics.outcome }}
           UPLOAD_DIAGNOSTICS_OUTCOME: ${{ steps.upload_failure_diagnostics.outcome }}
           RECORD_STATUS_OUTCOME: ${{ steps.record_workflow_status.outcome }}
+          COLLECT_CHANGE_DIAGNOSTICS_OUTCOME: ${{ steps.collect_change_diagnostics.outcome }}
           COMMIT_OUTCOME: ${{ steps.commit_changes.outcome }}
+          EVOLVE_CONTEXT_METADATA_FILE: ${{ runner.temp }}/evolve-context.metadata
+          EVOLVE_CHANGE_DIAGNOSTICS_FILE: ${{ runner.temp }}/evolve-change-diagnostics.md
         run: scripts/write-evolve-job-summary.sh
