@@ -86,6 +86,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟢 Recovering — Interdependence deepening via new 'nutrient-refiner' trait.
-The new 'nutrient-refiner' trait allows animals to gain an extra energy boost when feeding, provided they are not stressed.
+**Garden Health:** 🟢 Recovering — Interdependence deepening via new 'moss-harvester' trait.
+The new 'moss-harvester' trait allows animals to reduce metabolic costs when mosses are present in the ecosystem, increasing the interdependence between animal survival and this highly abundant plant species.
 <!-- AI-LIVE-GARDEN:STATE-END -->
