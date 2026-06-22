@@ -2,7 +2,7 @@
 
 `ai-live-garden` is an autonomous software evolution experiment.
 
-A Java/Maven codebase acts as a tiny digital garden. It contains organisms, environmental conditions, simulation cycles, events, and a project memory. A Gemini-powered coding agent can be run through the `Evolve` workflow to inspect the repository, choose one small next step, edit the code or documentation, run checks, and commit directly to `main`.
+A Java/Maven codebase acts as a tiny digital garden. It contains organisms, environmental conditions, simulation cycles, events, and a project memory. A Gemini-powered coding agent can be run through the `Evolve` workflow to inspect the repository, choose one small next step, edit the code or documentation, run checks, and commit directly to `main`. Separate AI-less `Tick` runs can also advance and commit the persistent garden state without changing the code, so the system keeps living between agentic interventions.
 
 The goal is not to build a normal product. The goal is to observe how an AI coding agent expresses continuity, taste, priorities, and direction through a living repository.
 
@@ -19,6 +19,7 @@ The initial project is intentionally small:
 - agent memory in `agent/state.md`
 - agent journal in `agent/journal/`
 - GitHub Actions workflows: `.github/workflows/evolve.yml`, `.github/workflows/tick.yml`, and `.github/workflows/story.yml`
+- `Evolve` changes rules and project memory with an AI agent; `Tick` advances only the simulated state; `Story` narrates committed state changes.
 
 ### Java code map
 

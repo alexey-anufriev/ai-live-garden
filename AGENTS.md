@@ -30,11 +30,15 @@ The garden state is intentionally committed to the repository. It is part of the
 
 The agent may evolve the simulation rules and state format, but should not manually fabricate large arbitrary state changes. Normal garden evolution should happen by running the simulation.
 
+The repository may also advance through AI-less tick runs. These runs do not ask an agent to change code or memory; they only run the simulation and commit the resulting `data/garden-state.txt`. This is intentional. The experiment is broader than agentic code edits: AI agents perform functional evolution of rules, tests, and memory, while the living state can continue changing independently between those agentic interventions.
+
 ## Core idea
 
 Each autonomous run should feel like one growth cycle of the garden.
 
 The agent should not merely produce random code. It should preserve continuity with earlier runs and make the project feel increasingly coherent.
+
+The agent is not the only source of change in the repository. AI-less tick workflows may advance the persistent state between agentic runs. Treat those commits as real ecological history, not as tasks the agent personally performed. When documenting a run, distinguish between rule changes made by the agent and state changes produced by simulation ticks.
 
 Good evolution may include:
 

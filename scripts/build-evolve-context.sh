@@ -299,6 +299,8 @@ append_garden_digest() {
   echo
   echo "You are performing one autonomous evolution step for this repository. This compact bundle is the normal context; inspect raw files only when needed for the chosen task."
   echo
+  echo "Important workflow model: AI agents perform functional evolution of rules, tests, rendering, memory, and documentation. Separate AI-less tick workflows may advance \`data/garden-state.txt\` by simulation only. Treat tick commits as independent ecological history, and distinguish your code/memory changes from state changes produced by simulation ticks."
+  echo
   echo "## Non-Negotiable Run Contract"
   echo
   echo "- Choose exactly one small, coherent next step."
