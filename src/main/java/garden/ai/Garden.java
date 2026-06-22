@@ -128,7 +128,8 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         
         // Add nutrients and moisture based on deaths
         Environment environmentWithNutrientsAndMoisture = nextEnvironment.withNutrients(feeding.totalNutrientContribution())
-                .withMoisture(feeding.totalMoistureContribution());
+                .withMoisture(feeding.totalMoistureContribution())
+                .withNutrientBuffer(nextEnvironment.nutrientBuffer() + feeding.nutrientBufferBoost());
         
         ReproductionResult reproduction = reproductionPhase(feeding.organisms(), nextCycle, nextId, nextEvents);
         List<Organism> finalChanged = reproduction.organisms();
@@ -367,13 +368,31 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
                     totalMoistureContribution += 5;
                     events.add(new GardenEvent(cycle, "%s returned moisture to the soil.".formatted(organism.id())));
                 }
+                if (organism.traits().contains("mycelial-distributor")) {
+                    long fungusCount = organisms.stream().filter(o -> o.type() == OrganismType.FUNGUS).count();
+                    if (fungusCount > 0) {
+                        events.add(new GardenEvent(cycle, "%s distributed nutrients to the fungal network.".formatted(organism.id())));
+                    }
+                }
             }
         }
         survivors.sort(Comparator.comparing(Organism::id));
-        return new FeedingResult(survivors, totalNutrientContribution, totalMoistureContribution);
+        
+        // Final adjustment to the feeding result to include nutrient buffer boost
+        int bufferBoost = 0;
+        for (Organism organism : mutable) {
+            if (organism.energy() <= 0 && organism.traits().contains("mycelial-distributor")) {
+                long fungusCount = organisms.stream().filter(o -> o.type() == OrganismType.FUNGUS).count();
+                if (fungusCount > 0) {
+                    bufferBoost += 5;
+                }
+            }
         }
 
-        private record FeedingResult(List<Organism> organisms, int totalNutrientContribution, int totalMoistureContribution) {
+        return new FeedingResult(survivors, totalNutrientContribution, totalMoistureContribution, bufferBoost);
+        }
+
+        private record FeedingResult(List<Organism> organisms, int totalNutrientContribution, int totalMoistureContribution, int nutrientBufferBoost) {
         }
 
 
@@ -495,7 +514,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
     }
 
     private String mutationTrait(int cycle, Organism organism) {
-        String[] traits = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "sun-seeker", "rain-collector", "nutrient-finder", "nutrient-efficient", "shadow-stepper", "hardy", "water-seeker", "dormancy", "nutrient-weaver", "metabolic-efficiency", "scavenger", "nutrient-sharer", "buffer-resonator", "buffer-scavenger", "nutrient-hoarder", "nutrient-scout", "soil-master", "deep-rooting", "buffer-optimizer", "buffer-tapper", "nutrient-translocator", "camouflaged", "shade-thriver", "moisture-retainer", "nutrient-absorber", "nutrient-synthesizer", "prey-tracker", "resource-tracker", "predator-focus", "nutrient-reclaimer", "nutrient-producer", "nutrient-enricher", "moisture-thriver", "prolific", "cautious-feeder", "nutrient-decomposer", "fungus-soil-enricher", "fungal-network-connector", "fungal-feeder", "mycorrhizal-booster", "nutrient-scrounger", "fungal-symbiote", "nutrient-pump", "nutrient-distributor", "resourceful-breeder", "fungal-enhancer", "mycelial-scavenger", "mycelial-harvester"};
+        String[] traits = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "sun-seeker", "rain-collector", "nutrient-finder", "nutrient-efficient", "shadow-stepper", "hardy", "water-seeker", "dormancy", "nutrient-weaver", "metabolic-efficiency", "scavenger", "nutrient-sharer", "buffer-resonator", "buffer-scavenger", "nutrient-hoarder", "nutrient-scout", "soil-master", "deep-rooting", "buffer-optimizer", "buffer-tapper", "nutrient-translocator", "camouflaged", "shade-thriver", "moisture-retainer", "nutrient-absorber", "nutrient-synthesizer", "prey-tracker", "resource-tracker", "predator-focus", "nutrient-reclaimer", "nutrient-producer", "nutrient-enricher", "moisture-thriver", "prolific", "cautious-feeder", "nutrient-decomposer", "fungus-soil-enricher", "fungal-network-connector", "fungal-feeder", "mycorrhizal-booster", "nutrient-scrounger", "fungal-symbiote", "nutrient-pump", "nutrient-distributor", "resourceful-breeder", "fungal-enhancer", "mycelial-scavenger", "mycelial-harvester", "mycelial-distributor"};
         int index = Math.floorMod(organism.id().hashCode() + cycle + organism.generation(), traits.length);
         return traits[index];
     }

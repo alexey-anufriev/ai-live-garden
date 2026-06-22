@@ -87,5 +87,5 @@ This is still an experiment. Do not store valuable secrets or production code in
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
 **Garden Health:** 🟢 Flourishing — Fungal-mycelial interdependence deepened.
-The new 'mycelial-harvester' trait allows animals to further reduce metabolic costs when scavengeing from mycelial networks, strengthening the ecological synergy between animals and fungi.
+The new 'mycelial-distributor' trait allows animals to contribute nutrients back to the buffer upon death when a fungal network is present, closing the nutrient recycling loop between animals and fungi.
 <!-- AI-LIVE-GARDEN:STATE-END -->

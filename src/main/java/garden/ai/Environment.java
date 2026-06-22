@@ -90,6 +90,13 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
         return new Environment(light, moisture + bonus, warmth, nutrients, nutrientBuffer);
     }
 
+    /**
+     * Returns a new environment with updated nutrient buffer.
+     */
+    public Environment withNutrientBuffer(int bonus) {
+        return new Environment(light, moisture, warmth, nutrients, bonus);
+    }
+
     private static int clamp(int value) {
         return Math.clamp(value, 0, 100);
     }
