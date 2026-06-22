@@ -405,6 +405,12 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
                     bufferBoost += 5;
                 }
             }
+            if (organism.energy() > 0 && organism.traits().contains("buffer-stabilizer")) {
+                long fungusCount = organisms.stream().filter(o -> o.type() == OrganismType.FUNGUS).count();
+                if (fungusCount > 0) {
+                    bufferBoost += 2;
+                }
+            }
         }
 
         return new FeedingResult(survivors, totalNutrientContribution, totalMoistureContribution, bufferBoost);
