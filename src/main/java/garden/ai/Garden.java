@@ -413,6 +413,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         boolean nutrientScout = hunter.traits().contains("nutrient-scout");
         boolean preyTracker = hunter.traits().contains("prey-tracker");
         boolean resourceTracker = hunter.traits().contains("resource-tracker");
+        boolean mycelialNetworkScout = hunter.traits().contains("mycelial-network-scout");
 
         boolean stealthHunter = hunter.traits().contains("stealth-hunter");
 
@@ -431,6 +432,19 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
                 if (i == hunterIndex) continue;
                 Organism candidate = organisms.get(i);
                 if (isValidPrey.test(candidate) && candidate.traits().contains("nutrient-hoarder")) {
+                    return Optional.of(i);
+                }
+            }
+        }
+        
+        // New Pass: Look for prey near fungal network if hunter is mycelial-network-scout
+        if (mycelialNetworkScout && fungalContribution() > 0) {
+            for (int i = 0; i < organisms.size(); i++) {
+                if (i == hunterIndex) continue;
+                Organism candidate = organisms.get(i);
+                // For simplicity in this simulation, prioritize any prey if fungal network exists
+                if (isValidPrey.test(candidate)) {
+                    events.add(new GardenEvent(cycle, "%s scouted prey using the fungal network.".formatted(hunter.id())));
                     return Optional.of(i);
                 }
             }
@@ -527,7 +541,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
     }
 
     private String mutationTrait(int cycle, Organism organism) {
-        String[] traits = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "sun-seeker", "rain-collector", "nutrient-finder", "nutrient-efficient", "shadow-stepper", "hardy", "water-seeker", "dormancy", "nutrient-weaver", "metabolic-efficiency", "scavenger", "nutrient-sharer", "buffer-resonator", "buffer-scavenger", "nutrient-hoarder", "nutrient-scout", "soil-master", "deep-rooting", "buffer-optimizer", "buffer-tapper", "nutrient-translocator", "camouflaged", "shade-thriver", "moisture-retainer", "nutrient-absorber", "nutrient-synthesizer", "prey-tracker", "resource-tracker", "predator-focus", "nutrient-reclaimer", "nutrient-producer", "nutrient-enricher", "moisture-thriver", "prolific", "cautious-feeder", "nutrient-decomposer", "fungus-soil-enricher", "fungal-network-connector", "fungal-feeder", "mycorrhizal-booster", "nutrient-scrounger", "fungal-symbiote", "nutrient-pump", "nutrient-distributor", "resourceful-breeder", "fungal-enhancer", "mycelial-scavenger", "mycelial-harvester", "mycelial-distributor", "mycelial-resonator"};
+        String[] traits = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "sun-seeker", "rain-collector", "nutrient-finder", "nutrient-efficient", "shadow-stepper", "hardy", "water-seeker", "dormancy", "nutrient-weaver", "metabolic-efficiency", "scavenger", "nutrient-sharer", "buffer-resonator", "buffer-scavenger", "nutrient-hoarder", "nutrient-scout", "soil-master", "deep-rooting", "buffer-optimizer", "buffer-tapper", "nutrient-translocator", "camouflaged", "shade-thriver", "moisture-retainer", "nutrient-absorber", "nutrient-synthesizer", "prey-tracker", "resource-tracker", "predator-focus", "nutrient-reclaimer", "nutrient-producer", "nutrient-enricher", "moisture-thriver", "prolific", "cautious-feeder", "nutrient-decomposer", "fungus-soil-enricher", "fungal-network-connector", "fungal-feeder", "mycorrhizal-booster", "nutrient-scrounger", "fungal-symbiote", "nutrient-pump", "nutrient-distributor", "resourceful-breeder", "fungal-enhancer", "mycelial-scavenger", "mycelial-harvester", "mycelial-distributor", "mycelial-resonator", "mycelial-network-scout"};
         int index = Math.floorMod(organism.id().hashCode() + cycle + organism.generation(), traits.length);
         return traits[index];
     }
