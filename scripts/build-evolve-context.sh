@@ -27,6 +27,17 @@ append_file_excerpt() {
   echo
 }
 
+append_full_file() {
+  local path="$1"
+
+  echo "### ${path}"
+  echo
+  echo '```markdown'
+  sed -n '1,$p' "$path"
+  echo '```'
+  echo
+}
+
 append_latest_summary() {
   local title="$1"
   local dir="$2"
@@ -55,7 +66,9 @@ append_garden_digest() {
   echo "### Environment"
   echo
   awk -F= '
-    /^(version|cycle|nextId|light|moisture|warmth|nutrients|nutrientBuffer)=/ {
+    /^#/ { next }
+    /^$/ { exit }
+    /^[^=]+=.*$/ {
       printf "- %s: %s\n", $1, $2
     }
   ' data/garden-state.txt
@@ -63,23 +76,36 @@ append_garden_digest() {
   echo "### Organism Counts"
   echo
   awk -F'[=|]' '
+    function numeric(value) {
+      return value ~ /^-?[0-9]+([.][0-9]+)?$/
+    }
+    function numeric_label(fieldIndex) {
+      return "numeric-field-" (fieldIndex - 3) " (organism column " fieldIndex ")"
+    }
     /^organism=/ {
       total++
       type=$3
       count[type]++
-      energy=$4 + 0
-      if (!(type in min) || energy < min[type]) min[type] = energy
-      if (!(type in max) || energy > max[type]) max[type] = energy
-      sum[type] += energy
-      if (type == "BEETLE" || type == "HARE" || type == "FOX") animals++
-      else plants++
+      for (fieldIndex = 4; fieldIndex <= NF; fieldIndex++) {
+        if (!numeric($fieldIndex)) continue
+        key=type SUBSEP numeric_label(fieldIndex)
+        value=$fieldIndex + 0
+        numericCount[key]++
+        if (!(key in min) || value < min[key]) min[key] = value
+        if (!(key in max) || value > max[key]) max[key] = value
+        sum[key] += value
+      }
     }
     END {
       printf "- Total organisms: %d\n", total
-      printf "- Plants and fungi/root networks: %d\n", plants
-      printf "- Animals: %d\n", animals
       for (type in count) {
-        printf "- %s: %d, energy min/max/avg: %d/%d/%.1f\n", type, count[type], min[type], max[type], sum[type] / count[type]
+        printf "- %s: %d\n", type, count[type]
+      }
+      for (key in numericCount) {
+        split(key, parts, SUBSEP)
+        type=parts[1]
+        label=parts[2]
+        printf "- %s %s min/max/avg: %s/%s/%.1f\n", type, label, min[key], max[key], sum[key] / numericCount[key]
       }
     }
   ' data/garden-state.txt | sort
@@ -87,8 +113,16 @@ append_garden_digest() {
   echo "### Most Common Traits"
   echo
   awk -F'[=|]' '
+    function numeric(value) {
+      return value ~ /^-?[0-9]+([.][0-9]+)?$/
+    }
     /^organism=/ {
-      traits=$7
+      traits=""
+      for (fieldIndex = 4; fieldIndex <= NF; fieldIndex++) {
+        if (!numeric($fieldIndex)) {
+          traits = traits (traits == "" ? "" : "|") $fieldIndex
+        }
+      }
       gsub(/\\,/, ",", traits)
       n=split(traits, parts, ",")
       for (i = 1; i <= n; i++) {
@@ -98,7 +132,149 @@ append_garden_digest() {
     END {
       for (name in trait) print trait[name] "\t" name
     }
-  ' data/garden-state.txt | sort -nr | head -20 | awk -F'\t' '{ printf "- %s: %s\n", $2, $1 }'
+  ' data/garden-state.txt | sort -nr | awk -F'\t' 'NR <= 20 { printf "- %s: %s\n", $2, $1 }'
+  echo
+  echo "### Attribute Extremes"
+  echo
+  echo "Current numeric organism fields:"
+  awk -F'[=|]' '
+    function numeric(value) {
+      return value ~ /^-?[0-9]+([.][0-9]+)?$/
+    }
+    function numeric_label(fieldIndex) {
+      return "numeric-field-" (fieldIndex - 3) " (organism column " fieldIndex ")"
+    }
+    function trait_text(    fieldIndex, text) {
+      text = ""
+      for (fieldIndex = 4; fieldIndex <= NF; fieldIndex++) {
+        if (!numeric($fieldIndex)) {
+          text = text (text == "" ? "" : "|") $fieldIndex
+        }
+      }
+      gsub(/\\,/, ",", text)
+      return text
+    }
+    function other_numeric_text(skipFieldIndex,    fieldIndex, text) {
+      text = ""
+      for (fieldIndex = 4; fieldIndex <= NF; fieldIndex++) {
+        if (fieldIndex != skipFieldIndex && numeric($fieldIndex)) {
+          text = text (text == "" ? "" : " ") numeric_label(fieldIndex) "=" $fieldIndex
+        }
+      }
+      return text
+    }
+    /^organism=/ {
+      traits = trait_text()
+      for (fieldIndex = 4; fieldIndex <= NF; fieldIndex++) {
+        if (numeric($fieldIndex)) {
+          printf "%s\t%s\t%s\t%s\t%s nonNumeric=%s\n", numeric_label(fieldIndex), $fieldIndex, $2, $3, other_numeric_text(fieldIndex), traits
+        }
+      }
+    }
+  ' data/garden-state.txt | sort -t $'\t' -k1,1 -k2,2n | awk -F'\t' '
+    $1 != current {
+      current=$1
+      count=0
+      printf "- Lowest %s:\n", current
+    }
+    count < 3 {
+      printf "  - %s (%s): %s=%s, %s\n", $3, $4, $1, $2, $5
+      count++
+    }
+  '
+  awk -F'[=|]' '
+    function numeric(value) {
+      return value ~ /^-?[0-9]+([.][0-9]+)?$/
+    }
+    function numeric_label(fieldIndex) {
+      return "numeric-field-" (fieldIndex - 3) " (organism column " fieldIndex ")"
+    }
+    function trait_text(    fieldIndex, text) {
+      text = ""
+      for (fieldIndex = 4; fieldIndex <= NF; fieldIndex++) {
+        if (!numeric($fieldIndex)) {
+          text = text (text == "" ? "" : "|") $fieldIndex
+        }
+      }
+      gsub(/\\,/, ",", text)
+      return text
+    }
+    function other_numeric_text(skipFieldIndex,    fieldIndex, text) {
+      text = ""
+      for (fieldIndex = 4; fieldIndex <= NF; fieldIndex++) {
+        if (fieldIndex != skipFieldIndex && numeric($fieldIndex)) {
+          text = text (text == "" ? "" : " ") numeric_label(fieldIndex) "=" $fieldIndex
+        }
+      }
+      return text
+    }
+    /^organism=/ {
+      traits = trait_text()
+      for (fieldIndex = 4; fieldIndex <= NF; fieldIndex++) {
+        if (numeric($fieldIndex)) {
+          printf "%s\t%s\t%s\t%s\t%s nonNumeric=%s\n", numeric_label(fieldIndex), $fieldIndex, $2, $3, other_numeric_text(fieldIndex), traits
+        }
+      }
+    }
+  ' data/garden-state.txt | sort -t $'\t' -k1,1 -k2,2nr | awk -F'\t' '
+    $1 != current {
+      current=$1
+      count=0
+      printf "- Highest %s:\n", current
+    }
+    count < 3 {
+      printf "  - %s (%s): %s=%s, %s\n", $3, $4, $1, $2, $5
+      count++
+    }
+  '
+  echo
+  echo "Common trait-like tokens by numeric field:"
+  awk -F'[=|]' '
+    function numeric(value) {
+      return value ~ /^-?[0-9]+([.][0-9]+)?$/
+    }
+    function numeric_label(fieldIndex) {
+      return "numeric-field-" (fieldIndex - 3) " (organism column " fieldIndex ")"
+    }
+    /^organism=/ {
+      id=$2
+      type=$3
+      traits=""
+      for (fieldIndex = 4; fieldIndex <= NF; fieldIndex++) {
+        if (!numeric($fieldIndex)) {
+          traits = traits (traits == "" ? "" : "|") $fieldIndex
+        }
+      }
+      gsub(/\\,/, ",", traits)
+      n=split(traits, parts, ",")
+      for (i = 1; i <= n; i++) {
+        traitName=parts[i]
+        if (traitName == "") continue
+        count[traitName]++
+        for (fieldIndex = 4; fieldIndex <= NF; fieldIndex++) {
+          if (!numeric($fieldIndex)) continue
+          key=traitName SUBSEP numeric_label(fieldIndex)
+          value=$fieldIndex + 0
+          if (!(key in minValue) || value < minValue[key]) {
+            minValue[key]=value
+            minCarrier[key]=id " (" type ")"
+          }
+          if (!(key in maxValue) || value > maxValue[key]) {
+            maxValue[key]=value
+            maxCarrier[key]=id " (" type ")"
+          }
+        }
+      }
+    }
+    END {
+      for (key in minValue) {
+        split(key, parts, SUBSEP)
+        traitName=parts[1]
+        label=parts[2]
+        printf "%d\t%s\t%s\t%s\t%s\t%s\t%s\n", count[traitName], traitName, label, minValue[key], minCarrier[key], maxValue[key], maxCarrier[key]
+      }
+    }
+  ' data/garden-state.txt | sort -nr | awk -F'\t' 'NR <= 30 { printf "- %s / %s: count %s, lowest %s at %s, highest %s at %s\n", $2, $3, $1, $4, $5, $6, $7 }'
   echo
 }
 
@@ -128,16 +304,16 @@ append_garden_digest() {
   echo
   echo "## Authoritative Templates"
   echo
-  append_file_excerpt "agent/templates/journal-entry.md" 80
-  append_file_excerpt "agent/templates/daily-summary.md" 60
+  append_full_file "agent/templates/journal-entry.md"
+  append_full_file "agent/templates/daily-summary.md"
   echo "For weekly, monthly, and yearly rollups, use the matching template in \`agent/templates/\` only when that rollup is due."
   echo
   echo "## Current Agent Memory"
   echo
-  append_file_excerpt "agent/state.md" 140
+  append_full_file "agent/state.md"
   echo "## Open Agent Requests"
   echo
-  append_file_excerpt "agent/requests.md" 120
+  append_full_file "agent/requests.md"
   append_latest_summary "Latest Daily Summary" "agent/summaries/daily"
   append_latest_summary "Latest Weekly Summary" "agent/summaries/weekly"
   append_latest_summary "Latest Monthly Summary" "agent/summaries/monthly"
@@ -146,7 +322,7 @@ append_garden_digest() {
   echo "## Recent Active Journal Entries"
   echo
   while IFS= read -r journal; do
-    append_file_excerpt "$journal" 80
+    append_full_file "$journal"
   done < <(latest_files 8 "agent/journal")
   echo "## Project Index"
   echo
