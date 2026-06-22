@@ -52,6 +52,7 @@ jobs:
           upload_artifacts: true
 
       - name: Restore protected files
+        id: restore_protected
         if: ${{ !cancelled() }}
         shell: bash
         run: scripts/restore-evolve-protected-files.sh
@@ -109,19 +110,23 @@ jobs:
           artifact-name-prefix: summary-append-only-repair
 
       - name: Archive old journal entries
+        id: archive_journal
         shell: bash
         run: scripts/archive-journal.sh
 
       - name: Archive old summary files
+        id: archive_summaries
         shell: bash
         run: scripts/archive-summaries.sh
 
       - name: Collect failure diagnostics
+        id: collect_failure_diagnostics
         if: ${{ failure() && !cancelled() }}
         shell: bash
         run: scripts/collect-evolve-failure-diagnostics.sh "${{ runner.temp }}/evolve-failure-diagnostics"
 
       - name: Upload failure diagnostics
+        id: upload_failure_diagnostics
         if: ${{ failure() && !cancelled() }}
         uses: actions/upload-artifact@v6
         with:
@@ -130,6 +135,7 @@ jobs:
           if-no-files-found: warn
 
       - name: Record workflow check status
+        id: record_workflow_status
         shell: bash
         env:
           BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
@@ -142,8 +148,30 @@ jobs:
         run: scripts/record-evolve-status.sh
 
       - name: Commit changes directly to main
+        id: commit_changes
         shell: bash
         env:
           COMMIT_MESSAGE_PREFIX: "feat: autonomous garden evolution"
           COMMIT_TIMESTAMP_FORMAT: "%Y-%m-%dT%H:%MZ"
         run: scripts/commit-if-changed.sh .
+
+      - name: Write workflow summary
+        if: ${{ always() }}
+        shell: bash
+        env:
+          GEMINI_MODEL: ${{ env.GEMINI_MODEL }}
+          BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
+          GEMINI_OUTCOME: ${{ steps.gemini.outcome }}
+          RESTORE_PROTECTED_OUTCOME: ${{ steps.restore_protected.outcome }}
+          POST_TEST_OUTCOME: ${{ steps.post_test_final.outcome }}
+          ADVANCE_GARDEN_OUTCOME: ${{ steps.advance_garden.outcome }}
+          JOURNAL_FORMAT_OUTCOME: ${{ steps.journal_format_final.outcome }}
+          SUMMARY_FORMAT_OUTCOME: ${{ steps.summary_format_final.outcome }}
+          SUMMARY_APPEND_ONLY_OUTCOME: ${{ steps.summary_append_only_final.outcome }}
+          ARCHIVE_JOURNAL_OUTCOME: ${{ steps.archive_journal.outcome }}
+          ARCHIVE_SUMMARIES_OUTCOME: ${{ steps.archive_summaries.outcome }}
+          COLLECT_DIAGNOSTICS_OUTCOME: ${{ steps.collect_failure_diagnostics.outcome }}
+          UPLOAD_DIAGNOSTICS_OUTCOME: ${{ steps.upload_failure_diagnostics.outcome }}
+          RECORD_STATUS_OUTCOME: ${{ steps.record_workflow_status.outcome }}
+          COMMIT_OUTCOME: ${{ steps.commit_changes.outcome }}
+        run: scripts/write-evolve-job-summary.sh
