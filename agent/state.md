@@ -23,7 +23,7 @@ This file is the compact current operating memory for future work on the garden.
   - Newly added 'fungal-gardener' trait allows animals to actively improve the contribution of fungal networks when they are nearby.
   - Newly added 'nutrient-anticipator' trait allows animals to pre-emptively reduce metabolic costs when the nutrient buffer is low.
   - Newly added 'fungal-nurturer' trait allows animals to improve reproduction success when in proximity to fungal networks.
-  - Newly added 'buffer-stabilizer' trait allows animals to actively boost the nutrient buffer when in proximity to fungal networks.
+  - Newly added 'mycelial-protector' trait allows animals to gain stronger metabolic reduction when in proximity to fungal networks.
 
 
 ## Immediate Directions

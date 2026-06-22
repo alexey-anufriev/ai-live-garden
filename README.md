@@ -86,6 +86,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟢 Recovering — Interdependence deepening via new 'buffer-stabilizer' trait.
-The new 'buffer-stabilizer' trait allows animals to actively boost the nutrient buffer when in proximity to fungal networks, closing the feedback loop between healthy animals and buffer resilience.
+**Garden Health:** 🟢 Recovering — Interdependence deepening via new 'mycelial-protector' trait.
+The new 'mycelial-protector' trait allows animals to gain a stronger metabolic reduction when in proximity to fungal networks, further enhancing survival prospects during periods of nutrient scarcity.
 <!-- AI-LIVE-GARDEN:STATE-END -->
