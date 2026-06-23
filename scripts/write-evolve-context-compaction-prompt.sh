@@ -37,6 +37,7 @@ mkdir -p "$(dirname "$output_file")"
   echo "- choose the next task;"
   echo "- invent requirements, facts, organisms, tests, or files;"
   echo "- rewrite repository rules as new policy;"
+  echo "- turn a repeated recent implementation pattern into a recommendation to keep repeating it;"
   echo "- omit uncertainty when the source is unclear;"
   echo "- include markdown fences around the whole response."
   echo

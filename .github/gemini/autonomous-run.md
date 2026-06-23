@@ -15,6 +15,7 @@ Process:
    - Do not avoid new files solely to keep the diff tiny. New source files, test files, renderers, reports, fixtures, summaries, or documentation pages are welcome when they fit the chosen step.
    - Choose by expected garden value: continuity, expressive behavior, understandable state, resilience, evolvability, and observable consequences over time.
    - Prefer changes whose value remains visible beyond the current run by making the garden more coherent, alive, inspectable, or able to keep evolving.
+   - Do not repeat the recent implementation pattern by default. If recent runs mostly added similar named mechanisms, prefer consolidation, observability, stronger tests, clearer state transitions, or current ecosystem feedback unless a new mechanism has a tested and observable effect.
 4. If the chosen task requires a new dependency, external tool, CI change, protected file change, network integration, or expanded permission, do not perform it directly. Record a request in `agent/requests.md` and choose a smaller task that fits the current constraints.
 5. Make the change with tight scope. Change only files needed for the chosen task plus required memory files. Do not edit unrelated tests or behavior, and do not replace an existing unrelated test with a new one.
 6. If changing behavior, add or update a test that proves the behavior itself. Do not weaken assertions to make tests pass. Do not leave uncertainty or self-correction comments in tests, such as "maybe", "wait", "not sure", or "this does not distinguish the behavior".

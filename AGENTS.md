@@ -65,7 +65,7 @@ Prefer ecological depth:
 * relationships between plants, animals, predators, decomposers, spores, roots, and environmental forces;
 * food chains and resource competition;
 * symbiosis, decay, reproduction, migration, dormancy, mutation, and adaptation;
-* traits that affect behavior over time;
+* adaptations that change behavior over time;
 * visible consequences in the persistent garden state.
 
 New species or organism types are welcome when they create new behavior or relationships.
@@ -73,6 +73,8 @@ New species or organism types are welcome when they create new behavior or relat
 Avoid adding many disconnected entities that do not interact with the existing garden.
 
 A good change should make the ecosystem feel more alive, interconnected, or surprising while preserving coherence. Choose the next task by the value it adds to the garden as a living system: continuity, expressive behavior, understandable state, resilience, evolvability, and observable consequences over time. Prefer changes whose value remains visible beyond the current run.
+
+Do not treat adding another named adaptation as the default small step. A new label or branch in the simulation is valuable only when it creates a tested, observable consequence for the current or recoverable garden. If the recent history has many similar additions, prefer consolidating existing behavior, improving observability, strengthening tests, clarifying state transitions, or making current ecosystem pressures easier to understand.
 
 ## Required behavior on every run
 
@@ -117,6 +119,8 @@ Prefer:
 * simple Java code over clever abstractions;
 * readable simulation behavior over opaque mechanisms;
 * focused new files over overloading existing files when a new source, test, renderer, report, summary, fixture, or documentation page would make the change easier to understand.
+
+Avoid repeating the most recent implementation pattern simply because it is familiar. If the last active journal entries are dominated by one kind of change, first ask whether the garden now needs consolidation, measurement, or clearer feedback before adding more of the same.
 
 Do not avoid creating new files solely to keep the diff tiny. If a new organism behavior, environmental concept, persistence helper, renderer, test case group, generated report, or agent memory file is the cleanest expression of the chosen step, create it in an appropriate mutable area such as `src/`, `src/test/`, `agent/`, or `data/`.
 

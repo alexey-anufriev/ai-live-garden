@@ -124,30 +124,6 @@ append_garden_digest() {
     }
   ' data/garden-state.txt | sort
   echo
-  echo "### Most Common Traits"
-  echo
-  awk -F'[=|]' '
-    function numeric(value) {
-      return value ~ /^-?[0-9]+([.][0-9]+)?$/
-    }
-    /^organism=/ {
-      traits=""
-      for (fieldIndex = 4; fieldIndex <= NF; fieldIndex++) {
-        if (!numeric($fieldIndex)) {
-          traits = traits (traits == "" ? "" : "|") $fieldIndex
-        }
-      }
-      gsub(/\\,/, ",", traits)
-      n=split(traits, parts, ",")
-      for (i = 1; i <= n; i++) {
-        if (parts[i] != "") trait[parts[i]]++
-      }
-    }
-    END {
-      for (name in trait) print trait[name] "\t" name
-    }
-  ' data/garden-state.txt | sort -nr | awk -F'\t' 'NR <= 20 { printf "- %s: %s\n", $2, $1 }'
-  echo
   echo "### Attribute Extremes"
   echo
   echo "Current numeric organism fields:"
@@ -242,54 +218,6 @@ append_garden_digest() {
     }
   '
   echo
-  echo "Common trait-like tokens by numeric field:"
-  awk -F'[=|]' '
-    function numeric(value) {
-      return value ~ /^-?[0-9]+([.][0-9]+)?$/
-    }
-    function numeric_label(fieldIndex) {
-      return "numeric-field-" (fieldIndex - 3) " (organism column " fieldIndex ")"
-    }
-    /^organism=/ {
-      id=$2
-      type=$3
-      traits=""
-      for (fieldIndex = 4; fieldIndex <= NF; fieldIndex++) {
-        if (!numeric($fieldIndex)) {
-          traits = traits (traits == "" ? "" : "|") $fieldIndex
-        }
-      }
-      gsub(/\\,/, ",", traits)
-      n=split(traits, parts, ",")
-      for (i = 1; i <= n; i++) {
-        traitName=parts[i]
-        if (traitName == "") continue
-        count[traitName]++
-        for (fieldIndex = 4; fieldIndex <= NF; fieldIndex++) {
-          if (!numeric($fieldIndex)) continue
-          key=traitName SUBSEP numeric_label(fieldIndex)
-          value=$fieldIndex + 0
-          if (!(key in minValue) || value < minValue[key]) {
-            minValue[key]=value
-            minCarrier[key]=id " (" type ")"
-          }
-          if (!(key in maxValue) || value > maxValue[key]) {
-            maxValue[key]=value
-            maxCarrier[key]=id " (" type ")"
-          }
-        }
-      }
-    }
-    END {
-      for (key in minValue) {
-        split(key, parts, SUBSEP)
-        traitName=parts[1]
-        label=parts[2]
-        printf "%d\t%s\t%s\t%s\t%s\t%s\t%s\n", count[traitName], traitName, label, minValue[key], minCarrier[key], maxValue[key], maxCarrier[key]
-      }
-    }
-  ' data/garden-state.txt | sort -nr | awk -F'\t' 'NR <= 30 { printf "- %s / %s: count %s, lowest %s at %s, highest %s at %s\n", $2, $3, $1, $4, $5, $6, $7 }'
-  echo
 }
 
 {
@@ -307,6 +235,7 @@ append_garden_digest() {
   echo "- Prefer continuity over novelty and ecological depth over disconnected additions."
   echo "- Choose by expected garden value: continuity, expressive behavior, understandable state, resilience, evolvability, and observable consequences over time."
   echo "- Prefer changes whose value remains visible beyond the current run by making the garden more coherent, alive, inspectable, or able to keep evolving."
+  echo "- Do not repeat the recent implementation pattern by default. If recent runs mostly added similar named mechanisms, prefer consolidation, observability, stronger tests, clearer state transitions, or current ecosystem feedback unless a new mechanism has a tested and observable effect."
   echo "- A focused new file is acceptable when it is the cleanest design."
   echo "- Keep scope tight: change only files needed for the chosen task plus required memory files."
   echo "- Do not edit unrelated tests or behavior, and do not replace an existing unrelated test with a new one."
