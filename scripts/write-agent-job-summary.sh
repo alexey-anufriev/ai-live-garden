@@ -50,6 +50,7 @@ metadata_value() {
   echo "| Protected file restore | $(value_or_dash "${RESTORE_PROTECTED_OUTCOME:-}") |"
   echo "| Post-Gemini test validation | $(value_or_dash "${POST_TEST_OUTCOME:-}") |"
   echo "| Garden state advance | $(value_or_dash "${ADVANCE_GARDEN_OUTCOME:-}") |"
+  echo "| Required memory validation | $(value_or_dash "${REQUIRED_MEMORY_OUTCOME:-}") |"
   echo "| Journal format validation | $(value_or_dash "${JOURNAL_FORMAT_OUTCOME:-}") |"
   echo "| Summary format validation | $(value_or_dash "${SUMMARY_FORMAT_OUTCOME:-}") |"
   echo "| Summary append-only validation | $(value_or_dash "${SUMMARY_APPEND_ONLY_OUTCOME:-}") |"
@@ -94,6 +95,8 @@ metadata_value() {
     echo "The run failed after Gemini while validating or repairing tests."
   elif [[ "${SUMMARY_APPEND_ONLY_OUTCOME:-}" == "failure" ]]; then
     echo "The run failed while validating or repairing append-only summaries."
+  elif [[ "${REQUIRED_MEMORY_OUTCOME:-}" == "failure" ]]; then
+    echo "The run failed while validating or repairing required README/state memory updates."
   elif [[ "${JOURNAL_FORMAT_OUTCOME:-}" == "failure" || "${SUMMARY_FORMAT_OUTCOME:-}" == "failure" ]]; then
     echo "The run failed while validating or repairing generated memory format."
   elif [[ "${COMMIT_OUTCOME:-}" == "success" ]]; then

@@ -38,7 +38,8 @@ delimiter="JOURNAL_REPAIR_PROMPT_$(date +%s)_${RANDOM}"
   echo '9. Run `scripts/validate-journal-format.sh` before finishing.'
   echo "10. The journal must describe the final state of the current run, not a stale intermediate state."
   echo '11. If post-change test validation succeeded, the journal test-result section must start with `Passed` or `Success`.'
-  echo '12. The `## Files changed` section should include the meaningful files changed by the run. Required memory/state files may be grouped, but do not claim only one source file changed when the final diff changed more.'
+  echo '12. The `## Files changed` section must list every currently changed path from `git diff --name-only HEAD` and `git ls-files --others --exclude-standard`, excluding `agent/journal/archive/`.'
+  echo '13. Include the new journal file itself, required memory files, summaries, `data/garden-state.txt`, source/test files, and other changed files as separate backtick-quoted bullet items.'
   echo
   echo "Useful sources:"
   echo

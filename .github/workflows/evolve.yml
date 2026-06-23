@@ -125,6 +125,18 @@ jobs:
         id: advance_garden
         run: mvn -B -q exec:java -Dexec.args="tick --steps 3"
 
+      - name: Validate and repair required memory updates
+        id: required_memory_final
+        uses: ./.github/actions/gemini-validate-repair
+        with:
+          validation-command: scripts/validate-required-memory-updates.sh
+          repair-prompt-command: scripts/write-required-memory-repair-prompt.sh
+          protected-restore-command: scripts/restore-agent-protected-files.sh
+          violations-file: ${{ runner.temp }}/required-memory-violations.txt
+          gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
+          gemini-model: ${{ env.EXECUTION_MODEL }}
+          artifact-name-prefix: required-memory-repair
+
       - name: Validate and repair journal format
         id: journal_format_final
         uses: ./.github/actions/gemini-validate-repair
@@ -203,6 +215,7 @@ jobs:
           GEMINI_OUTCOME: ${{ steps.gemini.outcome }}
           POST_TEST_OUTCOME: ${{ steps.post_test_final.outcome }}
           ADVANCE_GARDEN_OUTCOME: ${{ steps.advance_garden.outcome }}
+          REQUIRED_MEMORY_OUTCOME: ${{ steps.required_memory_final.outcome }}
           JOURNAL_FORMAT_OUTCOME: ${{ steps.journal_format_final.outcome }}
           SUMMARY_FORMAT_OUTCOME: ${{ steps.summary_format_final.outcome }}
           SUMMARY_APPEND_ONLY_OUTCOME: ${{ steps.summary_append_only_final.outcome }}
@@ -233,6 +246,7 @@ jobs:
           RESTORE_PROTECTED_OUTCOME: ${{ steps.restore_protected.outcome }}
           POST_TEST_OUTCOME: ${{ steps.post_test_final.outcome }}
           ADVANCE_GARDEN_OUTCOME: ${{ steps.advance_garden.outcome }}
+          REQUIRED_MEMORY_OUTCOME: ${{ steps.required_memory_final.outcome }}
           JOURNAL_FORMAT_OUTCOME: ${{ steps.journal_format_final.outcome }}
           SUMMARY_FORMAT_OUTCOME: ${{ steps.summary_format_final.outcome }}
           SUMMARY_APPEND_ONLY_OUTCOME: ${{ steps.summary_append_only_final.outcome }}

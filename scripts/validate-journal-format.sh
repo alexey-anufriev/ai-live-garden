@@ -39,6 +39,22 @@ first_non_empty_line() {
   awk 'NF { print; exit }'
 }
 
+changed_paths_for_journal() {
+  {
+    git diff --name-only --diff-filter=ACMR -- .
+    git ls-files --others --exclude-standard -- .
+  } | sort -u |
+    while IFS= read -r path; do
+      case "$path" in
+        agent/journal/archive/*)
+          ;;
+        *)
+          printf '%s\n' "$path"
+          ;;
+      esac
+    done
+}
+
 is_active_journal_path() {
   local path="$1"
 
@@ -66,6 +82,8 @@ mapfile -t changed_journal_files < <(
       fi
     done
 )
+
+mapfile -t changed_paths < <(changed_paths_for_journal)
 
 if (( ${#changed_journal_files[@]} == 0 )); then
   echo "Journal format violation: no added or modified active journal entry found."
@@ -127,6 +145,14 @@ for path in "${changed_journal_files[@]}"; do
       failed=1
     fi
   fi
+
+  files_changed_section="$(section_text "$path" "## Files changed")"
+  for changed_path in "${changed_paths[@]}"; do
+    if ! grep -Fq -- "\`${changed_path}\`" <<<"$files_changed_section"; then
+      record_violation "$path" "Files changed section must include \`${changed_path}\`"
+      failed=1
+    fi
+  done
 done
 
 if (( failed != 0 )); then
