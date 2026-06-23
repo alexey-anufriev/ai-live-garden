@@ -396,17 +396,22 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             if (hunter.traits().contains("nutrient-hoarder")) {
                 bite += 1;
             }
+            if (hunter.type() == OrganismType.FOX && hunter.traits().contains("predator-focus")) {
+                bite += 1;
+            }
             if (hunter.traits().contains("root-tapper")) {
                 long rootNetworkCount = organisms.stream().filter(o -> o.type() == OrganismType.ROOT_NETWORK).count();
                 if (rootNetworkCount > 0) {
                     bite += 1;
                 }
             }
-            if (hunter.type() == OrganismType.FOX && hunter.traits().contains("predator-focus")) {
-                bite += 1;
-            }
-            if (hunter.traits().contains("nutrient-refiner") && !hunter.traits().contains("stressed")) {
-                bite += 1;
+            if (hunter.traits().contains("nutrient-refiner")) {
+                if (!hunter.traits().contains("stressed") || hunter.traits().contains("starving")) {
+                    bite += 1;
+                    if (hunter.traits().contains("starving")) {
+                        events.add(new GardenEvent(cycle, "%s refined nutrients while starving.".formatted(hunter.id())));
+                    }
+                }
             }
             if (hunter.traits().contains("gentle-feeder")) {
                 bite = Math.max(1, bite - 1);
