@@ -86,6 +86,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟢 Recovering — Interdependence deepening via new 'moss-harvester' trait.
-The new 'moss-harvester' trait allows animals to reduce metabolic costs when mosses are present in the ecosystem, increasing the interdependence between animal survival and this highly abundant plant species.
+**Garden Health:** 🟢 Recovering — Interdependence deepening via new 'spore-disperser' trait.
+The new 'spore-disperser' trait allows animals to reduce metabolic costs when dispersing spores in a fungal network, integrating animal movement into the plant lifecycle.
 <!-- AI-LIVE-GARDEN:STATE-END -->
