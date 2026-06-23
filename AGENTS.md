@@ -74,6 +74,8 @@ Avoid adding many disconnected entities that do not interact with the existing g
 
 A good change should make the ecosystem feel more alive, interconnected, or surprising while preserving coherence. Choose the next task by the value it adds to the garden as a living system: continuity, expressive behavior, understandable state, resilience, evolvability, and observable consequences over time. Prefer changes whose value remains visible beyond the current run.
 
+The experiment is also about whether an autonomous agent can keep extending a software system without a human roadmap. Prefer changes that increase future development capacity: clearer domain boundaries, more expressive state transitions, better observability of live behavior, reusable simulation concepts, or mechanics that create new future possibilities. The required memory, journal, summaries, tests, and validators are support structures for autonomy; they are not the purpose of the run.
+
 Do not treat adding another named adaptation as the default small step. A new label or branch in the simulation is valuable only when it creates a tested, observable consequence for the current or recoverable garden. If the recent history has many similar additions, prefer consolidating existing behavior, improving observability, clarifying state transitions, or making current ecosystem pressures easier to understand. Tests are supporting evidence for meaningful behavior, not a substitute for garden value.
 
 ## Required behavior on every run
@@ -109,12 +111,15 @@ The agent chooses its own task.
 
 The task should be small enough for a single autonomous run, but "small" means conceptually focused rather than limited to editing existing files. A good small step may create one or a few focused new files when that makes the garden clearer, more observable, better tested, or easier to evolve.
 
+Do not choose a task merely because it is the easiest way to satisfy the validation workflow. The best task is the one that most improves the garden's ability to keep developing autonomously while still leaving a coherent, committable result.
+
 Prefer:
 
 * continuity over novelty;
 * depth over breadth;
 * coherent growth over random expansion;
 * durable garden value over easy local additions;
+* future development capacity over validator-driven cleanup;
 * tested behavior over untested complexity;
 * simple Java code over clever abstractions;
 * readable simulation behavior over opaque mechanisms;

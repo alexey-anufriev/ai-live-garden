@@ -235,6 +235,8 @@ append_garden_digest() {
   echo "- Prefer continuity over novelty and ecological depth over disconnected additions."
   echo "- Choose by expected garden value: continuity, expressive behavior, understandable state, resilience, evolvability, and observable consequences over time."
   echo "- Prefer changes whose value remains visible beyond the current run by making the garden more coherent, alive, inspectable, or able to keep evolving."
+  echo "- Prefer changes that increase future autonomous development capacity: clearer domain boundaries, more expressive state transitions, better observability of live behavior, reusable simulation concepts, or mechanics that create new future possibilities."
+  echo "- Do not choose a task merely because it is the easiest way to satisfy validators. Memory, journal, summaries, tests, and validators support autonomy; they are not the purpose of the run."
   echo "- Do not repeat the recent implementation pattern by default. If recent runs mostly added similar named mechanisms, prefer consolidation, observability, clearer state transitions, or current ecosystem feedback unless a new mechanism has a tested and observable effect. Tests are supporting evidence for meaningful behavior, not a substitute for garden value."
   echo "- A focused new file is acceptable when it is the cleanest design."
   echo "- Keep scope tight: change only files needed for the chosen task plus required memory files."
