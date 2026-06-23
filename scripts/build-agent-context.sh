@@ -9,9 +9,9 @@ fi
 output_file="$1"
 mkdir -p "$(dirname "$output_file")"
 
-recent_journal_limit="${EVOLVE_CONTEXT_RECENT_JOURNAL_LIMIT:-8}"
-context_warn_lines="${EVOLVE_CONTEXT_WARN_LINES:-1200}"
-metadata_file="${EVOLVE_CONTEXT_METADATA_FILE:-${output_file}.metadata}"
+recent_journal_limit="${AGENT_CONTEXT_RECENT_JOURNAL_LIMIT:-8}"
+context_warn_lines="${AGENT_CONTEXT_WARN_LINES:-1200}"
+metadata_file="${AGENT_CONTEXT_METADATA_FILE:-${output_file}.metadata}"
 mkdir -p "$(dirname "$metadata_file")"
 
 latest_files() {
@@ -221,7 +221,7 @@ append_garden_digest() {
 }
 
 {
-  echo "# AI Live Garden Compact Evolve Context"
+  echo "# AI Live Garden Compact Agent Context"
   echo
   echo "Generated at: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
   echo
@@ -302,24 +302,24 @@ append_garden_digest() {
 context_line_count="$(wc -l < "$output_file" | tr -d '[:space:]')"
 context_byte_count="$(wc -c < "$output_file" | tr -d '[:space:]')"
 if (( context_line_count > context_warn_lines )); then
-  echo "Warning: compact evolve context is ${context_line_count} lines, above EVOLVE_CONTEXT_WARN_LINES=${context_warn_lines}." >&2
+  echo "Warning: compact agent context is ${context_line_count} lines, above AGENT_CONTEXT_WARN_LINES=${context_warn_lines}." >&2
 fi
 
 {
-  echo "EVOLVE_CONTEXT_FILE=${output_file}"
-  echo "EVOLVE_CONTEXT_LINES=${context_line_count}"
-  echo "EVOLVE_CONTEXT_BYTES=${context_byte_count}"
-  echo "EVOLVE_CONTEXT_WARN_LINES=${context_warn_lines}"
+  echo "AGENT_CONTEXT_FILE=${output_file}"
+  echo "AGENT_CONTEXT_LINES=${context_line_count}"
+  echo "AGENT_CONTEXT_BYTES=${context_byte_count}"
+  echo "AGENT_CONTEXT_WARN_LINES=${context_warn_lines}"
   if (( context_line_count > context_warn_lines )); then
-    echo "EVOLVE_CONTEXT_WARNED=true"
+    echo "AGENT_CONTEXT_WARNED=true"
   else
-    echo "EVOLVE_CONTEXT_WARNED=false"
+    echo "AGENT_CONTEXT_WARNED=false"
   fi
-  echo "EVOLVE_CONTEXT_RECENT_JOURNAL_LIMIT=${recent_journal_limit}"
-  echo "EVOLVE_CONTEXT_ACTIVE_JOURNAL_COUNT=$(count_files "agent/journal")"
-  echo "EVOLVE_CONTEXT_SELECTED_JOURNALS=$(latest_files "$recent_journal_limit" "agent/journal" | join_lines)"
-  echo "EVOLVE_CONTEXT_LATEST_DAILY_SUMMARY=$(latest_files 1 "agent/summaries/daily" || true)"
-  echo "EVOLVE_CONTEXT_LATEST_WEEKLY_SUMMARY=$(latest_files 1 "agent/summaries/weekly" || true)"
-  echo "EVOLVE_CONTEXT_LATEST_MONTHLY_SUMMARY=$(latest_files 1 "agent/summaries/monthly" || true)"
-  echo "EVOLVE_CONTEXT_LATEST_YEARLY_SUMMARY=$(latest_files 1 "agent/summaries/yearly" || true)"
+  echo "AGENT_CONTEXT_RECENT_JOURNAL_LIMIT=${recent_journal_limit}"
+  echo "AGENT_CONTEXT_ACTIVE_JOURNAL_COUNT=$(count_files "agent/journal")"
+  echo "AGENT_CONTEXT_SELECTED_JOURNALS=$(latest_files "$recent_journal_limit" "agent/journal" | join_lines)"
+  echo "AGENT_CONTEXT_LATEST_DAILY_SUMMARY=$(latest_files 1 "agent/summaries/daily" || true)"
+  echo "AGENT_CONTEXT_LATEST_WEEKLY_SUMMARY=$(latest_files 1 "agent/summaries/weekly" || true)"
+  echo "AGENT_CONTEXT_LATEST_MONTHLY_SUMMARY=$(latest_files 1 "agent/summaries/monthly" || true)"
+  echo "AGENT_CONTEXT_LATEST_YEARLY_SUMMARY=$(latest_files 1 "agent/summaries/yearly" || true)"
 } > "$metadata_file"

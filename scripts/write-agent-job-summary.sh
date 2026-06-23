@@ -17,7 +17,7 @@ value_or_dash() {
 
 metadata_value() {
   local key="$1"
-  local file="${EVOLVE_CONTEXT_METADATA_FILE:-}"
+  local file="${AGENT_CONTEXT_METADATA_FILE:-}"
 
   if [[ -z "$file" || ! -f "$file" ]]; then
     echo "-"
@@ -34,7 +34,7 @@ metadata_value() {
 }
 
 {
-  echo "## Evolve Workflow Summary"
+  echo "## Agent Workflow Summary"
   echo
   echo "- UTC: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
   echo "- Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
@@ -63,31 +63,31 @@ metadata_value() {
   echo
   echo "## Context Diagnostics"
   echo
-  echo "- Context lines: $(metadata_value EVOLVE_CONTEXT_LINES)"
-  echo "- Context bytes: $(metadata_value EVOLVE_CONTEXT_BYTES)"
-  echo "- Compacted prompt lines: $(metadata_value EVOLVE_CONTEXT_COMPACTED_LINES)"
-  echo "- Compacted prompt bytes: $(metadata_value EVOLVE_CONTEXT_COMPACTED_BYTES)"
-  echo "- Compaction digest lines: $(metadata_value EVOLVE_CONTEXT_COMPACTION_DIGEST_LINES)"
-  echo "- Compaction digest bytes: $(metadata_value EVOLVE_CONTEXT_COMPACTION_DIGEST_BYTES)"
-  echo "- Warning threshold: $(metadata_value EVOLVE_CONTEXT_WARN_LINES)"
-  echo "- Warning threshold exceeded: $(metadata_value EVOLVE_CONTEXT_WARNED)"
-  echo "- Recent journal limit: $(metadata_value EVOLVE_CONTEXT_RECENT_JOURNAL_LIMIT)"
-  echo "- Active journal files: $(metadata_value EVOLVE_CONTEXT_ACTIVE_JOURNAL_COUNT)"
-  echo "- Selected journal files: $(value_or_dash "$(metadata_value EVOLVE_CONTEXT_SELECTED_JOURNALS)")"
-  echo "- Latest daily summary: $(value_or_dash "$(metadata_value EVOLVE_CONTEXT_LATEST_DAILY_SUMMARY)")"
-  echo "- Latest weekly summary: $(value_or_dash "$(metadata_value EVOLVE_CONTEXT_LATEST_WEEKLY_SUMMARY)")"
-  echo "- Latest monthly summary: $(value_or_dash "$(metadata_value EVOLVE_CONTEXT_LATEST_MONTHLY_SUMMARY)")"
-  echo "- Latest yearly summary: $(value_or_dash "$(metadata_value EVOLVE_CONTEXT_LATEST_YEARLY_SUMMARY)")"
+  echo "- Context lines: $(metadata_value AGENT_CONTEXT_LINES)"
+  echo "- Context bytes: $(metadata_value AGENT_CONTEXT_BYTES)"
+  echo "- Compacted prompt lines: $(metadata_value AGENT_CONTEXT_COMPACTED_LINES)"
+  echo "- Compacted prompt bytes: $(metadata_value AGENT_CONTEXT_COMPACTED_BYTES)"
+  echo "- Compaction digest lines: $(metadata_value AGENT_CONTEXT_COMPACTION_DIGEST_LINES)"
+  echo "- Compaction digest bytes: $(metadata_value AGENT_CONTEXT_COMPACTION_DIGEST_BYTES)"
+  echo "- Warning threshold: $(metadata_value AGENT_CONTEXT_WARN_LINES)"
+  echo "- Warning threshold exceeded: $(metadata_value AGENT_CONTEXT_WARNED)"
+  echo "- Recent journal limit: $(metadata_value AGENT_CONTEXT_RECENT_JOURNAL_LIMIT)"
+  echo "- Active journal files: $(metadata_value AGENT_CONTEXT_ACTIVE_JOURNAL_COUNT)"
+  echo "- Selected journal files: $(value_or_dash "$(metadata_value AGENT_CONTEXT_SELECTED_JOURNALS)")"
+  echo "- Latest daily summary: $(value_or_dash "$(metadata_value AGENT_CONTEXT_LATEST_DAILY_SUMMARY)")"
+  echo "- Latest weekly summary: $(value_or_dash "$(metadata_value AGENT_CONTEXT_LATEST_WEEKLY_SUMMARY)")"
+  echo "- Latest monthly summary: $(value_or_dash "$(metadata_value AGENT_CONTEXT_LATEST_MONTHLY_SUMMARY)")"
+  echo "- Latest yearly summary: $(value_or_dash "$(metadata_value AGENT_CONTEXT_LATEST_YEARLY_SUMMARY)")"
   echo
   if [[ "${CONTEXT_COMPACTION_OUTCOME:-}" == "failure" ]]; then
     echo "Context compaction failed before the main Gemini call. Check the compaction model id, quota, authentication, or provider availability."
   fi
-  if [[ -n "${EVOLVE_CHANGE_DIAGNOSTICS_FILE:-}" && -f "$EVOLVE_CHANGE_DIAGNOSTICS_FILE" ]]; then
-    cat "$EVOLVE_CHANGE_DIAGNOSTICS_FILE"
+  if [[ -n "${AGENT_CHANGE_DIAGNOSTICS_FILE:-}" && -f "$AGENT_CHANGE_DIAGNOSTICS_FILE" ]]; then
+    cat "$AGENT_CHANGE_DIAGNOSTICS_FILE"
     echo
   fi
   if [[ "${COLLECT_DIAGNOSTICS_OUTCOME:-}" == "success" || "${UPLOAD_DIAGNOSTICS_OUTCOME:-}" == "success" ]]; then
-    echo "Failure diagnostics artifact: \`evolve-failure-diagnostics-${GITHUB_RUN_ATTEMPT:-1}\`."
+    echo "Failure diagnostics artifact: \`agent-failure-diagnostics-${GITHUB_RUN_ATTEMPT:-1}\`."
   elif [[ "${GEMINI_OUTCOME:-}" == "failure" ]]; then
     echo "The run failed during the main Gemini call. This is usually provider quota, authentication, or model availability."
   elif [[ "${POST_TEST_OUTCOME:-}" == "failure" ]]; then

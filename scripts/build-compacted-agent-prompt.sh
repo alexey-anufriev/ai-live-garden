@@ -9,7 +9,7 @@ fi
 raw_context_file="$1"
 compacted_context_file="$2"
 output_file="$3"
-metadata_file="${EVOLVE_CONTEXT_METADATA_FILE:-${output_file}.metadata}"
+metadata_file="${AGENT_CONTEXT_METADATA_FILE:-${output_file}.metadata}"
 
 if [[ ! -f "$raw_context_file" ]]; then
   echo "Raw context file not found: $raw_context_file" >&2
@@ -60,9 +60,9 @@ compacted_line_count="$(wc -l < "$compacted_context_file" | tr -d '[:space:]')"
 compacted_byte_count="$(wc -c < "$compacted_context_file" | tr -d '[:space:]')"
 
 {
-  echo "EVOLVE_CONTEXT_COMPACTED_FILE=${output_file}"
-  echo "EVOLVE_CONTEXT_COMPACTED_LINES=${context_line_count}"
-  echo "EVOLVE_CONTEXT_COMPACTED_BYTES=${context_byte_count}"
-  echo "EVOLVE_CONTEXT_COMPACTION_DIGEST_LINES=${compacted_line_count}"
-  echo "EVOLVE_CONTEXT_COMPACTION_DIGEST_BYTES=${compacted_byte_count}"
+  echo "AGENT_CONTEXT_COMPACTED_FILE=${output_file}"
+  echo "AGENT_CONTEXT_COMPACTED_LINES=${context_line_count}"
+  echo "AGENT_CONTEXT_COMPACTED_BYTES=${context_byte_count}"
+  echo "AGENT_CONTEXT_COMPACTION_DIGEST_LINES=${compacted_line_count}"
+  echo "AGENT_CONTEXT_COMPACTION_DIGEST_BYTES=${compacted_byte_count}"
 } >> "$metadata_file"

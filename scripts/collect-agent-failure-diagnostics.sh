@@ -30,24 +30,24 @@ if [[ -d target/surefire-reports ]]; then
   cp -R target/surefire-reports/. "$output_dir/surefire-reports/"
 fi
 
-if [[ -n "${EVOLVE_CONTEXT_FILE:-}" && -f "$EVOLVE_CONTEXT_FILE" ]]; then
-  cp "$EVOLVE_CONTEXT_FILE" "$output_dir/evolve-context.md"
+if [[ -n "${AGENT_CONTEXT_FILE:-}" && -f "$AGENT_CONTEXT_FILE" ]]; then
+  cp "$AGENT_CONTEXT_FILE" "$output_dir/agent-context.md"
 fi
 
-if [[ -n "${EVOLVE_CONTEXT_COMPACTION_PROMPT_FILE:-}" && -f "$EVOLVE_CONTEXT_COMPACTION_PROMPT_FILE" ]]; then
-  cp "$EVOLVE_CONTEXT_COMPACTION_PROMPT_FILE" "$output_dir/evolve-context-compaction-prompt.md"
+if [[ -n "${AGENT_CONTEXT_COMPACTION_PROMPT_FILE:-}" && -f "$AGENT_CONTEXT_COMPACTION_PROMPT_FILE" ]]; then
+  cp "$AGENT_CONTEXT_COMPACTION_PROMPT_FILE" "$output_dir/agent-context-compaction-prompt.md"
 fi
 
-if [[ -n "${EVOLVE_CONTEXT_COMPACTION_FILE:-}" && -f "$EVOLVE_CONTEXT_COMPACTION_FILE" ]]; then
-  cp "$EVOLVE_CONTEXT_COMPACTION_FILE" "$output_dir/evolve-context-compaction.md"
+if [[ -n "${AGENT_CONTEXT_COMPACTION_FILE:-}" && -f "$AGENT_CONTEXT_COMPACTION_FILE" ]]; then
+  cp "$AGENT_CONTEXT_COMPACTION_FILE" "$output_dir/agent-context-compaction.md"
 fi
 
-if [[ -n "${EVOLVE_COMPACTED_CONTEXT_FILE:-}" && -f "$EVOLVE_COMPACTED_CONTEXT_FILE" ]]; then
-  cp "$EVOLVE_COMPACTED_CONTEXT_FILE" "$output_dir/evolve-context-compacted.md"
+if [[ -n "${AGENT_COMPACTED_CONTEXT_FILE:-}" && -f "$AGENT_COMPACTED_CONTEXT_FILE" ]]; then
+  cp "$AGENT_COMPACTED_CONTEXT_FILE" "$output_dir/agent-context-compacted.md"
 fi
 
-if [[ -n "${EVOLVE_CONTEXT_METADATA_FILE:-}" && -f "$EVOLVE_CONTEXT_METADATA_FILE" ]]; then
-  cp "$EVOLVE_CONTEXT_METADATA_FILE" "$output_dir/evolve-context.metadata"
+if [[ -n "${AGENT_CONTEXT_METADATA_FILE:-}" && -f "$AGENT_CONTEXT_METADATA_FILE" ]]; then
+  cp "$AGENT_CONTEXT_METADATA_FILE" "$output_dir/agent-context.metadata"
 fi
 
 if compgen -G "target/*.dump" > /dev/null || compgen -G "target/*.dumpstream" > /dev/null; then
@@ -56,7 +56,7 @@ if compgen -G "target/*.dump" > /dev/null || compgen -G "target/*.dumpstream" > 
 fi
 
 {
-  echo "# Evolve Failure Diagnostics"
+  echo "# Agent Failure Diagnostics"
   echo
   echo "Generated at: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
   echo
@@ -86,21 +86,21 @@ fi
   echo
   echo "## Compact context"
   echo
-  if [[ -f "$output_dir/evolve-context.metadata" ]]; then
-    sed 's/^/- /' "$output_dir/evolve-context.metadata"
+  if [[ -f "$output_dir/agent-context.metadata" ]]; then
+    sed 's/^/- /' "$output_dir/agent-context.metadata"
   else
     echo "- Context metadata not available"
   fi
-  if [[ -f "$output_dir/evolve-context.md" ]]; then
-    echo "- Full compact context copied to \`evolve-context.md\`"
+  if [[ -f "$output_dir/agent-context.md" ]]; then
+    echo "- Full compact context copied to \`agent-context.md\`"
   fi
-  if [[ -f "$output_dir/evolve-context-compaction-prompt.md" ]]; then
-    echo "- Context compaction prompt copied to \`evolve-context-compaction-prompt.md\`"
+  if [[ -f "$output_dir/agent-context-compaction-prompt.md" ]]; then
+    echo "- Context compaction prompt copied to \`agent-context-compaction-prompt.md\`"
   fi
-  if [[ -f "$output_dir/evolve-context-compaction.md" ]]; then
-    echo "- Context compaction output copied to \`evolve-context-compaction.md\`"
+  if [[ -f "$output_dir/agent-context-compaction.md" ]]; then
+    echo "- Context compaction output copied to \`agent-context-compaction.md\`"
   fi
-  if [[ -f "$output_dir/evolve-context-compacted.md" ]]; then
-    echo "- Final compacted context copied to \`evolve-context-compacted.md\`"
+  if [[ -f "$output_dir/agent-context-compacted.md" ]]; then
+    echo "- Final compacted context copied to \`agent-context-compacted.md\`"
   fi
 } > "$output_dir/README.md"
