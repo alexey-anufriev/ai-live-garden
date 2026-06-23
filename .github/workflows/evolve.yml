@@ -128,6 +128,8 @@ jobs:
       - name: Validate and repair journal format
         id: journal_format_final
         uses: ./.github/actions/gemini-validate-repair
+        env:
+          JOURNAL_MVN_TEST_OUTCOME: ${{ steps.post_test_final.outcome }}
         with:
           validation-command: scripts/validate-journal-format.sh
           repair-prompt-command: scripts/write-journal-repair-prompt.sh

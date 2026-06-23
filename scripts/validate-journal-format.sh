@@ -13,8 +13,30 @@ record_violation() {
 
   echo "Journal format violation in ${path}: ${message}"
   if [[ -n "$violation_file" ]]; then
-    printf '%s\n' "$path" >> "$violation_file"
+    printf '%s\t%s\n' "$path" "$message" >> "$violation_file"
   fi
+}
+
+section_text() {
+  local path="$1"
+  local heading="$2"
+
+  awk -v heading="$heading" '
+    $0 == heading {
+      in_section = 1
+      next
+    }
+    in_section && /^## / {
+      exit
+    }
+    in_section {
+      print
+    }
+  ' "$path"
+}
+
+first_non_empty_line() {
+  awk 'NF { print; exit }'
 }
 
 is_active_journal_path() {
@@ -96,6 +118,14 @@ for path in "${changed_journal_files[@]}"; do
   if ! grep -Eq '^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$' <<<"$timestamp_line"; then
     record_violation "$path" "timestamp must be ISO-8601 UTC like YYYY-MM-DDTHH:MM:SSZ"
     failed=1
+  fi
+
+  if [[ "${JOURNAL_MVN_TEST_OUTCOME:-}" == "success" ]]; then
+    result_line="$(section_text "$path" "## Result of \`mvn test\`" | first_non_empty_line)"
+    if ! grep -Eq '^[[:space:]]*([Pp]ass(ed)?|[Ss]uccess)([[:space:][:punct:]]|$)' <<<"$result_line"; then
+      record_violation "$path" "mvn test result must describe the final successful post-change test validation, not an intermediate or stale failure"
+      failed=1
+    fi
   fi
 done
 
