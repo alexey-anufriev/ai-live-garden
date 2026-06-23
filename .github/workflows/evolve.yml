@@ -16,7 +16,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 42
     env:
-      GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-3.1-flash-lite' }}
+      EXECUTION_MODEL: ${{ vars.EXECUTION_MODEL || 'gemini-3.1-flash-lite' }}
+      CONTEXT_COMPACTION_MODEL: ${{ vars.CONTEXT_COMPACTION_MODEL || 'gemma-4-26b' }}
 
     steps:
       - name: Checkout repository
@@ -44,6 +45,44 @@ jobs:
           scripts/build-evolve-context.sh "${RUNNER_TEMP}/evolve-context.md"
           scripts/write-output-file.sh text "${RUNNER_TEMP}/evolve-context.md"
 
+      - name: Build context compaction prompt
+        id: context_compaction_prompt
+        if: ${{ env.CONTEXT_COMPACTION_MODEL != '' }}
+        shell: bash
+        run: |
+          scripts/write-evolve-context-compaction-prompt.sh "${RUNNER_TEMP}/evolve-context.md" "${RUNNER_TEMP}/evolve-context-compaction-prompt.md"
+          scripts/write-output-file.sh text "${RUNNER_TEMP}/evolve-context-compaction-prompt.md"
+
+      - name: Compact evolve context
+        id: context_compaction
+        if: ${{ env.CONTEXT_COMPACTION_MODEL != '' }}
+        continue-on-error: true
+        uses: google-github-actions/run-gemini-cli@v0.1.22
+        env:
+          GEMINI_CLI_TRUST_WORKSPACE: "true"
+        with:
+          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+          gemini_model: ${{ env.CONTEXT_COMPACTION_MODEL }}
+          prompt: ${{ steps.context_compaction_prompt.outputs.text }}
+          upload_artifacts: false
+
+      - name: Restore workspace after context compaction
+        if: ${{ env.CONTEXT_COMPACTION_MODEL != '' && !cancelled() }}
+        shell: bash
+        run: scripts/restore-worktree-to-head.sh
+
+      - name: Build compacted Gemini prompt
+        id: gemini_compacted_prompt
+        if: ${{ env.CONTEXT_COMPACTION_MODEL != '' && steps.context_compaction.outcome == 'success' }}
+        shell: bash
+        env:
+          EVOLVE_CONTEXT_COMPACTION_SUMMARY: ${{ steps.context_compaction.outputs.summary }}
+          EVOLVE_CONTEXT_METADATA_FILE: ${{ runner.temp }}/evolve-context.metadata
+        run: |
+          scripts/write-evolve-compaction-output.sh "${RUNNER_TEMP}/evolve-context-compaction.md"
+          scripts/build-compacted-evolve-prompt.sh "${RUNNER_TEMP}/evolve-context.md" "${RUNNER_TEMP}/evolve-context-compaction.md" "${RUNNER_TEMP}/evolve-context-compacted.md"
+          scripts/write-output-file.sh text "${RUNNER_TEMP}/evolve-context-compacted.md"
+
       - name: Run Gemini autonomous step
         id: gemini
         uses: google-github-actions/run-gemini-cli@v0.1.22
@@ -51,8 +90,8 @@ jobs:
           GEMINI_CLI_TRUST_WORKSPACE: "true"
         with:
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
-          gemini_model: ${{ env.GEMINI_MODEL }}
-          prompt: ${{ steps.gemini_prompt.outputs.text }}
+          gemini_model: ${{ env.EXECUTION_MODEL }}
+          prompt: ${{ steps.gemini_compacted_prompt.outputs.text || steps.gemini_prompt.outputs.text }}
           upload_artifacts: true
 
       - name: Restore protected files
@@ -70,7 +109,7 @@ jobs:
           protected-restore-command: scripts/restore-evolve-protected-files.sh
           violations-file: ${{ runner.temp }}/post-test-violations.txt
           gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
-          gemini-model: ${{ env.GEMINI_MODEL }}
+          gemini-model: ${{ env.EXECUTION_MODEL }}
           artifact-name-prefix: post-test-repair
 
       - name: Advance persistent garden state
@@ -86,7 +125,7 @@ jobs:
           protected-restore-command: scripts/restore-evolve-protected-files.sh
           violations-file: ${{ runner.temp }}/journal-format-violations.txt
           gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
-          gemini-model: ${{ env.GEMINI_MODEL }}
+          gemini-model: ${{ env.EXECUTION_MODEL }}
           artifact-name-prefix: journal-format-repair
 
       - name: Validate and repair summary format
@@ -98,7 +137,7 @@ jobs:
           protected-restore-command: scripts/restore-evolve-protected-files.sh
           violations-file: ${{ runner.temp }}/summary-format-violations.txt
           gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
-          gemini-model: ${{ env.GEMINI_MODEL }}
+          gemini-model: ${{ env.EXECUTION_MODEL }}
           artifact-name-prefix: summary-format-repair
 
       - name: Validate and repair append-only summaries
@@ -110,7 +149,7 @@ jobs:
           protected-restore-command: scripts/restore-evolve-protected-files.sh
           violations-file: ${{ runner.temp }}/summary-append-only-violations.txt
           gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
-          gemini-model: ${{ env.GEMINI_MODEL }}
+          gemini-model: ${{ env.EXECUTION_MODEL }}
           artifact-name-prefix: summary-append-only-repair
 
       - name: Archive old journal entries
@@ -129,6 +168,7 @@ jobs:
         shell: bash
         env:
           EVOLVE_CONTEXT_FILE: ${{ runner.temp }}/evolve-context.md
+          EVOLVE_COMPACTED_CONTEXT_FILE: ${{ runner.temp }}/evolve-context-compacted.md
           EVOLVE_CONTEXT_METADATA_FILE: ${{ runner.temp }}/evolve-context.metadata
         run: scripts/collect-evolve-failure-diagnostics.sh "${{ runner.temp }}/evolve-failure-diagnostics"
 
@@ -146,6 +186,7 @@ jobs:
         shell: bash
         env:
           BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
+          CONTEXT_COMPACTION_OUTCOME: ${{ steps.context_compaction.outcome }}
           GEMINI_OUTCOME: ${{ steps.gemini.outcome }}
           POST_TEST_OUTCOME: ${{ steps.post_test_final.outcome }}
           ADVANCE_GARDEN_OUTCOME: ${{ steps.advance_garden.outcome }}
@@ -171,8 +212,10 @@ jobs:
         if: ${{ always() }}
         shell: bash
         env:
-          GEMINI_MODEL: ${{ env.GEMINI_MODEL }}
+          EXECUTION_MODEL: ${{ env.EXECUTION_MODEL }}
+          CONTEXT_COMPACTION_MODEL: ${{ env.CONTEXT_COMPACTION_MODEL }}
           BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
+          CONTEXT_COMPACTION_OUTCOME: ${{ steps.context_compaction.outcome }}
           GEMINI_OUTCOME: ${{ steps.gemini.outcome }}
           RESTORE_PROTECTED_OUTCOME: ${{ steps.restore_protected.outcome }}
           POST_TEST_OUTCOME: ${{ steps.post_test_final.outcome }}

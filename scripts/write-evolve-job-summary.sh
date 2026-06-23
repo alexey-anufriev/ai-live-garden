@@ -39,11 +39,13 @@ metadata_value() {
   echo "- UTC: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
   echo "- Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
   echo "- Attempt: ${GITHUB_RUN_ATTEMPT:-1}"
-  echo "- Model: $(value_or_dash "${GEMINI_MODEL:-}")"
+  echo "- Execution model: $(value_or_dash "${EXECUTION_MODEL:-}")"
+  echo "- Context compaction model: $(value_or_dash "${CONTEXT_COMPACTION_MODEL:-}")"
   echo
   echo "| Phase | Outcome |"
   echo "| --- | --- |"
   echo "| Baseline test | $(value_or_dash "${BASELINE_TEST_OUTCOME:-}") |"
+  echo "| Context compaction | $(value_or_dash "${CONTEXT_COMPACTION_OUTCOME:-}") |"
   echo "| Gemini autonomous step | $(value_or_dash "${GEMINI_OUTCOME:-}") |"
   echo "| Protected file restore | $(value_or_dash "${RESTORE_PROTECTED_OUTCOME:-}") |"
   echo "| Post-Gemini test validation | $(value_or_dash "${POST_TEST_OUTCOME:-}") |"
@@ -63,6 +65,10 @@ metadata_value() {
   echo
   echo "- Context lines: $(metadata_value EVOLVE_CONTEXT_LINES)"
   echo "- Context bytes: $(metadata_value EVOLVE_CONTEXT_BYTES)"
+  echo "- Compacted prompt lines: $(metadata_value EVOLVE_CONTEXT_COMPACTED_LINES)"
+  echo "- Compacted prompt bytes: $(metadata_value EVOLVE_CONTEXT_COMPACTED_BYTES)"
+  echo "- Compaction digest lines: $(metadata_value EVOLVE_CONTEXT_COMPACTION_DIGEST_LINES)"
+  echo "- Compaction digest bytes: $(metadata_value EVOLVE_CONTEXT_COMPACTION_DIGEST_BYTES)"
   echo "- Warning threshold: $(metadata_value EVOLVE_CONTEXT_WARN_LINES)"
   echo "- Warning threshold exceeded: $(metadata_value EVOLVE_CONTEXT_WARNED)"
   echo "- Recent journal limit: $(metadata_value EVOLVE_CONTEXT_RECENT_JOURNAL_LIMIT)"
@@ -73,6 +79,9 @@ metadata_value() {
   echo "- Latest monthly summary: $(value_or_dash "$(metadata_value EVOLVE_CONTEXT_LATEST_MONTHLY_SUMMARY)")"
   echo "- Latest yearly summary: $(value_or_dash "$(metadata_value EVOLVE_CONTEXT_LATEST_YEARLY_SUMMARY)")"
   echo
+  if [[ "${CONTEXT_COMPACTION_OUTCOME:-}" == "failure" ]]; then
+    echo "Context compaction failed, so the workflow used the raw compact context for the main Gemini call."
+  fi
   if [[ -n "${EVOLVE_CHANGE_DIAGNOSTICS_FILE:-}" && -f "$EVOLVE_CHANGE_DIAGNOSTICS_FILE" ]]; then
     cat "$EVOLVE_CHANGE_DIAGNOSTICS_FILE"
     echo

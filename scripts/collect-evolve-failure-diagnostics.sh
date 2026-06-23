@@ -34,6 +34,10 @@ if [[ -n "${EVOLVE_CONTEXT_FILE:-}" && -f "$EVOLVE_CONTEXT_FILE" ]]; then
   cp "$EVOLVE_CONTEXT_FILE" "$output_dir/evolve-context.md"
 fi
 
+if [[ -n "${EVOLVE_COMPACTED_CONTEXT_FILE:-}" && -f "$EVOLVE_COMPACTED_CONTEXT_FILE" ]]; then
+  cp "$EVOLVE_COMPACTED_CONTEXT_FILE" "$output_dir/evolve-context-compacted.md"
+fi
+
 if [[ -n "${EVOLVE_CONTEXT_METADATA_FILE:-}" && -f "$EVOLVE_CONTEXT_METADATA_FILE" ]]; then
   cp "$EVOLVE_CONTEXT_METADATA_FILE" "$output_dir/evolve-context.metadata"
 fi
@@ -81,5 +85,8 @@ fi
   fi
   if [[ -f "$output_dir/evolve-context.md" ]]; then
     echo "- Full compact context copied to \`evolve-context.md\`"
+  fi
+  if [[ -f "$output_dir/evolve-context-compacted.md" ]]; then
+    echo "- Final compacted context copied to \`evolve-context-compacted.md\`"
   fi
 } > "$output_dir/README.md"

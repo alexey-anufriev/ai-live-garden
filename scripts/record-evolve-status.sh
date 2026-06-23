@@ -9,6 +9,7 @@ mkdir -p agent
   echo "- UTC: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
   echo "- Workflow run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
   echo "- Baseline test outcome: ${BASELINE_TEST_OUTCOME}"
+  echo "- Context compaction outcome: ${CONTEXT_COMPACTION_OUTCOME:-skipped}"
   echo "- Gemini outcome: ${GEMINI_OUTCOME}"
   echo "- Post-change test outcome: ${POST_TEST_OUTCOME}"
   echo "- Garden state advance outcome: ${ADVANCE_GARDEN_OUTCOME}"
