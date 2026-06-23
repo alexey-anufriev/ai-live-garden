@@ -30,6 +30,7 @@ This file is the compact current operating memory for future work on the garden.
   - Newly added 'nutrient-refiner' trait allows animals to gain an extra energy boost when feeding, provided they are not stressed.
   - Newly added 'fungal-root-symbiont' trait allows root networks to more efficiently leverage fungal network activity, enhancing nutrient recycling.
   - Newly added 'mycelial-root-mediator' trait allows animals to enhance root network nutrient contribution when in proximity to fungal networks, completing a tripartite feedback loop between animals, fungi, and root networks.
+  - Newly added 'fungal-attractor' trait allows ROOT_NETWORK organisms to attract animals when in proximity to fungal networks, providing a localized boost to animal energy-gathering efficiency.
 
 
 ## Immediate Directions

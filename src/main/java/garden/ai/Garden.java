@@ -99,6 +99,11 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         return (int) (fungusCount * 2 + decomposerCount * 3 + soilEnricherCount * 5 + networkConnectorCount * connectorBonus + fungalSymbioteCount * 2 + fungalAcceleratorCount * 10 + fungalEnhancerCount * 8 + fungalGardenerCount * 5 + fungalFertilizerCount * 7);
     }
 
+    public int fungalAttractorContribution() {
+        long fungalAttractorCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("fungal-attractor")).count();
+        return (fungalAttractorCount > 0 && fungalContribution() > 0) ? 1 : 0;
+    }
+
     public int mossContribution() {
         return organisms.stream().anyMatch(organism -> organism.type() == OrganismType.MOSS) ? 1 : 0;
     }
@@ -128,9 +133,10 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             nextEvents.add(new GardenEvent(nextCycle, "The nutrient buffer is near exhaustion."));
         }
         int fungalContribution = fungalContribution();
+        int fungalAttractorContribution = fungalAttractorContribution();
         int mossContribution = mossContribution();
         List<Organism> changed = organisms.stream()
-                .map(organism -> passiveChange(organism, environment, nextCycle, nextEvents, fungalContribution, mossContribution))
+                .map(organism -> passiveChange(organism, environment, nextCycle, nextEvents, fungalContribution, fungalAttractorContribution, mossContribution))
                 .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
 
         FeedingResult feeding = feedingPhase(changed, nextCycle, nextEvents);
@@ -170,7 +176,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         return organisms.stream().filter(organism -> organism.type().isAnimal()).count();
     }
 
-    private Organism passiveChange(Organism organism, Environment environment, int cycle, List<GardenEvent> events, int fungalContribution, int mossContribution) {
+    private Organism passiveChange(Organism organism, Environment environment, int cycle, List<GardenEvent> events, int fungalContribution, int fungalAttractorContribution, int mossContribution) {
         Organism changed = organism;
         if (organism.type().isPlant()) {
             int growth = environment.favorsPlants() ? 2 : 0;
@@ -305,6 +311,10 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             if (changed.traits().contains("nutrient-scrounger") && environment.nutrients() < 25) {
                 changed = changed.withEnergy(changed.energy() + 1);
                 events.add(new GardenEvent(cycle, "%s scrounged for nutrients.".formatted(changed.id())));
+            }
+            if (fungalAttractorContribution > 0) {
+                changed = changed.withEnergy(changed.energy() + 1);
+                events.add(new GardenEvent(cycle, "%s was attracted to a fungal-rich area.".formatted(changed.id())));
             }
             changed = changed.withEnergy(changed.energy() - metabolism)
                     .withCuriosity(changed.curiosity() + (cycle % 4 == 0 ? 1 : 0));
@@ -582,7 +592,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
     }
 
     private String mutationTrait(int cycle, Organism organism) {
-        String[] traits = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "sun-seeker", "rain-collector", "nutrient-finder", "nutrient-efficient", "shadow-stepper", "hardy", "water-seeker", "dormancy", "nutrient-weaver", "metabolic-efficiency", "scavenger", "nutrient-sharer", "buffer-resonator", "buffer-scavenger", "nutrient-hoarder", "nutrient-scout", "soil-master", "deep-rooting", "buffer-optimizer", "buffer-tapper", "nutrient-translocator", "camouflaged", "shade-thriver", "moisture-retainer", "nutrient-absorber", "nutrient-synthesizer", "prey-tracker", "resource-tracker", "predator-focus", "nutrient-reclaimer", "nutrient-producer", "nutrient-enricher", "moisture-thriver", "prolific", "cautious-feeder", "nutrient-decomposer", "fungus-soil-enricher", "fungal-network-connector", "fungal-feeder", "mycorrhizal-booster", "nutrient-scrounger", "fungal-symbiote", "nutrient-pump", "nutrient-distributor", "resourceful-breeder", "fungal-enhancer", "mycelial-scavenger", "mycelial-harvester", "mycelial-distributor", "mycelial-resonator", "mycelial-network-scout", "fungal-gardener", "fungal-fertilizer", "nutrient-anticipator", "mycelial-protector", "metabolic-economizer", "spore-disperser", "fungal-root-symbiont", "mycelial-root-mediator"};
+        String[] traits = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "sun-seeker", "rain-collector", "nutrient-finder", "nutrient-efficient", "shadow-stepper", "hardy", "water-seeker", "dormancy", "nutrient-weaver", "metabolic-efficiency", "scavenger", "nutrient-sharer", "buffer-resonator", "buffer-scavenger", "nutrient-hoarder", "nutrient-scout", "soil-master", "deep-rooting", "buffer-optimizer", "buffer-tapper", "nutrient-translocator", "camouflaged", "shade-thriver", "moisture-retainer", "nutrient-absorber", "nutrient-synthesizer", "prey-tracker", "resource-tracker", "predator-focus", "nutrient-reclaimer", "nutrient-producer", "nutrient-enricher", "moisture-thriver", "prolific", "cautious-feeder", "nutrient-decomposer", "fungus-soil-enricher", "fungal-network-connector", "fungal-feeder", "mycorrhizal-booster", "nutrient-scrounger", "fungal-symbiote", "nutrient-pump", "nutrient-distributor", "resourceful-breeder", "fungal-enhancer", "mycelial-scavenger", "mycelial-harvester", "mycelial-distributor", "mycelial-resonator", "mycelial-network-scout", "fungal-gardener", "fungal-fertilizer", "nutrient-anticipator", "mycelial-protector", "metabolic-economizer", "spore-disperser", "fungal-root-symbiont", "mycelial-root-mediator", "fungal-attractor"};
         int index = Math.floorMod(organism.id().hashCode() + cycle + organism.generation(), traits.length);
         return traits[index];
     }

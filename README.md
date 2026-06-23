@@ -86,6 +86,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟢 Stable Integration — Tripartite loop enhanced via new 'mycelial-root-mediator' trait.
-The new 'mycelial-root-mediator' trait allows animals to enhance root network nutrient contribution when in proximity to fungal networks, deepening plant-fungal-animal cooperation.
+**Garden Health:** 🟢 Stable Integration — Tripartite loop and attractor mechanisms active.
+The new 'fungal-attractor' trait allows ROOT_NETWORK organisms to attract animals when in proximity to fungal networks, providing a localized boost to animal energy-gathering efficiency.
 <!-- AI-LIVE-GARDEN:STATE-END -->
