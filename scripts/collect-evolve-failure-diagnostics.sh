@@ -34,6 +34,14 @@ if [[ -n "${EVOLVE_CONTEXT_FILE:-}" && -f "$EVOLVE_CONTEXT_FILE" ]]; then
   cp "$EVOLVE_CONTEXT_FILE" "$output_dir/evolve-context.md"
 fi
 
+if [[ -n "${EVOLVE_CONTEXT_COMPACTION_PROMPT_FILE:-}" && -f "$EVOLVE_CONTEXT_COMPACTION_PROMPT_FILE" ]]; then
+  cp "$EVOLVE_CONTEXT_COMPACTION_PROMPT_FILE" "$output_dir/evolve-context-compaction-prompt.md"
+fi
+
+if [[ -n "${EVOLVE_CONTEXT_COMPACTION_FILE:-}" && -f "$EVOLVE_CONTEXT_COMPACTION_FILE" ]]; then
+  cp "$EVOLVE_CONTEXT_COMPACTION_FILE" "$output_dir/evolve-context-compaction.md"
+fi
+
 if [[ -n "${EVOLVE_COMPACTED_CONTEXT_FILE:-}" && -f "$EVOLVE_COMPACTED_CONTEXT_FILE" ]]; then
   cp "$EVOLVE_COMPACTED_CONTEXT_FILE" "$output_dir/evolve-context-compacted.md"
 fi
@@ -85,6 +93,12 @@ fi
   fi
   if [[ -f "$output_dir/evolve-context.md" ]]; then
     echo "- Full compact context copied to \`evolve-context.md\`"
+  fi
+  if [[ -f "$output_dir/evolve-context-compaction-prompt.md" ]]; then
+    echo "- Context compaction prompt copied to \`evolve-context-compaction-prompt.md\`"
+  fi
+  if [[ -f "$output_dir/evolve-context-compaction.md" ]]; then
+    echo "- Context compaction output copied to \`evolve-context-compaction.md\`"
   fi
   if [[ -f "$output_dir/evolve-context-compacted.md" ]]; then
     echo "- Final compacted context copied to \`evolve-context-compacted.md\`"

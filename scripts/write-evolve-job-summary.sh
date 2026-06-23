@@ -80,7 +80,7 @@ metadata_value() {
   echo "- Latest yearly summary: $(value_or_dash "$(metadata_value EVOLVE_CONTEXT_LATEST_YEARLY_SUMMARY)")"
   echo
   if [[ "${CONTEXT_COMPACTION_OUTCOME:-}" == "failure" ]]; then
-    echo "Context compaction failed, so the workflow used the raw compact context for the main Gemini call."
+    echo "Context compaction failed before the main Gemini call. Check the compaction model id, quota, authentication, or provider availability."
   fi
   if [[ -n "${EVOLVE_CHANGE_DIAGNOSTICS_FILE:-}" && -f "$EVOLVE_CHANGE_DIAGNOSTICS_FILE" ]]; then
     cat "$EVOLVE_CHANGE_DIAGNOSTICS_FILE"
