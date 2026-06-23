@@ -16,4 +16,20 @@ public class FungalRootSymbiontTest {
         
         assertTrue(g2.rootContribution() > g1.rootContribution(), "Symbiont root should contribute more nutrients");
     }
+
+    @Test
+    public void testFungalRootSymbiontEventGenerated() {
+        Environment env = new Environment(50, 50, 50, 50, 50);
+        Organism symRoot = Organism.of("root-2", OrganismType.ROOT_NETWORK, 10, 1, "fungal-root-symbiont");
+        Organism fungus = Organism.of("fungus-1", OrganismType.FUNGUS, 10, 1, "test");
+        
+        Garden g = new Garden(1, 3, env, List.of(symRoot, fungus), List.of());
+        
+        Garden next = g.nextCycle();
+        
+        boolean foundEvent = next.events().stream()
+                .anyMatch(e -> e.description().contains("benefited from its fungal symbiont"));
+        
+        assertTrue(foundEvent, "Should have generated symbiont benefit event");
+    }
 }

@@ -209,6 +209,9 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             if (organism.type() == OrganismType.FERN && changed.traits().contains("hardy") && environment.warmth() > 50) {
                 growth += 1;
             }
+            if (organism.type() == OrganismType.ROOT_NETWORK && changed.traits().contains("fungal-root-symbiont") && fungalContribution > 0) {
+                events.add(new GardenEvent(cycle, "%s benefited from its fungal symbiont.".formatted(changed.id())));
+            }
             if (organism.type() == OrganismType.SPORE && environment.light() < 45) {
                 changed = changed.withCuriosity(changed.curiosity() + 2);
             }

@@ -86,6 +86,5 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟢 Stable Integration — Tripartite loop and attractor mechanisms active.
-The new 'fungal-attractor' trait allows ROOT_NETWORK organisms to attract animals when in proximity to fungal networks. Fungal-root interactions have been verified with new test coverage for `fungal-root-symbiont`.
+**Garden Health:** 🟡 Hungry — Cycle 2494 reached; nutrients are scarce, prompting increased trait adaptation in ROOT_NETWORK and MOSS.
 <!-- AI-LIVE-GARDEN:STATE-END -->
