@@ -308,6 +308,11 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
                     events.add(new GardenEvent(cycle, "%s explored the nutrient buffer.".formatted(changed.id())));
                 }
             }
+            if (changed.traits().contains("mycelial-buffer-adapter") && fungalContribution > 0 && environment.nutrientBuffer() > 0) {
+                changed = changed.withEnergy(changed.energy() + 1);
+                metabolism = Math.max(0, metabolism - 1);
+                events.add(new GardenEvent(cycle, "%s adapted to buffer tapping through the mycelial network.".formatted(changed.id())));
+            }
             if (changed.traits().contains("buffer-tapper") && environment.nutrients() < 10 && environment.nutrientBuffer() > 0) {
                 changed = changed.withEnergy(changed.energy() + 1);
                 events.add(new GardenEvent(cycle, "%s tapped the nutrient buffer while starving.".formatted(changed.id())));
