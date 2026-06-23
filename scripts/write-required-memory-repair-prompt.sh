@@ -29,10 +29,12 @@ delimiter="REQUIRED_MEMORY_REPAIR_PROMPT_$(date +%s)_${RANDOM}"
   echo
   echo '1. Update `agent/state.md` by rewriting stale current-memory sections in place. Keep it compact and current; do not append a run log.'
   echo '2. Update only the `README.md` Current Garden State block between `<!-- AI-LIVE-GARDEN:STATE-START -->` and `<!-- AI-LIVE-GARDEN:STATE-END -->`.'
-  echo '3. Keep the README health line shaped as `**Garden Health:** SYMBOL Status — one short reason.`'
-  echo '4. Ground both files in the current repository state and `data/garden-state.txt`; do not claim absent organisms or effects as current activity.'
-  echo '5. Do not modify protected files, workflows, archives, old journal entries, or unrelated source code.'
-  echo '6. Run `scripts/validate-required-memory-updates.sh` before finishing.'
+  echo '3. The first non-empty README state-block line must be shaped as `**Garden Health:** SYMBOL Status — one short reason.`'
+  echo '4. Use only one of these README health statuses: `Flourishing`, `Stable`, `Strained`, `Critical`, or `Dormant`.'
+  echo '5. The second non-empty README state-block line must be one short public-facing narrative sentence describing the current garden situation.'
+  echo '6. Ground both files in the current repository state and `data/garden-state.txt`; do not claim absent organisms or effects as current activity.'
+  echo '7. Do not modify protected files, workflows, archives, old journal entries, or unrelated source code.'
+  echo '8. Run `scripts/validate-required-memory-updates.sh` before finishing.'
   echo
   echo "Useful sources:"
   echo
