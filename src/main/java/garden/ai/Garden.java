@@ -97,7 +97,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         long mycelialSynergizerCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("mycelial-synergizer")).count();
 
         int connectorBonus = (rootNetworkCount > 0) ? 6 : 4;
-        int synergizerBonus = (mycelialSynergizerCount > 0) ? 5 : 0;
+        int synergizerBonus = (mycelialSynergizerCount > 0 && fungusCount > 0) ? 5 : 0;
 
         return (int) (fungusCount * 2 + decomposerCount * 3 + soilEnricherCount * 5 + networkConnectorCount * connectorBonus + fungalSymbioteCount * 2 + fungalAcceleratorCount * 10 + fungalEnhancerCount * 8 + fungalGardenerCount * 5 + fungalFertilizerCount * 7) + synergizerBonus;
     }

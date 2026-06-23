@@ -75,4 +75,13 @@ public class FungalContributionTest {
         // Count: 1 FUNGUS (2), 1 decomposer (3), 1 synergizer (5 bonus) = 10
         assertEquals(10, garden.fungalContribution());
     }
+
+    @Test
+    public void testFungalContributionWithMycelialSynergizerNoFungus() {
+        Organism root1 = Organism.of("root-1", OrganismType.ROOT_NETWORK, 10, 1, "mycelial-synergizer");
+        Garden garden = new Garden(1, 1, new Environment(50, 50, 50, 50, 50), List.of(root1), List.of());
+        
+        // Should be 0 since no fungi are present to contribute.
+        assertEquals(0, garden.fungalContribution());
+    }
 }
