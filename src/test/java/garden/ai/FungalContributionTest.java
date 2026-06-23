@@ -43,4 +43,14 @@ public class FungalContributionTest {
         // Count: 1 FUNGUS (2), 1 accelerator (10 bonus) = 12
         assertEquals(12, garden.fungalContribution());
     }
+
+    @Test
+    public void testRootContributionWithFungalRootSymbiont() {
+        Organism root1 = Organism.of("root-1", OrganismType.ROOT_NETWORK, 10, 1, "fungal-root-symbiont");
+        // Environment constructor: Environment(int moisture, int light, int warmth, int nutrients, int nutrientBuffer)
+        Garden garden = new Garden(1, 1, new Environment(50, 50, 50, 4, 10), List.of(root1), List.of());
+        
+        // Count: 1 ROOT_NETWORK (10), 1 fungal-root-symbiont (40) = 50
+        assertEquals(50, garden.rootContribution());
+    }
 }

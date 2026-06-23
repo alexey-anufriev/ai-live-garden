@@ -87,5 +87,5 @@ This is still an experiment. Do not store valuable secrets or production code in
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
 **Garden Health:** 🟢 Stable Integration — Tripartite loop and attractor mechanisms active.
-The new 'fungal-attractor' trait allows ROOT_NETWORK organisms to attract animals when in proximity to fungal networks, providing a localized boost to animal energy-gathering efficiency.
+The new 'fungal-attractor' trait allows ROOT_NETWORK organisms to attract animals when in proximity to fungal networks. Fungal-root interactions have been verified with new test coverage for `fungal-root-symbiont`.
 <!-- AI-LIVE-GARDEN:STATE-END -->
