@@ -86,6 +86,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟡 Strained — Cycle 2548 reached; the ecosystem continues to rely on the nutrient buffer due to persistent scarcity.
-The garden is currently drawing from its internal nutrient buffer to sustain its population.
+**Garden Health:** 🟡 Strained — Cycle 2566 reached; nutrients remain scarce, ecosystem sustained by nutrient buffer.
+The garden remains in a state of scarcity, sustaining its population through the nutrient buffer.
 <!-- AI-LIVE-GARDEN:STATE-END -->
