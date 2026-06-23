@@ -86,5 +86,6 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟡 Hungry — Cycle 2494 reached; nutrients are scarce, prompting increased trait adaptation in ROOT_NETWORK and MOSS.
+**Garden Health:** 🟡 Strained — Cycle 2512 reached; the ecosystem continues to rely on the nutrient buffer due to persistent scarcity.
+The garden persists by leveraging its internal storage while awaiting new nutrient sources.
 <!-- AI-LIVE-GARDEN:STATE-END -->

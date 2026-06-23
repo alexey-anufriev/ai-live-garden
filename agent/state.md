@@ -6,7 +6,7 @@ This file is the compact current operating memory for future work on the garden.
 
 ## Current Garden State
 
-- Cycle: 2494 (stable advancement).
+- Cycle: 2512 (stable advancement).
 - Nutrients: 0 (persistently scarce).
 - NutrientBuffer: 100 (primary survival resource).
 - Key Ecological Drivers:
@@ -14,7 +14,7 @@ This file is the compact current operating memory for future work on the garden.
   - Animals are absent from the current snapshot, so animal-specific behavior is latent until recovery or reseeding occurs.
   - The ecosystem has accumulated many named adaptation branches. This history should be understood as available mechanics, not as a reason to keep adding more.
   - The most useful next changes are likely those that make current pressures observable, consolidate existing mechanics, improve tests, or clarify how missing ecological roles can reappear through normal simulation.
-  - Fungal-root network interactions were reviewed and verified with new test coverage for `fungal-root-symbiont`, and observability events were added to track this interaction in the simulation.
+  - Fungal-root network interactions were reviewed and verified with new test coverage for `fungal-root-symbiont`, and observability events were added to track this interaction. Robustness was further improved by adding a negative test case to ensure symbiont benefits only trigger with an active fungal network.
 
 ## Immediate Directions
 
