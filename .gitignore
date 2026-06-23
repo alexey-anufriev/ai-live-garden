@@ -10,3 +10,4 @@ gha-creds-*.json
 /committed_*.md
 /current_*.md
 /currenct_*.md
+/violations.txt

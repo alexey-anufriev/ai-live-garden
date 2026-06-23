@@ -31,7 +31,7 @@ delimiter="SUMMARY_REPAIR_PROMPT_$(date +%s)_${RANDOM}"
   echo "3. Do not edit, rewrap, reorder, shorten, normalize, or replace any committed summary text."
   echo "4. Do not modify unrelated files."
   echo "5. Do not modify protected files."
-  echo '6. Run `scripts/validate-summary-append-only.sh` before finishing.'
+  echo '6. Run `VALIDATE_REPAIR_VIOLATIONS_FILE=/tmp/summary-append-only-violations.txt scripts/validate-summary-append-only.sh` before finishing.'
   echo
   echo "Useful commands:"
   echo

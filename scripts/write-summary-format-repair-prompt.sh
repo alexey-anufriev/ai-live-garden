@@ -33,7 +33,7 @@ delimiter="SUMMARY_FORMAT_REPAIR_PROMPT_$(date +%s)_${RANDOM}"
   echo '4. Do not leave `{{PLACEHOLDER}}` text.'
   echo "5. Preserve the existing meaning of each summary entry."
   echo "6. Do not modify protected files."
-  echo '7. Run `scripts/validate-summary-format.sh` before finishing.'
+  echo '7. Run `VALIDATE_REPAIR_VIOLATIONS_FILE=/tmp/summary-format-violations.txt scripts/validate-summary-format.sh` before finishing.'
   echo
   echo "Finish when summary format validation passes."
   echo "${delimiter}"

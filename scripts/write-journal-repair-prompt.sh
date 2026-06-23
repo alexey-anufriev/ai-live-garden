@@ -35,7 +35,7 @@ delimiter="JOURNAL_REPAIR_PROMPT_$(date +%s)_${RANDOM}"
   echo '6. Use an ISO-8601 UTC timestamp with seconds, such as `YYYY-MM-DDTHH:MM:SSZ`.'
   echo "7. Do not edit unrelated journal files."
   echo "8. Do not modify protected files."
-  echo '9. Run `scripts/validate-journal-format.sh` before finishing.'
+  echo '9. Run `VALIDATE_REPAIR_VIOLATIONS_FILE=/tmp/journal-format-violations.txt scripts/validate-journal-format.sh` before finishing.'
   echo "10. The journal must describe the final state of the current run, not a stale intermediate state."
   echo '11. If post-change test validation succeeded, the journal test-result section must start with `Passed` or `Success`.'
   echo '12. The `## Files changed` section must list every currently changed path from `git diff --name-only HEAD` and `git ls-files --others --exclude-standard`, excluding `agent/journal/archive/`.'

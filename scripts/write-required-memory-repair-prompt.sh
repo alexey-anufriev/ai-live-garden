@@ -34,7 +34,7 @@ delimiter="REQUIRED_MEMORY_REPAIR_PROMPT_$(date +%s)_${RANDOM}"
   echo '5. The second non-empty README state-block line must be one short public-facing narrative sentence describing the current garden situation.'
   echo '6. Ground both files in the current repository state and `data/garden-state.txt`; do not claim absent organisms or effects as current activity.'
   echo '7. Do not modify protected files, workflows, archives, old journal entries, or unrelated source code.'
-  echo '8. Run `scripts/validate-required-memory-updates.sh` before finishing.'
+  echo '8. Run `VALIDATE_REPAIR_VIOLATIONS_FILE=/tmp/required-memory-violations.txt scripts/validate-required-memory-updates.sh` before finishing.'
   echo
   echo "Useful sources:"
   echo

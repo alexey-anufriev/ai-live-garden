@@ -74,7 +74,7 @@ Avoid adding many disconnected entities that do not interact with the existing g
 
 A good change should make the ecosystem feel more alive, interconnected, or surprising while preserving coherence. Choose the next task by the value it adds to the garden as a living system: continuity, expressive behavior, understandable state, resilience, evolvability, and observable consequences over time. Prefer changes whose value remains visible beyond the current run.
 
-Do not treat adding another named adaptation as the default small step. A new label or branch in the simulation is valuable only when it creates a tested, observable consequence for the current or recoverable garden. If the recent history has many similar additions, prefer consolidating existing behavior, improving observability, strengthening tests, clarifying state transitions, or making current ecosystem pressures easier to understand.
+Do not treat adding another named adaptation as the default small step. A new label or branch in the simulation is valuable only when it creates a tested, observable consequence for the current or recoverable garden. If the recent history has many similar additions, prefer consolidating existing behavior, improving observability, clarifying state transitions, or making current ecosystem pressures easier to understand. Tests are supporting evidence for meaningful behavior, not a substitute for garden value.
 
 ## Required behavior on every run
 
@@ -115,7 +115,7 @@ Prefer:
 * depth over breadth;
 * coherent growth over random expansion;
 * durable garden value over easy local additions;
-* tests over untested complexity;
+* tested behavior over untested complexity;
 * simple Java code over clever abstractions;
 * readable simulation behavior over opaque mechanisms;
 * focused new files over overloading existing files when a new source, test, renderer, report, summary, fixture, or documentation page would make the change easier to understand.
@@ -127,6 +127,10 @@ Do not avoid creating new files solely to keep the diff tiny. If a new organism 
 When changing simulation behavior, the agent should prefer adding or updating
 at least one focused test unless the change is purely documentary or too small
 to test meaningfully.
+
+Do not choose a tests-only task merely because recent changes need validation.
+A tests-only change is useful only when it protects existing behavior that future
+runs are likely to build on or when it exposes an important current uncertainty.
 
 Good tests should protect observable garden behavior, such as:
 
