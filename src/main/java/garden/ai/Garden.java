@@ -68,7 +68,8 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         long nutrientPumpCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("nutrient-pump")).count();
         long nutrientDistributorCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("nutrient-distributor")).count();
         long fungalRootSymbiontCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("fungal-root-symbiont")).count();
-        long mycelialRootMediatorCount = organisms.stream().filter(organism -> organism.type().isAnimal() && organism.traits().contains("mycelial-root-mediator")).count();
+        long fungusCount = organisms.stream().filter(organism -> organism.type() == OrganismType.FUNGUS).count();
+        long mycelialRootMediatorCount = (fungusCount > 0) ? organisms.stream().filter(organism -> organism.type().isAnimal() && organism.traits().contains("mycelial-root-mediator")).count() : 0;
         
         if (environment.nutrients() < 5) {
             return (int) (rootNetworkCount * 10 + nutrientWeaverCount * 10 + nutrientSharerCount * 20 + bufferOptimizerCount * 20 + soilMasterCount * 30 + nutrientRecyclerCount * 10 + nutrientTranslocatorCount * 40 + nutrientSynthesizerCount * 30 + nutrientReclaimerCount * 25 + nutrientProducerCount * 50 + nutrientPumpCount * 60 + nutrientDistributorCount * 40 + fungalRootSymbiontCount * 40 + mycelialRootMediatorCount * 20);
