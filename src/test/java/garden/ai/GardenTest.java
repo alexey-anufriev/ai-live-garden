@@ -16,10 +16,10 @@ class GardenTest {
         assertThat(stable.diagnostic()).isEqualTo("stable");
 
         Environment exhausted = new Environment(50, 50, 50, 5, 5);
-        assertThat(exhausted.diagnostic()).isEqualTo("exhausted (low buffer, release=1)");
+        assertThat(exhausted.diagnostic()).isEqualTo("exhausted (low buffer, release=1, rate=5)");
 
         Environment buffered = new Environment(50, 50, 50, 5, 50);
-        assertThat(buffered.diagnostic()).isEqualTo("buffer-supported (low nutrients, release=10)");
+        assertThat(buffered.diagnostic()).isEqualTo("buffer-supported (low nutrients, release=10, rate=5)");
     }
 
     @Test
