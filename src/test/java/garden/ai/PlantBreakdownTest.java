@@ -12,5 +12,11 @@ class PlantBreakdownTest {
 
         assertThat(next.events()).anySatisfy(event -> 
             assertThat(event.description()).contains("Plant breakdown:"));
+        assertThat(next.events()).anySatisfy(event -> 
+            assertThat(event.description()).contains("Nutrient change breakdown:"));
+        assertThat(next.events()).anySatisfy(event -> {
+            assertThat(event.description()).contains("moss=");
+            assertThat(event.description()).contains("fern=");
+        });
     }
 }
