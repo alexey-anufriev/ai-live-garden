@@ -45,6 +45,10 @@ jobs:
           scripts/build-agent-context.sh "${RUNNER_TEMP}/agent-context.md"
           scripts/write-output-file.sh text "${RUNNER_TEMP}/agent-context.md"
 
+      - name: Record Gemini model diagnostics
+        shell: bash
+        run: scripts/write-gemini-model-diagnostics.sh
+
       - name: Build context compaction prompt
         id: context_compaction_prompt
         if: ${{ env.CONTEXT_COMPACTION_MODEL != '' }}
