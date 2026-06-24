@@ -12,7 +12,7 @@ class EnvironmentTest {
         // releaseRate = 10 (nutrients 50 >= 10).
         // released = 100 / 10 = 10.
         // newNutrients = 50 - 18 + 10 = 42.
-        Environment next = env.next(1, 100, 0, 0, 0);
+        Environment next = env.next(1, 100, 0, 0, 0, 0);
         assertThat(next.nutrients()).isEqualTo(42);
     }
 }

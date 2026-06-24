@@ -129,12 +129,13 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         long sporeCount = organisms.stream().filter(o -> o.type() == OrganismType.SPORE).count();
         long rootNetworkCount = organisms.stream().filter(o -> o.type() == OrganismType.ROOT_NETWORK).count();
         long fungusCount = organisms.stream().filter(o -> o.type() == OrganismType.FUNGUS).count();
+        long conserverCount = organisms.stream().filter(o -> o.type().isPlant() && o.traits().contains("nutrient-conserver")).count();
         
-        Environment nextEnvironment = environment.next(nextCycle, (int) plantCount, (int) animalCount, rootContribution(), fungalContribution());
+        Environment nextEnvironment = environment.next(nextCycle, (int) plantCount, (int) animalCount, rootContribution(), fungalContribution(), (int) (conserverCount / 10));
         List<GardenEvent> nextEvents = new ArrayList<>(events);
         
         int production = 2 + (int)animalCount / 2;
-        int consumption = (int)plantCount / 5;
+        int consumption = (int)Math.max(0, plantCount / 5 - (int) (conserverCount / 10));
         nextEvents.add(new GardenEvent(nextCycle, "Nutrient change breakdown: prod=%d, cons=%d".formatted(production, consumption)));
         nextEvents.add(new GardenEvent(nextCycle, "Plant breakdown: moss=%d, fern=%d, spore=%d, roots=%d, fungus=%d".formatted(mossCount, fernCount, sporeCount, rootNetworkCount, fungusCount)));
 
