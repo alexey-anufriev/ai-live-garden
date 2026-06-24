@@ -63,10 +63,12 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
         if (nutrients >= 25) {
             return "stable";
         }
+        int releaseRate = nutrients < 5 ? 2 : (nutrients < 10 ? 5 : 10);
+        int released = nutrientBuffer / releaseRate;
         if (nutrientBuffer < 10) {
-            return "exhausted (low buffer)";
+            return "exhausted (low buffer, release=%d)".formatted(released);
         }
-        return "buffer-supported (low nutrients)";
+        return "buffer-supported (low nutrients, release=%d)".formatted(released);
     }
 
     /**
