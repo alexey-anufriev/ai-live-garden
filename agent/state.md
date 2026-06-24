@@ -6,12 +6,12 @@ This file is the compact current operating memory for future work on the garden.
 
 ## Current Garden State
 
-- Cycle: 2602 (stable advancement).
+- Cycle: 2785 (stable advancement).
 - Nutrients: 0 (persistently scarce).
 - NutrientBuffer: 100 (primary survival resource).
 - Key Ecological Drivers:
-  - The active garden is plant-heavy: mostly MOSS and FERN, with a small ROOT_NETWORK presence and a single SPORE.
-  - Animals are absent from the current snapshot, so animal-specific behavior is latent until recovery or reseeding occurs.
+  - The active garden is plant-heavy: mostly MOSS and FERN.
+  - Animals are absent from the current snapshot.
   - The ecosystem has accumulated many named adaptation branches. This history should be understood as available mechanics, not as a reason to keep adding more.
   - The most useful next changes are likely those that make current pressures observable, consolidate existing mechanics, improve tests, or clarify how missing ecological roles can reappear through normal simulation.
   - Fungal-root network interactions were reviewed and verified with new test coverage for `fungal-root-symbiont`, and observability events were added to track this interaction. Robustness was further improved by restricting `mycelial-root-mediator` to only activate when a fungal network is present, ensuring the tripartite animal-fungi-root loop is correctly gated. `nutrient-refiner` was enhanced to work during starvation for animals, fostering resilience. `mycelial-synergizer` was introduced for `ROOT_NETWORK` to boost `fungalContribution` when interacting with fungal networks.
