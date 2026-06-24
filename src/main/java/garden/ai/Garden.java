@@ -126,6 +126,11 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         
         Environment nextEnvironment = environment.next(nextCycle, (int) plantCount, (int) animalCount, rootContribution(), fungalContribution());
         List<GardenEvent> nextEvents = new ArrayList<>(events);
+        
+        int production = 2 + (int)animalCount / 2;
+        int consumption = (int)plantCount / 5;
+        nextEvents.add(new GardenEvent(nextCycle, "Nutrient change breakdown: prod=%d, cons=%d".formatted(production, consumption)));
+
         if (nextEnvironment.nutrients() < environment.nutrients()) {
             nextEvents.add(new GardenEvent(nextCycle, "Nutrients are depleted by the plant population."));
         }
