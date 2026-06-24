@@ -124,12 +124,19 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         long plantCount = organisms.stream().filter(organism -> organism.type().isPlant()).count();
         long animalCount = organisms.stream().filter(organism -> organism.type().isAnimal()).count();
         
+        long mossCount = organisms.stream().filter(o -> o.type() == OrganismType.MOSS).count();
+        long fernCount = organisms.stream().filter(o -> o.type() == OrganismType.FERN).count();
+        long sporeCount = organisms.stream().filter(o -> o.type() == OrganismType.SPORE).count();
+        long rootNetworkCount = organisms.stream().filter(o -> o.type() == OrganismType.ROOT_NETWORK).count();
+        long fungusCount = organisms.stream().filter(o -> o.type() == OrganismType.FUNGUS).count();
+        
         Environment nextEnvironment = environment.next(nextCycle, (int) plantCount, (int) animalCount, rootContribution(), fungalContribution());
         List<GardenEvent> nextEvents = new ArrayList<>(events);
         
         int production = 2 + (int)animalCount / 2;
         int consumption = (int)plantCount / 5;
         nextEvents.add(new GardenEvent(nextCycle, "Nutrient change breakdown: prod=%d, cons=%d".formatted(production, consumption)));
+        nextEvents.add(new GardenEvent(nextCycle, "Plant breakdown: moss=%d, fern=%d, spore=%d, roots=%d, fungus=%d".formatted(mossCount, fernCount, sporeCount, rootNetworkCount, fungusCount)));
 
         if (nextEnvironment.nutrients() < environment.nutrients()) {
             nextEvents.add(new GardenEvent(nextCycle, "Nutrients are depleted by the plant population."));
