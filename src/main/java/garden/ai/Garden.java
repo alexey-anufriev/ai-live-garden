@@ -137,6 +137,9 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         if (nextEnvironment.nutrientBuffer() < environment.nutrientBuffer()) {
             nextEvents.add(new GardenEvent(nextCycle, "Nutrients released from the buffer."));
         }
+        int releaseRate = nextEnvironment.nutrients() < 5 ? 2 : (nextEnvironment.nutrients() < 10 ? 5 : 10);
+        int releasedFromBuffer = environment.nutrientBuffer() / releaseRate;
+        nextEvents.add(new GardenEvent(nextCycle, "Buffer release stats: rate=%d, released=%d".formatted(releaseRate, releasedFromBuffer)));
         if (plantCount > 200 && nextEnvironment.nutrients() < 10) {
             nextEvents.add(new GardenEvent(nextCycle, "High population pressure is straining nutrient reserves."));
         }

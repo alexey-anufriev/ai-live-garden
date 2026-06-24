@@ -6,7 +6,7 @@ This file is the compact current operating memory for future work on the garden.
 
 ## Current Garden State
 
-- Cycle: 2803 (stable advancement).
+- Cycle: 2831 (stable advancement).
 - Nutrients: 0 (persistently scarce).
 - NutrientBuffer: 100 (primary survival resource).
 - Key Ecological Drivers:
@@ -14,7 +14,8 @@ This file is the compact current operating memory for future work on the garden.
   - Animals are absent from the current snapshot.
   - The ecosystem has accumulated many named adaptation branches. This history should be understood as available mechanics, not as a reason to keep adding more.
   - The most useful next changes are likely those that make current pressures observable, consolidate existing mechanics, improve tests, or clarify how missing ecological roles can reappear through normal simulation.
-  - Fungal-root network interactions were reviewed and verified with new test coverage for `fungal-root-symbiont`, and observability events were added to track this interaction. Robustness was further improved by restricting `mycelial-root-mediator` to only activate when a fungal network is present, ensuring the tripartite animal-fungi-root loop is correctly gated. `nutrient-refiner` was enhanced to work during starvation for animals, fostering resilience. `mycelial-synergizer` was introduced for `ROOT_NETWORK` to boost `fungalContribution` when interacting with fungal networks.
+  - Fungal-root network interactions were reviewed and verified. `nutrient-refiner` was enhanced. `mycelial-synergizer` was introduced.
+  - **Diagnostic Improvement:** Added explicit logging of nutrient buffer release stats (rate and amount) to the event stream to better diagnose the chronic nutrient scarcity and bottleneck of the buffer release.
 
 ## Immediate Directions
 
