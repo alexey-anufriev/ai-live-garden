@@ -22,6 +22,10 @@ inputs:
     description: Gemini model used for repair attempts.
     required: false
     default: gemini-3.1-flash-lite
+  gemini-settings-file:
+    description: Repository path to Gemini CLI settings JSON used for repair attempts.
+    required: false
+    default: .github/gemini-cli-settings.json
   upload-artifacts:
     description: Whether to upload uniquely named artifacts for Gemini repair attempts.
     required: false
@@ -33,6 +37,13 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Load Gemini settings
+      id: gemini_settings
+      shell: bash
+      env:
+        GEMINI_SETTINGS_FILE: ${{ inputs.gemini-settings-file }}
+      run: scripts/write-output-file.sh settings "$GEMINI_SETTINGS_FILE"
+
     - name: Validate
       id: validate_initial
       continue-on-error: true
@@ -77,6 +88,7 @@ runs:
         gemini_api_key: ${{ inputs.gemini-api-key }}
         gemini_model: ${{ inputs.gemini-model }}
         prompt: ${{ steps.repair_prompt_1.outputs.text }}
+        settings: ${{ steps.gemini_settings.outputs.settings }}
         upload_artifacts: false
 
     - name: Upload repair artifacts 1
@@ -137,6 +149,7 @@ runs:
         gemini_api_key: ${{ inputs.gemini-api-key }}
         gemini_model: ${{ inputs.gemini-model }}
         prompt: ${{ steps.repair_prompt_2.outputs.text }}
+        settings: ${{ steps.gemini_settings.outputs.settings }}
         upload_artifacts: false
 
     - name: Upload repair artifacts 2
@@ -197,6 +210,7 @@ runs:
         gemini_api_key: ${{ inputs.gemini-api-key }}
         gemini_model: ${{ inputs.gemini-model }}
         prompt: ${{ steps.repair_prompt_3.outputs.text }}
+        settings: ${{ steps.gemini_settings.outputs.settings }}
         upload_artifacts: false
 
     - name: Upload repair artifacts 3

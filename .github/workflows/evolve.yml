@@ -25,6 +25,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Load Gemini CLI settings
+        id: gemini_cli_settings
+        shell: bash
+        run: scripts/write-output-file.sh settings .github/gemini-cli-settings.json
+
       - name: Set up Java
         uses: actions/setup-java@v5
         with:
@@ -67,6 +72,7 @@ jobs:
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
           gemini_model: ${{ env.CONTEXT_COMPACTION_MODEL }}
           prompt: ${{ steps.context_compaction_prompt.outputs.text }}
+          settings: ${{ steps.gemini_cli_settings.outputs.settings }}
           upload_artifacts: false
 
       - name: Restore workspace after context compaction
@@ -105,6 +111,7 @@ jobs:
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
           gemini_model: ${{ env.EXECUTION_MODEL }}
           prompt: ${{ steps.selected_gemini_prompt.outputs.text }}
+          settings: ${{ steps.gemini_cli_settings.outputs.settings }}
           upload_artifacts: true
 
       - name: Restore protected files

@@ -22,6 +22,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Load Gemini CLI settings
+        id: gemini_cli_settings
+        shell: bash
+        run: scripts/write-output-file.sh settings .github/gemini-cli-settings.json
+
       - name: Prepare story context
         id: story_context
         shell: bash
@@ -37,6 +42,7 @@ jobs:
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
           gemini_model: gemini-3.1-flash-lite
           prompt: ${{ steps.story_context.outputs.text }}
+          settings: ${{ steps.gemini_cli_settings.outputs.settings }}
           upload_artifacts: true
 
       - name: Restore protected files
