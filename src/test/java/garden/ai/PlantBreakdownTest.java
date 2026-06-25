@@ -32,4 +32,17 @@ class PlantBreakdownTest {
 
         assertThat(diagnostic).contains("consumption=30 [moss=20, fern=10]");
     }
+
+    @Test
+    void testDiagnosticBreakdown_HighConsumption() {
+        // Create a hungry environment with high plant counts
+        Environment env = new Environment(50, 50, 50, 5, 100);
+        // mossCount = 5000, fernCount = 1000, consumptionReduction = 0, mobilizerCount = 0
+        // mossConsumption = 5000 / 5 = 1000
+        // fernConsumption = 1000 / 5 = 200
+        // total consumption = 1200
+        String diagnostic = env.diagnostic(5000, 1000, 0, 0);
+
+        assertThat(diagnostic).contains("consumption=1200 [moss=1000, fern=200]");
+    }
 }
