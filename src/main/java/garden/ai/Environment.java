@@ -61,22 +61,23 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
     /**
      * Provides a diagnostic insight when the environment is hungry.
      */
-    public String diagnostic() {
+    public String diagnostic(int mobilizerCount) {
         if (nutrients >= 25) {
             return "stable";
         }
         int releaseRate = nutrients < 5 ? 2 : (nutrients < 10 ? 5 : 10);
+        releaseRate = Math.max(1, releaseRate - mobilizerCount);
         int released = nutrientBuffer / releaseRate;
         if (nutrientBuffer < 10) {
-            return "exhausted (low buffer, release=%d, rate=%d)".formatted(released, releaseRate);
+            return "exhausted (low buffer, release=%d, rate=%d, mobilizers=%d)".formatted(released, releaseRate, mobilizerCount);
         }
-        return "buffer-supported (low nutrients, release=%d, rate=%d)".formatted(released, releaseRate);
+        return "buffer-supported (low nutrients, release=%d, rate=%d, mobilizers=%d)".formatted(released, releaseRate, mobilizerCount);
     }
 
     /**
      * Provides a detailed diagnostic insight when the environment is hungry, including consumption info.
      */
-    public String diagnostic(long mossCount, long fernCount, int consumptionReduction) {
+    public String diagnostic(long mossCount, long fernCount, int consumptionReduction, int mobilizerCount) {
         if (nutrients >= 25) {
             return "stable";
         }
@@ -85,11 +86,12 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
         int consumption = mossConsumption + fernConsumption;
         
         int releaseRate = nutrients < 5 ? 2 : (nutrients < 10 ? 5 : 10);
+        releaseRate = Math.max(1, releaseRate - mobilizerCount);
         int released = nutrientBuffer / releaseRate;
         
         String bufferInfo = (nutrientBuffer < 10) ? "exhausted" : "buffer-supported";
-        return "%s (nutrients=%d, buffer=%d, release=%d, consumption=%d [moss=%d, fern=%d])".formatted(
-            bufferInfo, nutrients, nutrientBuffer, released, consumption, mossConsumption, fernConsumption);
+        return "%s (nutrients=%d, buffer=%d, release=%d, consumption=%d [moss=%d, fern=%d], mobilizers=%d)".formatted(
+            bufferInfo, nutrients, nutrientBuffer, released, consumption, mossConsumption, fernConsumption, mobilizerCount);
     }
 
     /**

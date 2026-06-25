@@ -6,7 +6,7 @@ This file is the compact current operating memory for future work on the garden.
 
 ## Current Garden State
 
-- Cycle: 3194
+- Cycle: 3212
 - Nutrients: 0 (persistently scarce).
 - NutrientBuffer: 100 (primary survival resource).
 - Key Ecological Drivers:
@@ -15,7 +15,7 @@ This file is the compact current operating memory for future work on the garden.
   - The ecosystem has accumulated many named adaptation branches. This history should be understood as available mechanics, not as a reason to keep adding more.
   - The most useful next changes are likely those that make current pressures observable, consolidate existing mechanics, improve tests, or clarify how missing ecological roles can reappear through normal simulation.
   - Fungal-root network interactions were reviewed and verified. `nutrient-refiner` was enhanced. `mycelial-synergizer` was introduced.
-  - **Diagnostic Improvement:** Added explicit logging of nutrient buffer release stats (rate and amount) to the event stream, and enhanced the `Environment.diagnostic()` method to include explicit nutrient buffer release rates and granular nutrient consumption breakdown.
+  - **Diagnostic Improvement:** Enhanced `Environment.diagnostic()` to explicitly include the `mobilizerCount` in its calculations and output string, providing precise observability into how mobilizers affect the nutrient buffer release rate.
   - **Observability Upgrade:** Added a granular breakdown of the plant population (moss, fern, spore, root-networks, fungus) to the cycle event log. Added granular nutrient consumption breakdown by MOSS and FERN population in cycle logs to better analyze the drivers of persistent nutrient scarcity. Added detailed buffer release logging, including base rate, mobilizer count, and effective release rate, to the event stream.
   - **Enhanced Observability:** Updated `Environment.diagnostic()` to accept granular counts of MOSS and FERN populations, providing a more detailed breakdown of consumption in diagnostic strings for improved bottleneck identification.
 - **Ecological Resilience:** Implemented `nutrient-conserver` trait for plants to reduce system-wide nutrient consumption under scarcity.
