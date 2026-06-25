@@ -11,5 +11,8 @@ gha-creds-*.json
 /current_*.md
 /currenct_*.md
 /violations.txt
+/agent/last-run.md
+/fix_readme.py
+/line.txt
 
 .local
