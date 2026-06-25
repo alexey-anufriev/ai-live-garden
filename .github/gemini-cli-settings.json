@@ -11,26 +11,68 @@
     "modelChains": {
       "lite": [
         {
-          "model": "gemini-3.1-flash-lite"
+          "model": "gemini-3.1-flash-lite",
+          "actions": {
+            "terminal": "silent",
+            "transient": "silent",
+            "not_found": "silent",
+            "unknown": "silent"
+          }
         },
         {
-          "model": "gemini-3.5-flash"
+          "model": "gemini-3.5-flash",
+          "actions": {
+            "terminal": "silent",
+            "transient": "silent",
+            "not_found": "silent",
+            "unknown": "silent"
+          }
         },
         {
-          "model": "gemini-3-flash-preview"
+          "model": "gemini-3-flash-preview",
+          "actions": {
+            "terminal": "silent",
+            "transient": "silent",
+            "not_found": "silent",
+            "unknown": "silent"
+          }
         },
         {
-          "model": "gemini-2.5-flash-lite"
+          "model": "gemini-2.5-flash-lite",
+          "actions": {
+            "terminal": "silent",
+            "transient": "silent",
+            "not_found": "silent",
+            "unknown": "silent"
+          }
         },
         {
-          "model": "gemini-2.5-flash"
+          "model": "gemini-2.5-flash",
+          "actions": {
+            "terminal": "silent",
+            "transient": "silent",
+            "not_found": "silent",
+            "unknown": "silent"
+          }
         },
         {
-          "model": "gemma-4-26b-a4b-it"
+          "model": "gemma-4-26b-a4b-it",
+          "actions": {
+            "terminal": "silent",
+            "transient": "silent",
+            "not_found": "silent",
+            "unknown": "silent"
+          }
         },
         {
           "model": "gemma-4-31b-it",
-          "isLastResort": true
+          "isLastResort": true,
+          "actions": {
+            "terminal": "silent",
+            "transient": "silent",
+            "not_found": "silent",
+            "unknown": "silent"
+          }
         }
       ]
     }
