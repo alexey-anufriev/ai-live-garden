@@ -37,6 +37,12 @@ public final class GardenRenderer {
         long hares = garden.organisms().stream().filter(o -> o.type() == OrganismType.HARE).count();
         long foxes = garden.organisms().stream().filter(o -> o.type() == OrganismType.FOX).count();
 
+        long mossConserverCount = garden.organisms().stream().filter(o -> o.type() == OrganismType.MOSS && o.traits().contains("nutrient-conserver")).count();
+        long mossScavengerCount = garden.organisms().stream().filter(o -> o.type() == OrganismType.MOSS && o.traits().contains("moss-nutrient-scavenger")).count();
+        long fernConserverCount = garden.organisms().stream().filter(o -> o.type() == OrganismType.FERN && o.traits().contains("nutrient-conserver")).count();
+        int consumptionReduction = (int) ((mossConserverCount + mossScavengerCount + fernConserverCount) / 10);
+        int mobilizerCount = (int) garden.organisms().stream().filter(o -> o.traits().contains("nutrient-mobilizer")).count();
+
         Map<String, Long> traitCounts = garden.organisms().stream()
                 .flatMap(o -> o.traits().stream())
                 .collect(Collectors.groupingBy(java.util.function.Function.identity(), Collectors.counting()));
@@ -69,7 +75,7 @@ public final class GardenRenderer {
                 garden.environment().nutrientBuffer(),
                 garden.rootContribution(),
                 garden.fungalContribution(),
-                garden.environment().mood() + (garden.environment().mood().equals("hungry") ? " (" + garden.environment().diagnostic((int) garden.organisms().stream().filter(o -> o.traits().contains("nutrient-mobilizer")).count()) + ")" : ""),
+                garden.environment().mood() + (garden.environment().mood().equals("hungry") ? " (" + garden.environment().diagnostic(moss, ferns, consumptionReduction, mobilizerCount) + ")" : ""),
                 garden.plantCount(),
                 moss, roots, spores, ferns,
                 garden.animalCount(),
