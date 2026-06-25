@@ -6,7 +6,7 @@ This file is the compact current operating memory for future work on the garden.
 
 ## Current Garden State
 
-- Cycle: 3302
+- Cycle: 3338
 - Nutrients: 0 (persistently scarce).
 - NutrientBuffer: 100 (primary survival resource).
 - Key Ecological Drivers:
@@ -20,6 +20,7 @@ This file is the compact current operating memory for future work on the garden.
     - Refactored `Garden` event logging in the feeding phase to aggregate organism death/recycling events, improving event history utilization and clarity while preserving essential aggregate nutrient and moisture recycling data.
     - Added `blockedPlantCount()` to report plants with reproduction blocked by 'stressed' or 'cautious-breeder' conditions, improving observability into the effectiveness of population regulation mechanisms during chronic nutrient scarcity.
     - Added buffer accumulation logging, tracking when the nutrient buffer is increasing to improve observability into surplus cycles.
+    - Added comprehensive unit tests for `OrganismType.offspringType` to verify succession mechanics.
   - **Diagnostic Improvement:** `Environment.diagnostic()` was previously enhanced to explicitly include mobilizer impact, population counts (MOSS, FERN), and consumption reduction rates, providing the necessary data for the renderer's new detailed output.
 - **Ecological Resilience:** Implemented `nutrient-conserver` trait for plants to reduce system-wide nutrient consumption under scarcity.
 - **New Adaptation:** Implemented `moss-nutrient-scavenger` to improve MOSS nutrient acquisition efficiency.
