@@ -6,7 +6,7 @@ This file is the compact current operating memory for future work on the garden.
 
 ## Current Garden State
 
-- Cycle: 3176 (advancement reached).
+- Cycle: 3194
 - Nutrients: 0 (persistently scarce).
 - NutrientBuffer: 100 (primary survival resource).
 - Key Ecological Drivers:
@@ -17,6 +17,7 @@ This file is the compact current operating memory for future work on the garden.
   - Fungal-root network interactions were reviewed and verified. `nutrient-refiner` was enhanced. `mycelial-synergizer` was introduced.
   - **Diagnostic Improvement:** Added explicit logging of nutrient buffer release stats (rate and amount) to the event stream, and enhanced the `Environment.diagnostic()` method to include explicit nutrient buffer release rates and granular nutrient consumption breakdown.
   - **Observability Upgrade:** Added a granular breakdown of the plant population (moss, fern, spore, root-networks, fungus) to the cycle event log. Added granular nutrient consumption breakdown by MOSS and FERN population in cycle logs to better analyze the drivers of persistent nutrient scarcity. Added detailed buffer release logging, including base rate, mobilizer count, and effective release rate, to the event stream.
+  - **Enhanced Observability:** Updated `Environment.diagnostic()` to accept granular counts of MOSS and FERN populations, providing a more detailed breakdown of consumption in diagnostic strings for improved bottleneck identification.
 - **Ecological Resilience:** Implemented `nutrient-conserver` trait for plants to reduce system-wide nutrient consumption under scarcity.
 - **New Adaptation:** Implemented `moss-nutrient-scavenger` to improve MOSS nutrient acquisition efficiency.
 - **New Adaptations:** Implemented `nutrient-mobilizer` trait for organisms to actively increase the nutrient release rate from the buffer under high population pressure.

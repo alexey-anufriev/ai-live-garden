@@ -20,8 +20,9 @@ class EnvironmentTest {
     void diagnosticWithConsumptionProvidesDetail() {
         Environment env = new Environment(50, 50, 50, 0, 100);
         // Nutrients=0. releaseRate = 2. Released=100/2=50.
-        // plantCount=1000, consumptionReduction=0. Consumption = 1000/5=200.
-        assertThat(env.diagnostic(1000, 0)).isEqualTo("buffer-supported (nutrients=0, buffer=100, release=50, consumption=200)");
+        // mossCount=500, fernCount=500, consumptionReduction=0.
+        // mossConsumption = 100, fernConsumption = 100, totalConsumption=200.
+        assertThat(env.diagnostic(500, 500, 0)).isEqualTo("buffer-supported (nutrients=0, buffer=100, release=50, consumption=200 [moss=100, fern=100])");
     }
 
 }
