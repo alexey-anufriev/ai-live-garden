@@ -28,6 +28,17 @@ copy_section() {
   ' "$raw_context_file"
 }
 
+copy_continuity_source() {
+  copy_section "## Current Agent Memory" "## Persistent Garden State Digest" | awk '
+    /^- Cycle:/ { next }
+    /^- Nutrients:/ { next }
+    /^- NutrientBuffer:/ { next }
+    /^- \*\*Cycle:\*\*/ { next }
+    /^- \*\*Status:\*\* Nutrients:/ { next }
+    { print }
+  '
+}
+
 latest_files() {
   local limit="$1"
   shift
@@ -67,9 +78,11 @@ append_journal_digest() {
   echo
   echo "The final prompt separately includes exact run rules, authoritative templates, the current garden-state digest, and the project file index. Do not restate those unless they appear in the continuity source as a current constraint or human preference."
   echo
+  echo "The source memory may contain stale numeric garden-state facts. Do not carry exact cycle numbers, population counts, nutrient values, or other snapshot metrics into the digest. Preserve qualitative pressures and continuity only; the final prompt will append the authoritative current garden-state digest."
+  echo
   echo "Preserve:"
   echo
-  echo "- current garden state facts and visible pressures mentioned in memory or recent history;"
+  echo "- qualitative garden pressures and visible themes mentioned in memory or recent history;"
   echo "- current project memory, open requests, and active constraints;"
   echo "- recent implemented changes and failure patterns;"
   echo "- human preferences that affect future autonomous runs;"
@@ -95,7 +108,7 @@ append_journal_digest() {
   echo "Source context:"
   echo
   echo "--- SOURCE CONTEXT START ---"
-  copy_section "## Current Agent Memory" "## Persistent Garden State Digest"
+  copy_continuity_source
   echo "## Recent Active Journal Entries Digest"
   echo
   while IFS= read -r journal; do

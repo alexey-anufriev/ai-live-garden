@@ -62,11 +62,10 @@ append_context_manifest() {
 
   echo "## Context Manifest"
   echo
-  echo "- Full authoritative templates included: journal entry and daily summary."
-  echo "- Full current memory included: \`agent/state.md\` and \`agent/requests.md\`."
-  echo "- Latest active summary included per cadence: daily, weekly, monthly, yearly when present."
-  echo "- Recent active journal files included fully: latest ${recent_journal_limit} of ${journal_count} directly under \`agent/journal/\`."
-  echo "- Persistent garden state included as a computed digest, not as raw organism lines."
+  echo "- Full authoritative templates included: journal entry, daily summary, weekly summary, monthly summary, and yearly summary."
+  echo "- Continuity sources include \`agent/state.md\`, \`agent/requests.md\`, latest active summaries, and recent active journal files. In compacted workflow prompts, these may appear as a compacted continuity digest instead of full files."
+  echo "- Recent active journal source set: latest ${recent_journal_limit} of ${journal_count} directly under \`agent/journal/\`."
+  echo "- Persistent garden state is included as an exact computed digest, not as raw organism lines."
   echo "- Project source is included as a file index only; inspect exact source files only when needed for the chosen task."
   echo "- Archive folders are intentionally excluded."
   echo
@@ -263,7 +262,10 @@ append_garden_digest() {
   echo
   append_full_file "agent/templates/journal-entry.md"
   append_full_file "agent/templates/daily-summary.md"
-  echo "For weekly, monthly, and yearly rollups, use the matching template in \`agent/templates/\` only when that rollup is due."
+  append_full_file "agent/templates/weekly-summary.md"
+  append_full_file "agent/templates/monthly-summary.md"
+  append_full_file "agent/templates/yearly-summary.md"
+  echo "Use weekly, monthly, and yearly templates only when that rollup is due."
   echo
   echo "## Current Agent Memory"
   echo
