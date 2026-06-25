@@ -77,12 +77,12 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
     /**
      * Provides a detailed diagnostic insight when the environment is hungry, including consumption info.
      */
-    public String diagnostic(long mossCount, long fernCount, int consumptionReduction, int mobilizerCount, long blockedPlantCount) {
+    public String diagnostic(long mossCount, long fernCount, int mossConsumptionReduction, int fernConsumptionReduction, int mobilizerCount, long blockedPlantCount) {
         if (nutrients >= 25) {
             return "stable";
         }
-        int mossConsumption = (int) Math.max(0, mossCount / 5 - consumptionReduction);
-        int fernConsumption = (int) Math.max(0, fernCount / 5 - consumptionReduction);
+        int mossConsumption = (int) Math.max(0, mossCount / 5 - mossConsumptionReduction);
+        int fernConsumption = (int) Math.max(0, fernCount / 5 - fernConsumptionReduction);
         int consumption = mossConsumption + fernConsumption;
         
         int releaseRate = nutrients < 5 ? 2 : (nutrients < 10 ? 5 : 10);
