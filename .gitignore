@@ -11,3 +11,5 @@ gha-creds-*.json
 /current_*.md
 /currenct_*.md
 /violations.txt
+
+.local
