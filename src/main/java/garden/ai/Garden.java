@@ -463,24 +463,32 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
 
         int totalNutrientContribution = 0;
         int totalMoistureContribution = 0;
+        int deadOrganisms = 0;
+        int moistureRetainers = 0;
+        int mycelialDistributors = 0;
         List<Organism> survivors = new ArrayList<>();
         for (Organism organism : mutable) {
             if (organism.energy() > 0) {
                 survivors.add(organism);
             } else {
-                String causeOfDeath = organism.traits().contains("starving") ? " succumbed to hunger" : " returned to the soil";
-                events.add(new GardenEvent(cycle, "%s (%d nutrients)%s.".formatted(organism.id(), organism.nutrientValue(), causeOfDeath)));
                 totalNutrientContribution += organism.nutrientValue();
+                deadOrganisms++;
                 if (organism.traits().contains("moisture-retainer") && organism.type() == OrganismType.MOSS) {
                     totalMoistureContribution += 5;
-                    events.add(new GardenEvent(cycle, "%s returned moisture to the soil.".formatted(organism.id())));
+                    moistureRetainers++;
                 }
                 if (organism.traits().contains("mycelial-distributor")) {
-                    long fungusCount = organisms.stream().filter(o -> o.type() == OrganismType.FUNGUS).count();
-                    if (fungusCount > 0) {
-                        events.add(new GardenEvent(cycle, "%s distributed nutrients to the fungal network.".formatted(organism.id())));
-                    }
+                    mycelialDistributors++;
                 }
+            }
+        }
+        if (deadOrganisms > 0) {
+            events.add(new GardenEvent(cycle, "%d organisms returned %d nutrients to the soil.".formatted(deadOrganisms, totalNutrientContribution)));
+            if (moistureRetainers > 0) {
+                events.add(new GardenEvent(cycle, "%d moisture-retainers returned %d moisture to the soil.".formatted(moistureRetainers, totalMoistureContribution)));
+            }
+            if (mycelialDistributors > 0) {
+                events.add(new GardenEvent(cycle, "%d mycelial-distributors distributed nutrients to the fungal network.".formatted(mycelialDistributors)));
             }
         }
         survivors.sort(Comparator.comparing(Organism::id));
