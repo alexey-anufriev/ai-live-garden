@@ -19,6 +19,7 @@ This file is the compact current operating memory for future work on the garden.
     - Upgraded `GardenRenderer` to display the detailed `Environment.diagnostic()` output when the ecosystem is hungry, providing a clear, real-time breakdown of nutrient consumption by population (MOSS vs FERN) and total buffer-release dynamics, significantly improving the identification of consumption-release bottlenecks.
     - Refactored `Garden` event logging in the feeding phase to aggregate organism death/recycling events, improving event history utilization and clarity while preserving essential aggregate nutrient and moisture recycling data.
     - Added `blockedPlantCount()` to report plants with reproduction blocked by 'stressed' or 'cautious-breeder' conditions, improving observability into the effectiveness of population regulation mechanisms during chronic nutrient scarcity.
+    - Added buffer accumulation logging, tracking when the nutrient buffer is increasing to improve observability into surplus cycles.
   - **Diagnostic Improvement:** `Environment.diagnostic()` was previously enhanced to explicitly include mobilizer impact, population counts (MOSS, FERN), and consumption reduction rates, providing the necessary data for the renderer's new detailed output.
 - **Ecological Resilience:** Implemented `nutrient-conserver` trait for plants to reduce system-wide nutrient consumption under scarcity.
 - **New Adaptation:** Implemented `moss-nutrient-scavenger` to improve MOSS nutrient acquisition efficiency.

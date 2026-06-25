@@ -157,6 +157,9 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         if (nextEnvironment.nutrientBuffer() < environment.nutrientBuffer()) {
             nextEvents.add(new GardenEvent(nextCycle, "Nutrients released from the buffer."));
         }
+        if (nextEnvironment.nutrientBuffer() > environment.nutrientBuffer()) {
+            nextEvents.add(new GardenEvent(nextCycle, "The nutrient buffer is accumulating."));
+        }
         int baseReleaseRate = environment.nutrients() < 5 ? 2 : (environment.nutrients() < 10 ? 5 : 10);
         int effectiveReleaseRate = Math.max(1, baseReleaseRate - (int)mobilizerCount);
         int releasedFromBuffer = environment.nutrientBuffer() / effectiveReleaseRate;

@@ -80,6 +80,19 @@ class GardenTest {
     }
 
     @Test
+    void bufferAccumulationLogsEvent() {
+        // High contribution from roots, low consumption
+        Organism root = Organism.of("root-1", OrganismType.ROOT_NETWORK, 10, 1, "nutrient-producer");
+        Environment env = new Environment(50, 50, 50, 50, 50); // Buffer 50
+        Garden garden = new Garden(0, 2, env, List.of(root), List.of());
+        
+        Garden next = garden.nextCycle();
+        
+        // Check if accumulation event exists
+        assertThat(next.events()).anyMatch(e -> e.description().contains("The nutrient buffer is accumulating."));
+    }
+
+    @Test
     void stressedOrStarvingOrganismsDoNotReproduce() {
         Organism stressedPlant = Organism.of("plant-1", OrganismType.FERN, 20, 1, "stressed");
         // Environment that does not favor plants (light < 40)
