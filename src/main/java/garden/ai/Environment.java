@@ -74,6 +74,23 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
     }
 
     /**
+     * Provides a detailed diagnostic insight when the environment is hungry, including consumption info.
+     */
+    public String diagnostic(int plantCount, int consumptionReduction) {
+        if (nutrients >= 25) {
+            return "stable";
+        }
+        int consumption = Math.max(0, plantCount / 5 - consumptionReduction);
+        
+        int releaseRate = nutrients < 5 ? 2 : (nutrients < 10 ? 5 : 10);
+        int released = nutrientBuffer / releaseRate;
+        
+        String bufferInfo = (nutrientBuffer < 10) ? "exhausted" : "buffer-supported";
+        return "%s (nutrients=%d, buffer=%d, release=%d, consumption=%d)".formatted(
+            bufferInfo, nutrients, nutrientBuffer, released, consumption);
+    }
+
+    /**
      * Indicates whether current conditions are favorable enough for ordinary plant growth.
      */
     public boolean favorsPlants() {
