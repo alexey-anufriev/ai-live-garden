@@ -83,6 +83,14 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         }
     }
 
+    public long blockedPlantCount() {
+        return organisms.stream()
+            .filter(o -> o.type().isPlant())
+            .filter(o -> o.traits().contains("stressed") ||
+                         (o.traits().contains("cautious-breeder") && environment.nutrients() < 10))
+            .count();
+    }
+
     public int fungalContribution() {
         long fungusCount = organisms.stream().filter(organism -> organism.type() == OrganismType.FUNGUS).count();
         long decomposerCount = organisms.stream().filter(organism -> organism.type() == OrganismType.FUNGUS && organism.traits().contains("nutrient-decomposer")).count();
@@ -98,7 +106,6 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
 
         int connectorBonus = (rootNetworkCount > 0) ? 6 : 4;
         int synergizerBonus = (mycelialSynergizerCount > 0 && fungusCount > 0) ? 5 : 0;
-
         return (int) (fungusCount * 2 + decomposerCount * 3 + soilEnricherCount * 5 + networkConnectorCount * connectorBonus + fungalSymbioteCount * 2 + fungalAcceleratorCount * 10 + fungalEnhancerCount * 8 + fungalGardenerCount * 5 + fungalFertilizerCount * 7) + synergizerBonus;
     }
 

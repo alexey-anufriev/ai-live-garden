@@ -75,7 +75,7 @@ public final class GardenRenderer {
                 garden.environment().nutrientBuffer(),
                 garden.rootContribution(),
                 garden.fungalContribution(),
-                garden.environment().mood() + (garden.environment().mood().equals("hungry") ? " (" + garden.environment().diagnostic(moss, ferns, consumptionReduction, mobilizerCount) + ")" : ""),
+                garden.environment().mood() + (garden.environment().mood().equals("hungry") ? " (" + garden.environment().diagnostic(moss, ferns, consumptionReduction, mobilizerCount, garden.blockedPlantCount()) + ")" : ""),
                 garden.plantCount(),
                 moss, roots, spores, ferns,
                 garden.animalCount(),

@@ -77,7 +77,7 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
     /**
      * Provides a detailed diagnostic insight when the environment is hungry, including consumption info.
      */
-    public String diagnostic(long mossCount, long fernCount, int consumptionReduction, int mobilizerCount) {
+    public String diagnostic(long mossCount, long fernCount, int consumptionReduction, int mobilizerCount, long blockedPlantCount) {
         if (nutrients >= 25) {
             return "stable";
         }
@@ -90,8 +90,8 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
         int released = nutrientBuffer / releaseRate;
         
         String bufferInfo = (nutrientBuffer < 10) ? "exhausted" : "buffer-supported";
-        return "%s (nutrients=%d, buffer=%d, release=%d, consumption=%d [moss=%d, fern=%d], mobilizers=%d)".formatted(
-            bufferInfo, nutrients, nutrientBuffer, released, consumption, mossConsumption, fernConsumption, mobilizerCount);
+        return "%s (nutrients=%d, buffer=%d, release=%d, consumption=%d [moss=%d, fern=%d], mobilizers=%d, blocked-plants=%d)".formatted(
+            bufferInfo, nutrients, nutrientBuffer, released, consumption, mossConsumption, fernConsumption, mobilizerCount, blockedPlantCount);
     }
 
     /**
