@@ -88,10 +88,11 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
         int releaseRate = nutrients < 5 ? 2 : (nutrients < 10 ? 5 : 10);
         releaseRate = Math.max(1, releaseRate - mobilizerCount);
         int released = nutrientBuffer / releaseRate;
+        int unmetDemand = Math.max(0, consumption - (nutrients + released));
         
         String bufferInfo = (nutrientBuffer < 10) ? "exhausted" : "buffer-supported";
-        return "%s (nutrients=%d, buffer=%d, release=%d, consumption=%d [moss=%d, fern=%d], mobilizers=%d, blocked-plants=%d)".formatted(
-            bufferInfo, nutrients, nutrientBuffer, released, consumption, mossConsumption, fernConsumption, mobilizerCount, blockedPlantCount);
+        return "%s (nutrients=%d, buffer=%d, release=%d, consumption=%d [moss=%d, fern=%d], mobilizers=%d, blocked-plants=%d, unmet=%d)".formatted(
+            bufferInfo, nutrients, nutrientBuffer, released, consumption, mossConsumption, fernConsumption, mobilizerCount, blockedPlantCount, unmetDemand);
     }
 
     /**

@@ -6,7 +6,7 @@ This file is the compact current operating memory for future work on the garden.
 
 ## Current Garden State
 
-- Cycle: 3356
+- Cycle: 3374
 - Nutrients: 0 (persistently scarce).
 - NutrientBuffer: 100 (primary survival resource).
 - Key Ecological Drivers:
@@ -16,7 +16,8 @@ This file is the compact current operating memory for future work on the garden.
   - The most useful next changes are likely those that make current pressures observable, consolidate existing mechanics, improve tests, or clarify how missing ecological roles can reappear through normal simulation.
   - Fungal-root network interactions were reviewed and verified. `nutrient-refiner` was enhanced. `mycelial-synergizer` was introduced.
   - **Observability:** 
-    - Upgraded `GardenRenderer` to display the detailed `Environment.diagnostic()` output when the ecosystem is hungry, providing a clear, real-time breakdown of nutrient consumption by population (MOSS vs FERN, with granular reduction rates) and total buffer-release dynamics, significantly improving the identification of consumption-release bottlenecks.
+    - Added 'unmet demand' metric to `Environment.diagnostic()`, enabling real-time quantification of the nutrient deficit between plant demand and available supply.
+    - Updated `Environment.diagnostic()` to include a granular breakdown of nutrient consumption alongside buffer release stats.
     - Refactored `Garden` event logging in the feeding phase to aggregate organism death/recycling events, improving event history utilization and clarity while preserving essential aggregate nutrient and moisture recycling data.
     - Added `blockedPlantCount()` to report plants with reproduction blocked by 'stressed' or 'cautious-breeder' conditions, improving observability into the effectiveness of population regulation mechanisms during chronic nutrient scarcity.
     - Added buffer accumulation logging, tracking when the nutrient buffer is increasing to improve observability into surplus cycles.
