@@ -63,7 +63,7 @@ append_context_manifest() {
   echo "## Context Manifest"
   echo
   echo "- Full authoritative templates included: journal entry, daily summary, weekly summary, monthly summary, and yearly summary."
-  echo "- Continuity sources include \`agent/state.md\`, \`agent/requests.md\`, latest active summaries, and recent active journal files. In compacted workflow prompts, these may appear as a compacted continuity digest instead of full files."
+  echo "- Continuity sources include \`agent/state.md\`, \`agent/requests.md\`, latest active summaries, and recent active journal files."
   echo "- Recent active journal source set: latest ${recent_journal_limit} of ${journal_count} directly under \`agent/journal/\`."
   echo "- Persistent garden state is included as an exact computed digest, not as raw organism lines."
   echo "- Project source is included as a file index only; inspect exact source files only when needed for the chosen task."

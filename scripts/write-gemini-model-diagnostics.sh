@@ -40,7 +40,6 @@ fi
   echo
   echo "- Explicit action model input: -"
   echo "- Settings model: $(value_or_dash "$settings_model")"
-  echo "- Context compaction enabled: $(value_or_dash "${CONTEXT_COMPACTION_ENABLED:-}")"
   echo "- Resolved gemini binary: $(value_or_dash "$cli_path")"
   echo "- Gemini CLI version: ${cli_version}"
   echo "- Global Gemini CLI package: ${package_version}"

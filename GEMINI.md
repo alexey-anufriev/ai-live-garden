@@ -15,6 +15,6 @@ For autonomous evolution runs, the Agent workflow normally provides a compact co
 
 This is a Java 25 / Maven project.
 
-The compact bundle is the operational checklist for normal Agent workflow runs. The workflow may optionally include an additional model-generated compaction of continuity material to reduce quota use. Treat that compaction as a lossy digest only; exact rules, templates, current garden-state digest, and validation results remain authoritative. Inspect raw source files, raw state, or additional memory files only when needed for the chosen task.
+The compact bundle is the operational checklist for normal Agent workflow runs. Exact rules, templates, current garden-state digest, and validation results remain authoritative. Inspect raw source files, raw state, or additional memory files only when needed for the chosen task.
 
 Do not modify `AGENTS.md`, `GEMINI.md`, or `.github/`.

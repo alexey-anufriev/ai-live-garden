@@ -40,12 +40,10 @@ metadata_value() {
   echo "- Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
   echo "- Attempt: ${GITHUB_RUN_ATTEMPT:-1}"
   echo "- Gemini model source: .gemini/settings.json"
-  echo "- Context compaction enabled: $(value_or_dash "${CONTEXT_COMPACTION_ENABLED:-}")"
   echo
   echo "| Phase | Outcome |"
   echo "| --- | --- |"
   echo "| Baseline test | $(value_or_dash "${BASELINE_TEST_OUTCOME:-}") |"
-  echo "| Context compaction | $(value_or_dash "${CONTEXT_COMPACTION_OUTCOME:-}") |"
   echo "| Gemini autonomous step | $(value_or_dash "${GEMINI_OUTCOME:-}") |"
   echo "| Protected file restore | $(value_or_dash "${RESTORE_PROTECTED_OUTCOME:-}") |"
   echo "| Post-Gemini test validation | $(value_or_dash "${POST_TEST_OUTCOME:-}") |"
@@ -66,10 +64,6 @@ metadata_value() {
   echo
   echo "- Context lines: $(metadata_value AGENT_CONTEXT_LINES)"
   echo "- Context bytes: $(metadata_value AGENT_CONTEXT_BYTES)"
-  echo "- Compacted prompt lines: $(metadata_value AGENT_CONTEXT_COMPACTED_LINES)"
-  echo "- Compacted prompt bytes: $(metadata_value AGENT_CONTEXT_COMPACTED_BYTES)"
-  echo "- Compaction digest lines: $(metadata_value AGENT_CONTEXT_COMPACTION_DIGEST_LINES)"
-  echo "- Compaction digest bytes: $(metadata_value AGENT_CONTEXT_COMPACTION_DIGEST_BYTES)"
   echo "- Warning threshold: $(metadata_value AGENT_CONTEXT_WARN_LINES)"
   echo "- Warning threshold exceeded: $(metadata_value AGENT_CONTEXT_WARNED)"
   echo "- Recent journal limit: $(metadata_value AGENT_CONTEXT_RECENT_JOURNAL_LIMIT)"
@@ -80,9 +74,6 @@ metadata_value() {
   echo "- Latest monthly summary: $(value_or_dash "$(metadata_value AGENT_CONTEXT_LATEST_MONTHLY_SUMMARY)")"
   echo "- Latest yearly summary: $(value_or_dash "$(metadata_value AGENT_CONTEXT_LATEST_YEARLY_SUMMARY)")"
   echo
-  if [[ "${CONTEXT_COMPACTION_OUTCOME:-}" == "failure" ]]; then
-    echo "Context compaction failed before the main Gemini call. Check Gemini CLI model routing, quota, authentication, or provider availability."
-  fi
   if [[ -n "${AGENT_CHANGE_DIAGNOSTICS_FILE:-}" && -f "$AGENT_CHANGE_DIAGNOSTICS_FILE" ]]; then
     cat "$AGENT_CHANGE_DIAGNOSTICS_FILE"
     echo

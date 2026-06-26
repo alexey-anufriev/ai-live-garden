@@ -15,8 +15,6 @@ jobs:
   agent:
     runs-on: ubuntu-latest
     timeout-minutes: 42
-    env:
-      CONTEXT_COMPACTION_ENABLED: ${{ vars.CONTEXT_COMPACTION_ENABLED || 'true' }}
 
     steps:
       - name: Checkout repository
@@ -48,52 +46,6 @@ jobs:
         shell: bash
         run: scripts/write-gemini-model-diagnostics.sh
 
-      - name: Build context compaction prompt
-        id: context_compaction_prompt
-        if: ${{ env.CONTEXT_COMPACTION_ENABLED == 'true' }}
-        shell: bash
-        run: |
-          scripts/write-agent-context-compaction-prompt.sh "${RUNNER_TEMP}/agent-context.md" "${RUNNER_TEMP}/agent-context-compaction-prompt.md"
-          scripts/write-output-file.sh text "${RUNNER_TEMP}/agent-context-compaction-prompt.md"
-
-      - name: Compact agent context
-        id: context_compaction
-        if: ${{ env.CONTEXT_COMPACTION_ENABLED == 'true' }}
-        uses: google-github-actions/run-gemini-cli@v0.1.22
-        env:
-          GEMINI_CLI_TRUST_WORKSPACE: "true"
-        with:
-          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
-          prompt: ${{ steps.context_compaction_prompt.outputs.text }}
-          upload_artifacts: false
-
-      - name: Restore workspace after context compaction
-        if: ${{ env.CONTEXT_COMPACTION_ENABLED == 'true' && !cancelled() }}
-        shell: bash
-        run: scripts/restore-worktree-to-head.sh
-
-      - name: Build compacted Gemini prompt
-        id: gemini_compacted_prompt
-        if: ${{ env.CONTEXT_COMPACTION_ENABLED == 'true' }}
-        shell: bash
-        env:
-          AGENT_CONTEXT_COMPACTION_SUMMARY: ${{ steps.context_compaction.outputs.summary }}
-          AGENT_CONTEXT_METADATA_FILE: ${{ runner.temp }}/agent-context.metadata
-        run: |
-          scripts/write-agent-compaction-output.sh "${RUNNER_TEMP}/agent-context-compaction.md"
-          scripts/build-compacted-agent-prompt.sh "${RUNNER_TEMP}/agent-context.md" "${RUNNER_TEMP}/agent-context-compaction.md" "${RUNNER_TEMP}/agent-context-compacted.md"
-          scripts/write-output-file.sh text "${RUNNER_TEMP}/agent-context-compacted.md"
-
-      - name: Select Gemini prompt
-        id: selected_gemini_prompt
-        shell: bash
-        run: |
-          if [[ -s "${RUNNER_TEMP}/agent-context-compacted.md" ]]; then
-            scripts/write-output-file.sh text "${RUNNER_TEMP}/agent-context-compacted.md"
-          else
-            scripts/write-output-file.sh text "${RUNNER_TEMP}/agent-context.md"
-          fi
-
       - name: Run Gemini autonomous step
         id: gemini
         uses: google-github-actions/run-gemini-cli@v0.1.22
@@ -101,7 +53,7 @@ jobs:
           GEMINI_CLI_TRUST_WORKSPACE: "true"
         with:
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
-          prompt: ${{ steps.selected_gemini_prompt.outputs.text }}
+          prompt: ${{ steps.gemini_prompt.outputs.text }}
           upload_artifacts: true
 
       - name: Restore protected files
@@ -187,9 +139,6 @@ jobs:
         shell: bash
         env:
           AGENT_CONTEXT_FILE: ${{ runner.temp }}/agent-context.md
-          AGENT_CONTEXT_COMPACTION_PROMPT_FILE: ${{ runner.temp }}/agent-context-compaction-prompt.md
-          AGENT_CONTEXT_COMPACTION_FILE: ${{ runner.temp }}/agent-context-compaction.md
-          AGENT_COMPACTED_CONTEXT_FILE: ${{ runner.temp }}/agent-context-compacted.md
           AGENT_CONTEXT_METADATA_FILE: ${{ runner.temp }}/agent-context.metadata
         run: scripts/collect-agent-failure-diagnostics.sh "${{ runner.temp }}/agent-failure-diagnostics"
 
@@ -207,7 +156,6 @@ jobs:
         shell: bash
         env:
           BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
-          CONTEXT_COMPACTION_OUTCOME: ${{ steps.context_compaction.outcome }}
           GEMINI_OUTCOME: ${{ steps.gemini.outcome }}
           POST_TEST_OUTCOME: ${{ steps.post_test_final.outcome }}
           ADVANCE_GARDEN_OUTCOME: ${{ steps.advance_garden.outcome }}
@@ -234,9 +182,7 @@ jobs:
         if: ${{ always() }}
         shell: bash
         env:
-          CONTEXT_COMPACTION_ENABLED: ${{ env.CONTEXT_COMPACTION_ENABLED }}
           BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
-          CONTEXT_COMPACTION_OUTCOME: ${{ steps.context_compaction.outcome }}
           GEMINI_OUTCOME: ${{ steps.gemini.outcome }}
           RESTORE_PROTECTED_OUTCOME: ${{ steps.restore_protected.outcome }}
           POST_TEST_OUTCOME: ${{ steps.post_test_final.outcome }}
