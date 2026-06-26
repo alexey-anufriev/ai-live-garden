@@ -164,6 +164,12 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         int effectiveReleaseRate = Math.max(1, baseReleaseRate - (int)mobilizerCount);
         int releasedFromBuffer = environment.nutrientBuffer() / effectiveReleaseRate;
         nextEvents.add(new GardenEvent(nextCycle, "Buffer release stats: baseRate=%d, mobilizers=%d, effectiveRate=%d, released=%d".formatted(baseReleaseRate, mobilizerCount, effectiveReleaseRate, releasedFromBuffer)));
+        
+        int availableNutrients = environment.nutrients() + releasedFromBuffer;
+        if (consumption > availableNutrients) {
+            nextEvents.add(new GardenEvent(nextCycle, "Nutrient scarcity is bottlenecking growth (consumption=%d, available=%d).".formatted(consumption, availableNutrients)));
+        }
+
         if (plantCount > 200 && nextEnvironment.nutrients() < 10) {
             nextEvents.add(new GardenEvent(nextCycle, "High population pressure is straining nutrient reserves."));
         }

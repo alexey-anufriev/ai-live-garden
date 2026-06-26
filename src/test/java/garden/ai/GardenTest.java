@@ -80,6 +80,22 @@ class GardenTest {
     }
 
     @Test
+    void nutrientBottleneckLogsEvent() {
+        // High plant count to drive consumption
+        List<Organism> organisms = new java.util.ArrayList<>();
+        for (int i = 0; i < 200; i++) {
+            organisms.add(Organism.of("moss-" + i, OrganismType.MOSS, 10, 1, "standard"));
+        }
+        // Nutrients 0, Buffer 50
+        Environment env = new Environment(50, 50, 50, 0, 50);
+        Garden garden = new Garden(0, 201, env, organisms, List.of());
+        
+        Garden next = garden.nextCycle();
+        
+        assertThat(next.events()).anyMatch(e -> e.description().contains("Nutrient scarcity is bottlenecking growth"));
+    }
+
+    @Test
     void bufferAccumulationLogsEvent() {
         // High contribution from roots, low consumption
         Organism root = Organism.of("root-1", OrganismType.ROOT_NETWORK, 10, 1, "nutrient-producer");
