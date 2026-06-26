@@ -20,7 +20,7 @@ import java.util.Optional;
  */
 public record Garden(int cycle, int nextId, Environment environment, List<Organism> organisms, List<GardenEvent> events) {
 
-    private static final int MAX_EVENTS = 40;
+    private static final int MAX_EVENTS = 600;
 
     public Garden(int cycle, int nextId, Environment environment, List<Organism> organisms, List<GardenEvent> events) {
         if (cycle < 0) {
@@ -388,6 +388,10 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
 
         if (organism.type().isPlant()) {
             if (!environment.favorsPlants() && !isResilient && !isDormant && !isDeepRooting) {
+                if (environment.nutrients() == 0) {
+                    changed = changed.withEnergy(Math.max(0, changed.energy() - 1));
+                    events.add(new GardenEvent(cycle, "%s lost energy due to environmental stress.".formatted(changed.id())));
+                }
                 changed = changed.withTrait("stressed");
             } else {
                 changed = changed.withoutTrait("stressed");

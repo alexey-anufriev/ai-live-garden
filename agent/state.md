@@ -6,7 +6,7 @@ This file is the compact current operating memory for future work on the garden.
 
 ## Current Garden State
 
-- Cycle: 3560
+- Cycle: 3608
 - Nutrients: 0 (persistently scarce).
 - NutrientBuffer: 100 (primary survival resource).
 - Key Ecological Drivers:
@@ -29,6 +29,7 @@ This file is the compact current operating memory for future work on the garden.
 - **New Adaptation:** Implemented `moss-nutrient-scavenger` to improve MOSS nutrient acquisition efficiency.
 - **New Adaptations:** Implemented `nutrient-mobilizer` trait for organisms to actively increase the nutrient release rate from the buffer under high population pressure.
 - **Reproduction Control:** Implemented `cautious-breeder` trait, preventing plant reproduction when nutrients are critically low (<10). Enhanced observability in the environment diagnostic to report the number of plants currently experiencing blocked reproduction.
+- **Population Regulation:** Implemented a mechanism where plants persistently 'stressed' in nutrient-depleted environments (nutrients=0) lose 1 energy per cycle, leading to eventual culling.
 
 ## Immediate Directions
 
