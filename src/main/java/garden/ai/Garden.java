@@ -195,8 +195,11 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         int nextIdentifier = reproduction.nextId();
         
         if (finalChanged.isEmpty()) {
-            finalChanged.add(Organism.of("moss-" + nextIdentifier, OrganismType.MOSS, 5, 1, "emergency-seed"));
-            nextEvents.add(new GardenEvent(nextCycle, "A last emergency moss seed appeared to keep the garden alive."));
+            OrganismType[] plantTypes = {OrganismType.MOSS, OrganismType.SPORE, OrganismType.FERN, OrganismType.FUNGUS};
+            OrganismType selected = plantTypes[new java.util.Random().nextInt(plantTypes.length)];
+            String id = selected.name().toLowerCase(java.util.Locale.ROOT).replace('_', '-') + "-" + nextIdentifier;
+            finalChanged.add(Organism.of(id, selected, 5, 1, "emergency-seed"));
+            nextEvents.add(new GardenEvent(nextCycle, "A last emergency %s appeared to keep the garden alive.".formatted(selected.displayName())));
             nextIdentifier++;
         }
         
