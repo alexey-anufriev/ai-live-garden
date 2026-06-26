@@ -57,6 +57,9 @@ public final class GardenRenderer {
             .filter(e -> e.cycle() == garden.cycle())
             .filter(e -> e.description().contains("was culled due to chronic environmental stress."))
             .count();
+        long stressResilientPlantCount = garden.organisms().stream()
+            .filter(o -> o.traits().contains("stress-resilient"))
+            .count();
 
         return """
                 AI Live Garden
@@ -81,7 +84,7 @@ public final class GardenRenderer {
                 garden.environment().nutrientBuffer(),
                 garden.rootContribution(),
                 garden.fungalContribution(),
-                garden.environment().mood() + (garden.environment().mood().equals("hungry") ? " (" + garden.environment().diagnostic(moss, ferns, mossConsumptionReduction, fernConsumptionReduction, mobilizerCount, garden.blockedPlantCount(), culledPlantCount) + ")" : ""),
+                garden.environment().mood() + (garden.environment().mood().equals("hungry") ? " (" + garden.environment().diagnostic(moss, ferns, mossConsumptionReduction, fernConsumptionReduction, mobilizerCount, garden.blockedPlantCount(), culledPlantCount, stressResilientPlantCount) + ")" : ""),
                 garden.plantCount(),
                 moss, roots, spores, ferns,
                 garden.animalCount(),

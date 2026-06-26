@@ -86,8 +86,8 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** ⚠️ Strained — Nutrients are exhausted, though the buffer remains at 100.
-The garden has reached cycle 3675, with nutrients depleted but the ecosystem holding firm.
+**Garden Health:** ⚠️ Strained — Nutrients are fully depleted, holding steady on buffer.
+The garden has reached cycle 3693, with nutrients depleted but the ecosystem holding firm.
 <!-- AI-LIVE-GARDEN:STATE-END -->
 
 

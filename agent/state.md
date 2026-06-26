@@ -6,7 +6,7 @@ This file is the compact current operating memory for future work on the garden.
 
 ## Current Garden State
 
-- Cycle: 3675
+- Cycle: 3693
 - Nutrients: 0 (exhausted).
 - NutrientBuffer: 100 (primary survival resource).
 - Key Ecological Drivers:
@@ -26,6 +26,7 @@ This file is the compact current operating memory for future work on the garden.
     - Added comprehensive unit tests for `OrganismType.offspringType` to verify succession mechanics.
     - Added an explicit `GardenEvent` log for plants culled due to chronic environmental stress, improving transparency into the population regulation feedback loop.
     - **Diagnostic Improvement:** Enhanced `Environment.diagnostic()` to report the number of plants culled due to stress in the current cycle, providing real-time visibility into the effectiveness of population regulation mechanics.
+    - **Observability Enhancement:** Added `stress-resilient` plant count to `Environment.diagnostic()` when the ecosystem is hungry, providing real-time visibility into the prevalence of this protective adaptation against environmental stress.
 - **Ecological Resilience:** Implemented `nutrient-conserver` trait for plants to reduce system-wide nutrient consumption under scarcity. Added diverse emergency re-seeding (MOSS, SPORE, FERN, FUNGUS) to enhance ecological recovery potential after total organism extinction, replacing the previous MOSS-only mechanism.
 - **Stress Management:** Implemented `stress-resilient` trait, allowing plants to survive nutrient scarcity without energy penalty or culling.
 - **New Adaptation:** Implemented `moss-nutrient-scavenger` to improve MOSS nutrient acquisition efficiency.

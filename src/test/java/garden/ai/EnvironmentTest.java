@@ -24,7 +24,8 @@ class EnvironmentTest {
         // mossConsumption = 100, fernConsumption = 100, totalConsumption=200.
         // blockedPlantCount = 10.
         // culledPlantCount = 5.
-        assertThat(env.diagnostic(500, 500, 0, 0, 0, 10, 5)).isEqualTo("buffer-supported (nutrients=0, buffer=100, release=50, consumption=200 [moss=100, fern=100], mobilizers=0, blocked-plants=10, unmet=150, culled=5)");
+        // stressResilientPlantCount = 0.
+        assertThat(env.diagnostic(500, 500, 0, 0, 0, 10, 5, 0)).isEqualTo("buffer-supported (nutrients=0, buffer=100, release=50, consumption=200 [moss=100, fern=100], mobilizers=0, blocked-plants=10, unmet=150, culled=5, stress-resilient=0)");
     }
 
 }
