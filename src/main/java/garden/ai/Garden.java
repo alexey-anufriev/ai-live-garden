@@ -526,10 +526,10 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             }
         }
 
-        return new FeedingResult(survivors, totalNutrientContribution, totalMoistureContribution, bufferBoost);
+        return new FeedingResult(survivors, totalNutrientContribution, totalMoistureContribution, bufferBoost, deadOrganisms);
         }
 
-        private record FeedingResult(List<Organism> organisms, int totalNutrientContribution, int totalMoistureContribution, int nutrientBufferBoost) {
+        private record FeedingResult(List<Organism> organisms, int totalNutrientContribution, int totalMoistureContribution, int nutrientBufferBoost, int culledPlantCount) {
         }
 
 

@@ -53,6 +53,11 @@ public final class GardenRenderer {
                 .map(e -> e.getKey() + ":" + e.getValue())
                 .collect(Collectors.joining(", "));
 
+        long culledPlantCount = garden.events().stream()
+            .filter(e -> e.cycle() == garden.cycle())
+            .filter(e -> e.description().contains("was culled due to chronic environmental stress."))
+            .count();
+
         return """
                 AI Live Garden
                 ==============
@@ -76,7 +81,7 @@ public final class GardenRenderer {
                 garden.environment().nutrientBuffer(),
                 garden.rootContribution(),
                 garden.fungalContribution(),
-                garden.environment().mood() + (garden.environment().mood().equals("hungry") ? " (" + garden.environment().diagnostic(moss, ferns, mossConsumptionReduction, fernConsumptionReduction, mobilizerCount, garden.blockedPlantCount()) + ")" : ""),
+                garden.environment().mood() + (garden.environment().mood().equals("hungry") ? " (" + garden.environment().diagnostic(moss, ferns, mossConsumptionReduction, fernConsumptionReduction, mobilizerCount, garden.blockedPlantCount(), culledPlantCount) + ")" : ""),
                 garden.plantCount(),
                 moss, roots, spores, ferns,
                 garden.animalCount(),

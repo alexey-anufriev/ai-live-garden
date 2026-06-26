@@ -77,7 +77,7 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
     /**
      * Provides a detailed diagnostic insight when the environment is hungry, including consumption info.
      */
-    public String diagnostic(long mossCount, long fernCount, int mossConsumptionReduction, int fernConsumptionReduction, int mobilizerCount, long blockedPlantCount) {
+    public String diagnostic(long mossCount, long fernCount, int mossConsumptionReduction, int fernConsumptionReduction, int mobilizerCount, long blockedPlantCount, long culledPlantCount) {
         if (nutrients >= 25) {
             return "stable";
         }
@@ -91,8 +91,8 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
         int unmetDemand = Math.max(0, consumption - (nutrients + released));
         
         String bufferInfo = (nutrientBuffer < 10) ? "exhausted" : "buffer-supported";
-        return "%s (nutrients=%d, buffer=%d, release=%d, consumption=%d [moss=%d, fern=%d], mobilizers=%d, blocked-plants=%d, unmet=%d)".formatted(
-            bufferInfo, nutrients, nutrientBuffer, released, consumption, mossConsumption, fernConsumption, mobilizerCount, blockedPlantCount, unmetDemand);
+        return "%s (nutrients=%d, buffer=%d, release=%d, consumption=%d [moss=%d, fern=%d], mobilizers=%d, blocked-plants=%d, unmet=%d, culled=%d)".formatted(
+            bufferInfo, nutrients, nutrientBuffer, released, consumption, mossConsumption, fernConsumption, mobilizerCount, blockedPlantCount, unmetDemand, culledPlantCount);
     }
 
     /**
