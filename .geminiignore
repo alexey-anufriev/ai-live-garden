@@ -1,0 +1,52 @@
+# Version-control internals
+.git/
+
+# Build output and test artifacts
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.log
+*.tmp
+*.temp
+*.dump
+*.dumpstream
+
+# Gemini CLI generated files and action artifacts
+.gemini/*
+!.gemini/
+!.gemini/settings.json
+gemini-artifacts/
+
+# Protected CI and automation infrastructure
+.github/
+
+# Local editor, IDE, and agent scratch state
+.idea/
+*.iml
+.local/
+.codex/
+.agents/
+
+# Credentials and CI auth material
+gha-creds-*.json
+
+# Repository scratch files that should never guide autonomous runs
+/committed_*.md
+/current_*.md
+/currenct_*.md
+/violations.txt
+/fix_readme.py
+/line.txt
+
+# Generated workflow status, not persistent project memory
+/agent/last-run.md
+
+# Archived memory is intentionally excluded from autonomous context.
+# Active memory and active summaries remain visible.
+/agent/journal/archive/
+/agent/summaries/daily/archive/
+/agent/summaries/weekly/archive/
+/agent/summaries/monthly/archive/
+/agent/summaries/yearly/archive/
