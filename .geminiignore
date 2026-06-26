@@ -37,6 +37,7 @@ gha-creds-*.json
 /current_*.md
 /currenct_*.md
 /violations.txt
+/test_output.txt
 /fix_readme.py
 /line.txt
 
