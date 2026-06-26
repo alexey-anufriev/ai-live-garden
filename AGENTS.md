@@ -76,7 +76,7 @@ A good change should make the ecosystem feel more alive, interconnected, or surp
 
 The experiment is also about whether an autonomous agent can keep extending a software system without a human roadmap. Prefer changes that increase future development capacity: clearer domain boundaries, more expressive state transitions, better observability of live behavior, reusable simulation concepts, or mechanics that create new future possibilities. The required memory, journal, summaries, tests, and validators are support structures for autonomy; they are not the purpose of the run.
 
-Do not treat adding another named adaptation as the default small step. A new label or branch in the simulation is valuable only when it creates a tested, observable consequence for the current or recoverable garden. If the recent history has many similar additions, prefer consolidating existing behavior, improving observability, clarifying state transitions, or making current ecosystem pressures easier to understand. Tests are supporting evidence for meaningful behavior, not a substitute for garden value.
+Do not treat adding another named adaptation as the default small step. A new label or branch in the simulation is valuable only when it creates a tested consequence that changes future garden behavior for the current or recoverable garden. If recent history is dominated by traits, diagnostics, event logs, counters, or tests, treat those categories as saturated. A new named trait, diagnostic field, renderer line, event-log message, or test-only change is low value unless it directly changes future garden behavior or removes a current obstacle to ecological recovery. Prefer outcome-changing work: consolidate duplicate mechanics, connect existing rules into feedback loops, make missing ecological roles recover through simulation, simplify state transitions, or convert existing observations into behavior that affects future ticks. Tests are supporting evidence for meaningful behavior, not a substitute for garden value.
 
 ## Required behavior on every run
 
@@ -125,7 +125,7 @@ Prefer:
 * readable simulation behavior over opaque mechanisms;
 * focused new files over overloading existing files when a new source, test, renderer, report, summary, fixture, or documentation page would make the change easier to understand.
 
-Avoid repeating the most recent implementation pattern simply because it is familiar. If the last active journal entries are dominated by one kind of change, first ask whether the garden now needs consolidation, measurement, or clearer feedback before adding more of the same.
+Avoid repeating the most recent implementation pattern simply because it is familiar. If the last active journal entries are dominated by one kind of change, first ask whether the garden now needs consolidation, state-transition repair, or an outcome-changing feedback loop before adding more of the same.
 
 Do not avoid creating new files solely to keep the diff tiny. If a new organism behavior, environmental concept, persistence helper, renderer, test case group, generated report, or agent memory file is the cleanest expression of the chosen step, create it in an appropriate mutable area such as `src/`, `src/test/`, `agent/`, or `data/`.
 
