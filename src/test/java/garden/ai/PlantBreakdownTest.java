@@ -34,15 +34,16 @@ class PlantBreakdownTest {
     }
 
     @Test
-    void testDiagnosticBreakdown_HighConsumption() {
-        // Create a hungry environment with high plant counts
-        Environment env = new Environment(50, 50, 50, 5, 100);
-        // mossCount = 5000, fernCount = 1000, mossReduction = 0, fernReduction = 0, mobilizerCount = 0
-        // mossConsumption = 5000 / 5 = 1000
-        // fernConsumption = 1000 / 5 = 200
-        // total consumption = 1200
-        String diagnostic = env.diagnostic(5000, 1000, 0, 0, 0, 0);
+    void testDiagnosticBreakdown_UnmetDemand() {
+        // Create a hungry environment
+        Environment env = new Environment(50, 50, 50, 2, 100);
+        // buffer release = 100 / 2 = 50
+        // mossCount = 2000, fernCount = 500, consumption = 400 + 100 = 500
+        // available = 2 (nutrients) + 50 (release) = 52
+        // unmet = 500 - 52 = 448
+        String diagnostic = env.diagnostic(2000, 500, 0, 0, 0, 0);
 
-        assertThat(diagnostic).contains("consumption=1200 [moss=1000, fern=200]");
+        assertThat(diagnostic).contains("consumption=500 [moss=400, fern=100]");
+        assertThat(diagnostic).contains("unmet=448");
     }
 }
