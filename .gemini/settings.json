@@ -1,11 +1,16 @@
 {
   "model": {
-    "name": "auto"
+    "name": "gemini-3.1-flash-lite",
+    "summarizeToolOutput": {
+      "run_shell_command": {
+        "tokenBudget": 4000
+      }
+    }
   },
   "general": {
     "plan": {
       "enabled": true,
-      "modelRouting": true
+      "modelRouting": false
     }
   }
 }

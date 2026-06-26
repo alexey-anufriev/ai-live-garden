@@ -247,7 +247,7 @@ Within each volume, chapter headings use second-level Markdown headings beginnin
 
 ## Workflow model, quota, and repair
 
-The Agent workflow uses Gemini through `GEMINI_API_KEY`. The workflow does not pass a model name explicitly to the Gemini action. Gemini CLI should resolve the model from `.gemini/settings.json`, where the project uses `model.name` set to `auto` and Plan Mode model routing enabled.
+The Agent workflow uses Gemini through `GEMINI_API_KEY`. The workflow does not pass a model name explicitly to the Gemini action. Gemini CLI should resolve the model from `.gemini/settings.json`, where the project pins `model.name` to `gemini-3.1-flash-lite` and disables Plan Mode model routing. This keeps hourly autonomous runs on the high-request model instead of routing into stronger models with smaller daily quotas.
 
 If the main Gemini autonomous step fails because of API quota exhaustion, billing limits, authentication, or provider availability, the run must fail without committing. This is an environment capacity issue, not a garden evolution task. Do not work around it by committing partial changes, removing validation, suppressing errors, or adding unbounded retries. The appropriate actions are to wait for quota reset, reduce run frequency, adjust `.gemini/settings.json`, or ask the human to adjust quota, billing, or credentials.
 

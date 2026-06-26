@@ -31,8 +31,10 @@ if [[ -n "$npm_path" ]]; then
 fi
 
 settings_model="-"
+shell_output_token_budget="-"
 if [[ -f .gemini/settings.json ]] && command -v jq >/dev/null 2>&1; then
   settings_model="$(jq -r '.model.name // "-"' .gemini/settings.json 2>/dev/null || echo "-")"
+  shell_output_token_budget="$(jq -r '.model.summarizeToolOutput.run_shell_command.tokenBudget // "-"' .gemini/settings.json 2>/dev/null || echo "-")"
 fi
 
 {
@@ -40,13 +42,14 @@ fi
   echo
   echo "- Explicit action model input: -"
   echo "- Settings model: $(value_or_dash "$settings_model")"
+  echo "- Shell output token budget: $(value_or_dash "$shell_output_token_budget")"
   echo "- Resolved gemini binary: $(value_or_dash "$cli_path")"
   echo "- Gemini CLI version: ${cli_version}"
   echo "- Global Gemini CLI package: ${package_version}"
   echo "- Node: $(value_or_dash "$node_path")"
   echo "- npm: $(value_or_dash "$npm_path")"
   echo
-  echo "The workflow does not pass a gemini_model input or settings input. Gemini CLI should resolve the model from .gemini/settings.json and provider-side routing; quota attribution must be read from Gemini CLI/API errors if a call fails."
+  echo "The workflow does not pass a gemini_model input or settings input. Gemini CLI should resolve the model from .gemini/settings.json; quota attribution must be read from Gemini CLI/API errors if a call fails."
 } | tee "${RUNNER_TEMP:-/tmp}/gemini-model-diagnostics.md"
 
 if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
