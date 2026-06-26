@@ -40,4 +40,19 @@ class StressedPlantCullingTest {
             .anyMatch(e -> e.description().contains("was culled due to chronic environmental stress"));
         assertThat(foundCullingEvent).isTrue();
     }
+
+    @Test
+    void stressResilientPlantsDoNotLoseEnergyOrBecomeStressed() {
+        // Environment does not favor plants (light, moisture, warmth < 40)
+        // Nutrients = 0 (scarcity)
+        Environment env = new Environment(10, 10, 10, 0, 100);
+        Organism moss = Organism.of("moss-1", OrganismType.MOSS, 10, 1, "stress-resilient");
+        Garden garden = new Garden(0, 2, env, List.of(moss), List.of());
+
+        // Cycle 1: Should NOT get "stressed" and NOT lose energy
+        Garden next = garden.nextCycle();
+        assertThat(next.organisms().get(0).traits()).doesNotContain("stressed");
+        // Energy: initial 10, +0 growth, -0 stress penalty = 10
+        assertThat(next.organisms().get(0).energy()).isEqualTo(10);
+    }
 }
