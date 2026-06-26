@@ -484,6 +484,9 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             if (organism.energy() > 0) {
                 survivors.add(organism);
             } else {
+                if (organism.traits().contains("stressed")) {
+                    events.add(new GardenEvent(cycle, "%s was culled due to chronic environmental stress.".formatted(organism.id())));
+                }
                 totalNutrientContribution += organism.nutrientValue();
                 deadOrganisms++;
                 if (organism.traits().contains("moisture-retainer") && organism.type() == OrganismType.MOSS) {
