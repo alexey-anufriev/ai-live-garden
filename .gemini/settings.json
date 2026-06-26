@@ -1,0 +1,11 @@
+{
+  "model": {
+    "name": "auto"
+  },
+  "general": {
+    "plan": {
+      "enabled": true,
+      "modelRouting": true
+    }
+  }
+}

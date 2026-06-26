@@ -16,19 +16,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 42
     env:
-      EXECUTION_MODEL: ${{ vars.EXECUTION_MODEL || 'gemini-3.1-flash-lite' }}
-      CONTEXT_COMPACTION_MODEL: ${{ vars.CONTEXT_COMPACTION_MODEL || 'gemma-4-26b-a4b-it' }}
+      CONTEXT_COMPACTION_ENABLED: ${{ vars.CONTEXT_COMPACTION_ENABLED || 'true' }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-
-      - name: Load Gemini CLI settings
-        id: gemini_cli_settings
-        shell: bash
-        run: scripts/write-output-file.sh settings .github/gemini-cli-settings.json
 
       - name: Set up Java
         uses: actions/setup-java@v5
@@ -56,7 +50,7 @@ jobs:
 
       - name: Build context compaction prompt
         id: context_compaction_prompt
-        if: ${{ env.CONTEXT_COMPACTION_MODEL != '' }}
+        if: ${{ env.CONTEXT_COMPACTION_ENABLED == 'true' }}
         shell: bash
         run: |
           scripts/write-agent-context-compaction-prompt.sh "${RUNNER_TEMP}/agent-context.md" "${RUNNER_TEMP}/agent-context-compaction-prompt.md"
@@ -64,25 +58,23 @@ jobs:
 
       - name: Compact agent context
         id: context_compaction
-        if: ${{ env.CONTEXT_COMPACTION_MODEL != '' }}
+        if: ${{ env.CONTEXT_COMPACTION_ENABLED == 'true' }}
         uses: google-github-actions/run-gemini-cli@v0.1.22
         env:
           GEMINI_CLI_TRUST_WORKSPACE: "true"
         with:
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
-          gemini_model: ${{ env.CONTEXT_COMPACTION_MODEL }}
           prompt: ${{ steps.context_compaction_prompt.outputs.text }}
-          settings: ${{ steps.gemini_cli_settings.outputs.settings }}
           upload_artifacts: false
 
       - name: Restore workspace after context compaction
-        if: ${{ env.CONTEXT_COMPACTION_MODEL != '' && !cancelled() }}
+        if: ${{ env.CONTEXT_COMPACTION_ENABLED == 'true' && !cancelled() }}
         shell: bash
         run: scripts/restore-worktree-to-head.sh
 
       - name: Build compacted Gemini prompt
         id: gemini_compacted_prompt
-        if: ${{ env.CONTEXT_COMPACTION_MODEL != '' }}
+        if: ${{ env.CONTEXT_COMPACTION_ENABLED == 'true' }}
         shell: bash
         env:
           AGENT_CONTEXT_COMPACTION_SUMMARY: ${{ steps.context_compaction.outputs.summary }}
@@ -109,9 +101,7 @@ jobs:
           GEMINI_CLI_TRUST_WORKSPACE: "true"
         with:
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
-          gemini_model: ${{ env.EXECUTION_MODEL }}
           prompt: ${{ steps.selected_gemini_prompt.outputs.text }}
-          settings: ${{ steps.gemini_cli_settings.outputs.settings }}
           upload_artifacts: true
 
       - name: Restore protected files
@@ -129,7 +119,6 @@ jobs:
           protected-restore-command: scripts/restore-agent-protected-files.sh
           violations-file: ${{ runner.temp }}/post-test-violations.txt
           gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
-          gemini-model: ${{ env.EXECUTION_MODEL }}
           artifact-name-prefix: post-test-repair
 
       - name: Advance persistent garden state
@@ -145,7 +134,6 @@ jobs:
           protected-restore-command: scripts/restore-agent-protected-files.sh
           violations-file: ${{ runner.temp }}/required-memory-violations.txt
           gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
-          gemini-model: ${{ env.EXECUTION_MODEL }}
           artifact-name-prefix: required-memory-repair
 
       - name: Validate and repair journal format
@@ -159,7 +147,6 @@ jobs:
           protected-restore-command: scripts/restore-agent-protected-files.sh
           violations-file: ${{ runner.temp }}/journal-format-violations.txt
           gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
-          gemini-model: ${{ env.EXECUTION_MODEL }}
           artifact-name-prefix: journal-format-repair
 
       - name: Validate and repair summary format
@@ -171,7 +158,6 @@ jobs:
           protected-restore-command: scripts/restore-agent-protected-files.sh
           violations-file: ${{ runner.temp }}/summary-format-violations.txt
           gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
-          gemini-model: ${{ env.EXECUTION_MODEL }}
           artifact-name-prefix: summary-format-repair
 
       - name: Validate and repair append-only summaries
@@ -183,7 +169,6 @@ jobs:
           protected-restore-command: scripts/restore-agent-protected-files.sh
           violations-file: ${{ runner.temp }}/summary-append-only-violations.txt
           gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
-          gemini-model: ${{ env.EXECUTION_MODEL }}
           artifact-name-prefix: summary-append-only-repair
 
       - name: Archive old journal entries
@@ -249,8 +234,7 @@ jobs:
         if: ${{ always() }}
         shell: bash
         env:
-          EXECUTION_MODEL: ${{ env.EXECUTION_MODEL }}
-          CONTEXT_COMPACTION_MODEL: ${{ env.CONTEXT_COMPACTION_MODEL }}
+          CONTEXT_COMPACTION_ENABLED: ${{ env.CONTEXT_COMPACTION_ENABLED }}
           BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
           CONTEXT_COMPACTION_OUTCOME: ${{ steps.context_compaction.outcome }}
           GEMINI_OUTCOME: ${{ steps.gemini.outcome }}

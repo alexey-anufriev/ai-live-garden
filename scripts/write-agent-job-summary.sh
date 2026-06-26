@@ -39,8 +39,8 @@ metadata_value() {
   echo "- UTC: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
   echo "- Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
   echo "- Attempt: ${GITHUB_RUN_ATTEMPT:-1}"
-  echo "- Execution model: $(value_or_dash "${EXECUTION_MODEL:-}")"
-  echo "- Context compaction model: $(value_or_dash "${CONTEXT_COMPACTION_MODEL:-}")"
+  echo "- Gemini model source: .gemini/settings.json"
+  echo "- Context compaction enabled: $(value_or_dash "${CONTEXT_COMPACTION_ENABLED:-}")"
   echo
   echo "| Phase | Outcome |"
   echo "| --- | --- |"
@@ -81,7 +81,7 @@ metadata_value() {
   echo "- Latest yearly summary: $(value_or_dash "$(metadata_value AGENT_CONTEXT_LATEST_YEARLY_SUMMARY)")"
   echo
   if [[ "${CONTEXT_COMPACTION_OUTCOME:-}" == "failure" ]]; then
-    echo "Context compaction failed before the main Gemini call. Check the compaction model id, quota, authentication, or provider availability."
+    echo "Context compaction failed before the main Gemini call. Check Gemini CLI model routing, quota, authentication, or provider availability."
   fi
   if [[ -n "${AGENT_CHANGE_DIAGNOSTICS_FILE:-}" && -f "$AGENT_CHANGE_DIAGNOSTICS_FILE" ]]; then
     cat "$AGENT_CHANGE_DIAGNOSTICS_FILE"

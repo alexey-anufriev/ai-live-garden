@@ -3,7 +3,9 @@
 
 target/
 
-.gemini/
+.gemini/*
+!.gemini/
+!.gemini/settings.json
 gemini-artifacts/
 gha-creds-*.json
 
