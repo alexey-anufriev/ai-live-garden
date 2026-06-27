@@ -21,11 +21,11 @@ class NutrientConserverTest {
         Garden next = garden.nextCycle();
 
         // 20 plants total, 10 conservers.
-        // Expected consumption: (20 / 5) - (10 / 10) = 3.
+        // Expected consumption: (20 / 5) - (10 / 5) = 2.
         // Current consumption: (20 / 5) = 4.
-        // Environment nutrients = 50 + 2 (prod) - 3 (cons) = 49 (should be 49).
+        // Environment nutrients = 50 + 2 (prod) - 2 (cons) = 50 (should be 50).
         // If current, nutrients = 50 + 2 - 4 = 48.
         
-        assertThat(next.environment().nutrients()).isEqualTo(54);
+        assertThat(next.environment().nutrients()).isEqualTo(55);
     }
 }

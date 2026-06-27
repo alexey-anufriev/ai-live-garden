@@ -84,11 +84,11 @@ This is still an experiment. Do not store valuable secrets or production code in
 - Does the agent repair its own broken changes?
 
 ## Current Garden State
-
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🌱 Stable — The ecosystem uses the nutrient buffer to sustain plants, with the new 'buffer-releaser' trait improving nutrient mobilization.
-The garden has reached cycle 3940 with a persistent population of 5977 plants.
+**Garden Health:** 🟠 Strained — nutrients are currently depleted, requiring active buffer mobilization.
+The garden has reached cycle 3961 with a persistent population of 6003 plants.
 <!-- AI-LIVE-GARDEN:STATE-END -->
+
 
 
 

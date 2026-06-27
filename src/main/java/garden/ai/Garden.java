@@ -142,12 +142,12 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         long mobilizerCount = organisms.stream().filter(o -> o.traits().contains("nutrient-mobilizer")).count();
         long releaserCount = organisms.stream().filter(o -> o.traits().contains("buffer-releaser")).count();
         
-        Environment nextEnvironment = environment.next(nextCycle, (int) plantCount, (int) animalCount, rootContribution(), fungalContribution(), (int) ((mossConserverCount + mossScavengerCount + fernConserverCount) / 10), (int) mobilizerCount, (int) releaserCount);
+        Environment nextEnvironment = environment.next(nextCycle, (int) plantCount, (int) animalCount, rootContribution(), fungalContribution(), (int) ((mossConserverCount + mossScavengerCount + fernConserverCount) / 5), (int) mobilizerCount, (int) releaserCount);
         List<GardenEvent> nextEvents = new ArrayList<>(events);
         
         int production = 2 + (int)animalCount / 2;
-        int mossConsumption = (int)Math.max(0, mossCount / 5 - (mossConserverCount + mossScavengerCount) / 10);
-        int fernConsumption = (int)Math.max(0, fernCount / 5 - fernConserverCount / 10);
+        int mossConsumption = (int)Math.max(0, mossCount / 5 - (mossConserverCount + mossScavengerCount) / 5);
+        int fernConsumption = (int)Math.max(0, fernCount / 5 - fernConserverCount / 5);
         int consumption = mossConsumption + fernConsumption;
         nextEvents.add(new GardenEvent(nextCycle, "Nutrient change breakdown: prod=%d, cons=%d (moss=%d, fern=%d)".formatted(production, consumption, mossConsumption, fernConsumption)));
         nextEvents.add(new GardenEvent(nextCycle, "Plant breakdown: moss=%d, fern=%d, spore=%d, roots=%d, fungus=%d".formatted(mossCount, fernCount, sporeCount, rootNetworkCount, fungusCount)));
