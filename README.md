@@ -85,8 +85,8 @@ This is still an experiment. Do not store valuable secrets or production code in
 
 ## Current Garden State
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟠 Strained — nutrients are currently depleted, requiring active buffer mobilization.
-The garden has reached cycle 3979 with a stable population of organisms.
+**Garden Health:** 🟠 Strained — nutrients are low, relying on buffer mobilization.
+The garden has reached cycle 3997 with a stable population of organisms.
 <!-- AI-LIVE-GARDEN:STATE-END -->
 
 
