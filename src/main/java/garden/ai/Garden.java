@@ -55,6 +55,11 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
     }
 
     public int rootContribution() {
+        long releaserCount = organisms.stream().filter(o -> o.traits().contains("buffer-releaser")).count();
+        return rootContribution(releaserCount);
+    }
+
+    public int rootContribution(long releaserCount) {
         long rootNetworkCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK).count();
         long nutrientWeaverCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("nutrient-weaver")).count();
         long nutrientSharerCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("nutrient-sharer")).count();
@@ -78,7 +83,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         } else if (environment.nutrients() < 25) {
             return (int) (rootNetworkCount * 4 + nutrientWeaverCount * 4 + nutrientSharerCount * 8 + bufferOptimizerCount * 8 + soilMasterCount * 12 + nutrientRecyclerCount * 4 + nutrientTranslocatorCount * 16 + nutrientSynthesizerCount * 12 + nutrientReclaimerCount * 10 + nutrientProducerCount * 20 + nutrientPumpCount * 24 + nutrientDistributorCount * 16 + fungalRootSymbiontCount * 16 + mycelialRootMediatorCount * 8);
         } else {
-            int recyclerBonus = environment.nutrientBuffer() > 50 ? 5 : 2;
+            int recyclerBonus = (environment.nutrientBuffer() > 50 ? 5 : 2) + (int) Math.min(releaserCount, 10);
             return (int) (Math.max(1, rootNetworkCount / 2) + nutrientWeaverCount + nutrientSharerCount * 2 + bufferOptimizerCount * 2 + soilMasterCount * 4 + nutrientRecyclerCount * recyclerBonus + nutrientTranslocatorCount * 4 + nutrientSynthesizerCount * 3 + nutrientReclaimerCount * 3 + nutrientProducerCount * 5 + nutrientPumpCount * 6 + nutrientDistributorCount * 4 + fungalRootSymbiontCount * 4 + mycelialRootMediatorCount * 2);
         }
     }
@@ -142,7 +147,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         long mobilizerCount = organisms.stream().filter(o -> o.traits().contains("nutrient-mobilizer")).count();
         long releaserCount = organisms.stream().filter(o -> o.traits().contains("buffer-releaser")).count();
         
-        Environment nextEnvironment = environment.next(nextCycle, (int) plantCount, (int) animalCount, rootContribution(), fungalContribution(), (int) ((mossConserverCount + mossScavengerCount + fernConserverCount) / 5), (int) mobilizerCount, (int) releaserCount);
+        Environment nextEnvironment = environment.next(nextCycle, (int) plantCount, (int) animalCount, rootContribution(releaserCount), fungalContribution(), (int) ((mossConserverCount + mossScavengerCount + fernConserverCount) / 5), (int) mobilizerCount, (int) releaserCount);
         List<GardenEvent> nextEvents = new ArrayList<>(events);
         
         int production = 2 + (int)animalCount / 2;
