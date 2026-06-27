@@ -12,10 +12,10 @@ class NutrientMobilizerTest {
         Environment env = new Environment(50, 50, 50, 50, 100);
         
         // Without mobilizer: release = 100 / 10 = 10.
-        Environment nextNoMobilizer = env.next(1, 0, 0, 0, 0, 0, 0, 0);
+        Environment nextNoMobilizer = env.next(1, 0, 0, 0, 0, 0, 0, 0, 0);
         
         // With mobilizer: release = 100 / 9 = 11.
-        Environment nextWithMobilizer = env.next(1, 0, 0, 0, 0, 0, 1, 0);
+        Environment nextWithMobilizer = env.next(1, 0, 0, 0, 0, 0, 0, 1, 0);
         
         assertThat(nextWithMobilizer.nutrients()).isGreaterThan(nextNoMobilizer.nutrients());
     }

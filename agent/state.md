@@ -14,8 +14,8 @@ This file is the compact current operating memory for future work on the garden.
   - The active garden is plant-only.
   - The 'buffer-releaser' trait is implemented to enhance nutrient mobilization from the nutrient buffer.
   - The 'nutrient-recycler' trait now synergizes with 'buffer-releaser' and actively accelerates nutrient release from the nutrient buffer, improving nutrient mobilization.
-  - The 'nutrient-distributor' trait for ROOT_NETWORK organisms facilitates buffer release during scarcity.
-  - Existing mechanics are sufficient for now; continue monitoring the interaction between these new traits and overall nutrient stability.
+  - The 'nutrient-demand-regulator' trait for ROOT_NETWORK organisms is implemented to actively reduce the overall plant nutrient consumption, helping to balance demand during scarcity.
+  - The nutrient mobilization feedback loop now includes supply-side (releasers/distributors) and demand-side (regulators) mechanisms.
 
 ## Immediate Directions
 

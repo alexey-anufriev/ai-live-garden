@@ -28,7 +28,7 @@ class PlantBreakdownTest {
         // mossConsumption = 100 / 5 - 0 = 20
         // fernConsumption = 50 / 5 - 0 = 10
         // total consumption = 30
-        String diagnostic = env.diagnostic(100, 50, 0, 0, 0, 0, 0, 0, 0);
+        String diagnostic = env.diagnostic(100, 50, 0, 0, 0, 0, 0, 0, 0, 0);
 
         assertThat(diagnostic).contains("consumption=30 [moss=20, fern=10]");
     }
@@ -41,7 +41,7 @@ class PlantBreakdownTest {
         // mossCount = 2000, fernCount = 500, consumption = 400 + 100 = 500
         // available = 2 (nutrients) + 50 (release) = 52
         // unmet = 500 - 52 = 448
-        String diagnostic = env.diagnostic(2000, 500, 0, 0, 0, 0, 0, 0, 0);
+        String diagnostic = env.diagnostic(2000, 500, 0, 0, 0, 0, 0, 0, 0, 0);
 
         assertThat(diagnostic).contains("consumption=500 [moss=400, fern=100]");
         assertThat(diagnostic).contains("unmet=448");

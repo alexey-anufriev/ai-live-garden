@@ -40,8 +40,10 @@ public final class GardenRenderer {
         long mossConserverCount = garden.organisms().stream().filter(o -> o.type() == OrganismType.MOSS && o.traits().contains("nutrient-conserver")).count();
         long mossScavengerCount = garden.organisms().stream().filter(o -> o.type() == OrganismType.MOSS && o.traits().contains("moss-nutrient-scavenger")).count();
         long fernConserverCount = garden.organisms().stream().filter(o -> o.type() == OrganismType.FERN && o.traits().contains("nutrient-conserver")).count();
-        int mossConsumptionReduction = (int) ((mossConserverCount + mossScavengerCount) / 10);
-        int fernConsumptionReduction = (int) (fernConserverCount / 10);
+        long demandRegulatorCount = garden.organisms().stream().filter(o -> o.traits().contains("nutrient-demand-regulator")).count();
+        int mossConsumptionReduction = (int) ((mossConserverCount + mossScavengerCount) / 5);
+        int fernConsumptionReduction = (int) (fernConserverCount / 5);
+        int rootConsumptionReduction = (int) (demandRegulatorCount / 2);
         int mobilizerCount = (int) garden.organisms().stream().filter(o -> o.traits().contains("nutrient-mobilizer")).count();
         int releaserCount = (int) garden.organisms().stream().filter(o -> o.traits().contains("buffer-releaser")).count();
 
@@ -85,7 +87,7 @@ public final class GardenRenderer {
                 garden.environment().nutrientBuffer(),
                 garden.rootContribution(),
                 garden.fungalContribution(),
-                garden.environment().mood() + (garden.environment().mood().equals("hungry") ? " (" + garden.environment().diagnostic(moss, ferns, mossConsumptionReduction, fernConsumptionReduction, mobilizerCount, releaserCount, garden.blockedPlantCount(), culledPlantCount, stressResilientPlantCount) + ")" : ""),
+                garden.environment().mood() + (garden.environment().mood().equals("hungry") ? " (" + garden.environment().diagnostic(moss, ferns, mossConsumptionReduction, fernConsumptionReduction, rootConsumptionReduction, mobilizerCount, releaserCount, garden.blockedPlantCount(), culledPlantCount, stressResilientPlantCount) + ")" : ""),
                 garden.plantCount(),
                 moss, roots, spores, ferns,
                 garden.animalCount(),
