@@ -208,7 +208,7 @@ append_compact_journal_entry() {
   echo "- Prefer continuity over novelty and ecological depth over disconnected additions."
   echo "- Choose by expected garden value: continuity, expressive behavior, understandable state, resilience, evolvability, and observable consequences over time."
   echo "- Prefer changes whose value remains visible beyond the current run by making the garden more coherent, alive, inspectable, or able to keep evolving."
-  echo "- Prefer changes that increase future autonomous development capacity: clearer domain boundaries, more expressive state transitions, better observability of live behavior, reusable simulation concepts, or mechanics that create new future possibilities."
+  echo "- Prefer changes that increase future autonomous development capacity: clearer domain boundaries, more expressive state transitions, visible behavioral consequences in future ticks, reusable simulation concepts, or mechanics that create new future possibilities."
   echo "- Do not choose a task merely because it is the easiest way to satisfy validators. Memory, journal, summaries, tests, and validators support autonomy; they are not the purpose of the run."
   echo "- Do not repeat the recent implementation pattern by default. If recent runs mostly added similar named mechanisms, diagnostics, event logs, counters, or tests, treat those categories as saturated."
   echo "- A new named trait, diagnostic field, renderer line, event-log message, or test-only change is low value unless it directly changes future garden behavior or removes a current obstacle to ecological recovery."
@@ -223,8 +223,8 @@ append_compact_journal_entry() {
   echo "- Do not weaken assertions to make tests pass or leave uncertainty comments in tests such as \"maybe\", \"wait\", \"not sure\", or \"does not distinguish\"."
   echo "- Run \`mvn test\` if possible and leave the code in a testable state."
   echo "- Do not fabricate large arbitrary edits to \`data/garden-state.txt\`; normal evolution happens by simulation."
-  echo "- Do not edit generated memory files: \`README.md\`, \`agent/state.md\`, \`agent/requests.md\`, \`agent/journal/\`, \`agent/summaries/\`, or \`agent/templates/\`."
-  echo "- Do not run memory harness scripts. CI post-processing will generate README state, summaries, journal, and current memory from the final diff and garden state."
+  echo "- Do not edit generated memory files: \`README.md\`, \`agent/state.md\`, \`agent/requests.md\`, \`agent/code-map.md\`, \`agent/journal/\`, \`agent/summaries/\`, or \`agent/templates/\`."
+  echo "- Do not run memory harness scripts. CI post-processing will generate README state, code map, summaries, journal, and current memory from the final diff and garden state."
   echo "- Write \`.agent-run.json\` as the machine-readable handoff described below. This file is required."
   echo "- Before finishing, compare the final diff to the chosen task and remove accidental edits, scratch files, speculative comments, and unrelated assertion changes."
   echo "- Do not modify \`AGENTS.md\`, \`GEMINI.md\`, \`.github/\`, \`story/\`, license files, secrets, or prior journal entries."
@@ -234,7 +234,7 @@ append_compact_journal_entry() {
   append_context_manifest
   echo "## Automatic Post-Processing"
   echo
-  echo "After this step, CI runs \`scripts/agent-auto-postprocess.sh\`. It parses \`.agent-run.json\`, restores generated memory files, advances documentation from \`data/garden-state.txt\`, appends summaries, creates the journal entry, applies any request entries, removes \`.agent-run.json\`, and leaves those artifacts for validation."
+  echo "After this step, CI runs \`scripts/agent-auto-postprocess.sh\`. It parses \`.agent-run.json\`, restores generated memory files, refreshes \`agent/code-map.md\`, advances documentation from \`data/garden-state.txt\`, appends summaries, creates the journal entry, applies any request entries, removes \`.agent-run.json\`, and leaves those artifacts for validation."
   echo
   echo "## Required Agent Handoff"
   echo
