@@ -43,10 +43,17 @@ jobs:
         shell: bash
         run: scripts/restore-story-protected-files.sh
 
-      - name: Update narrated garden-state commit
+      - name: Append story chapter
         if: steps.story_context.outputs.skip != 'true'
         shell: bash
-        run: scripts/update-narrated-garden-state.sh "${{ steps.story_context.outputs.current_state_commit }}"
+        run: >
+          scripts/story-append-chapter.sh
+          --handoff-file .story-run.json
+          --chapter-number "${{ steps.story_context.outputs.next_chapter }}"
+          --volume-number "${{ steps.story_context.outputs.volume_number }}"
+          --volume-file "${{ steps.story_context.outputs.volume_file }}"
+          --new-volume "${{ steps.story_context.outputs.new_volume }}"
+          --current-state-commit "${{ steps.story_context.outputs.current_state_commit }}"
 
       - name: Commit story
         if: steps.story_context.outputs.skip != 'true'

@@ -9,7 +9,7 @@ fi
 output_file="$1"
 mkdir -p "$(dirname "$output_file")"
 
-recent_journal_limit="${AGENT_CONTEXT_RECENT_JOURNAL_LIMIT:-8}"
+recent_journal_limit="${AGENT_CONTEXT_RECENT_JOURNAL_LIMIT:-3}"
 context_warn_lines="${AGENT_CONTEXT_WARN_LINES:-1200}"
 metadata_file="${AGENT_CONTEXT_METADATA_FILE:-${output_file}.metadata}"
 mkdir -p "$(dirname "$metadata_file")"
@@ -39,16 +39,55 @@ append_full_file() {
   echo
 }
 
-append_latest_summary() {
+append_requests() {
+  local path="agent/requests.md"
+
+  if awk '
+    /^## Open requests/ { in_open = 1; next }
+    /^## / && in_open { in_open = 0 }
+    in_open && /\*No open requests yet\.\*/ { empty = 1 }
+    END { exit empty ? 0 : 1 }
+  ' "$path"; then
+    echo "No open requests."
+    echo
+    return
+  fi
+
+  append_full_file "$path"
+}
+
+append_summary_entries() {
   local title="$1"
   local dir="$2"
+  local entry_limit="$3"
   local file
 
   file="$(latest_files 1 "$dir" || true)"
   echo "## ${title}"
   echo
   if [[ -n "$file" ]]; then
-    append_full_file "$file"
+    echo '```markdown'
+    awk -v limit="$entry_limit" '
+      /^### / {
+        entry_count++
+      }
+      {
+        lines[NR] = $0
+        entry_at_line[NR] = entry_count
+      }
+      END {
+        first_entry = entry_count - limit + 1
+        if (first_entry < 1) {
+          first_entry = 1
+        }
+        for (line = 1; line <= NR; line++) {
+          if (entry_at_line[line] >= first_entry) {
+            print lines[line]
+          }
+        }
+      }
+    ' "$file"
+    echo '```'
   else
     echo "No active ${title,,} file found."
   fi
@@ -62,11 +101,11 @@ append_context_manifest() {
 
   echo "## Context Manifest"
   echo
-  echo "- Full authoritative templates included: journal entry, daily summary, weekly summary, monthly summary, and yearly summary."
-  echo "- Continuity sources include \`agent/state.md\`, \`agent/requests.md\`, latest active summaries, and recent active journal files."
+  echo "- README state, summaries, journal, and current memory are generated after the agent step by scripts."
+  echo "- Continuity sources include \`agent/state.md\`, \`agent/code-map.md\`, \`agent/requests.md\`, latest active summaries, and recent active journal files."
   echo "- Recent active journal source set: latest ${recent_journal_limit} of ${journal_count} directly under \`agent/journal/\`."
   echo "- Persistent garden state is included as an exact computed digest, not as raw organism lines."
-  echo "- Project source is included as a file index only; inspect exact source files only when needed for the chosen task."
+  echo "- Project source is summarized in \`agent/code-map.md\`; inspect exact source files only when needed for the chosen task."
   echo "- Archive folders are intentionally excluded."
   echo
 }
@@ -89,133 +128,68 @@ append_garden_digest() {
   echo "### Organism Counts"
   echo
   awk -F'[=|]' '
-    function numeric(value) {
-      return value ~ /^-?[0-9]+([.][0-9]+)?$/
-    }
-    function numeric_label(fieldIndex) {
-      return "numeric-field-" (fieldIndex - 3) " (organism column " fieldIndex ")"
-    }
     /^organism=/ {
       total++
-      type=$3
-      count[type]++
-      for (fieldIndex = 4; fieldIndex <= NF; fieldIndex++) {
-        if (!numeric($fieldIndex)) continue
-        key=type SUBSEP numeric_label(fieldIndex)
-        value=$fieldIndex + 0
-        numericCount[key]++
-        if (!(key in min) || value < min[key]) min[key] = value
-        if (!(key in max) || value > max[key]) max[key] = value
-        sum[key] += value
-      }
+      count[$3]++
     }
     END {
       printf "- Total organisms: %d\n", total
       for (type in count) {
         printf "- %s: %d\n", type, count[type]
       }
-      for (key in numericCount) {
-        split(key, parts, SUBSEP)
-        type=parts[1]
-        label=parts[2]
-        printf "- %s %s min/max/avg: %s/%s/%.1f\n", type, label, min[key], max[key], sum[key] / numericCount[key]
+    }
+  ' data/garden-state.txt
+  echo
+  echo "### Attribute Extremes"
+  echo
+  awk -F'[=|]' '
+    function numeric(value) {
+      return value ~ /^-?[0-9]+([.][0-9]+)?$/
+    }
+    function numeric_label(fieldIndex) {
+      return "numeric-field-" (fieldIndex - 3) " (organism column " fieldIndex ")"
+    }
+    /^organism=/ {
+      for (fieldIndex = 4; fieldIndex <= NF; fieldIndex++) {
+        if (numeric($fieldIndex)) {
+          label = numeric_label(fieldIndex)
+          value = $fieldIndex + 0
+          count[label]++
+          if (!(label in min) || value < min[label]) {
+            min[label] = value
+            minOrganism[label] = $2
+            minType[label] = $3
+          }
+          if (!(label in max) || value > max[label]) {
+            max[label] = value
+            maxOrganism[label] = $2
+            maxType[label] = $3
+          }
+          sum[label] += value
+        }
+      }
+    }
+    END {
+      for (label in count) {
+        printf "- %s: min %s at %s (%s), max %s at %s (%s), avg %.1f\n", label, min[label], minOrganism[label], minType[label], max[label], maxOrganism[label], maxType[label], sum[label] / count[label]
       }
     }
   ' data/garden-state.txt | sort
   echo
-  echo "### Attribute Extremes"
-  echo
-  echo "Current numeric organism fields:"
-  awk -F'[=|]' '
-    function numeric(value) {
-      return value ~ /^-?[0-9]+([.][0-9]+)?$/
-    }
-    function numeric_label(fieldIndex) {
-      return "numeric-field-" (fieldIndex - 3) " (organism column " fieldIndex ")"
-    }
-    function trait_text(    fieldIndex, text) {
-      text = ""
-      for (fieldIndex = 4; fieldIndex <= NF; fieldIndex++) {
-        if (!numeric($fieldIndex)) {
-          text = text (text == "" ? "" : "|") $fieldIndex
-        }
-      }
-      gsub(/\\,/, ",", text)
-      return text
-    }
-    function other_numeric_text(skipFieldIndex,    fieldIndex, text) {
-      text = ""
-      for (fieldIndex = 4; fieldIndex <= NF; fieldIndex++) {
-        if (fieldIndex != skipFieldIndex && numeric($fieldIndex)) {
-          text = text (text == "" ? "" : " ") numeric_label(fieldIndex) "=" $fieldIndex
-        }
-      }
-      return text
-    }
-    /^organism=/ {
-      traits = trait_text()
-      for (fieldIndex = 4; fieldIndex <= NF; fieldIndex++) {
-        if (numeric($fieldIndex)) {
-          printf "%s\t%s\t%s\t%s\t%s nonNumeric=%s\n", numeric_label(fieldIndex), $fieldIndex, $2, $3, other_numeric_text(fieldIndex), traits
-        }
-      }
-    }
-  ' data/garden-state.txt | sort -t $'\t' -k1,1 -k2,2n | awk -F'\t' '
-    $1 != current {
-      current=$1
-      count=0
-      printf "- Lowest %s:\n", current
-    }
-    count < 3 {
-      printf "  - %s (%s): %s=%s, %s\n", $3, $4, $1, $2, $5
-      count++
-    }
-  '
-  awk -F'[=|]' '
-    function numeric(value) {
-      return value ~ /^-?[0-9]+([.][0-9]+)?$/
-    }
-    function numeric_label(fieldIndex) {
-      return "numeric-field-" (fieldIndex - 3) " (organism column " fieldIndex ")"
-    }
-    function trait_text(    fieldIndex, text) {
-      text = ""
-      for (fieldIndex = 4; fieldIndex <= NF; fieldIndex++) {
-        if (!numeric($fieldIndex)) {
-          text = text (text == "" ? "" : "|") $fieldIndex
-        }
-      }
-      gsub(/\\,/, ",", text)
-      return text
-    }
-    function other_numeric_text(skipFieldIndex,    fieldIndex, text) {
-      text = ""
-      for (fieldIndex = 4; fieldIndex <= NF; fieldIndex++) {
-        if (fieldIndex != skipFieldIndex && numeric($fieldIndex)) {
-          text = text (text == "" ? "" : " ") numeric_label(fieldIndex) "=" $fieldIndex
-        }
-      }
-      return text
-    }
-    /^organism=/ {
-      traits = trait_text()
-      for (fieldIndex = 4; fieldIndex <= NF; fieldIndex++) {
-        if (numeric($fieldIndex)) {
-          printf "%s\t%s\t%s\t%s\t%s nonNumeric=%s\n", numeric_label(fieldIndex), $fieldIndex, $2, $3, other_numeric_text(fieldIndex), traits
-        }
-      }
-    }
-  ' data/garden-state.txt | sort -t $'\t' -k1,1 -k2,2nr | awk -F'\t' '
-    $1 != current {
-      current=$1
-      count=0
-      printf "- Highest %s:\n", current
-    }
-    count < 3 {
-      printf "  - %s (%s): %s=%s, %s\n", $3, $4, $1, $2, $5
-      count++
-    }
-  '
+}
+
+append_compact_journal_entry() {
+  local path="$1"
+
+  echo '```markdown'
+  awk '
+    /^## Files changed$/ { skip = 1; next }
+    /^## Checks run$/ { skip = 1; next }
+    /^## Result of `mvn test`$/ { skip = 1; next }
+    /^## / { skip = 0 }
+    !skip { print }
+  ' "$path"
+  echo '```'
   echo
 }
 
@@ -224,9 +198,9 @@ append_garden_digest() {
   echo
   echo "Generated at: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
   echo
-  echo "You are performing one autonomous evolution step for this repository. This compact bundle is the normal context; inspect raw files only when needed for the chosen task."
+  echo "You are performing one autonomous implementation step for this repository. This compact bundle is the normal context; inspect raw files only when needed for the chosen task."
   echo
-  echo "Important workflow model: AI agents perform functional evolution of rules, tests, rendering, memory, and documentation. Separate AI-less tick workflows may advance \`data/garden-state.txt\` by simulation only. Treat tick commits as independent ecological history, and distinguish your code/memory changes from state changes produced by simulation ticks."
+  echo "Important workflow model: AI agents perform functional evolution of source code, tests, rendering, and small project files when needed. Separate scripts handle memory, README state, journal, summaries, and simulation ticks."
   echo
   echo "## Non-Negotiable Run Contract"
   echo
@@ -241,61 +215,88 @@ append_garden_digest() {
   echo "- Prefer outcome-changing work: consolidate duplicate mechanics, connect existing rules into feedback loops, make missing ecological roles recover through simulation, simplify state transitions, or convert existing observations into behavior that affects future ticks."
   echo "- Tests are supporting evidence for meaningful behavior, not a substitute for garden value."
   echo "- A focused new file is acceptable when it is the cleanest design."
-  echo "- Keep scope tight: change only files needed for the chosen task plus required memory files."
+  echo "- Keep scope tight: change only files needed for the chosen task."
   echo "- Do not edit unrelated tests or behavior, and do not replace an existing unrelated test with a new one."
   echo "- If a change touches simulation behavior, add or update a focused test unless the change is purely documentary or too small to test meaningfully."
   echo "- Do not choose a tests-only task unless it protects existing behavior future runs are likely to build on or exposes an important current uncertainty."
   echo "- Tests must prove the behavior itself, not just a log line or wording change."
   echo "- Do not weaken assertions to make tests pass or leave uncertainty comments in tests such as \"maybe\", \"wait\", \"not sure\", or \"does not distinguish\"."
-  echo "- Run \`mvn test\` if possible and report the real result."
+  echo "- Run \`mvn test\` if possible and leave the code in a testable state."
   echo "- Do not fabricate large arbitrary edits to \`data/garden-state.txt\`; normal evolution happens by simulation."
-  echo "- Update \`agent/state.md\` as compact current memory, not as a run log."
-  echo "- Update only the protected current-state block in \`README.md\`, grounded in the current garden snapshot and recent events."
-  echo "- Do not claim absent organism categories are currently benefiting from a change; describe latent or future behavior as such."
-  echo "- Add one new journal entry by copying \`agent/templates/journal-entry.md\` and replacing placeholders only."
-  echo "- Append exactly one current daily summary entry. Existing summary content must remain a byte-for-byte prefix."
-  echo "- Update weekly/monthly/yearly summaries only when scheduled by the rules."
+  echo "- Do not edit generated memory files: \`README.md\`, \`agent/state.md\`, \`agent/requests.md\`, \`agent/journal/\`, \`agent/summaries/\`, or \`agent/templates/\`."
+  echo "- Do not run memory harness scripts. CI post-processing will generate README state, summaries, journal, and current memory from the final diff and garden state."
+  echo "- Write \`.agent-run.json\` as the machine-readable handoff described below. This file is required."
   echo "- Before finishing, compare the final diff to the chosen task and remove accidental edits, scratch files, speculative comments, and unrelated assertion changes."
   echo "- Do not modify \`AGENTS.md\`, \`GEMINI.md\`, \`.github/\`, \`story/\`, license files, secrets, or prior journal entries."
   echo "- Do not read \`agent/journal/archive/\` or summary archive folders during a normal run."
   echo "- Do not ask the human what to do next."
   echo
   append_context_manifest
-  echo "## Authoritative Templates"
+  echo "## Automatic Post-Processing"
   echo
-  append_full_file "agent/templates/journal-entry.md"
-  append_full_file "agent/templates/daily-summary.md"
-  append_full_file "agent/templates/weekly-summary.md"
-  append_full_file "agent/templates/monthly-summary.md"
-  append_full_file "agent/templates/yearly-summary.md"
-  echo "Use weekly, monthly, and yearly templates only when that rollup is due."
+  echo "After this step, CI runs \`scripts/agent-auto-postprocess.sh\`. It parses \`.agent-run.json\`, restores generated memory files, advances documentation from \`data/garden-state.txt\`, appends summaries, creates the journal entry, applies any request entries, removes \`.agent-run.json\`, and leaves those artifacts for validation."
+  echo
+  echo "## Required Agent Handoff"
+  echo
+  echo "Before finishing, create \`.agent-run.json\` with this exact JSON object shape. Use concise strings. Use an empty \`requests\` array when no human help is needed."
+  echo
+  cat <<'JSON'
+```json
+{
+  "title": "Short title for this run",
+  "task": "One sentence describing the chosen implementation task.",
+  "why": "One short paragraph explaining why this was the right next step.",
+  "summary": "One short paragraph summarizing what changed.",
+  "observations": "One short paragraph describing what was learned or any limitations.",
+  "next": "One concrete possible next direction.",
+  "codeMap": [
+    {
+      "path": "src/main/java/garden/ai/FileChangedByThisRun.java",
+      "description": "One short description of this source file's current responsibility."
+    }
+  ],
+  "requests": [
+    {
+      "title": "Short request title",
+      "what": "What human help, tool, dependency, permission, or boundary change is requested.",
+      "why": "Why this would help the garden evolve.",
+      "affected": "Files, workflow, dependency, or configuration areas affected.",
+      "benefit": "Expected benefit.",
+      "fallback": "What agents can do if this is not approved."
+    }
+  ],
+  "state": {
+    "immediateDirections": [
+      "Optional current direction for future runs."
+    ],
+    "constraints": [
+      "Optional active constraint or known bad idea."
+    ]
+  }
+}
+```
+JSON
+  echo
+  echo "Do not wrap the actual \`.agent-run.json\` file in Markdown fences."
   echo
   echo "## Current Agent Memory"
   echo
   append_full_file "agent/state.md"
+  echo "## Code Map"
+  echo
+  append_full_file "agent/code-map.md"
   echo "## Open Agent Requests"
   echo
-  append_full_file "agent/requests.md"
-  append_latest_summary "Latest Daily Summary" "agent/summaries/daily"
-  append_latest_summary "Latest Weekly Summary" "agent/summaries/weekly"
-  append_latest_summary "Latest Monthly Summary" "agent/summaries/monthly"
-  append_latest_summary "Latest Yearly Summary" "agent/summaries/yearly"
+  append_requests
+  append_summary_entries "Latest Daily Summary Entries" "agent/summaries/daily" 3
+  append_summary_entries "Latest Weekly Summary Entry" "agent/summaries/weekly" 1
+  append_summary_entries "Latest Monthly Summary Entry" "agent/summaries/monthly" 1
   append_garden_digest
   echo "## Recent Active Journal Entries"
   echo
   while IFS= read -r journal; do
-    append_full_file "$journal"
+    append_compact_journal_entry "$journal"
   done < <(latest_files "$recent_journal_limit" "agent/journal")
-  echo "## Project Index"
-  echo
-  echo "### Main Java Files"
-  echo
-  find src/main/java -type f | sort | sed 's/^/- `/' | sed 's/$/`/'
-  echo
-  echo "### Test Java Files"
-  echo
-  find src/test/java -type f | sort | sed 's/^/- `/' | sed 's/$/`/'
-  echo
   echo "### Useful Commands"
   echo
   echo "- \`mvn test\`"

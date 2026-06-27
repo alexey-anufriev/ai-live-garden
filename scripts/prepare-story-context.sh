@@ -84,16 +84,15 @@ emit_bounded_file() {
 
   if [[ "$new_volume" == "true" ]]; then
     echo "This chapter starts a new volume."
-    echo "Create the requested volume file and generate a volume title."
-    echo "Also update \`story/chronicles-of-ai-garden.md\` to include a link to the new volume."
+    echo "Generate a volumeTitle for the JSON handoff."
   else
     echo "This chapter continues an existing volume."
-    echo "Append the chapter to the requested volume file."
-    echo "Do not change the existing volume title."
+    echo "Set volumeTitle to an empty string in the JSON handoff."
   fi
 
   echo
-  echo "The chapter title must be generated from the actual garden events."
+  echo "The chapter title and body must be generated from the actual garden events."
+  echo "Do not edit story files directly; CI will append the chapter from \`.story-run.json\`."
   echo
 
   if [[ -n "$last_narrated_commit" ]]; then

@@ -84,8 +84,8 @@ emit_untracked_source_files() {
   echo "3. Update a test expectation only when the production behavior is intentionally correct and the assertion is stale."
   echo "4. Do not delete, disable, or weaken tests just to make CI pass."
   echo "5. Do not modify protected files such as \`AGENTS.md\`, \`GEMINI.md\`, or \`.github/\`."
-  echo "6. Keep the autonomous run's required journal, summary, state, and README updates intact."
-  echo "7. Do not edit summaries, journal, README, or garden state unless the Maven failure is directly about those files."
+  echo "6. Do not edit generated memory files: \`README.md\`, \`agent/state.md\`, \`agent/journal/\`, \`agent/summaries/\`, or \`agent/templates/\`."
+  echo "7. Keep \`.agent-run.json\` valid; update it only if the repair changes the run summary, limitations, next direction, requests, or code-map descriptions."
   echo "8. Run \`mvn -B test\` before finishing."
   echo
   emit_section_from_command "Changed files:" git status --short

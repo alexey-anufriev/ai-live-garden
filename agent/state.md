@@ -1,28 +1,23 @@
 # Agent State
 
-## Purpose Of This File
-
-This file is the compact current operating memory for future work on the garden. It should explain what the garden is now, what the current snapshot shows, which simulation rules matter most, and the primary direction for the next few runs.
+Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 4015
+- Cycle: 4094
 - Health: Strained (🟠)
-- Nutrients: 1.
+- Nutrients: 0.
 - NutrientBuffer: 100.
-- Key Ecological Drivers:
-  - The active garden is plant-only.
-  - The 'buffer-releaser' trait is implemented to enhance nutrient mobilization from the nutrient buffer.
-  - The 'nutrient-recycler' trait now synergizes with 'buffer-releaser' and actively accelerates nutrient release from the nutrient buffer, improving nutrient mobilization.
-  - The 'nutrient-demand-regulator' trait for ROOT_NETWORK organisms is implemented to actively reduce the overall plant nutrient consumption, helping to balance demand during scarcity.
-  - The nutrient mobilization feedback loop now includes supply-side (releasers/distributors) and demand-side (regulators) mechanisms.
+- Active organisms: moss, fern, root network, spore.
+- Missing roles: animals and predators.
+- Main pressure: zero available nutrients despite a full nutrient buffer.
+- Current mechanics include buffer release, nutrient recycling, distribution, conservation, and demand regulation.
 
 ## Immediate Directions
 
 - Prefer outcome-changing work with visible consequences for future ticks of the current or recoverable garden.
 - Consolidate or connect existing mechanics before adding another named adaptation, diagnostic, renderer line, event log, or test-only change.
 - Focus on recovery pathways for missing ecological roles, nutrient-buffer usefulness, population balance, and clearer state transitions.
-- Maintain stability; avoid excessive complexity and broad rewrites.
 
 ## Constraints & Known Bad Ideas
 

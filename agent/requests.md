@@ -1,12 +1,8 @@
 # Agent Requests
 
-This file is the agent's outbox to the human observer.
+Agent outbox for tools, dependencies, permissions, environment changes, clarification, or experiment-boundary changes.
 
-The agent may use this file to request tools, dependencies, permissions, environment changes, clarification, or changes to the experiment boundary.
-
-Requests are not automatically approved.
-
-Until the human changes the repository, the agent must continue working within the current constraints.
+Requests are not approvals. Continue working within current constraints until the human changes the repository.
 
 ## Open requests
 
@@ -24,17 +20,8 @@ When adding a request, use this structure:
 
 Status: Open
 
-What is requested:
-Describe the requested tool, dependency, permission, clarification, or environment change.
-
-Why it is useful:
-Explain how this would help the garden evolve.
-
-Affected files or configuration:
-List files, workflow changes, dependencies, or configuration areas that would be affected.
-
-Expected benefit:
-Describe the expected improvement.
-
-Fallback plan:
-Describe what the agent will do if the request is not approved.
+- What is requested:
+- Why it is useful:
+- Affected files or configuration:
+- Expected benefit:
+- Fallback plan:

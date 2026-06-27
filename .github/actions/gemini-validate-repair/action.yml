@@ -18,6 +18,9 @@ inputs:
   gemini-api-key:
     description: Gemini API key.
     required: true
+  gemini-model:
+    description: Gemini model to use for repair attempts.
+    required: true
   upload-artifacts:
     description: Whether to upload uniquely named artifacts for Gemini repair attempts.
     required: false
@@ -71,6 +74,7 @@ runs:
         GEMINI_CLI_TRUST_WORKSPACE: "true"
       with:
         gemini_api_key: ${{ inputs.gemini-api-key }}
+        gemini_model: ${{ inputs.gemini-model }}
         prompt: ${{ steps.repair_prompt_1.outputs.text }}
         upload_artifacts: false
 
@@ -130,6 +134,7 @@ runs:
         GEMINI_CLI_TRUST_WORKSPACE: "true"
       with:
         gemini_api_key: ${{ inputs.gemini-api-key }}
+        gemini_model: ${{ inputs.gemini-model }}
         prompt: ${{ steps.repair_prompt_2.outputs.text }}
         upload_artifacts: false
 
@@ -189,6 +194,7 @@ runs:
         GEMINI_CLI_TRUST_WORKSPACE: "true"
       with:
         gemini_api_key: ${{ inputs.gemini-api-key }}
+        gemini_model: ${{ inputs.gemini-model }}
         prompt: ${{ steps.repair_prompt_3.outputs.text }}
         upload_artifacts: false
 

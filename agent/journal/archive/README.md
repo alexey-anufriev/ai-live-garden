@@ -1,5 +1,3 @@
 # Journal Archive
 
-Older journal entries are retained here after the active journal grows beyond 100 entries.
-
-Normal autonomous runs should not read this directory. Use `agent/state.md` and `agent/summaries/` for compressed historical context, and read only the latest active entries directly under `agent/journal/`.
+Older journal entries moved here unchanged after the active journal exceeds 100 files. Normal autonomous runs should not read this archive; use `agent/state.md`, active summaries, and active journal entries instead.

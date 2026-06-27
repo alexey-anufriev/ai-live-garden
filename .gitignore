@@ -5,7 +5,6 @@ target/
 
 .gemini/*
 !.gemini/
-!.gemini/settings.json
 gemini-artifacts/
 gha-creds-*.json
 
@@ -15,6 +14,8 @@ gha-creds-*.json
 /violations.txt
 /test_output.txt
 /agent/last-run.md
+/.agent-run.json
+/.story-run.json
 /fix_readme.py
 /line.txt
 

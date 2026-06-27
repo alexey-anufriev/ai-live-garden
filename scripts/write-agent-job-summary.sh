@@ -39,7 +39,7 @@ metadata_value() {
   echo "- UTC: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
   echo "- Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
   echo "- Attempt: ${GITHUB_RUN_ATTEMPT:-1}"
-  echo "- Gemini model source: .gemini/settings.json"
+  echo "- Gemini execution model: $(value_or_dash "${EXECUTION_MODEL:-}")"
   echo
   echo "| Phase | Outcome |"
   echo "| --- | --- |"
@@ -48,6 +48,7 @@ metadata_value() {
   echo "| Protected file restore | $(value_or_dash "${RESTORE_PROTECTED_OUTCOME:-}") |"
   echo "| Post-Gemini test validation | $(value_or_dash "${POST_TEST_OUTCOME:-}") |"
   echo "| Garden state advance | $(value_or_dash "${ADVANCE_GARDEN_OUTCOME:-}") |"
+  echo "| Automated memory generation | $(value_or_dash "${AUTO_MEMORY_OUTCOME:-}") |"
   echo "| Required memory validation | $(value_or_dash "${REQUIRED_MEMORY_OUTCOME:-}") |"
   echo "| Journal format validation | $(value_or_dash "${JOURNAL_FORMAT_OUTCOME:-}") |"
   echo "| Summary format validation | $(value_or_dash "${SUMMARY_FORMAT_OUTCOME:-}") |"
@@ -84,12 +85,14 @@ metadata_value() {
     echo "The run failed during the main Gemini call. This is usually provider quota, authentication, or model availability."
   elif [[ "${POST_TEST_OUTCOME:-}" == "failure" ]]; then
     echo "The run failed after Gemini while validating or repairing tests."
+  elif [[ "${AUTO_MEMORY_OUTCOME:-}" == "failure" ]]; then
+    echo "The run failed while generating deterministic memory artifacts."
   elif [[ "${SUMMARY_APPEND_ONLY_OUTCOME:-}" == "failure" ]]; then
-    echo "The run failed while validating or repairing append-only summaries."
+    echo "The run failed while validating append-only summaries."
   elif [[ "${REQUIRED_MEMORY_OUTCOME:-}" == "failure" ]]; then
-    echo "The run failed while validating or repairing required README/state memory updates."
+    echo "The run failed while validating required README/state memory updates."
   elif [[ "${JOURNAL_FORMAT_OUTCOME:-}" == "failure" || "${SUMMARY_FORMAT_OUTCOME:-}" == "failure" ]]; then
-    echo "The run failed while validating or repairing generated memory format."
+    echo "The run failed while validating generated memory format."
   elif [[ "${COMMIT_OUTCOME:-}" == "success" ]]; then
     echo "The run reached the commit step."
   else

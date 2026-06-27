@@ -12,6 +12,7 @@ mkdir -p agent
   echo "- Gemini outcome: ${GEMINI_OUTCOME}"
   echo "- Post-change test outcome: ${POST_TEST_OUTCOME}"
   echo "- Garden state advance outcome: ${ADVANCE_GARDEN_OUTCOME}"
+  echo "- Automated memory outcome: ${AUTO_MEMORY_OUTCOME}"
   echo "- Required memory outcome: ${REQUIRED_MEMORY_OUTCOME}"
   echo "- Journal format outcome: ${JOURNAL_FORMAT_OUTCOME}"
   echo "- Summary format outcome: ${SUMMARY_FORMAT_OUTCOME}"

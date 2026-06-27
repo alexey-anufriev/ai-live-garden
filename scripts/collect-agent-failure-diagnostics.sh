@@ -15,6 +15,10 @@ git diff --binary > "$output_dir/git-diff.patch"
 git diff --name-status > "$output_dir/git-diff-name-status.txt"
 git ls-files --others --exclude-standard > "$output_dir/git-untracked-files.txt"
 
+if [[ -f .agent-run.json ]]; then
+  cp .agent-run.json "$output_dir/agent-run.json"
+fi
+
 if [[ -s "$output_dir/git-untracked-files.txt" ]]; then
   mkdir -p "$output_dir/untracked-files"
   while IFS= read -r path; do
@@ -81,5 +85,8 @@ fi
   fi
   if [[ -f "$output_dir/agent-context.md" ]]; then
     echo "- Full compact context copied to \`agent-context.md\`"
+  fi
+  if [[ -f "$output_dir/agent-run.json" ]]; then
+    echo "- Agent handoff copied to \`agent-run.json\`"
   fi
 } > "$output_dir/README.md"

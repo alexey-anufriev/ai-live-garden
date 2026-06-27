@@ -11,6 +11,9 @@ concurrency:
 permissions:
   contents: write
 
+env:
+  EXECUTION_MODEL: gemini-3.1-flash-lite
+
 jobs:
   agent:
     runs-on: ubuntu-latest
@@ -53,6 +56,7 @@ jobs:
           GEMINI_CLI_TRUST_WORKSPACE: "true"
         with:
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+          gemini_model: ${{ env.EXECUTION_MODEL }}
           prompt: ${{ steps.gemini_prompt.outputs.text }}
           upload_artifacts: true
 
@@ -71,57 +75,46 @@ jobs:
           protected-restore-command: scripts/restore-agent-protected-files.sh
           violations-file: ${{ runner.temp }}/post-test-violations.txt
           gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
+          gemini-model: ${{ env.EXECUTION_MODEL }}
           artifact-name-prefix: post-test-repair
 
       - name: Advance persistent garden state
         id: advance_garden
         run: mvn -B -q exec:java -Dexec.args="tick --steps 3"
 
-      - name: Validate and repair required memory updates
-        id: required_memory_final
-        uses: ./.github/actions/gemini-validate-repair
-        with:
-          validation-command: scripts/validate-required-memory-updates.sh
-          repair-prompt-command: scripts/write-required-memory-repair-prompt.sh
-          protected-restore-command: scripts/restore-agent-protected-files.sh
-          violations-file: ${{ runner.temp }}/required-memory-violations.txt
-          gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
-          artifact-name-prefix: required-memory-repair
+      - name: Generate memory artifacts
+        id: auto_memory
+        shell: bash
+        run: scripts/agent-auto-postprocess.sh --test-outcome "${{ steps.post_test_final.outcome }}" --checks "mvn -B test"
 
-      - name: Validate and repair journal format
+      - name: Validate required memory updates
+        id: required_memory_final
+        shell: bash
+        env:
+          VALIDATE_REPAIR_VIOLATIONS_FILE: ${{ runner.temp }}/required-memory-violations.txt
+        run: scripts/validate-required-memory-updates.sh
+
+      - name: Validate journal format
         id: journal_format_final
-        uses: ./.github/actions/gemini-validate-repair
+        shell: bash
         env:
           JOURNAL_MVN_TEST_OUTCOME: ${{ steps.post_test_final.outcome }}
-        with:
-          validation-command: scripts/validate-journal-format.sh
-          repair-prompt-command: scripts/write-journal-repair-prompt.sh
-          protected-restore-command: scripts/restore-agent-protected-files.sh
-          violations-file: ${{ runner.temp }}/journal-format-violations.txt
-          gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
-          artifact-name-prefix: journal-format-repair
+          VALIDATE_REPAIR_VIOLATIONS_FILE: ${{ runner.temp }}/journal-format-violations.txt
+        run: scripts/validate-journal-format.sh
 
-      - name: Validate and repair summary format
+      - name: Validate summary format
         id: summary_format_final
-        uses: ./.github/actions/gemini-validate-repair
-        with:
-          validation-command: scripts/validate-summary-format.sh
-          repair-prompt-command: scripts/write-summary-format-repair-prompt.sh
-          protected-restore-command: scripts/restore-agent-protected-files.sh
-          violations-file: ${{ runner.temp }}/summary-format-violations.txt
-          gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
-          artifact-name-prefix: summary-format-repair
+        shell: bash
+        env:
+          VALIDATE_REPAIR_VIOLATIONS_FILE: ${{ runner.temp }}/summary-format-violations.txt
+        run: scripts/validate-summary-format.sh
 
-      - name: Validate and repair append-only summaries
+      - name: Validate append-only summaries
         id: summary_append_only_final
-        uses: ./.github/actions/gemini-validate-repair
-        with:
-          validation-command: scripts/validate-summary-append-only.sh
-          repair-prompt-command: scripts/write-summary-repair-prompt.sh
-          protected-restore-command: scripts/restore-agent-protected-files.sh
-          violations-file: ${{ runner.temp }}/summary-append-only-violations.txt
-          gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
-          artifact-name-prefix: summary-append-only-repair
+        shell: bash
+        env:
+          SUMMARY_APPEND_ONLY_VIOLATIONS_FILE: ${{ runner.temp }}/summary-append-only-violations.txt
+        run: scripts/validate-summary-append-only.sh
 
       - name: Archive old journal entries
         id: archive_journal
@@ -159,6 +152,7 @@ jobs:
           GEMINI_OUTCOME: ${{ steps.gemini.outcome }}
           POST_TEST_OUTCOME: ${{ steps.post_test_final.outcome }}
           ADVANCE_GARDEN_OUTCOME: ${{ steps.advance_garden.outcome }}
+          AUTO_MEMORY_OUTCOME: ${{ steps.auto_memory.outcome }}
           REQUIRED_MEMORY_OUTCOME: ${{ steps.required_memory_final.outcome }}
           JOURNAL_FORMAT_OUTCOME: ${{ steps.journal_format_final.outcome }}
           SUMMARY_FORMAT_OUTCOME: ${{ steps.summary_format_final.outcome }}
@@ -187,6 +181,7 @@ jobs:
           RESTORE_PROTECTED_OUTCOME: ${{ steps.restore_protected.outcome }}
           POST_TEST_OUTCOME: ${{ steps.post_test_final.outcome }}
           ADVANCE_GARDEN_OUTCOME: ${{ steps.advance_garden.outcome }}
+          AUTO_MEMORY_OUTCOME: ${{ steps.auto_memory.outcome }}
           REQUIRED_MEMORY_OUTCOME: ${{ steps.required_memory_final.outcome }}
           JOURNAL_FORMAT_OUTCOME: ${{ steps.journal_format_final.outcome }}
           SUMMARY_FORMAT_OUTCOME: ${{ steps.summary_format_final.outcome }}
