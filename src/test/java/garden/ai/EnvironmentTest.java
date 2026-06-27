@@ -12,7 +12,7 @@ class EnvironmentTest {
         // releaseRate = 10 (nutrients 50 >= 10).
         // released = 100 / 10 = 10.
         // newNutrients = 50 - 18 + 10 = 42.
-        Environment next = env.next(1, 100, 0, 0, 0, 0, 0);
+        Environment next = env.next(1, 100, 0, 0, 0, 0, 0, 0);
         assertThat(next.nutrients()).isEqualTo(42);
     }
 
@@ -25,7 +25,7 @@ class EnvironmentTest {
         // blockedPlantCount = 10.
         // culledPlantCount = 5.
         // stressResilientPlantCount = 0.
-        assertThat(env.diagnostic(500, 500, 0, 0, 0, 10, 5, 0)).isEqualTo("buffer-supported (nutrients=0, buffer=100, release=50, consumption=200 [moss=100, fern=100], mobilizers=0, blocked-plants=10, unmet=150, culled=5, stress-resilient=0)");
+        assertThat(env.diagnostic(500, 500, 0, 0, 0, 0, 10, 5, 0)).isEqualTo("buffer-supported (nutrients=0, buffer=100, release=50, consumption=200 [moss=100, fern=100], mobilizers=0, releasers=0, blocked-plants=10, unmet=150, culled=5, stress-resilient=0)");
     }
 
 }

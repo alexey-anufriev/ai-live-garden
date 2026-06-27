@@ -6,15 +6,13 @@ This file is the compact current operating memory for future work on the garden.
 
 ## Current Garden State
 
-- Cycle: 3925
-- Nutrients: 7.
+- Cycle: 3940
+- Nutrients: 0.
 - NutrientBuffer: 100.
 - Key Ecological Drivers:
-  - The active garden is plant-only with 5983 organisms.
-  - Animals, predators, and decomposers remain absent.
-  - The ecosystem maintains survival with a full nutrient buffer, but direct nutrient uptake remains a challenge.
-  - Existing mechanics are sufficient; future work should focus on connecting these systems for better nutrient mobilization and ecosystem balance rather than adding further isolated traits.
-  - Scratch artifacts such as command-output captures are not project memory and should never be committed.
+  - The active garden is plant-only with 5977 organisms.
+  - The 'buffer-releaser' trait is implemented to enhance nutrient mobilization from the nutrient buffer.
+  - Existing mechanics are sufficient for now; continue monitoring the interaction between these new traits and overall nutrient stability.
 
 ## Immediate Directions
 

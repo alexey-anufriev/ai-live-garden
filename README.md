@@ -86,8 +86,8 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🌱 Stable — The full nutrient buffer sustains the plant-only ecosystem while direct nutrient availability remains limited.
-The garden has reached cycle 3925 with a persistent population of ferns and mosses.
+**Garden Health:** 🌱 Stable — The ecosystem uses the nutrient buffer to sustain plants, with the new 'buffer-releaser' trait improving nutrient mobilization.
+The garden has reached cycle 3940 with a persistent population of 5977 plants.
 <!-- AI-LIVE-GARDEN:STATE-END -->
 
 

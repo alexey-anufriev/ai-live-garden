@@ -23,15 +23,15 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
      * @param rootContribution nutrient contribution from root networks
      * @return the next normalized environment
      */
-    public Environment next(int cycle, int plantCount, int animalCount, int rootContribution, int fungalContribution, int plantConsumptionReduction, int mobilizerCount) {
+    public Environment next(int cycle, int plantCount, int animalCount, int rootContribution, int fungalContribution, int plantConsumptionReduction, int mobilizerCount, int releaserCount) {
         int lightDelta = cycle % 2 == 0 ? 3 : -2;
         int moistureDelta = cycle % 3 == 0 ? 4 : -1;
         int warmthDelta = cycle % 5 == 0 ? -3 : 2;
         int nutrientDelta = 2 + animalCount / 2 - Math.max(0, plantCount / 5 - plantConsumptionReduction);
         
         int releaseRate = nutrients < 5 ? 2 : (nutrients < 10 ? 5 : 10);
-        // Reduce release rate if mobilizers are present (lower rate = higher release)
-        releaseRate = Math.max(1, releaseRate - mobilizerCount);
+        // Reduce release rate if mobilizers or releasers are present (lower rate = higher release)
+        releaseRate = Math.max(1, releaseRate - mobilizerCount - releaserCount);
         int releasedFromBuffer = nutrientBuffer / releaseRate;
         int newNutrients = nutrients + nutrientDelta + releasedFromBuffer;
         int newBuffer = nutrientBuffer + rootContribution + fungalContribution - releasedFromBuffer;
@@ -61,23 +61,23 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
     /**
      * Provides a diagnostic insight when the environment is hungry.
      */
-    public String diagnostic(int mobilizerCount) {
+    public String diagnostic(int mobilizerCount, int releaserCount) {
         if (nutrients >= 25) {
             return "stable";
         }
         int releaseRate = nutrients < 5 ? 2 : (nutrients < 10 ? 5 : 10);
-        releaseRate = Math.max(1, releaseRate - mobilizerCount);
+        releaseRate = Math.max(1, releaseRate - mobilizerCount - releaserCount);
         int released = nutrientBuffer / releaseRate;
         if (nutrientBuffer < 10) {
-            return "exhausted (low buffer, release=%d, rate=%d, mobilizers=%d)".formatted(released, releaseRate, mobilizerCount);
+            return "exhausted (low buffer, release=%d, rate=%d, mobilizers=%d, releasers=%d)".formatted(released, releaseRate, mobilizerCount, releaserCount);
         }
-        return "buffer-supported (low nutrients, release=%d, rate=%d, mobilizers=%d)".formatted(released, releaseRate, mobilizerCount);
+        return "buffer-supported (low nutrients, release=%d, rate=%d, mobilizers=%d, releasers=%d)".formatted(released, releaseRate, mobilizerCount, releaserCount);
     }
 
     /**
      * Provides a detailed diagnostic insight when the environment is hungry, including consumption info.
      */
-    public String diagnostic(long mossCount, long fernCount, int mossConsumptionReduction, int fernConsumptionReduction, int mobilizerCount, long blockedPlantCount, long culledPlantCount, long stressResilientPlantCount) {
+    public String diagnostic(long mossCount, long fernCount, int mossConsumptionReduction, int fernConsumptionReduction, int mobilizerCount, int releaserCount, long blockedPlantCount, long culledPlantCount, long stressResilientPlantCount) {
         if (nutrients >= 25) {
             return "stable";
         }
@@ -86,13 +86,13 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
         int consumption = mossConsumption + fernConsumption;
         
         int releaseRate = nutrients < 5 ? 2 : (nutrients < 10 ? 5 : 10);
-        releaseRate = Math.max(1, releaseRate - mobilizerCount);
+        releaseRate = Math.max(1, releaseRate - mobilizerCount - releaserCount);
         int released = nutrientBuffer / releaseRate;
         int unmetDemand = Math.max(0, consumption - (nutrients + released));
         
         String bufferInfo = (nutrientBuffer < 10) ? "exhausted" : "buffer-supported";
-        return "%s (nutrients=%d, buffer=%d, release=%d, consumption=%d [moss=%d, fern=%d], mobilizers=%d, blocked-plants=%d, unmet=%d, culled=%d, stress-resilient=%d)".formatted(
-            bufferInfo, nutrients, nutrientBuffer, released, consumption, mossConsumption, fernConsumption, mobilizerCount, blockedPlantCount, unmetDemand, culledPlantCount, stressResilientPlantCount);
+        return "%s (nutrients=%d, buffer=%d, release=%d, consumption=%d [moss=%d, fern=%d], mobilizers=%d, releasers=%d, blocked-plants=%d, unmet=%d, culled=%d, stress-resilient=%d)".formatted(
+            bufferInfo, nutrients, nutrientBuffer, released, consumption, mossConsumption, fernConsumption, mobilizerCount, releaserCount, blockedPlantCount, unmetDemand, culledPlantCount, stressResilientPlantCount);
     }
 
     /**

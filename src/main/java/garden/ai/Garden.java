@@ -140,8 +140,9 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         long mossScavengerCount = organisms.stream().filter(o -> o.type() == OrganismType.MOSS && o.traits().contains("moss-nutrient-scavenger")).count();
         long fernConserverCount = organisms.stream().filter(o -> o.type() == OrganismType.FERN && o.traits().contains("nutrient-conserver")).count();
         long mobilizerCount = organisms.stream().filter(o -> o.traits().contains("nutrient-mobilizer")).count();
+        long releaserCount = organisms.stream().filter(o -> o.traits().contains("buffer-releaser")).count();
         
-        Environment nextEnvironment = environment.next(nextCycle, (int) plantCount, (int) animalCount, rootContribution(), fungalContribution(), (int) ((mossConserverCount + mossScavengerCount + fernConserverCount) / 10), (int) mobilizerCount);
+        Environment nextEnvironment = environment.next(nextCycle, (int) plantCount, (int) animalCount, rootContribution(), fungalContribution(), (int) ((mossConserverCount + mossScavengerCount + fernConserverCount) / 10), (int) mobilizerCount, (int) releaserCount);
         List<GardenEvent> nextEvents = new ArrayList<>(events);
         
         int production = 2 + (int)animalCount / 2;
@@ -161,9 +162,9 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             nextEvents.add(new GardenEvent(nextCycle, "The nutrient buffer is accumulating."));
         }
         int baseReleaseRate = environment.nutrients() < 5 ? 2 : (environment.nutrients() < 10 ? 5 : 10);
-        int effectiveReleaseRate = Math.max(1, baseReleaseRate - (int)mobilizerCount);
+        int effectiveReleaseRate = Math.max(1, baseReleaseRate - (int)mobilizerCount - (int)releaserCount);
         int releasedFromBuffer = environment.nutrientBuffer() / effectiveReleaseRate;
-        nextEvents.add(new GardenEvent(nextCycle, "Buffer release stats: baseRate=%d, mobilizers=%d, effectiveRate=%d, released=%d".formatted(baseReleaseRate, mobilizerCount, effectiveReleaseRate, releasedFromBuffer)));
+        nextEvents.add(new GardenEvent(nextCycle, "Buffer release stats: baseRate=%d, mobilizers=%d, releasers=%d, effectiveRate=%d, released=%d".formatted(baseReleaseRate, mobilizerCount, releaserCount, effectiveReleaseRate, releasedFromBuffer)));
         
         int availableNutrients = environment.nutrients() + releasedFromBuffer;
         if (consumption > availableNutrients) {

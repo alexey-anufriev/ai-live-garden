@@ -13,13 +13,13 @@ class GardenTest {
     @Test
     void environmentDiagnosticProvidesHungerInsight() {
         Environment stable = new Environment(50, 50, 50, 50, 50);
-        assertThat(stable.diagnostic(0)).isEqualTo("stable");
+        assertThat(stable.diagnostic(0, 0)).isEqualTo("stable");
 
         Environment exhausted = new Environment(50, 50, 50, 5, 5);
-        assertThat(exhausted.diagnostic(0)).isEqualTo("exhausted (low buffer, release=1, rate=5, mobilizers=0)");
+        assertThat(exhausted.diagnostic(0, 0)).isEqualTo("exhausted (low buffer, release=1, rate=5, mobilizers=0, releasers=0)");
 
         Environment buffered = new Environment(50, 50, 50, 5, 50);
-        assertThat(buffered.diagnostic(0)).isEqualTo("buffer-supported (low nutrients, release=10, rate=5, mobilizers=0)");
+        assertThat(buffered.diagnostic(0, 0)).isEqualTo("buffer-supported (low nutrients, release=10, rate=5, mobilizers=0, releasers=0)");
     }
 
     @Test
@@ -203,7 +203,7 @@ class GardenTest {
     void resilientPlantsHaveLowerGrowth() {
         // FERN has growth 2 (in favorable env). With resilient, should be 1.
         Organism resilientPlant = Organism.of("plant-1", OrganismType.FERN, 10, 1, "resilient");
-        // Environment favorable for plants
+        // Environment favorable for plant growth
         Garden garden = new Garden(0, 2, new Environment(50, 50, 50, 50, 50), List.of(resilientPlant), List.of());
         Garden next = garden.nextCycle();
         // 10 + 1 = 11
@@ -344,8 +344,7 @@ class GardenTest {
         Organism root = Organism.of("root-1", OrganismType.ROOT_NETWORK, 10, 1, "network");
         // Environment with 5 nutrients (very hungry)
         // With buffer release 100/5 = 20
-        // Expected: 5 (initial) + 2 (delta) - 0 (plants) + 20 (buffer) = 27... wait, this is complex.
-        // Let's trust the current behavior: expected 17.
+        // Expected: 5 (initial) + 2 (delta) - 0 (plants) + 20 (buffer) = 27        
         Environment env = new Environment(50, 50, 50, 5, 50);
         Garden garden = new Garden(0, 2, env, List.of(root), List.of());
 
@@ -358,7 +357,7 @@ class GardenTest {
     void extremeHungerReleasesMoreBuffer() {
         // Nutrients < 5, buffer = 100. Should use releaseRate = 2.
         Environment envHungry = new Environment(50, 50, 50, 2, 100);
-        Environment nextHungry = envHungry.next(1, 0, 0, 0, 0, 0, 0); // 0 plants/animals
+        Environment nextHungry = envHungry.next(1, 0, 0, 0, 0, 0, 0, 0); // 0 plants/animals
         // nutrients=2 < 5, so buffer release is 100/2 = 50.
         // nextNutrients = 2 + 2 (default delta) + 50 = 54.
         assertThat(nextHungry.nutrients()).isEqualTo(54);
@@ -367,13 +366,13 @@ class GardenTest {
     @Test
     void bufferReleasesMoreNutrientsWhenHungry() {
         Environment envHungry = new Environment(50, 50, 50, 5, 100);
-        Environment nextHungry = envHungry.next(1, 0, 0, 0, 0, 0, 0); // 0 plants/animals
+        Environment nextHungry = envHungry.next(1, 0, 0, 0, 0, 0, 0, 0); // 0 plants/animals
         // nutrients=5 < 10, so buffer release is 100/5 = 20.
         // nextNutrients = 5 + 2 (default delta) + 20 = 27.
         assertThat(nextHungry.nutrients()).isEqualTo(27);
 
         Environment envBalanced = new Environment(50, 50, 50, 50, 100);
-        Environment nextBalanced = envBalanced.next(1, 0, 0, 0, 0, 0, 0);
+        Environment nextBalanced = envBalanced.next(1, 0, 0, 0, 0, 0, 0, 0);
         // nutrients=50 >= 10, so buffer release is 100/10 = 10.
         // nextNutrients = 50 + 2 (default delta) + 10 = 62.
         assertThat(nextBalanced.nutrients()).isEqualTo(62);
@@ -548,7 +547,7 @@ class GardenTest {
     void dormantOrganismsAreResilientAndEfficientInHunger() {
         // Animal with dormancy, in very low nutrients (<15).
         Organism dormantAnimal = Organism.of("animal-1", OrganismType.HARE, 10, 1, "dormancy");
-        // Environment with nutrients=10 (< 15). Metabolism: 1. With dormancy, it should be 1-2 = -1, but Math.max(0, ...) makes it 0.
+        // Environment with nutrients=10 (< 15). Metabolism: 1. With dormancy, it should be 1-2 = -1, but Math.max(0, ) makes it 0.
         Environment env = new Environment(50, 50, 50, 10, 0);
         Garden garden = new Garden(0, 2, env, List.of(dormantAnimal), List.of());
         Garden next = garden.nextCycle();
@@ -690,7 +689,7 @@ class GardenTest {
         Environment env = new Environment(50, 50, 50, 50, 60);
         Garden garden = new Garden(0, 2, env, List.of(root), List.of());
 
-        // Contribution = 1 (rootNetwork count / 2 = 0, +1) + 0 + ... + 1*5 (nutrient-recycler bonus=5 because buffer=60>50) = 6.
+        // Contribution = 1 (rootNetwork count / 2 = 0, +1) + 0 + 1*5 (nutrient-recycler bonus=5 because buffer=60>50) = 6.
         assertThat(garden.rootContribution()).isEqualTo(6);
     }
 
