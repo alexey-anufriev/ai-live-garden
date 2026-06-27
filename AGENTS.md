@@ -1,6 +1,6 @@
 # AI Live Garden Agent Rules
 
-This repository is an autonomous Java/Maven garden simulation. Each agent run observes the repository, chooses one small coherent implementation step, changes the project, and leaves a committable result. CI scripts record the run afterward.
+This repository is an autonomous Java/Maven garden simulation. Each agent run observes the repository, chooses one focused bounded improvement, changes the project, and leaves a committable result. CI scripts record the run afterward.
 
 The goal is not to finish a roadmap. The goal is to see whether autonomous agents can keep a living software system coherent, expressive, and extensible over time.
 
@@ -19,8 +19,8 @@ Use the compact context from `scripts/build-agent-context.sh` when the workflow 
 Every autonomous run must:
 
 1. Understand `AGENTS.md`, `GEMINI.md`, README, active memory summaries, `data/garden-state.txt`, and the Java/Maven project from the compact context.
-2. Choose exactly one focused implementation task.
-3. Make a meaningful source, test, rendering, or small project-file change.
+2. Choose exactly one focused bounded improvement.
+3. Make a meaningful source, test, rendering, or project-file change with a visible expected effect.
 4. Run `mvn test` if possible.
 5. Write `.agent-run.json` as the machine-readable handoff.
 6. Do not edit generated memory files.
@@ -39,11 +39,13 @@ Prefer changes that add durable garden value:
 - better boundaries for future work;
 - observable consequences in future ticks.
 
-Do not default to another named trait, diagnostic field, renderer line, event-log message, or tests-only change. Those are useful only when they change future behavior, protect important behavior, or remove a current obstacle.
+A run that only adds a named trait, diagnostic field, renderer line, event-log message, counter, or test coverage is low value unless it changes future simulation behavior or removes a concrete obstacle. If a candidate change would only add a name, counter, log line, renderer phrase, or isolated test, choose a stronger task.
 
-Small means conceptually focused, not necessarily single-file. Create a focused new source, test, renderer, fixture, report, or helper when that is clearer than overloading an existing file.
+Focused does not mean tiny. A bounded medium improvement may span several files when it has one clear behavioral purpose and leaves the project coherent. Create a focused new source, test, renderer, fixture, report, or helper when that is clearer than overloading an existing file.
 
-When changing behavior, add or update a focused test unless the change is purely documentation or too small to test meaningfully. Tests must prove behavior, not just wording. Do not weaken unrelated assertions.
+When changing behavior, add or update a focused test unless the change is purely documentation or too narrow to test meaningfully. Tests must prove behavior, not just wording. A tests-only run is valid only when it exposes an important current uncertainty and the handoff explains why no behavior change was appropriate. Do not weaken unrelated assertions.
+
+Good bounded medium tasks include consolidating duplicate nutrient-buffer mechanics, making a missing ecological role recoverable from the current state, simplifying survival or reproduction flow, introducing a reusable resource-flow concept that replaces duplicated code, or making state-format evolution explicit.
 
 ## Scope Rules
 
@@ -76,6 +78,7 @@ Before finishing, agents must write `.agent-run.json`:
   "summary": "What changed.",
   "observations": "What was learned or any limitations.",
   "next": "One possible next direction.",
+  "expectedGardenEffect": "What future ticks should do differently because of this change.",
   "codeMap": [
     {
       "path": "src/main/java/garden/ai/FileChangedByThisRun.java",

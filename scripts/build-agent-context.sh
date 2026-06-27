@@ -198,27 +198,30 @@ append_compact_journal_entry() {
   echo
   echo "Generated at: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
   echo
-  echo "You are performing one autonomous implementation step for this repository. This compact bundle is the normal context; inspect raw files only when needed for the chosen task."
+  echo "You are performing one focused bounded improvement for this repository. This compact bundle is the normal context; inspect raw files only when needed for the chosen task."
   echo
-  echo "Important workflow model: AI agents perform functional evolution of source code, tests, rendering, and small project files when needed. Separate scripts handle memory, README state, journal, summaries, and simulation ticks."
+  echo "Important workflow model: AI agents perform functional evolution of source code, tests, rendering, and project files when needed. Separate scripts handle memory, README state, journal, summaries, and simulation ticks."
   echo
   echo "## Non-Negotiable Run Contract"
   echo
-  echo "- Choose exactly one small, coherent next step."
+  echo "- Choose exactly one focused bounded improvement with a visible expected future effect."
   echo "- Prefer continuity over novelty and ecological depth over disconnected additions."
   echo "- Choose by expected garden value: continuity, expressive behavior, understandable state, resilience, evolvability, and observable consequences over time."
   echo "- Prefer changes whose value remains visible beyond the current run by making the garden more coherent, alive, inspectable, or able to keep evolving."
   echo "- Prefer changes that increase future autonomous development capacity: clearer domain boundaries, more expressive state transitions, visible behavioral consequences in future ticks, reusable simulation concepts, or mechanics that create new future possibilities."
   echo "- Do not choose a task merely because it is the easiest way to satisfy validators. Memory, journal, summaries, tests, and validators support autonomy; they are not the purpose of the run."
   echo "- Do not repeat the recent implementation pattern by default. If recent runs mostly added similar named mechanisms, diagnostics, event logs, counters, or tests, treat those categories as saturated."
-  echo "- A new named trait, diagnostic field, renderer line, event-log message, or test-only change is low value unless it directly changes future garden behavior or removes a current obstacle to ecological recovery."
+  echo "- A run that only adds a named trait, diagnostic field, renderer line, event-log message, counter, or test coverage is low value unless it directly changes future garden behavior or removes a current obstacle to ecological recovery."
+  echo "- If a candidate change would only add a name, counter, log line, renderer phrase, or isolated test, choose a stronger task."
   echo "- Prefer outcome-changing work: consolidate duplicate mechanics, connect existing rules into feedback loops, make missing ecological roles recover through simulation, simplify state transitions, or convert existing observations into behavior that affects future ticks."
   echo "- Tests are supporting evidence for meaningful behavior, not a substitute for garden value."
+  echo "- Focused does not mean tiny. A bounded medium improvement may span several files when it has one clear behavioral purpose and leaves the project coherent."
+  echo "- Good bounded medium tasks include consolidating duplicate nutrient-buffer mechanics, making a missing ecological role recoverable from the current state, simplifying survival or reproduction flow, introducing a reusable resource-flow concept that replaces duplicated code, or making state-format evolution explicit."
   echo "- A focused new file is acceptable when it is the cleanest design."
   echo "- Keep scope tight: change only files needed for the chosen task."
   echo "- Do not edit unrelated tests or behavior, and do not replace an existing unrelated test with a new one."
-  echo "- If a change touches simulation behavior, add or update a focused test unless the change is purely documentary or too small to test meaningfully."
-  echo "- Do not choose a tests-only task unless it protects existing behavior future runs are likely to build on or exposes an important current uncertainty."
+  echo "- If a change touches simulation behavior, add or update a focused test unless the change is purely documentary or too narrow to test meaningfully."
+  echo "- Do not choose a tests-only task unless it exposes an important current uncertainty and the handoff explains why no behavior change was appropriate."
   echo "- Tests must prove the behavior itself, not just a log line or wording change."
   echo "- Do not weaken assertions to make tests pass or leave uncertainty comments in tests such as \"maybe\", \"wait\", \"not sure\", or \"does not distinguish\"."
   echo "- Run \`mvn test\` if possible and leave the code in a testable state."
@@ -249,6 +252,7 @@ append_compact_journal_entry() {
   "summary": "One short paragraph summarizing what changed.",
   "observations": "One short paragraph describing what was learned or any limitations.",
   "next": "One concrete possible next direction.",
+  "expectedGardenEffect": "What future ticks should do differently because of this change.",
   "codeMap": [
     {
       "path": "src/main/java/garden/ai/FileChangedByThisRun.java",

@@ -74,7 +74,7 @@ emit_untracked_source_files() {
   echo "This is repair attempt ${attempt} of ${max_attempts}."
   echo
   echo "The autonomous change has already been made, but \`mvn -B test\` failed."
-  echo "Inspect the failing tests and the related production code, then make the smallest coherent repair."
+  echo "Inspect the failing tests and the related production code, then make the narrowest coherent repair."
   echo "Use the generated diff context below to understand what the autonomous step changed."
   echo
   echo "Repair rules:"
@@ -84,8 +84,8 @@ emit_untracked_source_files() {
   echo "3. Update a test expectation only when the production behavior is intentionally correct and the assertion is stale."
   echo "4. Do not delete, disable, or weaken tests just to make CI pass."
   echo "5. Do not modify protected files such as \`AGENTS.md\`, \`GEMINI.md\`, or \`.github/\`."
-  echo "6. Do not edit generated memory files: \`README.md\`, \`agent/state.md\`, \`agent/journal/\`, \`agent/summaries/\`, or \`agent/templates/\`."
-  echo "7. Keep \`.agent-run.json\` valid; update it only if the repair changes the run summary, limitations, next direction, requests, or code-map descriptions."
+  echo "6. Do not edit generated memory files: \`README.md\`, \`agent/state.md\`, \`agent/requests.md\`, \`agent/code-map.md\`, \`agent/journal/\`, \`agent/summaries/\`, or \`agent/templates/\`."
+  echo "7. Keep \`.agent-run.json\` valid; update it only if the repair changes the run summary, limitations, expected garden effect, next direction, requests, or code-map descriptions."
   echo "8. Run \`mvn -B test\` before finishing."
   echo
   emit_section_from_command "Changed files:" git status --short

@@ -61,7 +61,7 @@ require_handoff() {
   if ! jq -e '
     . as $root |
     type == "object" and
-    (["title", "task", "why", "summary", "observations", "next"] |
+    (["title", "task", "why", "summary", "observations", "next", "expectedGardenEffect"] |
       all(.[]; ($root[.] | type == "string" and length > 0))) and
     (($root.requests // []) | type == "array") and
     (all(($root.requests // [])[]; type == "object")) and
@@ -356,6 +356,8 @@ why_text="$(json_value '.why')"
 summary_text="$(json_value '.summary')"
 observations_text="$(json_value '.observations')"
 next_text="$(json_value '.next')"
+expected_effect="$(json_value '.expectedGardenEffect')"
+expected_effect="${expected_effect%.}"
 changed_list="$(changed_files_csv)"
 cycle="$(state_value cycle)"
 nutrients="$(state_value nutrients)"
@@ -373,7 +375,7 @@ append_requests
 readme_narrative="At cycle ${cycle}, the garden contains ${total:-0} organisms across ${active_types:-no active types}. Available nutrients are ${nutrients}, the nutrient buffer is ${buffer}, and missing roles are ${missing}; the next useful changes should improve recoverable ecosystem behavior rather than add bookkeeping."
 scripts/agent-update-readme-state.sh --symbol "$health_symbol" --status "$health_label" --reason "$health_reason" --narrative "$readme_narrative"
 
-summary_body="${summary_text} Changed files before memory generation: ${changed_list}. After the workflow tick, the garden reached cycle ${cycle} with nutrients ${nutrients}, nutrientBuffer ${buffer}, active types ${active_types:-none}, and missing roles ${missing}. Test validation outcome: ${test_outcome}."
+summary_body="${summary_text} Expected future effect: ${expected_effect}. Changed files before memory generation: ${changed_list}. After the workflow tick, the garden reached cycle ${cycle} with nutrients ${nutrients}, nutrientBuffer ${buffer}, active types ${active_types:-none}, and missing roles ${missing}. Test validation outcome: ${test_outcome}."
 scripts/agent-append-summary.sh --cadence daily --timestamp "$timestamp" --title "$change_title" --body "$summary_body" >/dev/null
 append_rollups_if_due
 
@@ -390,7 +392,7 @@ scripts/agent-create-journal-entry.sh \
   --reason "$why_text" \
   --checks "$checks" \
   --test-result "$test_result" \
-  --observations "${observations_text} Automated post-processing refreshed README/state memory from data/garden-state.txt at cycle ${cycle}." \
+  --observations "${observations_text} Expected future effect: ${expected_effect}. Automated post-processing refreshed README/state memory from data/garden-state.txt at cycle ${cycle}." \
   --next "$next_text" >/dev/null
 
 rm -f "$handoff_file"
