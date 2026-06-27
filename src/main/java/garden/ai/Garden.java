@@ -491,6 +491,9 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             } else {
                 if (organism.traits().contains("stressed")) {
                     events.add(new GardenEvent(cycle, "%s was culled due to chronic environmental stress.".formatted(organism.id())));
+                    if (organism.traits().contains("nutrient-recycler")) {
+                        totalNutrientContribution += 5;
+                    }
                 }
                 totalNutrientContribution += organism.nutrientValue();
                 deadOrganisms++;

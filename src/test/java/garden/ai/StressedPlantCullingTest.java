@@ -55,4 +55,23 @@ class StressedPlantCullingTest {
         // Energy: initial 10, +0 growth, -0 stress penalty = 10
         assertThat(next.organisms().get(0).energy()).isEqualTo(10);
     }
+
+    @Test
+    void stressedRecyclerPlantsProvideExtraNutrients() {
+        // Start with 1 energy so it dies in the next cycle, and add nutrient-recycler
+        Environment env = new Environment(10, 10, 10, 0, 100);
+        Organism moss = Organism.of("moss-1", OrganismType.MOSS, 1, 1, "nutrient-recycler");
+        Garden garden = new Garden(0, 2, env, List.of(moss), List.of());
+
+        // Cycle 1: Should lose 1 energy -> 0, and be culled
+        Garden next = garden.nextCycle();
+        
+        // Base nutrient value for MOSS is 2, nutrient-recycler adds 3 = 5 base.
+        // Stress-culling recycler adds +5 = 10 total.
+        
+        // Verify the nutrient return event
+        boolean foundReturnEvent = next.events().stream()
+            .anyMatch(e -> e.description().contains("returned 10 nutrients"));
+        assertThat(foundReturnEvent).isTrue();
+    }
 }

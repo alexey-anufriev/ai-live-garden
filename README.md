@@ -86,8 +86,8 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** ✅ Stable — Nutrients have recovered, with a steady buffer.
-The garden has reached cycle 3712, and the ecosystem is currently stable.
+**Garden Health:** 🌱 Stable — The full nutrient buffer sustains the plant-only ecosystem while direct nutrient availability remains limited.
+The garden has reached cycle 3925 with a persistent population of ferns and mosses.
 <!-- AI-LIVE-GARDEN:STATE-END -->
 
 

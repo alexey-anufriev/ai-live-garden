@@ -6,16 +6,14 @@ This file is the compact current operating memory for future work on the garden.
 
 ## Current Garden State
 
-- Cycle: 3772
-- Nutrients: 0.
+- Cycle: 3925
+- Nutrients: 7.
 - NutrientBuffer: 100.
 - Key Ecological Drivers:
-  - The active garden is plant-only: 5833 MOSS, 13 FERN, 6 SPORE, and 12 ROOT_NETWORK organisms.
-  - Animals, predators, and decomposers are absent from the current snapshot.
-  - The ecosystem is chronically nutrient-starved despite a full nutrient buffer, so the central problem is not lack of counters but weak connection between existing rules and recovery outcomes.
-  - The ecosystem has accumulated many named adaptation branches. This history should be understood as available mechanics, not as a reason to keep adding more.
-  - Recent runs repeatedly added observability, diagnostics, tests, and named stress/nutrient traits. That pattern is now saturated and should not be the default next step.
-  - Existing mechanics include stress culling, cautious breeding, nutrient conservation, nutrient mobilization, buffer release, diverse emergency reseeding, succession, fungal/root interactions, and many traits. Future work should connect or simplify those mechanisms rather than add another isolated branch.
+  - The active garden is plant-only with 5983 organisms.
+  - Animals, predators, and decomposers remain absent.
+  - The ecosystem maintains survival with a full nutrient buffer, but direct nutrient uptake remains a challenge.
+  - Existing mechanics are sufficient; future work should focus on connecting these systems for better nutrient mobilization and ecosystem balance rather than adding further isolated traits.
   - Scratch artifacts such as command-output captures are not project memory and should never be committed.
 
 ## Immediate Directions
