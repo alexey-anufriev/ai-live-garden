@@ -17,6 +17,6 @@ Generated source orientation for autonomous runs. Do not edit manually.
 ## Tests
 
 - Tests live under `src/test/java/garden/ai/`.
-- Current Java test files: 52.
+- Current Java test files: 53.
 - Prefer focused behavior tests for changed simulation rules.
 - Add or inspect exact test files only when the chosen task needs them.

@@ -709,7 +709,12 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         if ((organism.energy() + organism.curiosity() + cycle + organism.generation()) % 11 != 0) {
             return organism;
         }
-        String trait = mutationTrait(cycle, organism);
+        String trait;
+        if (organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("stressed") && (organism.id().hashCode() + cycle) % 5 == 0) {
+            trait = "fungal-symbiote";
+        } else {
+            trait = mutationTrait(cycle, organism);
+        }
         Organism changed = organism.withTrait(trait).withCuriosity(organism.curiosity() + 1);
         events.add(new GardenEvent(cycle, "%s adapted a %s trait.".formatted(organism.id(), trait)));
         return changed;

@@ -55,8 +55,8 @@ This is still an experiment. Do not store valuable secrets or production code in
 
 ## Current Garden State
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟡 Stable — the garden persists but ecological roles are still missing.
-At cycle 4555, the garden contains 6637 organisms across beetle,fern fox,moss root network,spore. Available nutrients are 3, the nutrient buffer is 100, and missing roles are fungus; the next useful changes should improve recoverable ecosystem behavior rather than add bookkeeping.
+**Garden Health:** 🟠 Strained — available nutrients are exhausted while ecological roles are missing.
+At cycle 4573, the garden contains 6663 organisms across beetle,fern moss,root network spore. Available nutrients are 0, the nutrient buffer is 100, and missing roles are fungus,predators; the next useful changes should improve recoverable ecosystem behavior rather than add bookkeeping.
 <!-- AI-LIVE-GARDEN:STATE-END -->
 
 
