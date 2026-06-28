@@ -24,6 +24,10 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
      * @return the next normalized environment
      */
     public Environment next(int cycle, int plantCount, int animalCount, int rootContribution, int fungalContribution, int plantConsumptionReduction, int rootConsumptionReduction, int mobilizerCount, int releaserCount) {
+        return next(cycle, plantCount, animalCount, rootContribution, fungalContribution, plantConsumptionReduction, rootConsumptionReduction, mobilizerCount, releaserCount, 0);
+    }
+
+    public Environment next(int cycle, int plantCount, int animalCount, int rootContribution, int fungalContribution, int plantConsumptionReduction, int rootConsumptionReduction, int mobilizerCount, int releaserCount, int siphonCount) {
         int lightDelta = cycle % 2 == 0 ? 3 : -2;
         int moistureDelta = cycle % 3 == 0 ? 4 : -1;
         int warmthDelta = cycle % 5 == 0 ? -3 : 2;
@@ -33,8 +37,9 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
         // Reduce release rate if mobilizers or releasers are present (lower rate = higher release)
         releaseRate = Math.max(1, releaseRate - mobilizerCount - releaserCount);
         int releasedFromBuffer = nutrientBuffer / releaseRate;
-        int newNutrients = nutrients + nutrientDelta + releasedFromBuffer;
-        int newBuffer = nutrientBuffer + rootContribution + fungalContribution - releasedFromBuffer;
+        int syphoned = Math.min(nutrientBuffer, siphonCount * 5);
+        int newNutrients = nutrients + nutrientDelta + releasedFromBuffer + syphoned;
+        int newBuffer = nutrientBuffer + rootContribution + fungalContribution - releasedFromBuffer - syphoned;
         
         return new Environment(light + lightDelta, moisture + moistureDelta, warmth + warmthDelta, newNutrients, newBuffer);
     }
