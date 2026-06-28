@@ -84,7 +84,7 @@ metadata_value() {
   elif [[ "${GEMINI_OUTCOME:-}" == "failure" ]]; then
     echo "The run failed during the main Gemini call. This is usually provider quota, authentication, or model availability."
   elif [[ "${POST_TEST_OUTCOME:-}" == "failure" ]]; then
-    echo "The run failed after Gemini while validating or repairing tests."
+    echo "The run failed after Gemini while validating tests. No automatic Gemini repair loop is run; a committed failing baseline is surfaced to the next agent through the prompt."
   elif [[ "${AUTO_MEMORY_OUTCOME:-}" == "failure" ]]; then
     echo "The run failed while generating deterministic memory artifacts."
   elif [[ "${SUMMARY_APPEND_ONLY_OUTCOME:-}" == "failure" ]]; then

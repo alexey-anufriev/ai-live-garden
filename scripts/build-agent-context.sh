@@ -12,6 +12,7 @@ mkdir -p "$(dirname "$output_file")"
 recent_journal_limit="${AGENT_CONTEXT_RECENT_JOURNAL_LIMIT:-3}"
 context_warn_lines="${AGENT_CONTEXT_WARN_LINES:-1200}"
 metadata_file="${AGENT_CONTEXT_METADATA_FILE:-${output_file}.metadata}"
+baseline_test_result_file="${AGENT_BASELINE_TEST_RESULT_FILE:-}"
 mkdir -p "$(dirname "$metadata_file")"
 
 latest_files() {
@@ -178,6 +179,17 @@ append_garden_digest() {
   echo
 }
 
+append_baseline_test_result() {
+  echo "## Baseline Maven Test Result"
+  echo
+  if [[ -n "$baseline_test_result_file" && -f "$baseline_test_result_file" ]]; then
+    sed -n '1,$p' "$baseline_test_result_file"
+  else
+    echo "No baseline Maven test result file was provided."
+  fi
+  echo
+}
+
 append_compact_journal_entry() {
   local path="$1"
 
@@ -211,6 +223,7 @@ append_compact_journal_entry() {
   echo "- Prefer changes that increase future autonomous development capacity: clearer domain boundaries, more expressive state transitions, visible behavioral consequences in future ticks, reusable simulation concepts, or mechanics that create new future possibilities."
   echo "- Do not choose a task merely because it is the easiest way to satisfy validators. Memory, journal, summaries, tests, and validators support autonomy; they are not the purpose of the run."
   echo "- Do not repeat the recent implementation pattern by default. If recent runs mostly added similar named mechanisms, diagnostics, event logs, counters, or tests, treat those categories as saturated."
+  echo "- If the Baseline Maven Test Result says \`failed\`, repairing the existing Java source or tests is the run's required first task. Do not add unrelated behavior until \`mvn test\` passes."
   echo "- A run that only adds a named trait, diagnostic field, renderer line, event-log message, counter, or test coverage is low value unless it directly changes future garden behavior or removes a current obstacle to ecological recovery."
   echo "- If a candidate change would only add a name, counter, log line, renderer phrase, or isolated test, choose a stronger task."
   echo "- Prefer outcome-changing work: consolidate duplicate mechanics, connect existing rules into feedback loops, make missing ecological roles recover through simulation, simplify state transitions, or convert existing observations into behavior that affects future ticks."
@@ -295,6 +308,7 @@ JSON
   append_summary_entries "Latest Daily Summary Entries" "agent/summaries/daily" 3
   append_summary_entries "Latest Weekly Summary Entry" "agent/summaries/weekly" 1
   append_summary_entries "Latest Monthly Summary Entry" "agent/summaries/monthly" 1
+  append_baseline_test_result
   append_garden_digest
   echo "## Recent Active Journal Entries"
   echo
@@ -335,4 +349,5 @@ fi
   echo "AGENT_CONTEXT_LATEST_WEEKLY_SUMMARY=$(latest_files 1 "agent/summaries/weekly" || true)"
   echo "AGENT_CONTEXT_LATEST_MONTHLY_SUMMARY=$(latest_files 1 "agent/summaries/monthly" || true)"
   echo "AGENT_CONTEXT_LATEST_YEARLY_SUMMARY=$(latest_files 1 "agent/summaries/yearly" || true)"
+  echo "AGENT_CONTEXT_BASELINE_TEST_RESULT_FILE=${baseline_test_result_file}"
 } > "$metadata_file"

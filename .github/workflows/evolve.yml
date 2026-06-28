@@ -34,13 +34,15 @@ jobs:
 
       - name: Baseline test
         id: baseline_test
-        run: mvn -B test
+        continue-on-error: true
+        run: scripts/capture-maven-test-result.sh "${RUNNER_TEMP}/baseline-test-result.md"
 
       - name: Build Gemini prompt
         id: gemini_prompt
         shell: bash
         env:
           AGENT_CONTEXT_METADATA_FILE: ${{ runner.temp }}/agent-context.metadata
+          AGENT_BASELINE_TEST_RESULT_FILE: ${{ runner.temp }}/baseline-test-result.md
         run: |
           scripts/build-agent-context.sh "${RUNNER_TEMP}/agent-context.md"
           scripts/write-output-file.sh text "${RUNNER_TEMP}/agent-context.md"
@@ -66,17 +68,12 @@ jobs:
         shell: bash
         run: scripts/restore-agent-protected-files.sh
 
-      - name: Validate and repair tests after Gemini changes
+      - name: Validate tests after Gemini changes
         id: post_test_final
-        uses: ./.github/actions/gemini-validate-repair
-        with:
-          validation-command: scripts/validate-tests.sh
-          repair-prompt-command: scripts/write-test-repair-prompt.sh
-          protected-restore-command: scripts/restore-agent-protected-files.sh
-          violations-file: ${{ runner.temp }}/post-test-violations.txt
-          gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
-          gemini-model: ${{ env.EXECUTION_MODEL }}
-          artifact-name-prefix: post-test-repair
+        shell: bash
+        env:
+          VALIDATE_REPAIR_VIOLATIONS_FILE: ${{ runner.temp }}/post-test-violations.txt
+        run: scripts/validate-tests.sh
 
       - name: Advance persistent garden state
         id: advance_garden
@@ -133,6 +130,7 @@ jobs:
         env:
           AGENT_CONTEXT_FILE: ${{ runner.temp }}/agent-context.md
           AGENT_CONTEXT_METADATA_FILE: ${{ runner.temp }}/agent-context.metadata
+          AGENT_BASELINE_TEST_RESULT_FILE: ${{ runner.temp }}/baseline-test-result.md
         run: scripts/collect-agent-failure-diagnostics.sh "${{ runner.temp }}/agent-failure-diagnostics"
 
       - name: Upload failure diagnostics

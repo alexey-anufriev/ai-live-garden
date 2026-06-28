@@ -42,6 +42,10 @@ if [[ -n "${AGENT_CONTEXT_METADATA_FILE:-}" && -f "$AGENT_CONTEXT_METADATA_FILE"
   cp "$AGENT_CONTEXT_METADATA_FILE" "$output_dir/agent-context.metadata"
 fi
 
+if [[ -n "${AGENT_BASELINE_TEST_RESULT_FILE:-}" && -f "$AGENT_BASELINE_TEST_RESULT_FILE" ]]; then
+  cp "$AGENT_BASELINE_TEST_RESULT_FILE" "$output_dir/baseline-test-result.md"
+fi
+
 if compgen -G "target/*.dump" > /dev/null || compgen -G "target/*.dumpstream" > /dev/null; then
   mkdir -p "$output_dir/maven-dumps"
   cp target/*.dump target/*.dumpstream "$output_dir/maven-dumps/" 2>/dev/null || true
@@ -88,5 +92,8 @@ fi
   fi
   if [[ -f "$output_dir/agent-run.json" ]]; then
     echo "- Agent handoff copied to \`agent-run.json\`"
+  fi
+  if [[ -f "$output_dir/baseline-test-result.md" ]]; then
+    echo "- Baseline Maven test result copied to \`baseline-test-result.md\`"
   fi
 } > "$output_dir/README.md"

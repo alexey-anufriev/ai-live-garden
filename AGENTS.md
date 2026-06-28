@@ -19,12 +19,13 @@ Use the compact context from `scripts/build-agent-context.sh` when the workflow 
 Every autonomous run must:
 
 1. Understand `AGENTS.md`, `GEMINI.md`, README, active memory summaries, `data/garden-state.txt`, and the Java/Maven project from the compact context.
-2. Choose exactly one focused bounded improvement.
-3. Make a meaningful source, test, rendering, or project-file change with a visible expected effect.
-4. Run `mvn test` if possible.
-5. Write `.agent-run.json` as the machine-readable handoff.
-6. Do not edit generated memory files.
-7. Leave no scratch files, unrelated edits, or misleading test claims.
+2. Check the baseline Maven test result in the compact context. If it failed, make repairing the existing Java source or tests the run's first task.
+3. Choose exactly one focused bounded improvement, unless baseline tests are already failing; in that case the focused task is to restore a passing test suite without unrelated feature work.
+4. Make a meaningful source, test, rendering, or project-file change with a visible expected effect.
+5. Run `mvn test` if possible.
+6. Write `.agent-run.json` as the machine-readable handoff.
+7. Do not edit generated memory files.
+8. Leave no scratch files, unrelated edits, or misleading test claims.
 
 After the agent step, the workflow advances `data/garden-state.txt` and runs `scripts/agent-auto-postprocess.sh`. That script parses `.agent-run.json`, restores generated memory files, updates README state, rewrites `agent/state.md`, refreshes `agent/code-map.md` from the Java tree, appends summaries, creates the journal entry, appends any request entries, removes `.agent-run.json`, and then validators check the result.
 
@@ -126,13 +127,15 @@ Only the latest 100 journal entries should remain directly under `agent/journal/
 
 The workflow archives old summaries unchanged: 100 daily, 50 weekly, 12 monthly, and 10 yearly files remain active.
 
-## Workflow And Repair
+## Workflow And Test Recovery
 
 The Agent workflow calls Gemini through `GEMINI_API_KEY` and passes `EXECUTION_MODEL`, currently `gemini-3.1-flash-lite`.
 
 If Gemini fails because of quota, billing, authentication, or provider availability, the run must fail without committing. Do not work around capacity failures by committing partial changes, suppressing errors, or adding unbounded retries.
 
-Only Java/test failures may use the bounded Gemini repair action. Journal, summary, state, and README formatting are produced by deterministic scripts and validated directly.
+The workflow does not run a Gemini repair loop. It captures `mvn -B test` before the agent step and includes that result in the next prompt. If a committed previous run left Java tests failing, the next autonomous run must fix those failures first. After Gemini finishes, CI runs tests once; if they fail, the run fails without committing generated memory or partial results.
+
+Journal, summary, state, and README formatting are produced by deterministic scripts and validated directly.
 
 ## Story Workflow
 
