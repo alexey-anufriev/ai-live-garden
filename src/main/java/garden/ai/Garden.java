@@ -151,12 +151,14 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         long distributorCount = organisms.stream().filter(o -> o.traits().contains("nutrient-distributor")).count();
         long demandRegulatorCount = organisms.stream().filter(o -> o.traits().contains("nutrient-demand-regulator")).count();
         long siphonCount = organisms.stream().filter(o -> o.traits().contains("buffer-siphon")).count();
-
-        Environment nextEnvironment = environment.next(nextCycle, (int) plantCount, (int) animalCount, rootContribution(releaserCount), fungalContribution(), (int) ((mossConserverCount + mossScavengerCount + fernConserverCount) / 5), (int) demandRegulatorCount / 2, (int) mobilizerCount, (int) releaserCount, (int) siphonCount);
+        
+        int reductionFactor = environment.nutrients() < 10 ? 1 : 5;
+        int plantConsumptionReduction = (int) ((mossConserverCount + mossScavengerCount + fernConserverCount) / reductionFactor);
+        Environment nextEnvironment = environment.next(nextCycle, (int) plantCount, (int) animalCount, rootContribution(releaserCount), fungalContribution(), plantConsumptionReduction, (int) demandRegulatorCount / 2, (int) mobilizerCount, (int) releaserCount, (int) siphonCount);
         List<GardenEvent> nextEvents = new ArrayList<>(events);
         int production = 2 + (int)animalCount / 2;
-        int mossConsumption = (int)Math.max(0, mossCount / 5 - (mossConserverCount + mossScavengerCount) / 5);
-        int fernConsumption = (int)Math.max(0, fernCount / 5 - fernConserverCount / 5);
+        int mossConsumption = (int)Math.max(0, mossCount / 5 - (mossConserverCount + mossScavengerCount) / reductionFactor);
+        int fernConsumption = (int)Math.max(0, fernCount / 5 - fernConserverCount / reductionFactor);
         int consumption = Math.max(0, mossConsumption + fernConsumption - (int) demandRegulatorCount / 2);
         nextEvents.add(new GardenEvent(nextCycle, "Nutrient change breakdown: prod=%d, cons=%d (moss=%d, fern=%d, root-reduction=%d)".formatted(production, consumption, mossConsumption, fernConsumption, (int) demandRegulatorCount / 2)));
         nextEvents.add(new GardenEvent(nextCycle, "Plant breakdown: moss=%d, fern=%d, spore=%d, roots=%d, fungus=%d".formatted(mossCount, fernCount, sporeCount, rootNetworkCount, fungusCount)));
