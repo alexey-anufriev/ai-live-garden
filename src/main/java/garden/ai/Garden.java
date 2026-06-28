@@ -146,6 +146,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         long mossScavengerCount = organisms.stream().filter(o -> o.type() == OrganismType.MOSS && o.traits().contains("moss-nutrient-scavenger")).count();
         long fernConserverCount = organisms.stream().filter(o -> o.type() == OrganismType.FERN && o.traits().contains("nutrient-conserver")).count();
         long mobilizerCount = organisms.stream().filter(o -> o.traits().contains("nutrient-mobilizer")).count();
+        long fungalNutrientMobilizerCount = organisms.stream().filter(o -> o.type() == OrganismType.FUNGUS && o.traits().contains("fungal-nutrient-mobilizer")).count();
         long releaserCount = organisms.stream().filter(o -> o.traits().contains("buffer-releaser")).count();
         long recyclerCount = organisms.stream().filter(o -> o.traits().contains("nutrient-recycler")).count();
         long distributorCount = organisms.stream().filter(o -> o.traits().contains("nutrient-distributor")).count();
@@ -154,7 +155,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         
         int reductionFactor = environment.nutrients() < 10 ? 1 : 5;
         int plantConsumptionReduction = (int) ((mossConserverCount + mossScavengerCount + fernConserverCount) / reductionFactor);
-        Environment nextEnvironment = environment.next(nextCycle, (int) plantCount, (int) animalCount, rootContribution(releaserCount), fungalContribution(), plantConsumptionReduction, (int) demandRegulatorCount / 2, (int) mobilizerCount, (int) releaserCount, (int) siphonCount);
+        Environment nextEnvironment = environment.next(nextCycle, (int) plantCount, (int) animalCount, rootContribution(releaserCount), fungalContribution(), plantConsumptionReduction, (int) demandRegulatorCount / 2, (int) (mobilizerCount + fungalNutrientMobilizerCount), (int) releaserCount, (int) siphonCount);
         List<GardenEvent> nextEvents = new ArrayList<>(events);
         int production = 2 + (int)animalCount / 2;
         int mossConsumption = (int)Math.max(0, mossCount / 5 - (mossConserverCount + mossScavengerCount) / reductionFactor);
@@ -173,9 +174,9 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             nextEvents.add(new GardenEvent(nextCycle, "The nutrient buffer is accumulating."));
         }
         int baseReleaseRate = environment.nutrients() < 5 ? 2 : (environment.nutrients() < 10 ? 5 : 10);
-        int effectiveReleaseRate = Math.max(1, baseReleaseRate - (int)mobilizerCount - (int)releaserCount - (int)recyclerCount - (int)distributorCount);
+        int effectiveReleaseRate = Math.max(1, baseReleaseRate - (int)(mobilizerCount + fungalNutrientMobilizerCount) - (int)releaserCount - (int)recyclerCount - (int)distributorCount);
         int releasedFromBuffer = environment.nutrientBuffer() / effectiveReleaseRate;
-        nextEvents.add(new GardenEvent(nextCycle, "Buffer release stats: baseRate=%d, mobilizers=%d, releasers=%d, recyclers=%d, distributors=%d, effectiveRate=%d, released=%d".formatted(baseReleaseRate, mobilizerCount, releaserCount, recyclerCount, distributorCount, effectiveReleaseRate, releasedFromBuffer)));
+        nextEvents.add(new GardenEvent(nextCycle, "Buffer release stats: baseRate=%d, mobilizers=%d, releasers=%d, recyclers=%d, distributors=%d, effectiveRate=%d, released=%d".formatted(baseReleaseRate, mobilizerCount + fungalNutrientMobilizerCount, releaserCount, recyclerCount, distributorCount, effectiveReleaseRate, releasedFromBuffer)));
         
         int availableNutrients = environment.nutrients() + releasedFromBuffer;
         if (consumption > availableNutrients) {
