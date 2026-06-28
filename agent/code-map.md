@@ -11,12 +11,12 @@ Generated source orientation for autonomous runs. Do not edit manually.
 - `src/main/java/garden/ai/GardenStateStore.java`: Persistence for `data/garden-state.txt`.
 - `src/main/java/garden/ai/Main.java`: CLI entry point for `inspect` and `tick`.
 - `src/main/java/garden/ai/Organism.java`: Immutable organism value and per-organism attributes.
-- `src/main/java/garden/ai/OrganismType.java`: Organism taxonomy, roles, prey, metabolism, and succession rules.
+- `src/main/java/garden/ai/OrganismType.java`: Defines organism taxonomy and reproduction/succession rules.
 - `src/main/java/garden/ai/Simulation.java`: Advances seed or loaded garden state.
 
 ## Tests
 
 - Tests live under `src/test/java/garden/ai/`.
-- Current Java test files: 49.
+- Current Java test files: 50.
 - Prefer focused behavior tests for changed simulation rules.
 - Add or inspect exact test files only when the chosen task needs them.

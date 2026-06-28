@@ -103,6 +103,9 @@ public enum OrganismType {
         if (this == FERN && (cycle + generation) % 9 == 0) {
             return SPORE;
         }
+        if (this == ROOT_NETWORK && (cycle + generation) % 11 == 0) {
+            return FUNGUS;
+        }
         if (this == HARE && (cycle + generation) % 7 == 0) {
             return BEETLE;
         }
