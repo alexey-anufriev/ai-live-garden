@@ -656,7 +656,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         for (Organism organism : organisms) {
             boolean canReproduce = organism.energy() >= reproductionThreshold(organism) && birthsThisCycle < 2;
 
-            if (organism.traits().contains("stressed")) {
+            if (organism.traits().contains("stressed") && !organism.traits().contains("fungal-symbiote")) {
                 canReproduce = false;
             }
             if (organism.traits().contains("starving") && !organism.traits().contains("resourceful-breeder")) {
