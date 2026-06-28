@@ -4,19 +4,22 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 4573
+- Cycle: 4606
 - Health: Strained (🟠)
 - Nutrients: 0.
 - NutrientBuffer: 100.
-- Active organisms: 6663 total across beetle,fern moss,root network spore.
-- Missing roles: fungus,predators.
-- Latest agent handoff: Implementing Evolutionary Catalyst for ROOT_NETWORK.
-- Latest result: Modified `Garden.java` to increase the probability of stressed `ROOT_NETWORK` organisms acquiring the `fungal-symbiote` trait, added a test to verify the behavior, and ensured all tests passed..
+- Active organisms: 6726 total across beetle,fungus moss,root network spore.
+- Missing roles: predators.
+- Latest agent handoff: Fix Fungal Succession Reproduction Bottleneck.
+- Latest result: Modified `Garden.reproductionPhase` to exempt FUNGUS-yielding reproduction events from the `birthsThisCycle < 2` limit, allowing natural fungal succession to proceed even in high-plant-density environments..
 
 ## Immediate Directions
 
-- Monitor ecosystem for FUNGUS emergence.
+- Monitor FUNGUS population sustainability and nutrient buffer impact.
 
 ## Constraints & Known Bad Ideas
 
-- Do not remove the evolutionary catalyst.
+- Do not attempt to fix the simulation in one run.
+- Do not add another named adaptation merely because recent runs did so.
+- Do not add another observability-only or tests-only change merely because it is easy to validate.
+- Do not treat the full nutrient buffer as proof of health while nutrients are zero or ecological roles are absent.

@@ -654,7 +654,9 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         int birthsThisCycle = 0;
 
         for (Organism organism : organisms) {
-            boolean canReproduce = organism.energy() >= reproductionThreshold(organism) && birthsThisCycle < 2;
+            OrganismType childType = organism.type().offspringType(cycle, organism.generation());
+            boolean isFungalSuccession = (organism.type() == OrganismType.ROOT_NETWORK && childType == OrganismType.FUNGUS);
+            boolean canReproduce = organism.energy() >= reproductionThreshold(organism) && (birthsThisCycle < 2 || isFungalSuccession);
 
             if (organism.traits().contains("stressed") && !organism.traits().contains("fungal-symbiote")) {
                 canReproduce = false;
@@ -667,7 +669,6 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             }
 
             if (canReproduce) {
-                OrganismType childType = organism.type().offspringType(cycle, organism.generation());
                 String childId = childType.name().toLowerCase(java.util.Locale.ROOT).replace('_', '-') + "-" + identifier;
                 Organism parentAfterBirth = organism.withEnergy(organism.energy() / 2);
                 Organism child = organism.child(childId, childType, mutationTrait(cycle, organism));

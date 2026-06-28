@@ -5,7 +5,7 @@ Generated source orientation for autonomous runs. Do not edit manually.
 ## Source Files
 
 - `src/main/java/garden/ai/Environment.java`: Immutable environmental resources and nutrient-buffer operations used by each garden cycle.
-- `src/main/java/garden/ai/Garden.java`: Contains reproduction logic, updated to check for fungal-symbiote trait when handling stressed reproduction blocks.
+- `src/main/java/garden/ai/Garden.java`: Manages reproduction logic, now allowing FUNGUS succession to bypass the birth limit.
 - `src/main/java/garden/ai/GardenEvent.java`: Compact event record used by simulation and rendering.
 - `src/main/java/garden/ai/GardenRenderer.java`: CLI rendering for inspect and tick output.
 - `src/main/java/garden/ai/GardenStateStore.java`: Persistence for `data/garden-state.txt`.
