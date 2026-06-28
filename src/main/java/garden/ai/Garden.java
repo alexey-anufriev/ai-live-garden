@@ -217,11 +217,21 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
 
         long currentAnimalCount = finalChanged.stream().filter(o -> o.type().isAnimal()).count();
         long currentPlantCount = finalChanged.stream().filter(o -> o.type().isPlant()).count();
-        if (currentAnimalCount == 0 && currentPlantCount > 200 && new java.util.Random().nextInt(20) == 0) {
+        if (currentAnimalCount == 0 && currentPlantCount > 200 && !Boolean.getBoolean("disable.emergency.colonization") && new java.util.Random().nextInt(20) == 0) {
             OrganismType herbivore = OrganismType.BEETLE;
             String id = herbivore.name().toLowerCase(java.util.Locale.ROOT).replace('_', '-') + "-" + nextIdentifier;
             finalChanged.add(Organism.of(id, herbivore, 5, 2, "emergency-colonizer"));
             nextEvents.add(new GardenEvent(nextCycle, "A new %s arrived to colonize the garden.".formatted(herbivore.displayName())));
+            nextIdentifier++;
+        }
+
+        long herbivoreCount = finalChanged.stream().filter(o -> o.type().kingdom() == OrganismType.Kingdom.HERBIVORE).count();
+        long predatorCount = finalChanged.stream().filter(o -> o.type().kingdom() == OrganismType.Kingdom.PREDATOR).count();
+        if (herbivoreCount > 0 && predatorCount == 0 && !Boolean.getBoolean("disable.emergency.colonization") && new java.util.Random().nextInt(20) == 0) {
+            OrganismType predator = OrganismType.FOX;
+            String id = predator.name().toLowerCase(java.util.Locale.ROOT).replace('_', '-') + "-" + nextIdentifier;
+            finalChanged.add(Organism.of(id, predator, 5, 8, "emergency-colonizer"));
+            nextEvents.add(new GardenEvent(nextCycle, "A new %s arrived to colonize the garden.".formatted(predator.displayName())));
             nextIdentifier++;
         }
         

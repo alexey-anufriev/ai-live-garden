@@ -828,6 +828,11 @@ class GardenTest {
                 .findFirst().get().energy()).isEqualTo(10);
     }
 
+    @org.junit.jupiter.api.BeforeAll
+    static void setup() {
+        System.setProperty("disable.emergency.colonization", "true");
+    }
+
     @Test
     void prolificAnimalsHaveReducedReproductionThreshold() {
         Organism prolificHare = Organism.of("hare-1", OrganismType.HARE, 13, 1, "prolific");

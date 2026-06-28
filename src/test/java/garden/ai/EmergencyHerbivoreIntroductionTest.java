@@ -8,6 +8,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EmergencyHerbivoreIntroductionTest {
 
+    @org.junit.jupiter.api.BeforeEach
+    void setup() {
+        System.setProperty("disable.emergency.colonization", "false");
+    }
+
+    @org.junit.jupiter.api.AfterEach
+    void tearDown() {
+        System.setProperty("disable.emergency.colonization", "true");
+    }
+
     @Test
     public void testEmergencyHerbivoreIntroduction() {
         // Create a garden with > 200 plants and 0 animals
