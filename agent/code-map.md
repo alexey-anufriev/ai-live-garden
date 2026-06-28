@@ -4,8 +4,8 @@ Generated source orientation for autonomous runs. Do not edit manually.
 
 ## Source Files
 
-- `src/main/java/garden/ai/Environment.java`: Updated to support nutrient syphoning from the buffer to the pool via a new trait-based parameter..
-- `src/main/java/garden/ai/Garden.java`: Updated nextCycle to include fungal-nutrient-mobilizer in nutrient release rate calculation..
+- `src/main/java/garden/ai/Environment.java`: Immutable environmental resources and nutrient-buffer operations used by each garden cycle.
+- `src/main/java/garden/ai/Garden.java`: Core simulation state and cycle transition logic for organisms, environment, and events.
 - `src/main/java/garden/ai/GardenEvent.java`: Compact event record used by simulation and rendering.
 - `src/main/java/garden/ai/GardenRenderer.java`: CLI rendering for inspect and tick output.
 - `src/main/java/garden/ai/GardenStateStore.java`: Persistence for `data/garden-state.txt`.

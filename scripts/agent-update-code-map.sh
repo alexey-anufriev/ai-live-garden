@@ -23,6 +23,69 @@ done
 
 declare -A descriptions=()
 
+normalize_description() {
+  local description="$1"
+
+  description="${description//$'\r'/}"
+  description="${description//$'\t'/ }"
+  description="$(sed -E 's/[[:space:]]+/ /g; s/^ //; s/ $//; s/[.]+$//' <<<"$description")"
+  echo "$description"
+}
+
+is_change_specific_description() {
+  local description
+
+  description="$(normalize_description "$1")"
+  [[ -n "$description" ]] || return 0
+
+  if grep -Eiq '^(updated|added|implemented|changed|modified|introduced|enhanced|extended|refactored|reworked|adjusted|fixed|removed|created)[[:space:]]' <<<"$description"; then
+    return 0
+  fi
+
+  if grep -Eiq '\b(this run|this change|new trait|new mechanism|new logic|to include|to support|via a new|now handles|now supports)\b' <<<"$description"; then
+    return 0
+  fi
+
+  return 1
+}
+
+default_description_for() {
+  local path="$1"
+
+  case "$path" in
+    src/main/java/garden/ai/Environment.java)
+      echo "Immutable environmental resources and nutrient-buffer operations used by each garden cycle"
+      ;;
+    src/main/java/garden/ai/Garden.java)
+      echo "Core simulation state and cycle transition logic for organisms, environment, and events"
+      ;;
+    src/main/java/garden/ai/GardenEvent.java)
+      echo "Compact event record used by simulation and rendering"
+      ;;
+    src/main/java/garden/ai/GardenRenderer.java)
+      echo "CLI rendering for inspect and tick output"
+      ;;
+    src/main/java/garden/ai/GardenStateStore.java)
+      echo "Persistence for \`data/garden-state.txt\`"
+      ;;
+    src/main/java/garden/ai/Main.java)
+      echo "CLI entry point for \`inspect\` and \`tick\`"
+      ;;
+    src/main/java/garden/ai/Organism.java)
+      echo "Immutable organism value and per-organism attributes"
+      ;;
+    src/main/java/garden/ai/OrganismType.java)
+      echo "Organism taxonomy, roles, prey, metabolism, and succession rules"
+      ;;
+    src/main/java/garden/ai/Simulation.java)
+      echo "Advances seed or loaded garden state"
+      ;;
+    *)
+      java_declarations "$path"
+      ;;
+  esac
+}
+
 load_existing_descriptions() {
   local line
   local path
@@ -34,7 +97,10 @@ load_existing_descriptions() {
     if [[ "$line" =~ ^-\ \`([^\`]+)\`:\ (.*)$ ]]; then
       path="${BASH_REMATCH[1]}"
       description="${BASH_REMATCH[2]}"
-      description="${description%.}"
+      description="$(normalize_description "$description")"
+      if is_change_specific_description "$description"; then
+        continue
+      fi
       descriptions["$path"]="$description"
     fi
   done < "$output_file"
@@ -50,6 +116,10 @@ load_handoff_descriptions() {
 
   while IFS=$'\t' read -r path description; do
     [[ -n "$path" && -n "$description" ]] || continue
+    description="$(normalize_description "$description")"
+    if is_change_specific_description "$description"; then
+      continue
+    fi
     descriptions["$path"]="$description"
   done < <(
     jq -r '
@@ -89,9 +159,9 @@ description_for() {
   local path="$1"
 
   if [[ -n "${descriptions[$path]:-}" ]]; then
-    echo "${descriptions[$path]}"
+    normalize_description "${descriptions[$path]}"
   else
-    java_declarations "$path"
+    default_description_for "$path"
   fi
 }
 

@@ -269,7 +269,7 @@ append_compact_journal_entry() {
   "codeMap": [
     {
       "path": "src/main/java/garden/ai/FileChangedByThisRun.java",
-      "description": "One short description of this source file's current responsibility."
+      "description": "One short stable description of what this source file is for, not what changed in this run."
     }
   ],
   "requests": [

@@ -94,7 +94,7 @@ Before finishing, agents must write `.agent-run.json`:
 }
 ```
 
-`codeMap` should include new or meaningfully changed Java source files from the run, with one short responsibility description each. Post-processing preserves existing descriptions for unchanged files.
+`codeMap` should include new or meaningfully changed Java source files from the run, with one short stable responsibility description each. Describe what the file is for, not what changed in the current run. Avoid change-specific phrasing such as "updated", "added", "implemented", "now supports", or "new logic".
 
 `requests` may contain objects with `title`, `what`, `why`, `affected`, `benefit`, and `fallback`. Use an empty array when no human help is needed.
 
