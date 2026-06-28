@@ -212,6 +212,16 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             nextEvents.add(new GardenEvent(nextCycle, "A last emergency %s appeared to keep the garden alive.".formatted(selected.displayName())));
             nextIdentifier++;
         }
+
+        long currentAnimalCount = finalChanged.stream().filter(o -> o.type().isAnimal()).count();
+        long currentPlantCount = finalChanged.stream().filter(o -> o.type().isPlant()).count();
+        if (currentAnimalCount == 0 && currentPlantCount > 200 && new java.util.Random().nextInt(20) == 0) {
+            OrganismType herbivore = OrganismType.BEETLE;
+            String id = herbivore.name().toLowerCase(java.util.Locale.ROOT).replace('_', '-') + "-" + nextIdentifier;
+            finalChanged.add(Organism.of(id, herbivore, 5, 2, "emergency-colonizer"));
+            nextEvents.add(new GardenEvent(nextCycle, "A new %s arrived to colonize the garden.".formatted(herbivore.displayName())));
+            nextIdentifier++;
+        }
         
         nextEvents.add(new GardenEvent(nextCycle,
                 "The garden becomes %s after cycle %d.".formatted(environmentWithNutrientsAndMoisture.mood(), nextCycle)));
