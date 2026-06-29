@@ -17,4 +17,5 @@ mkdir -p agent
   echo "- Journal format outcome: ${JOURNAL_FORMAT_OUTCOME}"
   echo "- Summary format outcome: ${SUMMARY_FORMAT_OUTCOME}"
   echo "- Summary append-only outcome: ${SUMMARY_APPEND_ONLY_OUTCOME}"
+  echo "- Agent worktree validation outcome: ${AGENT_WORKTREE_OUTCOME:-}"
 } > agent/last-run.md

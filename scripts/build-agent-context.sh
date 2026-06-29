@@ -190,6 +190,100 @@ append_baseline_test_result() {
   echo
 }
 
+autonomous_commits() {
+  git log --grep='^feat: autonomous garden evolution' --format='%H' -n "${1:-3}" 2>/dev/null || true
+}
+
+commit_title() {
+  local commit="$1"
+  git show -s --format='%s' "$commit"
+}
+
+commit_source_files() {
+  local commit="$1"
+  git show --name-only --format='' "$commit" 2>/dev/null |
+    sed '/^$/d' |
+    awk '/^src\/main\/java\/.+[.]java$/ { print }' |
+    sort -u
+}
+
+commit_domain_terms() {
+  local commit="$1"
+  {
+    commit_title "$commit"
+    git show --name-only --format='' "$commit" 2>/dev/null |
+      awk '/^agent\/journal\/[^/]+[.]md$/ { print }' |
+      while IFS= read -r journal; do
+        [[ -n "$journal" ]] || continue
+        git show "${commit}:${journal}" 2>/dev/null | sed -n '1,24p' || true
+      done
+  } |
+    tr '[:upper:]' '[:lower:]' |
+    awk '
+      {
+        while (match($0, /(fungal|fungus|nutrient|buffer|trait|observability|recovery|succession|predator|herbivore|root|moss|renderer)/)) {
+          print substr($0, RSTART, RLENGTH)
+          $0 = substr($0, RSTART + RLENGTH)
+        }
+      }
+    ' |
+    sort -u
+}
+
+append_recent_implementation_pattern() {
+  local commits=()
+  local commit
+  local source_file
+  local term
+  declare -A source_count=()
+  declare -A term_count=()
+  local repetition_lines=()
+
+  mapfile -t commits < <(autonomous_commits 3)
+
+  echo "## Recent Autonomous Coding Pattern"
+  echo
+  if (( ${#commits[@]} == 0 )); then
+    echo "No recent autonomous coding commits found."
+    echo
+    return
+  fi
+
+  for commit in "${commits[@]}"; do
+    echo "- $(git show -s --format='%h %cd %s' --date=short "$commit")"
+    while IFS= read -r source_file; do
+      [[ -n "$source_file" ]] || continue
+      source_count["$source_file"]=$(( ${source_count["$source_file"]:-0} + 1 ))
+    done < <(commit_source_files "$commit")
+    while IFS= read -r term; do
+      [[ -n "$term" ]] || continue
+      term_count["$term"]=$(( ${term_count["$term"]:-0} + 1 ))
+    done < <(commit_domain_terms "$commit")
+  done
+
+  echo
+  echo "### Repetition Signals"
+  echo
+  for source_file in "${!source_count[@]}"; do
+    if (( source_count["$source_file"] >= 2 )); then
+      repetition_lines+=("- Source repeated in ${source_count["$source_file"]} of the last ${#commits[@]} coding runs: \`${source_file}\`.")
+    fi
+  done
+  for term in "${!term_count[@]}"; do
+    if (( term_count["$term"] >= 2 )); then
+      repetition_lines+=("- Domain term repeated in ${term_count["$term"]} of the last ${#commits[@]} coding runs: ${term}.")
+    fi
+  done
+
+  if (( ${#repetition_lines[@]} > 0 )); then
+    printf '%s\n' "${repetition_lines[@]}" | sort
+    echo "- When recent work repeats the same file or domain term, prefer consolidation, simplification, or a different high-value area over another narrow exception."
+  else
+    echo "- No strong repetition signal detected."
+  fi
+  echo
+}
+
 append_compact_journal_entry() {
   local path="$1"
 
@@ -248,6 +342,7 @@ append_compact_journal_entry() {
   echo "- Do not ask the human what to do next."
   echo
   append_context_manifest
+  append_recent_implementation_pattern
   echo "## Automatic Post-Processing"
   echo
   echo "After this step, CI runs \`scripts/agent-auto-postprocess.sh\`. It parses \`.agent-run.json\`, restores generated memory files, refreshes \`agent/code-map.md\`, advances documentation from \`data/garden-state.txt\`, appends summaries, creates the journal entry, applies any request entries, removes \`.agent-run.json\`, and leaves those artifacts for validation."

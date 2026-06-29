@@ -123,6 +123,13 @@ jobs:
         shell: bash
         run: scripts/archive-summaries.sh
 
+      - name: Validate agent worktree
+        id: agent_worktree_final
+        shell: bash
+        env:
+          VALIDATE_AGENT_WORKTREE_VIOLATIONS_FILE: ${{ runner.temp }}/agent-worktree-violations.txt
+        run: scripts/validate-agent-worktree.sh
+
       - name: Collect failure diagnostics
         id: collect_failure_diagnostics
         if: ${{ failure() && !cancelled() }}
@@ -155,6 +162,7 @@ jobs:
           JOURNAL_FORMAT_OUTCOME: ${{ steps.journal_format_final.outcome }}
           SUMMARY_FORMAT_OUTCOME: ${{ steps.summary_format_final.outcome }}
           SUMMARY_APPEND_ONLY_OUTCOME: ${{ steps.summary_append_only_final.outcome }}
+          AGENT_WORKTREE_OUTCOME: ${{ steps.agent_worktree_final.outcome }}
         run: scripts/record-agent-status.sh
 
       - name: Collect change diagnostics
@@ -186,6 +194,7 @@ jobs:
           SUMMARY_APPEND_ONLY_OUTCOME: ${{ steps.summary_append_only_final.outcome }}
           ARCHIVE_JOURNAL_OUTCOME: ${{ steps.archive_journal.outcome }}
           ARCHIVE_SUMMARIES_OUTCOME: ${{ steps.archive_summaries.outcome }}
+          AGENT_WORKTREE_OUTCOME: ${{ steps.agent_worktree_final.outcome }}
           COLLECT_DIAGNOSTICS_OUTCOME: ${{ steps.collect_failure_diagnostics.outcome }}
           UPLOAD_DIAGNOSTICS_OUTCOME: ${{ steps.upload_failure_diagnostics.outcome }}
           RECORD_STATUS_OUTCOME: ${{ steps.record_workflow_status.outcome }}

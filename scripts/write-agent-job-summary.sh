@@ -55,6 +55,7 @@ metadata_value() {
   echo "| Summary append-only validation | $(value_or_dash "${SUMMARY_APPEND_ONLY_OUTCOME:-}") |"
   echo "| Journal archive | $(value_or_dash "${ARCHIVE_JOURNAL_OUTCOME:-}") |"
   echo "| Summary archive | $(value_or_dash "${ARCHIVE_SUMMARIES_OUTCOME:-}") |"
+  echo "| Agent worktree validation | $(value_or_dash "${AGENT_WORKTREE_OUTCOME:-}") |"
   echo "| Failure diagnostics collection | $(value_or_dash "${COLLECT_DIAGNOSTICS_OUTCOME:-}") |"
   echo "| Failure diagnostics upload | $(value_or_dash "${UPLOAD_DIAGNOSTICS_OUTCOME:-}") |"
   echo "| Workflow status record | $(value_or_dash "${RECORD_STATUS_OUTCOME:-}") |"
@@ -93,6 +94,8 @@ metadata_value() {
     echo "The run failed while validating required README/state memory updates."
   elif [[ "${JOURNAL_FORMAT_OUTCOME:-}" == "failure" || "${SUMMARY_FORMAT_OUTCOME:-}" == "failure" ]]; then
     echo "The run failed while validating generated memory format."
+  elif [[ "${AGENT_WORKTREE_OUTCOME:-}" == "failure" ]]; then
+    echo "The run failed because the final worktree contained generated artifacts, scratch files, or weak test patterns."
   elif [[ "${COMMIT_OUTCOME:-}" == "success" ]]; then
     echo "The run reached the commit step."
   else
