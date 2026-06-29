@@ -43,4 +43,28 @@ public class EmergencyPredatorIntroductionTest {
         // Verify the event was logged
         assertTrue(next.events().stream().anyMatch(e -> e.description().contains("colonize")), "Colonization event not logged");
     }
+
+    @Test
+    public void testMultiplePredatorIntroduction() {
+        // Create a garden with herbivores and one predator
+        List<Organism> organisms = new ArrayList<>();
+        organisms.add(Organism.of("beetle-1", OrganismType.BEETLE, 5, 2, "test"));
+        organisms.add(Organism.of("fox-1", OrganismType.FOX, 5, 8, "test"));
+        
+        Garden garden = new Garden(0, 3, new Environment(50, 50, 50, 50, 50), organisms, List.of());
+        
+        // Advance cycles - force the predator introduction
+        Garden next = null;
+        for (int i = 0; i < 5000; i++) {
+            next = garden.nextCycle();
+            if (next.organisms().stream().filter(o -> o.type() == OrganismType.FOX).count() >= 2) {
+                break;
+            }
+            garden = next;
+        }
+        
+        // Verify more than one predator was added
+        assertTrue(next.organisms().stream().filter(o -> o.type() == OrganismType.FOX).count() >= 2, 
+                "Multiple FOX predators not introduced");
+    }
 }

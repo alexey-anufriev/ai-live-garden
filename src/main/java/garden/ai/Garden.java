@@ -228,7 +228,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
 
         long herbivoreCount = finalChanged.stream().filter(o -> o.type().kingdom() == OrganismType.Kingdom.HERBIVORE).count();
         long predatorCount = finalChanged.stream().filter(o -> o.type().kingdom() == OrganismType.Kingdom.PREDATOR).count();
-        if (herbivoreCount > 0 && predatorCount == 0 && !Boolean.getBoolean("disable.emergency.colonization") && new java.util.Random().nextInt(20) == 0) {
+        if (herbivoreCount > 0 && predatorCount < 3 && !Boolean.getBoolean("disable.emergency.colonization") && new java.util.Random().nextInt(20) == 0) {
             OrganismType predator = OrganismType.FOX;
             String id = predator.name().toLowerCase(java.util.Locale.ROOT).replace('_', '-') + "-" + nextIdentifier;
             finalChanged.add(Organism.of(id, predator, 5, 8, "emergency-colonizer"));
