@@ -85,8 +85,14 @@ fi
 chapter_title="$(jq -r '.chapterTitle' "$handoff_file" | tr '\n' ' ' | sed 's/[[:space:]]\+/ /g; s/^ //; s/ $//')"
 chapter_body="$(jq -r '.chapterBody' "$handoff_file" | sed -e :a -e '/^\n*$/{$d;N;ba' -e '}')"
 volume_title="$(jq -r '.volumeTitle // ""' "$handoff_file" | tr '\n' ' ' | sed 's/[[:space:]]\+/ /g; s/^ //; s/ $//')"
-chapter_title="$(sed -E 's/^#+[[:space:]]*Chapter[[:space:]]+[0-9]+[[:space:]]+[—-][[:space:]]*//' <<<"$chapter_title")"
-volume_title="$(sed -E 's/^#+[[:space:]]*Volume[[:space:]]+[0-9]+[[:space:]]+[—-][[:space:]]*//' <<<"$volume_title")"
+chapter_title="$(sed -E ':again; s/^(#+[[:space:]]*)?Chapter[[:space:]]+[0-9]+[[:space:]]+[—-][[:space:]]*//; t again' <<<"$chapter_title")"
+volume_title="$(sed -E ':again; s/^(#+[[:space:]]*)?Volume[[:space:]]+[0-9]+[[:space:]]+[—-][[:space:]]*//; t again' <<<"$volume_title")"
+chapter_body="$(sed -E '1s/^(#+[[:space:]]*)?Chapter[[:space:]]+[0-9]+[[:space:]]+[—-][^\n]*$//' <<<"$chapter_body" | sed -e :a -e '/^\n*$/{$d;N;ba' -e '}')"
+
+if [[ -z "$chapter_title" ]]; then
+  echo "chapterTitle must contain a title without a Chapter N prefix." >&2
+  exit 1
+fi
 
 if grep -q '^## Chapter '"$chapter_number"'[[:space:]—-]' "$volume_file" 2>/dev/null; then
   echo "Chapter ${chapter_number} already exists in ${volume_file}." >&2

@@ -9,7 +9,7 @@ Required JSON shape:
 ```json
 {
   "volumeTitle": "Title for the volume, required only when the context says this starts a new volume",
-  "chapterTitle": "Title based on the actual garden events",
+  "chapterTitle": "Title based on the actual garden events, without Chapter N or Markdown heading text",
   "chapterBody": "300-700 words of narrative prose"
 }
 ```
@@ -20,3 +20,4 @@ Rules:
 2. Do not modify source code, workflows, `AGENTS.md`, `GEMINI.md`, `data/garden-state.txt`, `story/`, or `story/last-narrated-garden-state.txt`.
 3. Do not include raw statistics, implementation jargon, Markdown headings, or unsupported major events in `chapterBody`.
 4. Keep existing volume titles unchanged. If this continues an existing volume, set `volumeTitle` to an empty string.
+5. `chapterTitle` must be only the title phrase, for example `The Quiet Equilibrium`; do not include `Chapter 10 —`, `## Chapter 10`, or similar numbering.

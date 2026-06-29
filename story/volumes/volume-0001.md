@@ -106,7 +106,7 @@ In this age of the fungal covenant, the garden had become more connected than it
 
 And in this woven life, new spark-like promises still emerged. A new moss cluster, vibrant and small, took its place in the tapestry, while a new listening fern unfurled, its fronds a delicate, curious question mark in the damp, heavy air. They were the new voices in the covenant, born into a world that was profoundly, stubbornly hungry, but also profoundly, intricately one. The garden was still aching, yes, but it was an ache that had been transformed, through the patience of these fungal alliances, into a shared purpose. They had learned that the emptiness was not a barrier to life, but the very crucible in which their unity was forged.
 
-## Chapter 10 — Chapter 10 — The Awakening of the Thread and Shell
+## Chapter 10 — The Awakening of the Thread and Shell
 
 The passage of centuries across the garden was a slow, silent breathing. Over more than two thousand cycles, the ancient ferns—once the tall, elegant keepers of the shade—gradually unfurled their final fronds, dissolving back into the cool earth and leaving the emerald floor entirely to the sprawling moss. But this green dominance was heavy and still, a velvet weight upon a silent, nutrient-depleted world. Below, the vast subterranean web felt the strain of the centuries, holding its breath, waiting for a key to turn.
 
