@@ -599,7 +599,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         long fungusCount = organisms.stream().filter(o -> o.type() == OrganismType.FUNGUS).count();
 
         for (Organism organism : organisms) {
-            OrganismType childType = organism.type().offspringType(cycle, organism.generation());
+            OrganismType childType = organism.type().offspringType(cycle, organism.generation(), environment);
             
             // Fungal role rescue mechanism
             if (fungusCount == 0 && organism.type() == OrganismType.ROOT_NETWORK) {

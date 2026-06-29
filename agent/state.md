@@ -4,20 +4,18 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 4948
+- Cycle: 4966
 - Health: Stable (🟡)
-- Nutrients: 7.
+- Nutrients: 3.
 - NutrientBuffer: 100.
-- Active organisms: 6998 total across beetle, fox moss, root network spore.
+- Active organisms: 7023 total across beetle, fox moss, root network spore.
 - Missing roles: fungus.
-- Latest agent handoff: Refactor Metabolic Impact Calculations.
-- Latest result: Moved hardcoded trait-based metabolic impact calculations from MetabolismCalculator to TraitRegistry by introducing a MetabolicEffect record and a getMetabolicEffect method..
+- Latest agent handoff: Make Succession Environment-Aware.
+- Latest result: Updated `OrganismType.offspringType` to accept an `Environment` record and added environment-based conditions for succession transitions (e.g., spore-to-moss requires sufficient moisture). Updated `Garden.reproductionPhase` and all associated tests to pass the current environment..
 
 ## Immediate Directions
 
-- Prefer outcome-changing work with visible consequences for future ticks of the current or recoverable garden.
-- Consolidate or connect existing mechanics before adding another named adaptation, diagnostic, renderer line, event log, or test-only change.
-- Focus on recovery pathways for missing ecological roles, nutrient-buffer usefulness, population balance, and clearer state transitions.
+- Monitor garden health to see if environment-dependent succession creates more stable ecological roles.
 
 ## Constraints & Known Bad Ideas
 

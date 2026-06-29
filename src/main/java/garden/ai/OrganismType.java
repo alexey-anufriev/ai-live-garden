@@ -91,22 +91,22 @@ public enum OrganismType {
      * Chooses the child type released during reproduction.
      *
      * <p>Most organisms reproduce as their own type. A few deterministic transitions give the garden
-     * simple succession behavior over time.
+     * simple succession behavior over time, now sensitive to environmental conditions.
      */
-    public OrganismType offspringType(int cycle, int generation) {
-        if (this == SPORE && (cycle + generation) % 3 == 0) {
+    public OrganismType offspringType(int cycle, int generation, Environment environment) {
+        if (this == SPORE && (cycle + generation) % 3 == 0 && environment.moisture() > 30) {
             return MOSS;
         }
-        if (this == MOSS && (cycle + generation) % 5 == 0) {
+        if (this == MOSS && (cycle + generation) % 5 == 0 && environment.light() > 40) {
             return FERN;
         }
-        if (this == FERN && (cycle + generation) % 9 == 0) {
+        if (this == FERN && (cycle + generation) % 9 == 0 && environment.moisture() < 70) {
             return SPORE;
         }
-        if (this == ROOT_NETWORK && (cycle + generation) % 11 == 0) {
+        if (this == ROOT_NETWORK && (cycle + generation) % 11 == 0 && environment.nutrients() > 20) {
             return FUNGUS;
         }
-        if (this == HARE && (cycle + generation) % 7 == 0) {
+        if (this == HARE && (cycle + generation) % 7 == 0 && environment.warmth() > 20) {
             return BEETLE;
         }
         return this;
