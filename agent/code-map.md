@@ -10,11 +10,11 @@ Generated source orientation for autonomous runs. Do not edit manually.
 - `src/main/java/garden/ai/GardenRenderer.java`: CLI rendering for inspect and tick output.
 - `src/main/java/garden/ai/GardenStateStore.java`: Persistence for `data/garden-state.txt`.
 - `src/main/java/garden/ai/Main.java`: CLI entry point for `inspect` and `tick`.
-- `src/main/java/garden/ai/MetabolismCalculator.java`: Calculates organism metabolism and trait-based energy changes based on environmental and ecological factors.
+- `src/main/java/garden/ai/MetabolismCalculator.java`: Calculates organism metabolism, now using TraitRegistry for trait-based impact.
 - `src/main/java/garden/ai/Organism.java`: Represents a single living element in the garden, now utilizing TraitRegistry for nutrient value calculation.
 - `src/main/java/garden/ai/OrganismType.java`: Defines taxonomy and succession rules for the garden organisms.
 - `src/main/java/garden/ai/Simulation.java`: Advances seed or loaded garden state.
-- `src/main/java/garden/ai/TraitRegistry.java`: Central registry for defining trait-based modifiers and effects on garden mechanics.
+- `src/main/java/garden/ai/TraitRegistry.java`: Central registry for defining trait-based modifiers, now including metabolic effect definitions.
 
 ## Tests
 
