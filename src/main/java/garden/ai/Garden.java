@@ -290,59 +290,21 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             if (organism.type() == OrganismType.MOSS && environment.moisture() > 60) {
                 growth += 1;
             }
-            if (changed.traits().contains("water-seeker") && environment.moisture() < 50) {
-                growth += 1;
-            }
-            if (changed.traits().contains("sun-seeker") && environment.light() > 60) {
-                growth += 1;
-                events.add(new GardenEvent(cycle, "%s thrived in the sunlight.".formatted(changed.id())));
-            }
-            if (changed.traits().contains("sun-lover") && environment.light() > 60) {
-                growth += 1;
-            }
-            if (changed.traits().contains("shade-thriver") && environment.light() < 40) {
-                growth += 2;
-                events.add(new GardenEvent(cycle, "%s thrived in the shade.".formatted(changed.id())));
-            }
-            if (changed.traits().contains("rain-collector") && environment.moisture() < 40) {
-                growth += 1;
-            }
-            if (organism.type() == OrganismType.FERN && changed.traits().contains("hardy") && environment.warmth() > 50) {
-                growth += 1;
+            // Trait-based growth
+            for (String trait : organism.traits()) {
+                TraitRegistry.PlantGrowthEffect effect = TraitRegistry.getPlantGrowthEffect(trait, cycle, organism, environment, organisms, fungalContribution);
+                if (effect != null) {
+                    growth += effect.growthChange();
+                    if (effect.event() != null) {
+                        events.add(effect.event());
+                    }
+                }
             }
             if (organism.type() == OrganismType.ROOT_NETWORK && changed.traits().contains("fungal-root-symbiont") && fungalContribution > 0) {
                 events.add(new GardenEvent(cycle, "%s benefited from its fungal symbiont.".formatted(changed.id())));
             }
             if (organism.type() == OrganismType.SPORE && environment.light() < 45) {
                 changed = changed.withCuriosity(changed.curiosity() + 2);
-            }
-            if (changed.traits().contains("nutrient-efficient") && environment.nutrients() < 30) {
-                growth += 1;
-            }
-            if (changed.traits().contains("nutrient-synthesizer") && environment.nutrients() < 5) {
-                growth += 2;
-                events.add(new GardenEvent(cycle, "%s synthesized nutrients from the soil.".formatted(changed.id())));
-            }
-            if (changed.traits().contains("buffer-tapper") && environment.nutrients() < 5 && environment.nutrientBuffer() > 0) {
-                growth += 2;
-                events.add(new GardenEvent(cycle, "%s tapped the nutrient buffer.".formatted(changed.id())));
-            }
-            if (changed.traits().contains("buffer-resonator") && environment.nutrientBuffer() > 0) {
-                growth += 1;
-                events.add(new GardenEvent(cycle, "%s utilized the nutrient buffer.".formatted(changed.id())));
-            }
-            if (changed.traits().contains("moisture-thriver") && environment.moisture() > 60) {
-                growth += 2;
-                events.add(new GardenEvent(cycle, "%s thrived in the moisture.".formatted(changed.id())));
-            }
-            if (changed.traits().contains("fungal-feeder") && fungalContribution > 0) {
-                boolean hasMycorrhizalBooster = organisms.stream().anyMatch(o -> o.type() == OrganismType.FUNGUS && o.traits().contains("mycorrhizal-booster"));
-                int bonus = hasMycorrhizalBooster ? 2 : 1;
-                growth += bonus;
-                events.add(new GardenEvent(cycle, "%s fed on fungal networks%s.".formatted(changed.id(), hasMycorrhizalBooster ? " (boosted)" : "")));
-            }
-            if (changed.traits().contains("resilient")) {
-                growth -= 1;
             }
             changed = changed.withEnergy(changed.energy() + growth);
         } else {

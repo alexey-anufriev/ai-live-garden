@@ -1,6 +1,7 @@
 package garden.ai;
 
 import java.util.Map;
+import java.util.List;
 
 public class TraitRegistry {
     private static final Map<String, Integer> NUTRIENT_VALUES = Map.of(
@@ -15,8 +16,58 @@ public class TraitRegistry {
 
     public record MetabolicEffect(int metabolismChange, int energyBonus, GardenEvent event) {}
 
+    public record PlantGrowthEffect(int growthChange, GardenEvent event) {}
+
     public static int getNutrientValueModifier(String trait) {
         return NUTRIENT_VALUES.getOrDefault(trait, 0);
+    }
+
+    public static PlantGrowthEffect getPlantGrowthEffect(String trait, int cycle, Organism organism, Environment environment, List<Organism> organisms, int fungalContribution) {
+        switch (trait) {
+            case "water-seeker":
+                if (environment.moisture() < 50) return new PlantGrowthEffect(1, null);
+                break;
+            case "sun-seeker":
+                if (environment.light() > 60) return new PlantGrowthEffect(1, new GardenEvent(cycle, "%s thrived in the sunlight.".formatted(organism.id())));
+                break;
+            case "sun-lover":
+                if (environment.light() > 60) return new PlantGrowthEffect(1, null);
+                break;
+            case "shade-thriver":
+                if (environment.light() < 40) return new PlantGrowthEffect(2, new GardenEvent(cycle, "%s thrived in the shade.".formatted(organism.id())));
+                break;
+            case "rain-collector":
+                if (environment.moisture() < 40) return new PlantGrowthEffect(1, null);
+                break;
+            case "hardy":
+                if (organism.type() == OrganismType.FERN && environment.warmth() > 50) return new PlantGrowthEffect(1, null);
+                break;
+            case "nutrient-efficient":
+                if (environment.nutrients() < 30) return new PlantGrowthEffect(1, null);
+                break;
+            case "nutrient-synthesizer":
+                if (environment.nutrients() < 5) return new PlantGrowthEffect(2, new GardenEvent(cycle, "%s synthesized nutrients from the soil.".formatted(organism.id())));
+                break;
+            case "buffer-tapper":
+                if (environment.nutrients() < 5 && environment.nutrientBuffer() > 0) return new PlantGrowthEffect(2, new GardenEvent(cycle, "%s tapped the nutrient buffer.".formatted(organism.id())));
+                break;
+            case "buffer-resonator":
+                if (environment.nutrientBuffer() > 0) return new PlantGrowthEffect(1, new GardenEvent(cycle, "%s utilized the nutrient buffer.".formatted(organism.id())));
+                break;
+            case "moisture-thriver":
+                if (environment.moisture() > 60) return new PlantGrowthEffect(2, new GardenEvent(cycle, "%s thrived in the moisture.".formatted(organism.id())));
+                break;
+            case "fungal-feeder":
+                if (fungalContribution > 0) {
+                    boolean hasMycorrhizalBooster = organisms.stream().anyMatch(o -> o.type() == OrganismType.FUNGUS && o.traits().contains("mycorrhizal-booster"));
+                    int bonus = hasMycorrhizalBooster ? 2 : 1;
+                    return new PlantGrowthEffect(bonus, new GardenEvent(cycle, "%s fed on fungal networks%s.".formatted(organism.id(), hasMycorrhizalBooster ? " (boosted)" : "")));
+                }
+                break;
+            case "resilient":
+                return new PlantGrowthEffect(-1, null);
+        }
+        return null;
     }
 
     public static MetabolicEffect getMetabolicEffect(String trait, int cycle, Organism organism, Environment environment, int fungalContribution, int mossContribution) {

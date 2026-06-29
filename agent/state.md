@@ -4,22 +4,19 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 4966
+- Cycle: 4984
 - Health: Stable (🟡)
 - Nutrients: 3.
 - NutrientBuffer: 100.
-- Active organisms: 7023 total across beetle, fox moss, root network spore.
+- Active organisms: 7048 total across beetle, fox moss, root network spore.
 - Missing roles: fungus.
-- Latest agent handoff: Make Succession Environment-Aware.
-- Latest result: Updated `OrganismType.offspringType` to accept an `Environment` record and added environment-based conditions for succession transitions (e.g., spore-to-moss requires sufficient moisture). Updated `Garden.reproductionPhase` and all associated tests to pass the current environment..
+- Latest agent handoff: Consolidate Plant Growth Trait Logic.
+- Latest result: Extracted trait-based plant growth logic into a new `TraitRegistry.getPlantGrowthEffect` method, enabling centralized management of growth-related trait effects and side-effects (events). Updated `Garden.passiveChange` to iterate over organism traits and apply these effects, while preserving type-based growth rules. Verified the change with a new `PlantGrowthEffectTest` and full test suite pass..
 
 ## Immediate Directions
 
-- Monitor garden health to see if environment-dependent succession creates more stable ecological roles.
+- Continue consolidating other trait-based logic in the simulation loop.
 
 ## Constraints & Known Bad Ideas
 
-- Do not attempt to fix the simulation in one run.
-- Do not add another named adaptation merely because recent runs did so.
-- Do not add another observability-only or tests-only change merely because it is easy to validate.
-- Do not treat the full nutrient buffer as proof of health while nutrients are zero or ecological roles are absent.
+- Ensure all trait-related logic, particularly growth, metabolic, and nutrient-based modifiers, is managed through the TraitRegistry.
