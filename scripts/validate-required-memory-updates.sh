@@ -42,12 +42,31 @@ readme_state_block() {
   ' README.md
 }
 
+section_block() {
+  local heading="$1"
+
+  awk -v heading="$heading" '
+    $0 == heading {
+      in_section = 1
+      next
+    }
+    in_section && /^### / {
+      exit
+    }
+    in_section {
+      print
+    }
+  ' <<<"$block"
+}
+
 validate_readme_state_block() {
   local start_count
   local end_count
   local block
   local health_line
-  local narrative_line
+  local second_line
+  local organisms_section
+  local garden_section
 
   start_count="$(grep -c '^<!-- AI-LIVE-GARDEN:STATE-START -->$' README.md || true)"
   end_count="$(grep -c '^<!-- AI-LIVE-GARDEN:STATE-END -->$' README.md || true)"
@@ -58,8 +77,10 @@ validate_readme_state_block() {
   fi
 
   block="$(readme_state_block)"
+  organisms_section="$(section_block "### Organisms")"
+  garden_section="$(section_block "### Garden Characteristics")"
   health_line="$(awk 'NF { print; exit }' <<<"$block")"
-  narrative_line="$(awk '
+  second_line="$(awk '
     NF {
       seen++
       if (seen == 2) {
@@ -73,10 +94,72 @@ validate_readme_state_block() {
     record_violation "README.md" "first non-empty state-block line must be a Garden Health line with allowed status: Flourishing, Stable, Strained, Critical, or Dormant"
   fi
 
-  if [[ -z "$narrative_line" ]]; then
-    record_violation "README.md" "Current Garden State block must include a second non-empty narrative line after the health line"
-  elif [[ "$narrative_line" == \#* || "$narrative_line" == -* || "$narrative_line" == '<!--'* ]]; then
-    record_violation "README.md" "second non-empty state-block line must be a narrative sentence, not a heading, list item, or comment"
+  if [[ -z "$second_line" ]]; then
+    record_violation "README.md" "Current Garden State block must include structured state details after the health line"
+  elif [[ "$second_line" == '<!--'* ]]; then
+    record_violation "README.md" "state-block details must not begin with a comment"
+  fi
+
+  for required_heading in "### Organisms" "### Garden Characteristics"; do
+    if ! grep -qx "$required_heading" <<<"$block"; then
+      record_violation "README.md" "Current Garden State block must include '${required_heading}'"
+    fi
+  done
+
+  if grep -qx '### Recent Trends' <<<"$block"; then
+    record_violation "README.md" "trend charts must live in their respective sections, not in a separate Recent Trends section"
+  fi
+
+  if ! grep -Eq '^- Total: [0-9]+' <<<"$block"; then
+    record_violation "README.md" "Organisms section must include total organism count"
+  fi
+
+  if ! grep -Eq '^- Nutrients: ' <<<"$block" || ! grep -Eq '^- Nutrient buffer: ' <<<"$block"; then
+    record_violation "README.md" "Garden Characteristics must include nutrient values"
+  fi
+
+  if grep -q 'sampled' <<<"$block"; then
+    record_violation "README.md" "README state block must not describe chart sampling details"
+  fi
+
+  if ! grep -Fxq '![Garden trends](agent/garden-trends.svg)' <<<"$garden_section"; then
+    record_violation "README.md" "Garden Characteristics section must embed agent/garden-trends.svg"
+  fi
+
+  if ! grep -Fxq '![Organism trends](agent/organism-trends.svg)' <<<"$organisms_section"; then
+    record_violation "README.md" "Organisms section must embed agent/organism-trends.svg"
+  fi
+
+  if [[ ! -f agent/garden-trends.svg ]]; then
+    record_violation "agent/garden-trends.svg" "README trend chart must exist as a generated SVG"
+  elif ! grep -q '<svg ' agent/garden-trends.svg; then
+    record_violation "agent/garden-trends.svg" "generated trend chart must be an SVG document"
+  elif grep -q 'sampled' agent/garden-trends.svg; then
+    record_violation "agent/garden-trends.svg" "generated garden trend chart must not describe chart sampling details"
+  elif ! grep -q '>Garden Trends<' agent/garden-trends.svg; then
+    record_violation "agent/garden-trends.svg" "generated garden trend chart must describe garden trends"
+  elif grep -q '>Total organisms<' agent/garden-trends.svg; then
+    record_violation "agent/garden-trends.svg" "generated garden trend chart must not include organism rows"
+  elif grep -q '>max ' agent/garden-trends.svg || grep -q ', min ' agent/garden-trends.svg; then
+    record_violation "agent/garden-trends.svg" "generated garden trend chart must use positional axis values, not max/min text"
+  elif ! grep -q 'class="axis-value"' agent/garden-trends.svg; then
+    record_violation "agent/garden-trends.svg" "generated garden trend chart must show positional Y-axis values"
+  fi
+
+  if [[ ! -f agent/organism-trends.svg ]]; then
+    record_violation "agent/organism-trends.svg" "README organism trend chart must exist as a generated SVG"
+  elif ! grep -q '<svg ' agent/organism-trends.svg; then
+    record_violation "agent/organism-trends.svg" "generated organism trend chart must be an SVG document"
+  elif grep -q 'sampled' agent/organism-trends.svg; then
+    record_violation "agent/organism-trends.svg" "generated organism trend chart must not describe chart sampling details"
+  elif ! grep -q '>Organism Trends<' agent/organism-trends.svg; then
+    record_violation "agent/organism-trends.svg" "generated organism trend chart must describe organism trends"
+  elif ! grep -q '>Total organisms<' agent/organism-trends.svg; then
+    record_violation "agent/organism-trends.svg" "generated organism trend chart must include total organism trend"
+  elif grep -q '>max ' agent/organism-trends.svg || grep -q ', min ' agent/organism-trends.svg; then
+    record_violation "agent/organism-trends.svg" "generated organism trend chart must use positional axis values, not max/min text"
+  elif ! grep -q 'class="axis-value"' agent/organism-trends.svg; then
+    record_violation "agent/organism-trends.svg" "generated organism trend chart must show positional Y-axis values"
   fi
 }
 

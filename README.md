@@ -55,10 +55,33 @@ This is still an experiment. Do not store valuable secrets or production code in
 
 ## Current Garden State
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟡 Stable — the garden persists but ecological roles are still missing.
-At cycle 4810, the garden contains 6835 organisms across beetle,fox moss,root network spore. Available nutrients are 5, the nutrient buffer is 100, and missing roles are fungus; the next useful changes should improve recoverable ecosystem behavior rather than add bookkeeping.
+**Garden Health:** 🟢 Flourishing — diverse roles persist with usable nutrients.
+At cycle 4784, the garden has this committed shape:
+
+### Organisms
+
+- Total: 6844
+- Breakdown:
+  - Beetle: 92
+  - Fox: 1
+  - Fungus: 56
+  - Moss: 6682
+  - Root Network: 12
+  - Spore: 1
+
+![Organism trends](agent/organism-trends.svg)
+
+### Garden Characteristics
+
+- Version: 2
+- Cycle: 4784
+- Next id: 9680
+- Light: 100
+- Moisture: 98
+- Warmth: 100
+- Nutrients: 12
+- Nutrient buffer: 100
+- Missing roles: none
+
+![Garden trends](agent/garden-trends.svg)
 <!-- AI-LIVE-GARDEN:STATE-END -->
-
-
-
-
