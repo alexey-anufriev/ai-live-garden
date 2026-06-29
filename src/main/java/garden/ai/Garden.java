@@ -692,7 +692,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         if (organism.type().isPlant()) {
             threshold = 14;
         } else if (organism.type() == OrganismType.FOX) {
-            threshold = 18;
+            threshold = 15;
         }
         if (organism.traits().contains("prolific")) {
             threshold -= 3;
