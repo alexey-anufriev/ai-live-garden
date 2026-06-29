@@ -4,20 +4,18 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 4828
+- Cycle: 4846
 - Health: Stable (🟡)
-- Nutrients: 9.
+- Nutrients: 3.
 - NutrientBuffer: 100.
-- Active organisms: 6834 total across beetle, fox moss, root network spore.
+- Active organisms: 6852 total across beetle, fox moss, root network spore.
 - Missing roles: fungus.
-- Latest agent handoff: Refactor trait counting logic in Garden.java.
-- Latest result: Added private helper methods `countType`, `countTrait`, `countAnimalTrait`, `countPlantTrait`, and `countTrait(String)` to `Garden.java` and updated all relevant counting logic in `rootContribution`, `fungalContribution`, and `nextCycle` to use these helpers..
+- Latest agent handoff: Implement Fungal Role Rescue Mechanism.
+- Latest result: Modified Garden.java to detect the absence of FUNGUS organisms during reproduction and force one ROOT_NETWORK to spawn a FUNGUS offspring, breaking the extinction feedback loop. Added FungalRoleRescueTest.java to verify this recovery behavior..
 
 ## Immediate Directions
 
-- Prefer outcome-changing work with visible consequences for future ticks of the current or recoverable garden.
-- Consolidate or connect existing mechanics before adding another named adaptation, diagnostic, renderer line, event log, or test-only change.
-- Focus on recovery pathways for missing ecological roles, nutrient-buffer usefulness, population balance, and clearer state transitions.
+- Monitor fungal population stability.
 
 ## Constraints & Known Bad Ideas
 

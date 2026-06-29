@@ -677,9 +677,16 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         List<Organism> next = new ArrayList<>();
         int identifier = nextId;
         int birthsThisCycle = 0;
+        long fungusCount = organisms.stream().filter(o -> o.type() == OrganismType.FUNGUS).count();
 
         for (Organism organism : organisms) {
             OrganismType childType = organism.type().offspringType(cycle, organism.generation());
+            
+            // Fungal role rescue mechanism
+            if (fungusCount == 0 && organism.type() == OrganismType.ROOT_NETWORK) {
+                childType = OrganismType.FUNGUS;
+            }
+
             boolean isFungalSuccession = (organism.type() == OrganismType.ROOT_NETWORK && childType == OrganismType.FUNGUS);
             boolean canReproduce = organism.energy() >= reproductionThreshold(organism) && (birthsThisCycle < 2 || isFungalSuccession);
 
