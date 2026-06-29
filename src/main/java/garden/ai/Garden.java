@@ -20,6 +20,27 @@ import java.util.Optional;
  */
 public record Garden(int cycle, int nextId, Environment environment, List<Organism> organisms, List<GardenEvent> events) {
 
+    private long countType(OrganismType type) {
+        return organisms.stream().filter(o -> o.type() == type).count();
+    }
+
+    private long countTrait(OrganismType type, String trait) {
+        return organisms.stream().filter(o -> o.type() == type && o.traits().contains(trait)).count();
+    }
+
+    private long countTrait(String trait) {
+        return organisms.stream().filter(o -> o.traits().contains(trait)).count();
+    }
+
+    private long countAnimalTrait(String trait) {
+        return organisms.stream().filter(o -> o.type().isAnimal() && o.traits().contains(trait)).count();
+    }
+
+    private long countPlantTrait(String trait) {
+        return organisms.stream().filter(o -> o.type().isPlant() && o.traits().contains(trait)).count();
+    }
+
+
     private static final int MAX_EVENTS = 600;
 
     public Garden(int cycle, int nextId, Environment environment, List<Organism> organisms, List<GardenEvent> events) {
@@ -60,21 +81,21 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
     }
 
     public int rootContribution(long releaserCount) {
-        long rootNetworkCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK).count();
-        long nutrientWeaverCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("nutrient-weaver")).count();
-        long nutrientSharerCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("nutrient-sharer")).count();
-        long bufferOptimizerCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("buffer-optimizer")).count();
-        long soilMasterCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("soil-master")).count();
-        long nutrientRecyclerCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("nutrient-recycler")).count();
-        long nutrientTranslocatorCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("nutrient-translocator")).count();
-        long nutrientSynthesizerCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("nutrient-synthesizer")).count();
-        long nutrientReclaimerCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("nutrient-reclaimer")).count();
-        long nutrientProducerCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("nutrient-producer")).count();
-        long nutrientPumpCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("nutrient-pump")).count();
-        long nutrientDistributorCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("nutrient-distributor")).count();
-        long fungalRootSymbiontCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("fungal-root-symbiont")).count();
-        long fungusCount = organisms.stream().filter(organism -> organism.type() == OrganismType.FUNGUS).count();
-        long mycelialRootMediatorCount = (fungusCount > 0) ? organisms.stream().filter(organism -> organism.type().isAnimal() && organism.traits().contains("mycelial-root-mediator")).count() : 0;
+        long rootNetworkCount = countType(OrganismType.ROOT_NETWORK);
+        long nutrientWeaverCount = countTrait(OrganismType.ROOT_NETWORK, "nutrient-weaver");
+        long nutrientSharerCount = countTrait(OrganismType.ROOT_NETWORK, "nutrient-sharer");
+        long bufferOptimizerCount = countTrait(OrganismType.ROOT_NETWORK, "buffer-optimizer");
+        long soilMasterCount = countTrait(OrganismType.ROOT_NETWORK, "soil-master");
+        long nutrientRecyclerCount = countTrait(OrganismType.ROOT_NETWORK, "nutrient-recycler");
+        long nutrientTranslocatorCount = countTrait(OrganismType.ROOT_NETWORK, "nutrient-translocator");
+        long nutrientSynthesizerCount = countTrait(OrganismType.ROOT_NETWORK, "nutrient-synthesizer");
+        long nutrientReclaimerCount = countTrait(OrganismType.ROOT_NETWORK, "nutrient-reclaimer");
+        long nutrientProducerCount = countTrait(OrganismType.ROOT_NETWORK, "nutrient-producer");
+        long nutrientPumpCount = countTrait(OrganismType.ROOT_NETWORK, "nutrient-pump");
+        long nutrientDistributorCount = countTrait(OrganismType.ROOT_NETWORK, "nutrient-distributor");
+        long fungalRootSymbiontCount = countTrait(OrganismType.ROOT_NETWORK, "fungal-root-symbiont");
+        long fungusCount = countType(OrganismType.FUNGUS);
+        long mycelialRootMediatorCount = (fungusCount > 0) ? countAnimalTrait("mycelial-root-mediator") : 0;
         
         if (environment.nutrients() < 5) {
             return (int) (rootNetworkCount * 10 + nutrientWeaverCount * 10 + nutrientSharerCount * 20 + bufferOptimizerCount * 20 + soilMasterCount * 30 + nutrientRecyclerCount * 10 + nutrientTranslocatorCount * 40 + nutrientSynthesizerCount * 30 + nutrientReclaimerCount * 25 + nutrientProducerCount * 50 + nutrientPumpCount * 60 + nutrientDistributorCount * 40 + fungalRootSymbiontCount * 40 + mycelialRootMediatorCount * 20);
@@ -97,18 +118,18 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
     }
 
     public int fungalContribution() {
-        long fungusCount = organisms.stream().filter(organism -> organism.type() == OrganismType.FUNGUS).count();
-        long decomposerCount = organisms.stream().filter(organism -> organism.type() == OrganismType.FUNGUS && organism.traits().contains("nutrient-decomposer")).count();
-        long soilEnricherCount = organisms.stream().filter(organism -> organism.type() == OrganismType.FUNGUS && organism.traits().contains("fungus-soil-enricher")).count();
-        long networkConnectorCount = organisms.stream().filter(organism -> organism.type() == OrganismType.FUNGUS && organism.traits().contains("fungal-network-connector")).count();
-        long fungalSymbioteCount = organisms.stream().filter(organism -> organism.type().isPlant() && organism.traits().contains("fungal-symbiote")).count();
-        long fungalAcceleratorCount = organisms.stream().filter(organism -> organism.type() == OrganismType.FUNGUS && organism.traits().contains("fungal-accelerator")).count();
-        long fungalEnhancerCount = organisms.stream().filter(organism -> organism.type() == OrganismType.FUNGUS && organism.traits().contains("fungal-enhancer")).count();
-        long fungalGardenerCount = organisms.stream().filter(organism -> organism.type().isAnimal() && organism.traits().contains("fungal-gardener")).count();
-        long fungalFertilizerCount = organisms.stream().filter(organism -> organism.type().isAnimal() && organism.traits().contains("fungal-fertilizer")).count();
-        long rootNetworkCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK).count();
-        long mycelialSynergizerCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("mycelial-synergizer")).count();
-        long fungalDecomposerMimicCount = organisms.stream().filter(organism -> organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("fungal-decomposer-mimic")).count();
+        long fungusCount = countType(OrganismType.FUNGUS);
+        long decomposerCount = countTrait(OrganismType.FUNGUS, "nutrient-decomposer");
+        long soilEnricherCount = countTrait(OrganismType.FUNGUS, "fungus-soil-enricher");
+        long networkConnectorCount = countTrait(OrganismType.FUNGUS, "fungal-network-connector");
+        long fungalSymbioteCount = countPlantTrait("fungal-symbiote");
+        long fungalAcceleratorCount = countTrait(OrganismType.FUNGUS, "fungal-accelerator");
+        long fungalEnhancerCount = countTrait(OrganismType.FUNGUS, "fungal-enhancer");
+        long fungalGardenerCount = countAnimalTrait("fungal-gardener");
+        long fungalFertilizerCount = countAnimalTrait("fungal-fertilizer");
+        long rootNetworkCount = countType(OrganismType.ROOT_NETWORK);
+        long mycelialSynergizerCount = countTrait(OrganismType.ROOT_NETWORK, "mycelial-synergizer");
+        long fungalDecomposerMimicCount = countTrait(OrganismType.ROOT_NETWORK, "fungal-decomposer-mimic");
 
         int connectorBonus = (rootNetworkCount > 0) ? 6 : 4;
         int synergizerBonus = (mycelialSynergizerCount > 0 && fungusCount > 0) ? 5 : 0;
@@ -137,21 +158,21 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         long plantCount = organisms.stream().filter(organism -> organism.type().isPlant()).count();
         long animalCount = organisms.stream().filter(organism -> organism.type().isAnimal()).count();
         
-        long mossCount = organisms.stream().filter(o -> o.type() == OrganismType.MOSS).count();
-        long fernCount = organisms.stream().filter(o -> o.type() == OrganismType.FERN).count();
-        long sporeCount = organisms.stream().filter(o -> o.type() == OrganismType.SPORE).count();
-        long rootNetworkCount = organisms.stream().filter(o -> o.type() == OrganismType.ROOT_NETWORK).count();
-        long fungusCount = organisms.stream().filter(o -> o.type() == OrganismType.FUNGUS).count();
-        long mossConserverCount = organisms.stream().filter(o -> o.type() == OrganismType.MOSS && o.traits().contains("nutrient-conserver")).count();
-        long mossScavengerCount = organisms.stream().filter(o -> o.type() == OrganismType.MOSS && o.traits().contains("moss-nutrient-scavenger")).count();
-        long fernConserverCount = organisms.stream().filter(o -> o.type() == OrganismType.FERN && o.traits().contains("nutrient-conserver")).count();
-        long mobilizerCount = organisms.stream().filter(o -> o.traits().contains("nutrient-mobilizer")).count();
-        long fungalNutrientMobilizerCount = organisms.stream().filter(o -> o.type() == OrganismType.FUNGUS && o.traits().contains("fungal-nutrient-mobilizer")).count();
-        long releaserCount = organisms.stream().filter(o -> o.traits().contains("buffer-releaser")).count();
-        long recyclerCount = organisms.stream().filter(o -> o.traits().contains("nutrient-recycler")).count();
-        long distributorCount = organisms.stream().filter(o -> o.traits().contains("nutrient-distributor")).count();
-        long demandRegulatorCount = organisms.stream().filter(o -> o.traits().contains("nutrient-demand-regulator")).count();
-        long siphonCount = organisms.stream().filter(o -> o.traits().contains("buffer-siphon")).count();
+        long mossCount = countType(OrganismType.MOSS);
+        long fernCount = countType(OrganismType.FERN);
+        long sporeCount = countType(OrganismType.SPORE);
+        long rootNetworkCount = countType(OrganismType.ROOT_NETWORK);
+        long fungusCount = countType(OrganismType.FUNGUS);
+        long mossConserverCount = countTrait(OrganismType.MOSS, "nutrient-conserver");
+        long mossScavengerCount = countTrait(OrganismType.MOSS, "moss-nutrient-scavenger");
+        long fernConserverCount = countTrait(OrganismType.FERN, "nutrient-conserver");
+        long mobilizerCount = countTrait("nutrient-mobilizer");
+        long fungalNutrientMobilizerCount = countTrait(OrganismType.FUNGUS, "fungal-nutrient-mobilizer");
+        long releaserCount = countTrait("buffer-releaser");
+        long recyclerCount = countTrait("nutrient-recycler");
+        long distributorCount = countTrait("nutrient-distributor");
+        long demandRegulatorCount = countTrait("nutrient-demand-regulator");
+        long siphonCount = countTrait("buffer-siphon");
         
         int reductionFactor = environment.nutrients() < 10 ? 1 : 5;
         int plantConsumptionReduction = (int) ((mossConserverCount + mossScavengerCount + fernConserverCount) / reductionFactor);
