@@ -4,18 +4,18 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 4879
+- Cycle: 4912
 - Health: Stable (🟡)
 - Nutrients: 5.
 - NutrientBuffer: 100.
-- Active organisms: 6909 total across beetle, fox fungus, moss root network, spore.
+- Active organisms: 6976 total across beetle, fox fungus, moss root network, spore.
 - Missing roles: none.
-- Latest agent handoff: Fix Fungal Role Rescue Mechanism.
-- Latest result: Modified Garden.java to allow stressed root networks to reproduce if they are the ones spawning a FUNGUS child, ensuring the fungal rescue mechanism works as intended. Added FungalRoleRescueStressedTest.java to verify this behavior..
+- Latest agent handoff: Metabolism Calculation Refactor.
+- Latest result: Moved metabolism calculation logic from Garden.java to a new MetabolismCalculator class and updated Garden.java to use the new class. Verified with full test suite pass..
 
 ## Immediate Directions
 
-- Monitor if the FUNGUS population recovers over the next few cycles.
+- Monitor for any unexpected changes in predator-prey dynamics.
 
 ## Constraints & Known Bad Ideas
 

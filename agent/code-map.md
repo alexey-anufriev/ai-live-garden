@@ -5,11 +5,12 @@ Generated source orientation for autonomous runs. Do not edit manually.
 ## Source Files
 
 - `src/main/java/garden/ai/Environment.java`: Immutable environmental resources and nutrient-buffer operations used by each garden cycle.
-- `src/main/java/garden/ai/Garden.java`: Simulation core for advancing garden state and managing organism reproduction.
+- `src/main/java/garden/ai/Garden.java`: Simulation core for advancing garden state and managing organism reproduction, now utilizing MetabolismCalculator.
 - `src/main/java/garden/ai/GardenEvent.java`: Compact event record used by simulation and rendering.
 - `src/main/java/garden/ai/GardenRenderer.java`: CLI rendering for inspect and tick output.
 - `src/main/java/garden/ai/GardenStateStore.java`: Persistence for `data/garden-state.txt`.
 - `src/main/java/garden/ai/Main.java`: CLI entry point for `inspect` and `tick`.
+- `src/main/java/garden/ai/MetabolismCalculator.java`: Calculates organism metabolism and trait-based energy changes based on environmental and ecological factors.
 - `src/main/java/garden/ai/Organism.java`: Immutable organism value and per-organism attributes.
 - `src/main/java/garden/ai/OrganismType.java`: Defines taxonomy and succession rules for the garden organisms.
 - `src/main/java/garden/ai/Simulation.java`: Advances seed or loaded garden state.

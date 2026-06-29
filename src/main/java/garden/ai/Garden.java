@@ -346,90 +346,9 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             }
             changed = changed.withEnergy(changed.energy() + growth);
         } else {
-            int metabolism = organism.type().metabolism();
-            if (changed.traits().contains("resilient")) {
-                metabolism += 1;
-            }
-            if (changed.traits().contains("dormancy") && environment.nutrients() < 15) {
-                metabolism = Math.max(0, metabolism - 2);
-            }
-            if (changed.traits().contains("metabolic-efficiency")) {
-                metabolism = Math.max(0, metabolism - 1);
-            }
-            if (changed.traits().contains("quiet-hunger") && changed.traits().contains("starving")) {
-                metabolism = Math.max(0, metabolism - 1);
-            }
-            if (changed.traits().contains("nutrient-sharer") && changed.traits().contains("starving")) {
-                metabolism = Math.max(0, metabolism - 2);
-                events.add(new GardenEvent(cycle, "%s shared metabolic burden while starving.".formatted(changed.id())));
-            }
-            if (changed.traits().contains("moss-harvester") && mossContribution > 0) {
-                metabolism = Math.max(0, metabolism - 1);
-                events.add(new GardenEvent(cycle, "%s harvested nutrients from mosses.".formatted(changed.id())));
-            }
-            if (changed.traits().contains("spore-disperser") && fungalContribution > 0) {
-                metabolism = Math.max(0, metabolism - 1);
-                events.add(new GardenEvent(cycle, "%s dispersed spores near the fungal network.".formatted(changed.id())));
-            }
-            if (changed.traits().contains("mycelial-conduit") && fungalContribution > 0) {
-                changed = changed.withEnergy(changed.energy() + 1);
-                events.add(new GardenEvent(cycle, "%s channeled energy through the mycelial network.".formatted(changed.id())));
-            }
-            if (changed.traits().contains("mycelial-scavenger") && fungalContribution > 0) {
-                int reduction = 2;
-                if (changed.traits().contains("mycelial-harvester")) {
-                    reduction += 1;
-                }
-                metabolism = Math.max(0, metabolism - reduction);
-                events.add(new GardenEvent(cycle, "%s scavenged nutrients from the mycelial network%s.".formatted(changed.id(), changed.traits().contains("mycelial-harvester") ? " (harvested)" : "")));
-            }
-            if (changed.traits().contains("mycelial-resonator") && fungalContribution > 0 && !changed.traits().contains("mycelial-scavenger")) {
-                metabolism = Math.max(0, metabolism - 1);
-                events.add(new GardenEvent(cycle, "%s resonated with the mycelial network.".formatted(changed.id())));
-            }
-            if (changed.traits().contains("mycelial-protector") && fungalContribution > 0) {
-                metabolism = Math.max(0, metabolism - 2);
-                events.add(new GardenEvent(cycle, "%s was protected by the mycelial network.".formatted(changed.id())));
-            }
-            if (changed.traits().contains("nutrient-anticipator") && environment.nutrientBuffer() < 20) {
-                metabolism = Math.max(0, metabolism - 1);
-                events.add(new GardenEvent(cycle, "%s anticipated nutrient scarcity.".formatted(changed.id())));
-            }
-            if (changed.traits().contains("metabolic-economizer") && changed.traits().contains("stressed")) {
-                metabolism = Math.max(0, metabolism - 1);
-                events.add(new GardenEvent(cycle, "%s economically managed its metabolism while stressed.".formatted(changed.id())));
-            }
-            if (changed.traits().contains("buffer-scavenger") && environment.nutrientBuffer() > 0) {
-                metabolism = Math.max(0, metabolism - 1);
-                events.add(new GardenEvent(cycle, "%s utilized the nutrient buffer.".formatted(changed.id())));
-            }
-            if (changed.traits().contains("buffer-explorer") && environment.nutrientBuffer() > 0) {
-                metabolism = Math.max(0, metabolism - 1);
-                if (changed.traits().contains("buffer-tapper") && environment.nutrients() < 10) {
-                    changed = changed.withEnergy(changed.energy() + 1);
-                    events.add(new GardenEvent(cycle, "%s explored and tapped additional buffer nutrients.".formatted(changed.id())));
-                } else {
-                    events.add(new GardenEvent(cycle, "%s explored the nutrient buffer.".formatted(changed.id())));
-                }
-            }
-            if (changed.traits().contains("mycelial-buffer-adapter") && fungalContribution > 0 && environment.nutrientBuffer() > 0) {
-                changed = changed.withEnergy(changed.energy() + 1);
-                metabolism = Math.max(0, metabolism - 1);
-                events.add(new GardenEvent(cycle, "%s adapted to buffer tapping through the mycelial network.".formatted(changed.id())));
-            }
-            if (changed.traits().contains("buffer-tapper") && environment.nutrients() < 10 && environment.nutrientBuffer() > 0) {
-                changed = changed.withEnergy(changed.energy() + 1);
-                events.add(new GardenEvent(cycle, "%s tapped the nutrient buffer while starving.".formatted(changed.id())));
-            }
-            if (changed.traits().contains("nutrient-scrounger") && environment.nutrients() < 25) {
-                changed = changed.withEnergy(changed.energy() + 1);
-                events.add(new GardenEvent(cycle, "%s scrounged for nutrients.".formatted(changed.id())));
-            }
-            if (fungalAttractorContribution > 0) {
-                changed = changed.withEnergy(changed.energy() + 1);
-                events.add(new GardenEvent(cycle, "%s was attracted to a fungal-rich area.".formatted(changed.id())));
-            }
-            changed = changed.withEnergy(changed.energy() - metabolism)
+            MetabolismCalculator.MetabolicResult result = MetabolismCalculator.calculate(cycle, changed, environment, mossContribution, fungalContribution, fungalAttractorContribution);
+            events.addAll(result.events());
+            changed = changed.withEnergy(changed.energy() + result.energyBonus() - result.metabolism())
                     .withCuriosity(changed.curiosity() + (cycle % 4 == 0 ? 1 : 0));
         }
 
