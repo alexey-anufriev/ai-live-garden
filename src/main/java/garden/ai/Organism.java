@@ -105,28 +105,7 @@ public record Organism(String id, OrganismType type, int energy, int curiosity, 
 
     public int nutrientValue() {
         int value = type.nutrientValue();
-        if (traits.contains("nutrient-hoarder")) {
-            value += 5;
-        }
-        if (traits.contains("nutrient-recycler")) {
-            value += 3;
-        }
-        if (traits.contains("nutrient-decomposer")) {
-            value += 7;
-        }
-        if (traits.contains("nutrient-enricher")) {
-            value += 5;
-        }
-        if (traits.contains("nutrient-distributor")) {
-            value += 4;
-        }
-        if (traits.contains("nutrient-sharer")) {
-            value += 3;
-        }
-        if (traits.contains("nutrient-storer")) {
-            value += 6;
-        }
-        return value;
+        return value + traits.stream().mapToInt(TraitRegistry::getNutrientValueModifier).sum();
     }
 
     /**
