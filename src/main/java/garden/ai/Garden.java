@@ -690,7 +690,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             boolean isFungalSuccession = (organism.type() == OrganismType.ROOT_NETWORK && childType == OrganismType.FUNGUS);
             boolean canReproduce = organism.energy() >= reproductionThreshold(organism) && (birthsThisCycle < 2 || isFungalSuccession);
 
-            if (organism.traits().contains("stressed") && !organism.traits().contains("fungal-symbiote")) {
+            if (organism.traits().contains("stressed") && !organism.traits().contains("fungal-symbiote") && !isFungalSuccession) {
                 canReproduce = false;
             }
             if (organism.traits().contains("starving") && !organism.traits().contains("resourceful-breeder")) {
