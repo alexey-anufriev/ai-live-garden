@@ -37,6 +37,11 @@ jobs:
         id: advance_garden
         run: mvn -B -q exec:java -Dexec.args="tick --steps 5"
 
+      - name: Update README garden state
+        id: update_readme_state
+        shell: bash
+        run: scripts/update-readme-garden-state.sh
+
       - name: Commit changes directly to main
         shell: bash
         env:

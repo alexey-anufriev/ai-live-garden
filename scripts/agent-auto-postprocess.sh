@@ -138,17 +138,6 @@ organism_counts() {
   }' data/garden-state.txt | sort
 }
 
-display_label() {
-  local value="$1"
-  tr '[:upper:]_' '[:lower:] ' <<<"$value" |
-    awk '{
-      for (i = 1; i <= NF; i++) {
-        $i = toupper(substr($i, 1, 1)) substr($i, 2)
-      }
-      print
-    }'
-}
-
 types_csv() {
   organism_counts |
     awk -F= '$1 != "total" { print tolower($1) }' |
@@ -191,57 +180,6 @@ health_status() {
   else
     echo "🟡|Stable|diverse roles persist under limited nutrients."
   fi
-}
-
-write_readme_state_body() {
-  local cycle="$1"
-  local nutrients="$2"
-  local buffer="$3"
-  local total="$4"
-  local missing="$5"
-
-  {
-    echo "At cycle ${cycle}, the garden has this committed shape:"
-    echo
-    echo "### Organisms"
-    echo
-    echo "- Total: ${total}"
-    echo "- Breakdown:"
-    organism_counts |
-      awk -F= '$1 != "total" { print $1 "\t" $2 }' |
-      sort |
-      while IFS=$'\t' read -r type count; do
-        echo "  - $(display_label "$type"): ${count}"
-      done
-    echo
-    echo "![Organism trends](agent/organism-trends.svg)"
-    echo
-    echo "### Garden Characteristics"
-    echo
-    awk -F= '
-      /^#/ { next }
-      /^$/ { exit }
-      /^[^=]+=.*$/ {
-        label = $1
-        if (label == "cycle") label = "Cycle"
-        else if (label == "version") label = "Version"
-        else if (label == "nextId") label = "Next id"
-        else if (label == "light") label = "Light"
-        else if (label == "moisture") label = "Moisture"
-        else if (label == "warmth") label = "Warmth"
-        else if (label == "nutrients") label = "Nutrients"
-        else if (label == "nutrientBuffer") label = "Nutrient buffer"
-        else {
-          gsub(/_/, " ", label)
-          label = toupper(substr(label, 1, 1)) substr(label, 2)
-        }
-        printf "- %s: %s\n", label, $2
-      }
-    ' data/garden-state.txt
-    echo "- Missing roles: ${missing}"
-    echo
-    echo "![Garden trends](agent/garden-trends.svg)"
-  }
 }
 
 write_agent_state() {
@@ -434,10 +372,7 @@ IFS='|' read -r health_symbol health_label health_reason <<<"$health_record"
 
 write_agent_state "$cycle" "$nutrients" "$buffer" "${total:-0}" "$active_types" "$missing" "$health_symbol" "$health_label" "$change_title" "$summary_text"
 append_requests
-scripts/generate-garden-trends-svg.sh agent/garden-trends.svg agent/organism-trends.svg
-
-readme_narrative="$(write_readme_state_body "$cycle" "$nutrients" "$buffer" "${total:-0}" "$missing")"
-scripts/agent-update-readme-state.sh --symbol "$health_symbol" --status "$health_label" --reason "$health_reason" --narrative "$readme_narrative"
+scripts/update-readme-garden-state.sh
 
 summary_body="${summary_text} Expected future effect: ${expected_effect}. Changed files before memory generation: ${changed_list}. After the workflow tick, the garden reached cycle ${cycle} with nutrients ${nutrients}, nutrientBuffer ${buffer}, active types ${active_types:-none}, and missing roles ${missing}. Test validation outcome: ${test_outcome}."
 scripts/agent-append-summary.sh --cadence daily --timestamp "$timestamp" --title "$change_title" --body "$summary_body" >/dev/null

@@ -170,7 +170,7 @@ write_svg_header() {
     .separator { stroke: #eef2f7; stroke-width: 1; }
   </style>
   <text x="24" y="32" class="title">${title}</text>
-  <text x="24" y="52" class="subtitle">Last 7 days</text>
+  <text x="24" y="52" class="subtitle">Last 7 days range</text>
 SVG
 }
 
