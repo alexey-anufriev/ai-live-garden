@@ -199,7 +199,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         FeedingResult feeding = feedingPhase(changed, nextCycle, nextEvents);
         
         // Add nutrients and moisture based on deaths
-        Environment environmentWithNutrientsAndMoisture = nextEnvironment.withNutrients(feeding.totalNutrientContribution())
+        Environment environmentWithNutrientsAndMoisture = nextEnvironment.withNutrients(feeding.totalNutrientContribution() + feeding.predatorNutrientContribution())
                 .withMoisture(feeding.totalMoistureContribution())
                 .withNutrientBuffer(nextEnvironment.nutrientBuffer() + feeding.nutrientBufferBoost());
         
@@ -450,6 +450,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         mutable.sort(Comparator.comparing((Organism organism) -> organism.type().kingdom().ordinal())
                 .thenComparing(Organism::id));
 
+        int predatorNutrientContribution = 0;
         for (int hunterIndex = 0; hunterIndex < mutable.size(); hunterIndex++) {
             Organism hunter = mutable.get(hunterIndex);
             if (!hunter.type().isAnimal() || hunter.energy() <= 0) {
@@ -508,6 +509,9 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             if (hunter.traits().contains("nutrient-harvester")) {
                 bite += 1;
                 events.add(new GardenEvent(cycle, "%s harvested additional nutrients.".formatted(hunter.id())));
+            }
+            if (hunter.type() == OrganismType.FOX) {
+                predatorNutrientContribution += 1;
             }
             Organism fedHunter = hunter.withEnergy(hunter.energy() + bite).withTrait("fed-" + cycle);
             Organism weakenedPrey = prey.withEnergy(prey.energy() - bite);
@@ -571,10 +575,10 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             }
         }
 
-        return new FeedingResult(survivors, totalNutrientContribution, totalMoistureContribution, bufferBoost, deadOrganisms);
+        return new FeedingResult(survivors, totalNutrientContribution, totalMoistureContribution, bufferBoost, deadOrganisms, predatorNutrientContribution);
         }
 
-        private record FeedingResult(List<Organism> organisms, int totalNutrientContribution, int totalMoistureContribution, int nutrientBufferBoost, int culledPlantCount) {
+        private record FeedingResult(List<Organism> organisms, int totalNutrientContribution, int totalMoistureContribution, int nutrientBufferBoost, int culledPlantCount, int predatorNutrientContribution) {
         }
 
 

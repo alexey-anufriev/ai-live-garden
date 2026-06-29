@@ -55,8 +55,8 @@ This is still an experiment. Do not store valuable secrets or production code in
 
 ## Current Garden State
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟢 Flourishing — diverse roles persist with usable nutrients.
-At cycle 4792, the garden contains 6833 organisms across beetle,fox fungus,moss root network,spore. Available nutrients are 21, the nutrient buffer is 100, and missing roles are none; the next useful changes should improve recoverable ecosystem behavior rather than add bookkeeping.
+**Garden Health:** 🟡 Stable — the garden persists but ecological roles are still missing.
+At cycle 4810, the garden contains 6835 organisms across beetle,fox moss,root network spore. Available nutrients are 5, the nutrient buffer is 100, and missing roles are fungus; the next useful changes should improve recoverable ecosystem behavior rather than add bookkeeping.
 <!-- AI-LIVE-GARDEN:STATE-END -->
 
 
