@@ -206,7 +206,8 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
                 .withMoisture(feeding.totalMoistureContribution())
                 .withNutrientBuffer(nextEnvironment.nutrientBuffer() + feeding.nutrientBufferBoost());
         
-        ReproductionResult reproduction = reproductionPhase(feeding.organisms(), nextCycle, nextId, nextEvents);
+        ReproductionCalculator.ReproductionResult reproduction = ReproductionCalculator.calculate(new ReproductionCalculator.ReproductionContext(
+                environment, feeding.organisms(), nextCycle, nextId, nextEvents, fungalContribution));
         List<Organism> finalChanged = reproduction.organisms();
         int nextIdentifier = reproduction.nextId();
         
@@ -504,64 +505,6 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         return Optional.empty();
     }
 
-    private ReproductionResult reproductionPhase(List<Organism> organisms, int cycle, int nextId, List<GardenEvent> events) {
-        List<Organism> next = new ArrayList<>();
-        int identifier = nextId;
-        int birthsThisCycle = 0;
-        long fungusCount = organisms.stream().filter(o -> o.type() == OrganismType.FUNGUS).count();
-
-        for (Organism organism : organisms) {
-            OrganismType childType = organism.type().offspringType(cycle, organism.generation(), environment);
-            
-            // Fungal role rescue mechanism
-            if (fungusCount == 0 && organism.type() == OrganismType.ROOT_NETWORK) {
-                childType = OrganismType.FUNGUS;
-            }
-
-            boolean isFungalSuccession = (organism.type() == OrganismType.ROOT_NETWORK && childType == OrganismType.FUNGUS);
-            boolean canReproduce = (organism.energy() >= reproductionThreshold(organism) || (isFungalSuccession && organism.energy() >= 5)) && (birthsThisCycle < 2 || isFungalSuccession);
-
-            if (organism.traits().contains("stressed") && !organism.traits().contains("fungal-symbiote") && !isFungalSuccession) {
-                canReproduce = false;
-            }
-            if (organism.traits().contains("starving") && !organism.traits().contains("resourceful-breeder")) {
-                canReproduce = false;
-            }
-            if (organism.traits().contains("cautious-breeder") && environment.nutrients() < 10) {
-                canReproduce = false;
-            }
-
-            if (canReproduce) {
-                String childId = childType.name().toLowerCase(java.util.Locale.ROOT).replace('_', '-') + "-" + identifier;
-                Organism parentAfterBirth = organism.withEnergy(organism.energy() / 2);
-                Organism child = organism.child(childId, childType, TraitRegistry.getMutationTrait(cycle, organism));
-                next.add(parentAfterBirth);
-                next.add(child);
-                events.add(new GardenEvent(cycle, "%s released %s as a new %s.".formatted(
-                        organism.id(), child.id(), childType.displayName())));
-                identifier++;
-                birthsThisCycle++;
-            } else {
-                next.add(organism);
-            }
-        }
-
-        next.sort(Comparator.comparing(Organism::id));
-        return new ReproductionResult(next, identifier);
-    }
-
-    private int reproductionThreshold(Organism organism) {
-        int threshold = 15;
-        if (organism.type().isPlant()) {
-            threshold = 14;
-        } else if (organism.type() == OrganismType.FOX) {
-            threshold = 15;
-        }
-        for (String trait : organism.traits()) {
-            threshold += TraitRegistry.getReproductionThresholdModifier(trait, environment, fungalContribution());
-        }
-        return threshold;
-    }
 
     private Organism maybeMutate(Organism organism, int cycle, List<GardenEvent> events) {
         if ((organism.energy() + organism.curiosity() + cycle + organism.generation()) % 11 != 0) {
@@ -598,6 +541,4 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         return List.copyOf(events.subList(events.size() - MAX_EVENTS, events.size()));
     }
 
-    private record ReproductionResult(List<Organism> organisms, int nextId) {
-    }
 }
