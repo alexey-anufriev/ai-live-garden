@@ -101,23 +101,21 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
     }
 
     public int fungalContribution() {
-        long fungusCount = countType(OrganismType.FUNGUS);
-        long decomposerCount = TraitRegistry.count(organisms, "nutrient-decomposer", OrganismType.FUNGUS);
-        long soilEnricherCount = TraitRegistry.count(organisms, "fungus-soil-enricher", OrganismType.FUNGUS);
-        long networkConnectorCount = TraitRegistry.count(organisms, "fungal-network-connector", OrganismType.FUNGUS);
-        long fungalSymbioteCount = TraitRegistry.countPlantTrait(organisms, "fungal-symbiote");
-        long fungalAcceleratorCount = TraitRegistry.count(organisms, "fungal-accelerator", OrganismType.FUNGUS);
-        long fungalEnhancerCount = TraitRegistry.count(organisms, "fungal-enhancer", OrganismType.FUNGUS);
-        long fungalBufferStabilizerCount = TraitRegistry.count(organisms, "fungal-buffer-stabilizer", OrganismType.FUNGUS);
-        long fungalGardenerCount = TraitRegistry.countAnimalTrait(organisms, "fungal-gardener");
-        long fungalFertilizerCount = TraitRegistry.countAnimalTrait(organisms, "fungal-fertilizer");
-        long rootNetworkCount = countType(OrganismType.ROOT_NETWORK);
-        long mycelialSynergizerCount = TraitRegistry.count(organisms, "mycelial-synergizer", OrganismType.ROOT_NETWORK);
-        long fungalDecomposerMimicCount = TraitRegistry.count(organisms, "fungal-decomposer-mimic", OrganismType.ROOT_NETWORK);
-
-        int connectorBonus = (rootNetworkCount > 0) ? 6 : 4;
-        int synergizerBonus = (mycelialSynergizerCount > 0 && fungusCount > 0) ? 5 : 0;
-        return (int) (fungusCount * 2 + decomposerCount * 3 + soilEnricherCount * 5 + networkConnectorCount * connectorBonus + fungalSymbioteCount * 2 + fungalAcceleratorCount * 10 + fungalEnhancerCount * 8 + fungalBufferStabilizerCount * 12 + fungalGardenerCount * 5 + fungalFertilizerCount * 7 + fungalDecomposerMimicCount * 5) + synergizerBonus;
+        return FungalContributionCalculator.calculate(new FungalContributionCalculator.FungalContributionContext(
+                countType(OrganismType.FUNGUS),
+                TraitRegistry.count(organisms, "nutrient-decomposer", OrganismType.FUNGUS),
+                TraitRegistry.count(organisms, "fungus-soil-enricher", OrganismType.FUNGUS),
+                TraitRegistry.count(organisms, "fungal-network-connector", OrganismType.FUNGUS),
+                TraitRegistry.countPlantTrait(organisms, "fungal-symbiote"),
+                TraitRegistry.count(organisms, "fungal-accelerator", OrganismType.FUNGUS),
+                TraitRegistry.count(organisms, "fungal-enhancer", OrganismType.FUNGUS),
+                TraitRegistry.count(organisms, "fungal-buffer-stabilizer", OrganismType.FUNGUS),
+                TraitRegistry.countAnimalTrait(organisms, "fungal-gardener"),
+                TraitRegistry.countAnimalTrait(organisms, "fungal-fertilizer"),
+                countType(OrganismType.ROOT_NETWORK),
+                TraitRegistry.count(organisms, "mycelial-synergizer", OrganismType.ROOT_NETWORK),
+                TraitRegistry.count(organisms, "fungal-decomposer-mimic", OrganismType.ROOT_NETWORK)
+        ));
     }
 
     public int fungalAttractorContribution() {
