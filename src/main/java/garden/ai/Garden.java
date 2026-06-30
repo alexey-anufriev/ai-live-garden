@@ -67,32 +67,29 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
     }
 
     public int rootContribution(long releaserCount) {
-        long rootNetworkCount = countType(OrganismType.ROOT_NETWORK);
-        long nutrientWeaverCount = TraitRegistry.count(organisms, "nutrient-weaver", OrganismType.ROOT_NETWORK);
-        long nutrientSharerCount = TraitRegistry.count(organisms, "nutrient-sharer", OrganismType.ROOT_NETWORK);
-        long bufferOptimizerCount = TraitRegistry.count(organisms, "buffer-optimizer", OrganismType.ROOT_NETWORK);
-        long soilMasterCount = TraitRegistry.count(organisms, "soil-master", OrganismType.ROOT_NETWORK);
-        long nutrientRecyclerCount = TraitRegistry.count(organisms, "nutrient-recycler", OrganismType.ROOT_NETWORK);
-        long nutrientTranslocatorCount = TraitRegistry.count(organisms, "nutrient-translocator", OrganismType.ROOT_NETWORK);
-        long nutrientSynthesizerCount = TraitRegistry.count(organisms, "nutrient-synthesizer", OrganismType.ROOT_NETWORK);
-        long nutrientReclaimerCount = TraitRegistry.count(organisms, "nutrient-reclaimer", OrganismType.ROOT_NETWORK);
-        long nutrientProducerCount = TraitRegistry.count(organisms, "nutrient-producer", OrganismType.ROOT_NETWORK);
-        long nutrientPumpCount = TraitRegistry.count(organisms, "nutrient-pump", OrganismType.ROOT_NETWORK);
-        long nutrientDistributorCount = TraitRegistry.count(organisms, "nutrient-distributor", OrganismType.ROOT_NETWORK);
-        long fungalRootSymbiontCount = TraitRegistry.count(organisms, "fungal-root-symbiont", OrganismType.ROOT_NETWORK);
         long fungusCount = countType(OrganismType.FUNGUS);
         long mycelialRootMediatorCount = (fungusCount > 0) ? TraitRegistry.countAnimalTrait(organisms, "mycelial-root-mediator") : 0;
-        
-        if (environment.nutrients() < 5) {
-            return (int) (rootNetworkCount * 10 + nutrientWeaverCount * 10 + nutrientSharerCount * 20 + bufferOptimizerCount * 20 + soilMasterCount * 30 + nutrientRecyclerCount * 10 + nutrientTranslocatorCount * 40 + nutrientSynthesizerCount * 30 + nutrientReclaimerCount * 25 + nutrientProducerCount * 50 + nutrientPumpCount * 60 + nutrientDistributorCount * 40 + fungalRootSymbiontCount * 40 + mycelialRootMediatorCount * 20);
-        } else if (environment.nutrients() < 10) {
-            return (int) (rootNetworkCount * 8 + nutrientWeaverCount * 8 + nutrientSharerCount * 16 + bufferOptimizerCount * 16 + soilMasterCount * 24 + nutrientRecyclerCount * 8 + nutrientTranslocatorCount * 32 + nutrientSynthesizerCount * 24 + nutrientReclaimerCount * 20 + nutrientProducerCount * 40 + nutrientPumpCount * 48 + nutrientDistributorCount * 32 + fungalRootSymbiontCount * 32 + mycelialRootMediatorCount * 16);
-        } else if (environment.nutrients() < 25) {
-            return (int) (rootNetworkCount * 4 + nutrientWeaverCount * 4 + nutrientSharerCount * 8 + bufferOptimizerCount * 8 + soilMasterCount * 12 + nutrientRecyclerCount * 4 + nutrientTranslocatorCount * 16 + nutrientSynthesizerCount * 12 + nutrientReclaimerCount * 10 + nutrientProducerCount * 20 + nutrientPumpCount * 24 + nutrientDistributorCount * 16 + fungalRootSymbiontCount * 16 + mycelialRootMediatorCount * 8);
-        } else {
-            int recyclerBonus = (environment.nutrientBuffer() > 50 ? 5 : 2) + (int) Math.min(releaserCount, 10);
-            return (int) (Math.max(1, rootNetworkCount / 2) + nutrientWeaverCount + nutrientSharerCount * 2 + bufferOptimizerCount * 2 + soilMasterCount * 4 + nutrientRecyclerCount * recyclerBonus + nutrientTranslocatorCount * 4 + nutrientSynthesizerCount * 3 + nutrientReclaimerCount * 3 + nutrientProducerCount * 5 + nutrientPumpCount * 6 + nutrientDistributorCount * 4 + fungalRootSymbiontCount * 4 + mycelialRootMediatorCount * 2);
-        }
+
+        var context = new RootContributionCalculator.RootContributionContext(
+                countType(OrganismType.ROOT_NETWORK),
+                TraitRegistry.count(organisms, "nutrient-weaver", OrganismType.ROOT_NETWORK),
+                TraitRegistry.count(organisms, "nutrient-sharer", OrganismType.ROOT_NETWORK),
+                TraitRegistry.count(organisms, "buffer-optimizer", OrganismType.ROOT_NETWORK),
+                TraitRegistry.count(organisms, "soil-master", OrganismType.ROOT_NETWORK),
+                TraitRegistry.count(organisms, "nutrient-recycler", OrganismType.ROOT_NETWORK),
+                TraitRegistry.count(organisms, "nutrient-translocator", OrganismType.ROOT_NETWORK),
+                TraitRegistry.count(organisms, "nutrient-synthesizer", OrganismType.ROOT_NETWORK),
+                TraitRegistry.count(organisms, "nutrient-reclaimer", OrganismType.ROOT_NETWORK),
+                TraitRegistry.count(organisms, "nutrient-producer", OrganismType.ROOT_NETWORK),
+                TraitRegistry.count(organisms, "nutrient-pump", OrganismType.ROOT_NETWORK),
+                TraitRegistry.count(organisms, "nutrient-distributor", OrganismType.ROOT_NETWORK),
+                TraitRegistry.count(organisms, "fungal-root-symbiont", OrganismType.ROOT_NETWORK),
+                mycelialRootMediatorCount,
+                releaserCount,
+                environment.nutrients(),
+                environment.nutrientBuffer()
+        );
+        return RootContributionCalculator.calculate(context);
     }
 
     public long blockedPlantCount() {
