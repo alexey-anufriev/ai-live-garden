@@ -159,4 +159,21 @@ public class TraitRegistry {
         }
         return null;
     }
+
+    public static long count(List<Organism> organisms, String trait) {
+        return organisms.stream().filter(o -> o.traits().contains(trait)).count();
+    }
+
+    public static long count(List<Organism> organisms, String trait, OrganismType type) {
+        return organisms.stream().filter(o -> o.type() == type && o.traits().contains(trait)).count();
+    }
+
+    public static long countAnimalTrait(List<Organism> organisms, String trait) {
+        return organisms.stream().filter(o -> o.type().isAnimal() && o.traits().contains(trait)).count();
+    }
+
+    public static long countPlantTrait(List<Organism> organisms, String trait) {
+        return organisms.stream().filter(o -> o.type().isPlant() && o.traits().contains(trait)).count();
+    }
 }
+

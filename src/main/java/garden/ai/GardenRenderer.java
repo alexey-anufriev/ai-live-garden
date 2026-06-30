@@ -37,15 +37,15 @@ public final class GardenRenderer {
         long hares = garden.organisms().stream().filter(o -> o.type() == OrganismType.HARE).count();
         long foxes = garden.organisms().stream().filter(o -> o.type() == OrganismType.FOX).count();
 
-        long mossConserverCount = garden.organisms().stream().filter(o -> o.type() == OrganismType.MOSS && o.traits().contains("nutrient-conserver")).count();
-        long mossScavengerCount = garden.organisms().stream().filter(o -> o.type() == OrganismType.MOSS && o.traits().contains("moss-nutrient-scavenger")).count();
-        long fernConserverCount = garden.organisms().stream().filter(o -> o.type() == OrganismType.FERN && o.traits().contains("nutrient-conserver")).count();
-        long demandRegulatorCount = garden.organisms().stream().filter(o -> o.traits().contains("nutrient-demand-regulator")).count();
+        long mossConserverCount = TraitRegistry.count(garden.organisms(), "nutrient-conserver", OrganismType.MOSS);
+        long mossScavengerCount = TraitRegistry.count(garden.organisms(), "moss-nutrient-scavenger", OrganismType.MOSS);
+        long fernConserverCount = TraitRegistry.count(garden.organisms(), "nutrient-conserver", OrganismType.FERN);
+        long demandRegulatorCount = TraitRegistry.count(garden.organisms(), "nutrient-demand-regulator");
         int mossConsumptionReduction = (int) ((mossConserverCount + mossScavengerCount) / 5);
         int fernConsumptionReduction = (int) (fernConserverCount / 5);
         int rootConsumptionReduction = (int) (demandRegulatorCount / 2);
-        int mobilizerCount = (int) garden.organisms().stream().filter(o -> o.traits().contains("nutrient-mobilizer")).count();
-        int releaserCount = (int) garden.organisms().stream().filter(o -> o.traits().contains("buffer-releaser")).count();
+        int mobilizerCount = (int) TraitRegistry.count(garden.organisms(), "nutrient-mobilizer");
+        int releaserCount = (int) TraitRegistry.count(garden.organisms(), "buffer-releaser");
 
         Map<String, Long> traitCounts = garden.organisms().stream()
                 .flatMap(o -> o.traits().stream())

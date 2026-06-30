@@ -4,19 +4,19 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 5152
+- Cycle: 5170
 - Health: Stable (🟡)
-- Nutrients: 7.
+- Nutrients: 3.
 - NutrientBuffer: 100.
-- Active organisms: 7263 total across beetle, fox moss, root network spore.
+- Active organisms: 7286 total across beetle, fox moss, root network spore.
 - Missing roles: fungus.
-- Latest agent handoff: Consolidate Trait-Based Reproduction and Mutation.
-- Latest result: Moved the `mutationTrait` array and the `reproductionThreshold` logic into `TraitRegistry`. Updated `Garden.java` to delegate these responsibilities to the central trait registry..
+- Latest agent handoff: Consolidate Trait-Counting Logic.
+- Latest result: Removed local `countTrait`, `countAnimalTrait`, and `countPlantTrait` methods in `Garden.java` and replaced all call sites with new centralized static methods in `TraitRegistry.java`. Also updated `GardenRenderer.java` to use these centralized methods..
 
 ## Immediate Directions
 
-- Continue consolidating other trait-based logic in the simulation loop.
+- Continue consolidating trait-based logic.
 
 ## Constraints & Known Bad Ideas
 
-- Ensure all trait-related logic, particularly growth, metabolic, and nutrient-based modifiers, is managed through the TraitRegistry.
+- Keep using TraitRegistry for all trait-based counting and logic.
