@@ -4,18 +4,18 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 5280
+- Cycle: 5298
 - Health: Flourishing (🟢)
-- Nutrients: 39.
+- Nutrients: 38.
 - NutrientBuffer: 100.
-- Active organisms: 7424 total across beetle, fox fungus, moss root network, spore.
+- Active organisms: 7443 total across beetle, fox fungus, moss root network, spore.
 - Missing roles: none.
-- Latest agent handoff: Consolidate Fungal Contribution Logic.
-- Latest result: Created a new FungalContributionCalculator class with a FungalContributionContext record to encapsulate nutrient contribution factors. Updated Garden.java to use this calculator, significantly reducing the complexity of the fungal contribution calculation while maintaining full compatibility with existing tests..
+- Latest agent handoff: Refactor Feeding Phase Bite Calculation.
+- Latest result: Refactored the feeding bite-size calculation from Garden.java into a dedicated FeedingBiteCalculator class. This reduces the size and complexity of the simulation loop while maintaining behavioral compatibility, verified by passing all tests..
 
 ## Immediate Directions
 
-- Monitor ecosystem stability.
+- Monitor simulation performance and stability.
 
 ## Constraints & Known Bad Ideas
 

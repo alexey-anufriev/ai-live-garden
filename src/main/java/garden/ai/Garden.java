@@ -335,6 +335,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
                 .thenComparing(Organism::id));
 
         int predatorNutrientContribution = 0;
+        long rootNetworkCount = organisms.stream().filter(o -> o.type() == OrganismType.ROOT_NETWORK).count();
         for (int hunterIndex = 0; hunterIndex < mutable.size(); hunterIndex++) {
             Organism hunter = mutable.get(hunterIndex);
             if (!hunter.type().isAnimal() || hunter.energy() <= 0) {
@@ -356,44 +357,11 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
 
             int index = preyIndex.get();
             Organism prey = mutable.get(index);
-            int bite = hunter.type() == OrganismType.FOX ? 3 : 2;
-            if (hunter.traits().contains("nutrient-finder")) {
-                bite += 1;
-            }
-            if (hunter.traits().contains("scavenger") && environment.nutrients() < 25) {
-                bite += 1;
-            }
-            if (hunter.traits().contains("nutrient-hoarder")) {
-                bite += 1;
-            }
-            if (hunter.type() == OrganismType.FOX && hunter.traits().contains("predator-focus")) {
-                bite += 1;
-            }
-            if (hunter.traits().contains("root-tapper")) {
-                long rootNetworkCount = organisms.stream().filter(o -> o.type() == OrganismType.ROOT_NETWORK).count();
-                if (rootNetworkCount > 0) {
-                    bite += 1;
-                }
-            }
-            if (hunter.traits().contains("nutrient-refiner")) {
-                if (!hunter.traits().contains("stressed") || hunter.traits().contains("starving")) {
-                    bite += 1;
-                    if (hunter.traits().contains("starving")) {
-                        events.add(new GardenEvent(cycle, "%s refined nutrients while starving.".formatted(hunter.id())));
-                    }
-                }
-            }
-            if (hunter.traits().contains("gentle-feeder")) {
-                bite = Math.max(1, bite - 1);
-            }
-            if (hunter.traits().contains("nutrient-reclaimer") && prey.traits().contains("nutrient-storer")) {
-                bite += 2;
-                events.add(new GardenEvent(cycle, "%s reclaimed extra nutrients from %s.".formatted(hunter.id(), prey.id())));
-            }
-            if (hunter.traits().contains("nutrient-harvester")) {
-                bite += 1;
-                events.add(new GardenEvent(cycle, "%s harvested additional nutrients.".formatted(hunter.id())));
-            }
+            
+            FeedingBiteCalculator.FeedingBiteResult biteResult = FeedingBiteCalculator.calculate(new FeedingBiteCalculator.FeedingBiteContext(hunter, prey, environment, cycle, rootNetworkCount));
+            int bite = biteResult.biteSize();
+            events.addAll(biteResult.events());
+            
             if (hunter.type() == OrganismType.FOX) {
                 predatorNutrientContribution += 1;
             }
