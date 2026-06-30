@@ -10,6 +10,7 @@ mkdir -p agent
   echo "- Workflow run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
   echo "- Baseline test outcome: ${BASELINE_TEST_OUTCOME}"
   echo "- Gemini outcome: ${GEMINI_OUTCOME}"
+  echo "- Agent handoff outcome: ${AGENT_HANDOFF_OUTCOME:-}"
   echo "- Post-change test outcome: ${POST_TEST_OUTCOME}"
   echo "- Garden state advance outcome: ${ADVANCE_GARDEN_OUTCOME}"
   echo "- Automated memory outcome: ${AUTO_MEMORY_OUTCOME}"

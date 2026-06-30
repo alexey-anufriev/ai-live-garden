@@ -46,6 +46,7 @@ metadata_value() {
   echo "| Baseline test | $(value_or_dash "${BASELINE_TEST_OUTCOME:-}") |"
   echo "| Gemini autonomous step | $(value_or_dash "${GEMINI_OUTCOME:-}") |"
   echo "| Protected file restore | $(value_or_dash "${RESTORE_PROTECTED_OUTCOME:-}") |"
+  echo "| Agent handoff validation | $(value_or_dash "${AGENT_HANDOFF_OUTCOME:-}") |"
   echo "| Post-Gemini test validation | $(value_or_dash "${POST_TEST_OUTCOME:-}") |"
   echo "| Garden state advance | $(value_or_dash "${ADVANCE_GARDEN_OUTCOME:-}") |"
   echo "| Automated memory generation | $(value_or_dash "${AUTO_MEMORY_OUTCOME:-}") |"
@@ -84,6 +85,8 @@ metadata_value() {
     echo "Failure diagnostics artifact: \`agent-failure-diagnostics-${GITHUB_RUN_ATTEMPT:-1}\`."
   elif [[ "${GEMINI_OUTCOME:-}" == "failure" ]]; then
     echo "The run failed during the main Gemini call. This is usually provider quota, authentication, or model availability."
+  elif [[ "${AGENT_HANDOFF_OUTCOME:-}" == "failure" ]]; then
+    echo "The run failed because Gemini did not leave a valid \`.agent-run.json\` handoff."
   elif [[ "${POST_TEST_OUTCOME:-}" == "failure" ]]; then
     echo "The run failed after Gemini while validating tests. No automatic Gemini repair loop is run; a committed failing baseline is surfaced to the next agent through the prompt."
   elif [[ "${AUTO_MEMORY_OUTCOME:-}" == "failure" ]]; then

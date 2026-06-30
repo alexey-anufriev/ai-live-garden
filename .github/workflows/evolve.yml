@@ -68,6 +68,11 @@ jobs:
         shell: bash
         run: scripts/restore-agent-protected-files.sh
 
+      - name: Validate agent handoff
+        id: agent_handoff
+        shell: bash
+        run: scripts/validate-agent-handoff.sh .agent-run.json
+
       - name: Validate tests after Gemini changes
         id: post_test_final
         shell: bash
@@ -155,6 +160,7 @@ jobs:
         env:
           BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
           GEMINI_OUTCOME: ${{ steps.gemini.outcome }}
+          AGENT_HANDOFF_OUTCOME: ${{ steps.agent_handoff.outcome }}
           POST_TEST_OUTCOME: ${{ steps.post_test_final.outcome }}
           ADVANCE_GARDEN_OUTCOME: ${{ steps.advance_garden.outcome }}
           AUTO_MEMORY_OUTCOME: ${{ steps.auto_memory.outcome }}
@@ -185,6 +191,7 @@ jobs:
           BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
           GEMINI_OUTCOME: ${{ steps.gemini.outcome }}
           RESTORE_PROTECTED_OUTCOME: ${{ steps.restore_protected.outcome }}
+          AGENT_HANDOFF_OUTCOME: ${{ steps.agent_handoff.outcome }}
           POST_TEST_OUTCOME: ${{ steps.post_test_final.outcome }}
           ADVANCE_GARDEN_OUTCOME: ${{ steps.advance_garden.outcome }}
           AUTO_MEMORY_OUTCOME: ${{ steps.auto_memory.outcome }}
