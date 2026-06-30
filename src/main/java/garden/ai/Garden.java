@@ -111,6 +111,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         long fungalSymbioteCount = TraitRegistry.countPlantTrait(organisms, "fungal-symbiote");
         long fungalAcceleratorCount = TraitRegistry.count(organisms, "fungal-accelerator", OrganismType.FUNGUS);
         long fungalEnhancerCount = TraitRegistry.count(organisms, "fungal-enhancer", OrganismType.FUNGUS);
+        long fungalBufferStabilizerCount = TraitRegistry.count(organisms, "fungal-buffer-stabilizer", OrganismType.FUNGUS);
         long fungalGardenerCount = TraitRegistry.countAnimalTrait(organisms, "fungal-gardener");
         long fungalFertilizerCount = TraitRegistry.countAnimalTrait(organisms, "fungal-fertilizer");
         long rootNetworkCount = countType(OrganismType.ROOT_NETWORK);
@@ -119,7 +120,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
 
         int connectorBonus = (rootNetworkCount > 0) ? 6 : 4;
         int synergizerBonus = (mycelialSynergizerCount > 0 && fungusCount > 0) ? 5 : 0;
-        return (int) (fungusCount * 2 + decomposerCount * 3 + soilEnricherCount * 5 + networkConnectorCount * connectorBonus + fungalSymbioteCount * 2 + fungalAcceleratorCount * 10 + fungalEnhancerCount * 8 + fungalGardenerCount * 5 + fungalFertilizerCount * 7 + fungalDecomposerMimicCount * 5) + synergizerBonus;
+        return (int) (fungusCount * 2 + decomposerCount * 3 + soilEnricherCount * 5 + networkConnectorCount * connectorBonus + fungalSymbioteCount * 2 + fungalAcceleratorCount * 10 + fungalEnhancerCount * 8 + fungalBufferStabilizerCount * 12 + fungalGardenerCount * 5 + fungalFertilizerCount * 7 + fungalDecomposerMimicCount * 5) + synergizerBonus;
     }
 
     public int fungalAttractorContribution() {
