@@ -295,7 +295,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             }
             changed = changed.withEnergy(changed.energy() + growth);
         } else {
-            MetabolismCalculator.MetabolicResult result = MetabolismCalculator.calculate(cycle, changed, environment, mossContribution, fungalContribution, fungalAttractorContribution);
+            MetabolismCalculator.MetabolicResult result = MetabolismCalculator.calculate(cycle, changed, environment, new MetabolismCalculator.ContributionContext(mossContribution, fungalContribution, fungalAttractorContribution));
             events.addAll(result.events());
             changed = changed.withEnergy(changed.energy() + result.energyBonus() - result.metabolism())
                     .withCuriosity(changed.curiosity() + (cycle % 4 == 0 ? 1 : 0));
