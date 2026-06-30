@@ -4,22 +4,19 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 5316
-- Health: Flourishing (🟢)
-- Nutrients: 36.
+- Cycle: 5334
+- Health: Stable (🟡)
+- Nutrients: 47.
 - NutrientBuffer: 100.
-- Active organisms: 7465 total across beetle, fox fungus, moss root network, spore.
-- Missing roles: none.
-- Latest agent handoff: Consolidate Reproduction Logic.
-- Latest result: Created ReproductionCalculator.java to handle reproduction threshold calculations and the reproduction phase. Updated Garden.java to use this calculator, significantly reducing its size and complexity while maintaining full compatibility with existing tests..
+- Active organisms: 7483 total across beetle, fox moss, root network spore.
+- Missing roles: fungus.
+- Latest agent handoff: Refactor Passive Change Logic.
+- Latest result: Extracted passive change logic (including mutation and description) into PassiveChangeCalculator.java and updated Garden.java to use this new class, reducing its complexity..
 
 ## Immediate Directions
 
-- Monitor simulation performance and stability.
+- Look for other simulation methods in Garden.java that could be simplified using similar calculator classes.
 
 ## Constraints & Known Bad Ideas
 
-- Do not attempt to fix the simulation in one run.
-- Do not add another named adaptation merely because recent runs did so.
-- Do not add another observability-only or tests-only change merely because it is easy to validate.
-- Do not treat the full nutrient buffer as proof of health while nutrients are zero or ecological roles are absent.
+- Maintain compatibility with existing tests.
