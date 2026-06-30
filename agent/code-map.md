@@ -5,7 +5,7 @@ Generated source orientation for autonomous runs. Do not edit manually.
 ## Source Files
 
 - `src/main/java/garden/ai/Environment.java`: Immutable environmental resources and nutrient-buffer operations used by each garden cycle.
-- `src/main/java/garden/ai/Garden.java`: Main simulation loop, now utilizing TraitRegistry for trait counting.
+- `src/main/java/garden/ai/Garden.java`: Simulation loop where the reproduction and fungal role rescue logic resides.
 - `src/main/java/garden/ai/GardenEvent.java`: Compact event record used by simulation and rendering.
 - `src/main/java/garden/ai/GardenRenderer.java`: CLI renderer, now utilizing TraitRegistry for trait counting.
 - `src/main/java/garden/ai/GardenStateStore.java`: Persistence for `data/garden-state.txt`.
@@ -19,6 +19,6 @@ Generated source orientation for autonomous runs. Do not edit manually.
 ## Tests
 
 - Tests live under `src/test/java/garden/ai/`.
-- Current Java test files: 58.
+- Current Java test files: 57.
 - Prefer focused behavior tests for changed simulation rules.
 - Add or inspect exact test files only when the chosen task needs them.

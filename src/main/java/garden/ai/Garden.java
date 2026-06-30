@@ -555,7 +555,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
             }
 
             boolean isFungalSuccession = (organism.type() == OrganismType.ROOT_NETWORK && childType == OrganismType.FUNGUS);
-            boolean canReproduce = organism.energy() >= reproductionThreshold(organism) && (birthsThisCycle < 2 || isFungalSuccession);
+            boolean canReproduce = (organism.energy() >= reproductionThreshold(organism) || (isFungalSuccession && organism.energy() >= 5)) && (birthsThisCycle < 2 || isFungalSuccession);
 
             if (organism.traits().contains("stressed") && !organism.traits().contains("fungal-symbiote") && !isFungalSuccession) {
                 canReproduce = false;
