@@ -14,12 +14,35 @@ public class TraitRegistry {
             "nutrient-storer", 6
     );
 
+    private static final String[] TRAITS = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "sun-seeker", "rain-collector", "nutrient-finder", "nutrient-efficient", "shadow-stepper", "hardy", "water-seeker", "dormancy", "nutrient-weaver", "metabolic-efficiency", "scavenger", "nutrient-sharer", "buffer-resonator", "buffer-scavenger", "nutrient-hoarder", "nutrient-scout", "soil-master", "deep-rooting", "buffer-optimizer", "buffer-tapper", "nutrient-translocator", "camouflaged", "shade-thriver", "moisture-retainer", "nutrient-absorber", "nutrient-synthesizer", "prey-tracker", "resource-tracker", "predator-focus", "nutrient-reclaimer", "nutrient-producer", "nutrient-enricher", "moisture-thriver", "prolific", "cautious-feeder", "nutrient-decomposer", "fungus-soil-enricher", "fungal-network-connector", "fungal-feeder", "mycorrhizal-booster", "nutrient-scrounger", "fungal-symbiote", "nutrient-pump", "nutrient-distributor", "resourceful-breeder", "fungal-enhancer", "mycelial-scavenger", "mycelial-harvester", "mycelial-distributor", "mycelial-resonator", "mycelial-network-scout", "fungal-gardener", "fungal-fertilizer", "nutrient-anticipator", "mycelial-protector", "metabolic-economizer", "spore-disperser", "fungal-root-symbiont", "mycelial-root-mediator", "fungal-attractor", "mycelial-conduit", "mycelial-synergizer", "moss-nutrient-scavenger", "cautious-breeder", "stress-resilient", "stress-avoidance", "buffer-siphon", "fungal-decomposer-mimic", "nutrient-harvester"};
+
     public record MetabolicEffect(int metabolismChange, int energyBonus, GardenEvent event) {}
 
     public record PlantGrowthEffect(int growthChange, GardenEvent event) {}
 
     public static int getNutrientValueModifier(String trait) {
         return NUTRIENT_VALUES.getOrDefault(trait, 0);
+    }
+
+    public static int getReproductionThresholdModifier(String trait, Environment environment, int fungalContribution) {
+        int modifier = 0;
+        switch (trait) {
+            case "prolific":
+                modifier -= 3;
+                break;
+            case "resourceful-breeder":
+                if (environment.nutrients() < 20) modifier -= 3;
+                break;
+            case "fungal-nurturer":
+                if (fungalContribution > 0) modifier -= 3;
+                break;
+        }
+        return modifier;
+    }
+
+    public static String getMutationTrait(int cycle, Organism organism) {
+        int index = Math.floorMod(organism.id().hashCode() + cycle + organism.generation(), TRAITS.length);
+        return TRAITS[index];
     }
 
     public static PlantGrowthEffect getPlantGrowthEffect(String trait, int cycle, Organism organism, Environment environment, List<Organism> organisms, int fungalContribution) {
