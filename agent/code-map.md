@@ -5,12 +5,13 @@ Generated source orientation for autonomous runs. Do not edit manually.
 ## Source Files
 
 - `src/main/java/garden/ai/ColonizationCalculator.java`: Calculator for emergency reseeding and colonization phases.
+- `src/main/java/garden/ai/ContributionCalculator.java`: Calculates various organism contributions to the garden environment.
 - `src/main/java/garden/ai/Environment.java`: Immutable environmental resources and nutrient-buffer operations used by each garden cycle.
 - `src/main/java/garden/ai/EnvironmentalUpdateCalculator.java`: Calculator for the environmental update phase of the garden simulation.
 - `src/main/java/garden/ai/FeedingBiteCalculator.java`: Calculator for animal feeding bite size.
 - `src/main/java/garden/ai/FeedingPhaseCalculator.java`: New calculator class for the feeding phase of the simulation.
 - `src/main/java/garden/ai/FungalContributionCalculator.java`: Calculator for fungal network nutrient contributions.
-- `src/main/java/garden/ai/Garden.java`: Simulation loop, now utilizing ColonizationCalculator.
+- `src/main/java/garden/ai/Garden.java`: Simulation loop, now utilizing ContributionCalculator.
 - `src/main/java/garden/ai/GardenEvent.java`: Compact event record used by simulation and rendering.
 - `src/main/java/garden/ai/GardenRenderer.java`: CLI renderer, now utilizing TraitRegistry for trait counting.
 - `src/main/java/garden/ai/GardenStateStore.java`: Persistence for `data/garden-state.txt`.
@@ -18,7 +19,7 @@ Generated source orientation for autonomous runs. Do not edit manually.
 - `src/main/java/garden/ai/MetabolismCalculator.java`: Calculates organism metabolism, now using a consolidated ContributionContext.
 - `src/main/java/garden/ai/Organism.java`: Represents a single living element in the garden, now utilizing TraitRegistry for nutrient value calculation.
 - `src/main/java/garden/ai/OrganismType.java`: Defines organism taxonomy and now hosts environment-sensitive succession rules.
-- `src/main/java/garden/ai/PassiveChangeCalculator.java`: Calculates passive changes for organisms, including growth, metabolism, mutation, and status updates.
+- `src/main/java/garden/ai/PassiveChangeCalculator.java`: Calculates passive changes for organisms, now using ContributionResult.
 - `src/main/java/garden/ai/ReproductionCalculator.java`: Calculates reproduction outcomes for organisms based on environment and traits.
 - `src/main/java/garden/ai/RootContributionCalculator.java`: Calculator for root network nutrient contributions.
 - `src/main/java/garden/ai/Simulation.java`: Advances seed or loaded garden state.

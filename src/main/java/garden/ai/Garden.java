@@ -62,34 +62,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
     }
 
     public int rootContribution() {
-        long releaserCount = organisms.stream().filter(o -> o.traits().contains("buffer-releaser")).count();
-        return rootContribution(releaserCount);
-    }
-
-    public int rootContribution(long releaserCount) {
-        long fungusCount = countType(OrganismType.FUNGUS);
-        long mycelialRootMediatorCount = (fungusCount > 0) ? TraitRegistry.countAnimalTrait(organisms, "mycelial-root-mediator") : 0;
-
-        var context = new RootContributionCalculator.RootContributionContext(
-                countType(OrganismType.ROOT_NETWORK),
-                TraitRegistry.count(organisms, "nutrient-weaver", OrganismType.ROOT_NETWORK),
-                TraitRegistry.count(organisms, "nutrient-sharer", OrganismType.ROOT_NETWORK),
-                TraitRegistry.count(organisms, "buffer-optimizer", OrganismType.ROOT_NETWORK),
-                TraitRegistry.count(organisms, "soil-master", OrganismType.ROOT_NETWORK),
-                TraitRegistry.count(organisms, "nutrient-recycler", OrganismType.ROOT_NETWORK),
-                TraitRegistry.count(organisms, "nutrient-translocator", OrganismType.ROOT_NETWORK),
-                TraitRegistry.count(organisms, "nutrient-synthesizer", OrganismType.ROOT_NETWORK),
-                TraitRegistry.count(organisms, "nutrient-reclaimer", OrganismType.ROOT_NETWORK),
-                TraitRegistry.count(organisms, "nutrient-producer", OrganismType.ROOT_NETWORK),
-                TraitRegistry.count(organisms, "nutrient-pump", OrganismType.ROOT_NETWORK),
-                TraitRegistry.count(organisms, "nutrient-distributor", OrganismType.ROOT_NETWORK),
-                TraitRegistry.count(organisms, "fungal-root-symbiont", OrganismType.ROOT_NETWORK),
-                mycelialRootMediatorCount,
-                releaserCount,
-                environment.nutrients(),
-                environment.nutrientBuffer()
-        );
-        return RootContributionCalculator.calculate(context);
+        return ContributionCalculator.calculateRootContribution(organisms, environment, TraitRegistry.count(organisms, "buffer-releaser"));
     }
 
     public long blockedPlantCount() {
@@ -101,26 +74,11 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
     }
 
     public int fungalContribution() {
-        return FungalContributionCalculator.calculate(new FungalContributionCalculator.FungalContributionContext(
-                countType(OrganismType.FUNGUS),
-                TraitRegistry.count(organisms, "nutrient-decomposer", OrganismType.FUNGUS),
-                TraitRegistry.count(organisms, "fungus-soil-enricher", OrganismType.FUNGUS),
-                TraitRegistry.count(organisms, "fungal-network-connector", OrganismType.FUNGUS),
-                TraitRegistry.countPlantTrait(organisms, "fungal-symbiote"),
-                TraitRegistry.count(organisms, "fungal-accelerator", OrganismType.FUNGUS),
-                TraitRegistry.count(organisms, "fungal-enhancer", OrganismType.FUNGUS),
-                TraitRegistry.count(organisms, "fungal-buffer-stabilizer", OrganismType.FUNGUS),
-                TraitRegistry.countAnimalTrait(organisms, "fungal-gardener"),
-                TraitRegistry.countAnimalTrait(organisms, "fungal-fertilizer"),
-                countType(OrganismType.ROOT_NETWORK),
-                TraitRegistry.count(organisms, "mycelial-synergizer", OrganismType.ROOT_NETWORK),
-                TraitRegistry.count(organisms, "fungal-decomposer-mimic", OrganismType.ROOT_NETWORK)
-        ));
+        return ContributionCalculator.calculateFungalContribution(organisms);
     }
 
     public int fungalAttractorContribution() {
-        long fungalAttractorCount = TraitRegistry.count(organisms, "fungal-attractor", OrganismType.ROOT_NETWORK);
-        return (fungalAttractorCount > 0 && fungalContribution() > 0) ? 1 : 0;
+        return (TraitRegistry.count(organisms, "fungal-attractor", OrganismType.ROOT_NETWORK) > 0 && fungalContribution() > 0) ? 1 : 0;
     }
 
     public int mossContribution() {
@@ -137,18 +95,14 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
      */
     public Garden nextCycle() {
         int nextCycle = cycle + 1;
-        long releaserCount = TraitRegistry.count(organisms, "buffer-releaser");
-        int rootContribution = rootContribution(releaserCount);
-        int fungalContribution = fungalContribution();
+        ContributionCalculator.ContributionResult contribution = ContributionCalculator.calculate(organisms, environment);
         
-        EnvironmentalUpdateCalculator.EnvironmentalUpdateResult envUpdate = EnvironmentalUpdateCalculator.calculate(organisms, environment, nextCycle, events, rootContribution, fungalContribution);
+        EnvironmentalUpdateCalculator.EnvironmentalUpdateResult envUpdate = EnvironmentalUpdateCalculator.calculate(organisms, environment, nextCycle, events, contribution.rootContribution(), contribution.fungalContribution());
         Environment nextEnvironment = envUpdate.nextEnvironment();
         List<GardenEvent> nextEvents = envUpdate.updatedEvents();
 
-        int fungalAttractorContribution = fungalAttractorContribution();
-        int mossContribution = mossContribution();
         List<Organism> changed = organisms.stream()
-                .map(organism -> PassiveChangeCalculator.calculate(organism, environment, nextCycle, nextEvents, fungalContribution, fungalAttractorContribution, mossContribution, organisms))
+                .map(organism -> PassiveChangeCalculator.calculate(organism, environment, nextCycle, nextEvents, contribution, organisms))
                 .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
 
         FeedingPhaseCalculator.FeedingResult feeding = FeedingPhaseCalculator.calculate(changed, environment, nextCycle, nextEvents);
@@ -159,7 +113,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
                 .withNutrientBuffer(nextEnvironment.nutrientBuffer() + feeding.nutrientBufferBoost());
         
         ReproductionCalculator.ReproductionResult reproduction = ReproductionCalculator.calculate(new ReproductionCalculator.ReproductionContext(
-                environment, feeding.organisms(), nextCycle, nextId, nextEvents, fungalContribution));
+                environment, feeding.organisms(), nextCycle, nextId, nextEvents, contribution.fungalContribution()));
         List<Organism> finalChanged = reproduction.organisms();
         int nextIdentifier = reproduction.nextId();
         

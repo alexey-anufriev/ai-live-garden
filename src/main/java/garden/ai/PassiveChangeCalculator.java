@@ -5,7 +5,7 @@ import java.util.Optional;
 
 public class PassiveChangeCalculator {
 
-    public static Organism calculate(Organism organism, Environment environment, int cycle, List<GardenEvent> events, int fungalContribution, int fungalAttractorContribution, int mossContribution, List<Organism> allOrganisms) {
+    public static Organism calculate(Organism organism, Environment environment, int cycle, List<GardenEvent> events, ContributionCalculator.ContributionResult contribution, List<Organism> allOrganisms) {
         Organism changed = organism;
         if (organism.type().isPlant()) {
             int growth = environment.favorsPlants() ? 2 : 0;
@@ -20,7 +20,7 @@ public class PassiveChangeCalculator {
             }
             // Trait-based growth
             for (String trait : organism.traits()) {
-                TraitRegistry.PlantGrowthEffect effect = TraitRegistry.getPlantGrowthEffect(trait, cycle, organism, environment, allOrganisms, fungalContribution);
+                TraitRegistry.PlantGrowthEffect effect = TraitRegistry.getPlantGrowthEffect(trait, cycle, organism, environment, allOrganisms, contribution.fungalContribution());
                 if (effect != null) {
                     growth += effect.growthChange();
                     if (effect.event() != null) {
@@ -28,7 +28,7 @@ public class PassiveChangeCalculator {
                     }
                 }
             }
-            if (organism.type() == OrganismType.ROOT_NETWORK && changed.traits().contains("fungal-root-symbiont") && fungalContribution > 0) {
+            if (organism.type() == OrganismType.ROOT_NETWORK && changed.traits().contains("fungal-root-symbiont") && contribution.fungalContribution() > 0) {
                 events.add(new GardenEvent(cycle, "%s benefited from its fungal symbiont.".formatted(changed.id())));
             }
             if (organism.type() == OrganismType.SPORE && environment.light() < 45) {
@@ -36,7 +36,7 @@ public class PassiveChangeCalculator {
             }
             changed = changed.withEnergy(changed.energy() + growth);
         } else {
-            MetabolismCalculator.MetabolicResult result = MetabolismCalculator.calculate(cycle, changed, environment, new MetabolismCalculator.ContributionContext(mossContribution, fungalContribution, fungalAttractorContribution));
+            MetabolismCalculator.MetabolicResult result = MetabolismCalculator.calculate(cycle, changed, environment, new MetabolismCalculator.ContributionContext(contribution.mossContribution(), contribution.fungalContribution(), contribution.fungalAttractorContribution()));
             events.addAll(result.events());
             changed = changed.withEnergy(changed.energy() + result.energyBonus() - result.metabolism())
                     .withCuriosity(changed.curiosity() + (cycle % 4 == 0 ? 1 : 0));
