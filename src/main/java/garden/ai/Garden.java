@@ -105,7 +105,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
                 .map(organism -> PassiveChangeCalculator.calculate(organism, environment, nextCycle, nextEvents, contribution, organisms))
                 .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
 
-        FeedingPhaseCalculator.FeedingResult feeding = FeedingPhaseCalculator.calculate(changed, environment, nextCycle, nextEvents);
+        FeedingPhaseCalculator.FeedingResult feeding = FeedingPhaseCalculator.calculate(new FeedingPhaseCalculator.FeedingPhaseContext(changed, environment, nextCycle, nextEvents));
         
         // Add nutrients and moisture based on deaths
         Environment environmentWithNutrientsAndMoisture = nextEnvironment.applyFeeding(

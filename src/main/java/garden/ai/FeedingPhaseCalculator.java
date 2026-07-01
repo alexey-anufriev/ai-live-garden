@@ -13,7 +13,14 @@ public class FeedingPhaseCalculator {
     public record FeedingResult(List<Organism> organisms, int totalNutrientContribution, int totalMoistureContribution, int nutrientBufferBoost, int culledPlantCount, int predatorNutrientContribution) {
     }
 
-    public static FeedingResult calculate(List<Organism> organisms, Environment environment, int cycle, List<GardenEvent> events) {
+    public record FeedingPhaseContext(List<Organism> organisms, Environment environment, int cycle, List<GardenEvent> events) {
+    }
+
+    public static FeedingResult calculate(FeedingPhaseContext context) {
+        List<Organism> organisms = context.organisms();
+        Environment environment = context.environment();
+        int cycle = context.cycle();
+        List<GardenEvent> events = context.events();
         List<Organism> mutable = new ArrayList<>(organisms);
         mutable.sort(Comparator.comparing((Organism organism) -> organism.type().kingdom().ordinal())
                 .thenComparing(Organism::id));
