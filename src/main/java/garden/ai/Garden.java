@@ -97,7 +97,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         int nextCycle = cycle + 1;
         ContributionCalculator.ContributionResult contribution = ContributionCalculator.calculate(organisms, environment);
         
-        EnvironmentalUpdateCalculator.EnvironmentalUpdateResult envUpdate = EnvironmentalUpdateCalculator.calculate(organisms, environment, nextCycle, events, contribution.rootContribution(), contribution.fungalContribution());
+        EnvironmentalUpdateCalculator.EnvironmentalUpdateResult envUpdate = EnvironmentalUpdateCalculator.calculate(new EnvironmentalUpdateCalculator.EnvironmentalUpdateContext(organisms, environment, nextCycle, events, contribution.rootContribution(), contribution.fungalContribution()));
         Environment nextEnvironment = envUpdate.nextEnvironment();
         List<GardenEvent> nextEvents = envUpdate.updatedEvents();
 
