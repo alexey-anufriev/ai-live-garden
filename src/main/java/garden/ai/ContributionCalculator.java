@@ -4,14 +4,16 @@ import java.util.List;
 
 public class ContributionCalculator {
 
+    public record ContributionPhaseContext(List<Organism> organisms, Environment environment) {}
+
     public record ContributionResult(int rootContribution, int fungalContribution, int fungalAttractorContribution, int mossContribution) {}
 
-    public static ContributionResult calculate(List<Organism> organisms, Environment environment) {
-        long releaserCount = TraitRegistry.count(organisms, "buffer-releaser");
-        int rootContribution = calculateRootContribution(organisms, environment, releaserCount);
-        int fungalContribution = calculateFungalContribution(organisms);
-        int fungalAttractorContribution = (TraitRegistry.count(organisms, "fungal-attractor", OrganismType.ROOT_NETWORK) > 0 && fungalContribution > 0) ? 1 : 0;
-        int mossContribution = organisms.stream().anyMatch(organism -> organism.type() == OrganismType.MOSS) ? 1 : 0;
+    public static ContributionResult calculate(ContributionPhaseContext context) {
+        long releaserCount = TraitRegistry.count(context.organisms(), "buffer-releaser");
+        int rootContribution = calculateRootContribution(context.organisms(), context.environment(), releaserCount);
+        int fungalContribution = calculateFungalContribution(context.organisms());
+        int fungalAttractorContribution = (TraitRegistry.count(context.organisms(), "fungal-attractor", OrganismType.ROOT_NETWORK) > 0 && fungalContribution > 0) ? 1 : 0;
+        int mossContribution = context.organisms().stream().anyMatch(organism -> organism.type() == OrganismType.MOSS) ? 1 : 0;
         return new ContributionResult(rootContribution, fungalContribution, fungalAttractorContribution, mossContribution);
     }
 

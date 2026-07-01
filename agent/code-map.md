@@ -11,7 +11,7 @@ Generated source orientation for autonomous runs. Do not edit manually.
 - `src/main/java/garden/ai/FeedingBiteCalculator.java`: Calculator for animal feeding bite size.
 - `src/main/java/garden/ai/FeedingPhaseCalculator.java`: Calculator for the feeding phase of the simulation, now using a context record for its inputs.
 - `src/main/java/garden/ai/FungalContributionCalculator.java`: Calculator for fungal network nutrient contributions.
-- `src/main/java/garden/ai/Garden.java`: Orchestrates simulation loop phases, now using PassiveChangeContext for passive change calculations.
+- `src/main/java/garden/ai/Garden.java`: Orchestrates simulation loop phases.
 - `src/main/java/garden/ai/GardenEvent.java`: Compact event record used by simulation and rendering.
 - `src/main/java/garden/ai/GardenRenderer.java`: CLI renderer, now utilizing TraitRegistry for trait counting.
 - `src/main/java/garden/ai/GardenStateStore.java`: Persistence for `data/garden-state.txt`.
