@@ -163,34 +163,10 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         List<Organism> finalChanged = reproduction.organisms();
         int nextIdentifier = reproduction.nextId();
         
-        if (finalChanged.isEmpty()) {
-            OrganismType[] plantTypes = {OrganismType.MOSS, OrganismType.SPORE, OrganismType.FERN, OrganismType.FUNGUS};
-            OrganismType selected = plantTypes[new java.util.Random().nextInt(plantTypes.length)];
-            String id = selected.name().toLowerCase(java.util.Locale.ROOT).replace('_', '-') + "-" + nextIdentifier;
-            finalChanged.add(Organism.of(id, selected, 5, 1, "emergency-seed"));
-            nextEvents.add(new GardenEvent(nextCycle, "A last emergency %s appeared to keep the garden alive.".formatted(selected.displayName())));
-            nextIdentifier++;
-        }
-
-        long currentAnimalCount = finalChanged.stream().filter(o -> o.type().isAnimal()).count();
-        long currentPlantCount = finalChanged.stream().filter(o -> o.type().isPlant()).count();
-        if (currentAnimalCount == 0 && currentPlantCount > 200 && !Boolean.getBoolean("disable.emergency.colonization") && new java.util.Random().nextInt(20) == 0) {
-            OrganismType herbivore = OrganismType.BEETLE;
-            String id = herbivore.name().toLowerCase(java.util.Locale.ROOT).replace('_', '-') + "-" + nextIdentifier;
-            finalChanged.add(Organism.of(id, herbivore, 5, 2, "emergency-colonizer"));
-            nextEvents.add(new GardenEvent(nextCycle, "A new %s arrived to colonize the garden.".formatted(herbivore.displayName())));
-            nextIdentifier++;
-        }
-
-        long herbivoreCount = finalChanged.stream().filter(o -> o.type().kingdom() == OrganismType.Kingdom.HERBIVORE).count();
-        long predatorCount = finalChanged.stream().filter(o -> o.type().kingdom() == OrganismType.Kingdom.PREDATOR).count();
-        if (herbivoreCount > 0 && predatorCount < 3 && !Boolean.getBoolean("disable.emergency.colonization") && new java.util.Random().nextInt(20) == 0) {
-            OrganismType predator = OrganismType.FOX;
-            String id = predator.name().toLowerCase(java.util.Locale.ROOT).replace('_', '-') + "-" + nextIdentifier;
-            finalChanged.add(Organism.of(id, predator, 5, 8, "emergency-colonizer"));
-            nextEvents.add(new GardenEvent(nextCycle, "A new %s arrived to colonize the garden.".formatted(predator.displayName())));
-            nextIdentifier++;
-        }
+        ColonizationCalculator.ColonizationResult colonization = ColonizationCalculator.calculate(new ColonizationCalculator.ColonizationContext(
+                finalChanged, environment, nextCycle, nextIdentifier, nextEvents));
+        finalChanged = colonization.organisms();
+        nextIdentifier = colonization.nextId();
         
         nextEvents.add(new GardenEvent(nextCycle,
                 "The garden becomes %s after cycle %d.".formatted(environmentWithNutrientsAndMoisture.mood(), nextCycle)));

@@ -4,14 +4,14 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 5520
+- Cycle: 5548
 - Health: Stable (🟡)
-- Nutrients: 52.
+- Nutrients: 54.
 - NutrientBuffer: 100.
-- Active organisms: 7695 total across beetle, fox moss, root network spore.
+- Active organisms: 7725 total across beetle, fox moss, root network spore.
 - Missing roles: fungus.
-- Latest agent handoff: Extract Environmental Update Logic.
-- Latest result: Created EnvironmentalUpdateCalculator to handle environmental drift and associated event logging, and refactored Garden.java to use this new calculator..
+- Latest agent handoff: Extract Colonization Logic into ColonizationCalculator.
+- Latest result: Extracted emergency reseeding and colonization logic into a new `ColonizationCalculator` class. Updated `Garden.java` to use this calculator, ensuring behavioral parity by maintaining all original logic. Test validation outcome: success..
 
 ## Immediate Directions
 
