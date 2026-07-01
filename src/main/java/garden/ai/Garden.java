@@ -108,9 +108,11 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         FeedingPhaseCalculator.FeedingResult feeding = FeedingPhaseCalculator.calculate(changed, environment, nextCycle, nextEvents);
         
         // Add nutrients and moisture based on deaths
-        Environment environmentWithNutrientsAndMoisture = nextEnvironment.withNutrients(feeding.totalNutrientContribution() + feeding.predatorNutrientContribution())
-                .withMoisture(feeding.totalMoistureContribution())
-                .withNutrientBuffer(nextEnvironment.nutrientBuffer() + feeding.nutrientBufferBoost());
+        Environment environmentWithNutrientsAndMoisture = nextEnvironment.applyFeeding(
+                feeding.totalNutrientContribution(),
+                feeding.predatorNutrientContribution(),
+                feeding.totalMoistureContribution(),
+                feeding.nutrientBufferBoost());
         
         ReproductionCalculator.ReproductionResult reproduction = ReproductionCalculator.calculate(new ReproductionCalculator.ReproductionContext(
                 environment, feeding.organisms(), nextCycle, nextId, nextEvents, contribution.fungalContribution()));

@@ -108,6 +108,17 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
     }
 
     /**
+     * Returns a new environment with updated nutrients, moisture, and buffer based on feeding results.
+     */
+    public Environment applyFeeding(int nutrientContribution, int predatorContribution, int moistureContribution, int bufferBoost) {
+        return new Environment(light,
+                               moisture + moistureContribution,
+                               warmth,
+                               nutrients + nutrientContribution + predatorContribution,
+                               nutrientBuffer + bufferBoost);
+    }
+
+    /**
      * Returns a new environment with updated nutrients.
      */
     public Environment withNutrients(int bonus) {
