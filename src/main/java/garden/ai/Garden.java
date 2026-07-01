@@ -102,7 +102,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         List<GardenEvent> nextEvents = envUpdate.updatedEvents();
 
         List<Organism> changed = organisms.stream()
-                .map(organism -> PassiveChangeCalculator.calculate(organism, environment, nextCycle, nextEvents, contribution, organisms))
+                .map(organism -> PassiveChangeCalculator.calculate(organism, new PassiveChangeCalculator.PassiveChangeContext(environment, nextCycle, nextEvents, contribution, organisms)))
                 .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
 
         FeedingPhaseCalculator.FeedingResult feeding = FeedingPhaseCalculator.calculate(new FeedingPhaseCalculator.FeedingPhaseContext(changed, environment, nextCycle, nextEvents));

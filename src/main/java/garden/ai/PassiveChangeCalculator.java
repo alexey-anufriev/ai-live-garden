@@ -5,74 +5,82 @@ import java.util.Optional;
 
 public class PassiveChangeCalculator {
 
-    public static Organism calculate(Organism organism, Environment environment, int cycle, List<GardenEvent> events, ContributionCalculator.ContributionResult contribution, List<Organism> allOrganisms) {
+    public record PassiveChangeContext(
+            Environment environment,
+            int cycle,
+            List<GardenEvent> events,
+            ContributionCalculator.ContributionResult contribution,
+            List<Organism> allOrganisms
+    ) {}
+
+    public static Organism calculate(Organism organism, PassiveChangeContext context) {
         Organism changed = organism;
         if (organism.type().isPlant()) {
-            int growth = environment.favorsPlants() ? 2 : 0;
-            if (organism.type() == OrganismType.ROOT_NETWORK && environment.nutrients() > 45) {
+            int growth = context.environment().favorsPlants() ? 2 : 0;
+            if (organism.type() == OrganismType.ROOT_NETWORK && context.environment().nutrients() > 45) {
                 growth += 1;
             }
-            if (organism.type() == OrganismType.ROOT_NETWORK && environment.nutrients() < 25) {
+            if (organism.type() == OrganismType.ROOT_NETWORK && context.environment().nutrients() < 25) {
                 growth += 1;
             }
-            if (organism.type() == OrganismType.MOSS && environment.moisture() > 60) {
+            if (organism.type() == OrganismType.MOSS && context.environment().moisture() > 60) {
                 growth += 1;
             }
             // Trait-based growth
             for (String trait : organism.traits()) {
-                TraitRegistry.PlantGrowthEffect effect = TraitRegistry.getPlantGrowthEffect(trait, cycle, organism, environment, allOrganisms, contribution.fungalContribution());
+                TraitRegistry.PlantGrowthEffect effect = TraitRegistry.getPlantGrowthEffect(trait, context.cycle(), organism, context.environment(), context.allOrganisms(), context.contribution().fungalContribution());
                 if (effect != null) {
                     growth += effect.growthChange();
                     if (effect.event() != null) {
-                        events.add(effect.event());
+                        context.events().add(effect.event());
                     }
                 }
             }
-            if (organism.type() == OrganismType.ROOT_NETWORK && changed.traits().contains("fungal-root-symbiont") && contribution.fungalContribution() > 0) {
-                events.add(new GardenEvent(cycle, "%s benefited from its fungal symbiont.".formatted(changed.id())));
+            if (organism.type() == OrganismType.ROOT_NETWORK && changed.traits().contains("fungal-root-symbiont") && context.contribution().fungalContribution() > 0) {
+                context.events().add(new GardenEvent(context.cycle(), "%s benefited from its fungal symbiont.".formatted(changed.id())));
             }
-            if (organism.type() == OrganismType.SPORE && environment.light() < 45) {
+            if (organism.type() == OrganismType.SPORE && context.environment().light() < 45) {
                 changed = changed.withCuriosity(changed.curiosity() + 2);
             }
             changed = changed.withEnergy(changed.energy() + growth);
         } else {
-            MetabolismCalculator.MetabolicResult result = MetabolismCalculator.calculate(cycle, changed, environment, new MetabolismCalculator.ContributionContext(contribution.mossContribution(), contribution.fungalContribution(), contribution.fungalAttractorContribution()));
-            events.addAll(result.events());
+            MetabolismCalculator.MetabolicResult result = MetabolismCalculator.calculate(context.cycle(), changed, context.environment(), new MetabolismCalculator.ContributionContext(context.contribution().mossContribution(), context.contribution().fungalContribution(), context.contribution().fungalAttractorContribution()));
+            context.events().addAll(result.events());
             changed = changed.withEnergy(changed.energy() + result.energyBonus() - result.metabolism())
-                    .withCuriosity(changed.curiosity() + (cycle % 4 == 0 ? 1 : 0));
+                    .withCuriosity(changed.curiosity() + (context.cycle() % 4 == 0 ? 1 : 0));
         }
 
-        maybeDescribeChange(organism, changed, environment, cycle).ifPresent(events::add);
+        maybeDescribeChange(organism, changed, context.environment(), context.cycle()).ifPresent(context.events()::add);
         
         if (changed.energy() <= 2 && changed.energy() > 0) {
-            events.add(new GardenEvent(cycle, "%s is at a critical energy level.".formatted(changed.id())));
+            context.events().add(new GardenEvent(context.cycle(), "%s is at a critical energy level.".formatted(changed.id())));
         }
 
         boolean isResilient = changed.traits().contains("resilient");
-        boolean isDormant = changed.traits().contains("dormancy") && environment.nutrients() < 15;
-        boolean isDeepRooting = changed.traits().contains("deep-rooting") && environment.moisture() < 30;
+        boolean isDormant = changed.traits().contains("dormancy") && context.environment().nutrients() < 15;
+        boolean isDeepRooting = changed.traits().contains("deep-rooting") && context.environment().moisture() < 30;
         boolean isStressResilient = changed.traits().contains("stress-resilient");
         boolean isStressAvoidant = changed.traits().contains("stress-avoidance");
 
         if (organism.type().isPlant()) {
-            if (!environment.favorsPlants() && !isResilient && !isDormant && !isDeepRooting && !isStressResilient && !isStressAvoidant) {
-                if (environment.nutrients() == 0) {
+            if (!context.environment().favorsPlants() && !isResilient && !isDormant && !isDeepRooting && !isStressResilient && !isStressAvoidant) {
+                if (context.environment().nutrients() == 0) {
                     changed = changed.withEnergy(Math.max(0, changed.energy() - 1));
-                    events.add(new GardenEvent(cycle, "%s lost energy due to environmental stress.".formatted(changed.id())));
+                    context.events().add(new GardenEvent(context.cycle(), "%s lost energy due to environmental stress.".formatted(changed.id())));
                 }
                 changed = changed.withTrait("stressed");
             } else {
                 changed = changed.withoutTrait("stressed");
             }
         } else if (organism.type().isAnimal()) {
-            if (environment.nutrients() < 25 && !isResilient && !isDormant) {
+            if (context.environment().nutrients() < 25 && !isResilient && !isDormant) {
                 changed = changed.withTrait("starving");
             } else {
                 changed = changed.withoutTrait("starving");
             }
         }
 
-        return maybeMutate(changed, cycle, events);
+        return maybeMutate(changed, context.cycle(), context.events());
     }
 
     private static Organism maybeMutate(Organism organism, int cycle, List<GardenEvent> events) {
