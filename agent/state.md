@@ -4,18 +4,18 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 5334
+- Cycle: 5502
 - Health: Stable (🟡)
-- Nutrients: 47.
+- Nutrients: 54.
 - NutrientBuffer: 100.
-- Active organisms: 7483 total across beetle, fox moss, root network spore.
+- Active organisms: 7676 total across beetle, fox moss, root network spore.
 - Missing roles: fungus.
-- Latest agent handoff: Refactor Passive Change Logic.
-- Latest result: Extracted passive change logic (including mutation and description) into PassiveChangeCalculator.java and updated Garden.java to use this new class, reducing its complexity..
+- Latest agent handoff: Refactor Feeding Phase into FeedingPhaseCalculator.
+- Latest result: Extracted the complex feeding phase logic into a new `FeedingPhaseCalculator` class. Updated `Garden.java` to use this calculator, ensuring behavioral parity by maintaining all original logic, including prey searching mechanisms and event logging. Fixed a compilation issue and a minor test regression caused by the refactoring..
 
 ## Immediate Directions
 
-- Look for other simulation methods in Garden.java that could be simplified using similar calculator classes.
+- Continue refactoring complex simulation methods in Garden.java.
 
 ## Constraints & Known Bad Ideas
 
