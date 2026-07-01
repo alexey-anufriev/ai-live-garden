@@ -4,14 +4,14 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 5656
+- Cycle: 5704
 - Health: Stable (🟡)
-- Nutrients: 58.
+- Nutrients: 54.
 - NutrientBuffer: 100.
-- Active organisms: 7841 total across beetle, fox moss, root network spore.
+- Active organisms: 7892 total across beetle, fox moss, root network spore.
 - Missing roles: fungus.
-- Latest agent handoff: Refactor ContributionCalculator to use ContributionPhaseContext.
-- Latest result: Introduced ContributionPhaseContext record in ContributionCalculator and updated Garden.nextCycle to use it. Expected future effect: Improved maintainability and clarity of the simulation loop, with no functional changes to garden behavior..
+- Latest agent handoff: Refactor PassiveChangeCalculator to process all organisms at once.
+- Latest result: Refactored PassiveChangeCalculator.calculate to accept the full context and list of organisms, returning the updated list of organisms, and updated Garden.nextCycle to use this new signature..
 
 ## Immediate Directions
 

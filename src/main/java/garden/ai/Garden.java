@@ -101,9 +101,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         Environment nextEnvironment = envUpdate.nextEnvironment();
         List<GardenEvent> nextEvents = envUpdate.updatedEvents();
 
-        List<Organism> changed = organisms.stream()
-                .map(organism -> PassiveChangeCalculator.calculate(organism, new PassiveChangeCalculator.PassiveChangeContext(environment, nextCycle, nextEvents, contribution, organisms)))
-                .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        List<Organism> changed = PassiveChangeCalculator.calculate(new PassiveChangeCalculator.PassiveChangeContext(environment, nextCycle, nextEvents, contribution, organisms));
 
         FeedingPhaseCalculator.FeedingResult feeding = FeedingPhaseCalculator.calculate(new FeedingPhaseCalculator.FeedingPhaseContext(changed, environment, nextCycle, nextEvents));
         

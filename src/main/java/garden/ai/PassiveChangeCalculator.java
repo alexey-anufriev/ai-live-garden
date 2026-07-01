@@ -2,6 +2,7 @@ package garden.ai;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class PassiveChangeCalculator {
 
@@ -13,7 +14,13 @@ public class PassiveChangeCalculator {
             List<Organism> allOrganisms
     ) {}
 
-    public static Organism calculate(Organism organism, PassiveChangeContext context) {
+    public static List<Organism> calculate(PassiveChangeContext context) {
+        return context.allOrganisms().stream()
+                .map(organism -> calculateSingle(organism, context))
+                .collect(Collectors.toList());
+    }
+
+    private static Organism calculateSingle(Organism organism, PassiveChangeContext context) {
         Organism changed = organism;
         if (organism.type().isPlant()) {
             int growth = context.environment().favorsPlants() ? 2 : 0;
@@ -82,6 +89,7 @@ public class PassiveChangeCalculator {
 
         return maybeMutate(changed, context.cycle(), context.events());
     }
+
 
     private static Organism maybeMutate(Organism organism, int cycle, List<GardenEvent> events) {
         if ((organism.energy() + organism.curiosity() + cycle + organism.generation()) % 11 != 0) {
