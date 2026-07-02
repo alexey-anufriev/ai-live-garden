@@ -24,7 +24,7 @@ Generated source orientation for autonomous runs. Do not edit manually.
 - `src/main/java/garden/ai/RootContributionCalculator.java`: Calculator for root network nutrient contributions.
 - `src/main/java/garden/ai/Simulation.java`: Advances seed or loaded garden state.
 - `src/main/java/garden/ai/StressCalculator.java`: Calculator for identifying and evaluating environmental stress and starvation conditions.
-- `src/main/java/garden/ai/TraitRegistry.java`: Central registry for trait-based behavior, now with biased mutation logic.
+- `src/main/java/garden/ai/TraitRegistry.java`: Central registry for trait-based behavior and trait mutation logic.
 
 ## Tests
 
