@@ -46,6 +46,7 @@ metadata_value() {
   echo "| Baseline test | $(value_or_dash "${BASELINE_TEST_OUTCOME:-}") |"
   echo "| Gemini autonomous step | $(value_or_dash "${GEMINI_OUTCOME:-}") |"
   echo "| Protected file restore | $(value_or_dash "${RESTORE_PROTECTED_OUTCOME:-}") |"
+  echo "| Agent handoff extraction | $(value_or_dash "${EXTRACT_AGENT_HANDOFF_OUTCOME:-}") |"
   echo "| Agent handoff validation | $(value_or_dash "${AGENT_HANDOFF_OUTCOME:-}") |"
   echo "| Post-Gemini test validation | $(value_or_dash "${POST_TEST_OUTCOME:-}") |"
   echo "| Garden state advance | $(value_or_dash "${ADVANCE_GARDEN_OUTCOME:-}") |"
@@ -81,10 +82,10 @@ metadata_value() {
     cat "$AGENT_CHANGE_DIAGNOSTICS_FILE"
     echo
   fi
-  if [[ "${COLLECT_DIAGNOSTICS_OUTCOME:-}" == "success" || "${UPLOAD_DIAGNOSTICS_OUTCOME:-}" == "success" ]]; then
-    echo "Failure diagnostics artifact: \`agent-failure-diagnostics-${GITHUB_RUN_ATTEMPT:-1}\`."
-  elif [[ "${GEMINI_OUTCOME:-}" == "failure" ]]; then
+  if [[ "${GEMINI_OUTCOME:-}" == "failure" ]]; then
     echo "The run failed during the main Gemini call. This is usually provider quota, authentication, or model availability."
+  elif [[ "${EXTRACT_AGENT_HANDOFF_OUTCOME:-}" == "failure" ]]; then
+    echo "The run failed because Gemini did not leave a valid \`.agent-run.json\` file or marked handoff JSON in its output."
   elif [[ "${AGENT_HANDOFF_OUTCOME:-}" == "failure" ]]; then
     echo "The run failed because Gemini did not leave a valid \`.agent-run.json\` handoff."
   elif [[ "${POST_TEST_OUTCOME:-}" == "failure" ]]; then
@@ -103,5 +104,10 @@ metadata_value() {
     echo "The run reached the commit step."
   else
     echo "No specific failure hint was detected from recorded step outcomes."
+  fi
+
+  if [[ "${COLLECT_DIAGNOSTICS_OUTCOME:-}" == "success" || "${UPLOAD_DIAGNOSTICS_OUTCOME:-}" == "success" ]]; then
+    echo
+    echo "Failure diagnostics artifact: \`agent-failure-diagnostics-${GITHUB_RUN_ATTEMPT:-1}\`."
   fi
 } >> "$GITHUB_STEP_SUMMARY"

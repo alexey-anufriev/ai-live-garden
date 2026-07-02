@@ -336,6 +336,7 @@ append_compact_journal_entry() {
   echo "- Do not edit generated memory files: \`README.md\`, \`agent/state.md\`, \`agent/requests.md\`, \`agent/code-map.md\`, \`agent/journal/\`, \`agent/summaries/\`, or \`agent/templates/\`."
   echo "- Do not run memory harness scripts. CI post-processing will generate README state, code map, summaries, journal, and current memory from the final diff and garden state."
   echo "- Write \`.agent-run.json\` as the machine-readable handoff described below. This file is required."
+  echo "- Also include the same JSON object in your final response between \`AGENT_RUN_JSON_START\` and \`AGENT_RUN_JSON_END\` markers so the harness can recover the handoff if direct file creation fails."
   echo "- Before finishing, compare the final diff to the chosen task and remove accidental edits, scratch files, speculative comments, and unrelated assertion changes."
   echo "- Do not modify \`AGENTS.md\`, \`GEMINI.md\`, \`.github/\`, \`story/\`, license files, secrets, or prior journal entries."
   echo "- Do not read \`agent/journal/archive/\` or summary archive folders during a normal run."
@@ -349,7 +350,7 @@ append_compact_journal_entry() {
   echo
   echo "## Required Agent Handoff"
   echo
-  echo "Before finishing, create \`.agent-run.json\` with this exact JSON object shape. Use concise strings. Use an empty \`requests\` array when no human help is needed."
+  echo "Before finishing, create \`.agent-run.json\` with this exact JSON object shape. Use concise strings. Use an empty \`requests\` array when no human help is needed. Then repeat the exact same JSON object in your final response between \`AGENT_RUN_JSON_START\` and \`AGENT_RUN_JSON_END\` markers."
   echo
   cat <<'JSON'
 ```json
@@ -389,7 +390,7 @@ append_compact_journal_entry() {
 ```
 JSON
   echo
-  echo "Do not wrap the actual \`.agent-run.json\` file in Markdown fences."
+  echo "Do not wrap the actual \`.agent-run.json\` file in Markdown fences. Do not wrap the final marked JSON block in Markdown fences either."
   echo
   echo "## Current Agent Memory"
   echo

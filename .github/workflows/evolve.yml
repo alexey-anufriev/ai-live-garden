@@ -68,6 +68,11 @@ jobs:
         shell: bash
         run: scripts/restore-agent-protected-files.sh
 
+      - name: Extract agent handoff from Gemini output
+        id: extract_agent_handoff
+        shell: bash
+        run: scripts/extract-agent-handoff.sh --output .agent-run.json gemini-artifacts
+
       - name: Validate agent handoff
         id: agent_handoff
         shell: bash
@@ -160,6 +165,7 @@ jobs:
         env:
           BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
           GEMINI_OUTCOME: ${{ steps.gemini.outcome }}
+          EXTRACT_AGENT_HANDOFF_OUTCOME: ${{ steps.extract_agent_handoff.outcome }}
           AGENT_HANDOFF_OUTCOME: ${{ steps.agent_handoff.outcome }}
           POST_TEST_OUTCOME: ${{ steps.post_test_final.outcome }}
           ADVANCE_GARDEN_OUTCOME: ${{ steps.advance_garden.outcome }}
@@ -191,6 +197,7 @@ jobs:
           BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
           GEMINI_OUTCOME: ${{ steps.gemini.outcome }}
           RESTORE_PROTECTED_OUTCOME: ${{ steps.restore_protected.outcome }}
+          EXTRACT_AGENT_HANDOFF_OUTCOME: ${{ steps.extract_agent_handoff.outcome }}
           AGENT_HANDOFF_OUTCOME: ${{ steps.agent_handoff.outcome }}
           POST_TEST_OUTCOME: ${{ steps.post_test_final.outcome }}
           ADVANCE_GARDEN_OUTCOME: ${{ steps.advance_garden.outcome }}
