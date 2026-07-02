@@ -40,7 +40,11 @@ public class TraitRegistry {
         return modifier;
     }
 
-    public static String getMutationTrait(int cycle, Organism organism) {
+    public static String getMutationTrait(int cycle, Organism organism, OrganismType childType) {
+        if (childType == OrganismType.FUNGUS && Math.random() < 0.5) {
+            String[] fungalTraits = {"nutrient-decomposer", "fungus-soil-enricher", "fungal-network-connector", "fungal-accelerator", "fungal-enhancer", "fungal-buffer-stabilizer"};
+            return fungalTraits[Math.floorMod(cycle + organism.generation(), fungalTraits.length)];
+        }
         int index = Math.floorMod(organism.id().hashCode() + cycle + organism.generation(), TRAITS.length);
         return TRAITS[index];
     }

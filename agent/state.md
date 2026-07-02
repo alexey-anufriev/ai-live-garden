@@ -4,19 +4,22 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 5872
+- Cycle: 5890
 - Health: Stable (🟡)
 - Nutrients: 54.
 - NutrientBuffer: 100.
-- Active organisms: 8061 total across beetle, fox moss, root network spore.
+- Active organisms: 8079 total across beetle, fox moss, root network spore.
 - Missing roles: fungus.
-- Latest agent handoff: Extract Stress and Starvation Logic into StressCalculator.
-- Latest result: Created StressCalculator.java to encapsulate stress/starvation identification logic, updated PassiveChangeCalculator.java to utilize this new calculator, and added StressCalculatorTest.java to ensure behavioral parity and test coverage..
+- Latest agent handoff: Bias Fungal Trait Assignment.
+- Latest result: Updated TraitRegistry.getMutationTrait to accept the childType and bias trait assignment for FUNGUS organisms. Updated ReproductionCalculator and PassiveChangeCalculator to match the new signature. Verified with all tests passing..
 
 ## Immediate Directions
 
-- Maintain the current simulation loop structure.
+- Monitor fungal contribution impact over next ticks.
 
 ## Constraints & Known Bad Ideas
 
-- Keep behavioral parity with existing tests.
+- Do not attempt to fix the simulation in one run.
+- Do not add another named adaptation merely because recent runs did so.
+- Do not add another observability-only or tests-only change merely because it is easy to validate.
+- Do not treat the full nutrient buffer as proof of health while nutrients are zero or ecological roles are absent.

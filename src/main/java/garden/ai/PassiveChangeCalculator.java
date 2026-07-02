@@ -92,7 +92,7 @@ public class PassiveChangeCalculator {
         if (organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("stressed") && (organism.id().hashCode() + cycle) % 5 == 0) {
             trait = "fungal-symbiote";
         } else {
-            trait = TraitRegistry.getMutationTrait(cycle, organism);
+            trait = TraitRegistry.getMutationTrait(cycle, organism, organism.type());
         }
         Organism changed = organism.withTrait(trait).withCuriosity(organism.curiosity() + 1);
         events.add(new GardenEvent(cycle, "%s adapted a %s trait.".formatted(organism.id(), trait)));

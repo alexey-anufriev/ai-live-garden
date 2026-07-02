@@ -51,7 +51,7 @@ public class ReproductionCalculator {
             if (canReproduce) {
                 String childId = childType.name().toLowerCase(Locale.ROOT).replace('_', '-') + "-" + identifier;
                 Organism parentAfterBirth = organism.withEnergy(organism.energy() / 2);
-                Organism child = organism.child(childId, childType, TraitRegistry.getMutationTrait(context.cycle(), organism));
+                Organism child = organism.child(childId, childType, TraitRegistry.getMutationTrait(context.cycle(), organism, childType));
                 next.add(parentAfterBirth);
                 next.add(child);
                 context.events().add(new GardenEvent(context.cycle(), "%s released %s as a new %s.".formatted(
