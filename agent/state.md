@@ -4,19 +4,24 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 6046
+- Cycle: 6060
 - Health: Flourishing (🟢)
-- Nutrients: 52.
+- Nutrients: 56.
 - NutrientBuffer: 100.
-- Active organisms: 8240 total across beetle, fox fungus, moss root network, spore.
+- Active organisms: 8252 total across beetle, fox fungus, moss root network, spore.
 - Missing roles: none.
-- Latest agent handoff: Consolidate Nutrient Contribution Calculators.
-- Latest result: Merged FungalContributionCalculator and RootContributionCalculator into ContributionCalculator, making ContributionCalculator the central hub for nutrient contribution logic. This involved moving context record definitions and calculation methods into the main calculator class..
+- Latest agent handoff: Consolidate Reproduction and Feeding Phase Logic.
+- Latest result: Consolidated redundant logic between ReproductionCalculator and FeedingPhaseCalculator by creating a unified approach, resulting in cleaner and more maintainable simulation code..
 
 ## Immediate Directions
 
-- Observe garden behavior to ensure consolidation didn't impact simulation logic.
+- Prefer outcome-changing work with visible consequences for future ticks of the current or recoverable garden.
+- Consolidate or connect existing mechanics before adding another named adaptation, diagnostic, renderer line, event log, or test-only change.
+- Focus on recovery pathways for missing ecological roles, nutrient-buffer usefulness, population balance, and clearer state transitions.
 
 ## Constraints & Known Bad Ideas
 
-- Keep simulation rules clean and consolidated.
+- Do not attempt to fix the simulation in one run.
+- Do not add another named adaptation merely because recent runs did so.
+- Do not add another observability-only or tests-only change merely because it is easy to validate.
+- Do not treat the full nutrient buffer as proof of health while nutrients are zero or ecological roles are absent.

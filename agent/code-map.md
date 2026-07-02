@@ -9,7 +9,7 @@ Generated source orientation for autonomous runs. Do not edit manually.
 - `src/main/java/garden/ai/Environment.java`: Immutable environmental resources and nutrient-buffer operations, now including feeding-based updates.
 - `src/main/java/garden/ai/EnvironmentalUpdateCalculator.java`: Calculator for the environmental update phase of the garden simulation.
 - `src/main/java/garden/ai/FeedingBiteCalculator.java`: Calculator for animal feeding bite size.
-- `src/main/java/garden/ai/FeedingPhaseCalculator.java`: Calculator for the feeding phase of the simulation, now using a context record for its inputs.
+- `src/main/java/garden/ai/FeedingPhaseCalculator.java`: Calculator for the feeding phase of the simulation.
 - `src/main/java/garden/ai/Garden.java`: Main garden entry point that orchestrates the simulation phases.
 - `src/main/java/garden/ai/GardenEvent.java`: Compact event record used by simulation and rendering.
 - `src/main/java/garden/ai/GardenRenderer.java`: CLI renderer, now utilizing TraitRegistry for trait counting.
