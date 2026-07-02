@@ -5,13 +5,13 @@ Generated source orientation for autonomous runs. Do not edit manually.
 ## Source Files
 
 - `src/main/java/garden/ai/ColonizationCalculator.java`: Calculator for emergency reseeding and colonization phases.
-- `src/main/java/garden/ai/ContributionCalculator.java`: Calculates various organism contributions to the garden environment.
+- `src/main/java/garden/ai/ContributionCalculator.java`: Orchestrates contribution calculations, passing buffer info.
 - `src/main/java/garden/ai/Environment.java`: Immutable environmental resources and nutrient-buffer operations, now including feeding-based updates.
 - `src/main/java/garden/ai/EnvironmentalUpdateCalculator.java`: Calculator for the environmental update phase of the garden simulation.
 - `src/main/java/garden/ai/FeedingBiteCalculator.java`: Calculator for animal feeding bite size.
 - `src/main/java/garden/ai/FeedingPhaseCalculator.java`: Calculator for the feeding phase of the simulation, now using a context record for its inputs.
-- `src/main/java/garden/ai/FungalContributionCalculator.java`: Calculator for fungal network nutrient contributions.
-- `src/main/java/garden/ai/Garden.java`: Orchestrates simulation loop phases, now using the updated PassiveChangeCalculator.
+- `src/main/java/garden/ai/FungalContributionCalculator.java`: Calculates fungal contribution, now buffer-aware.
+- `src/main/java/garden/ai/Garden.java`: Entry point for fungal contribution, now passes environment.
 - `src/main/java/garden/ai/GardenEvent.java`: Compact event record used by simulation and rendering.
 - `src/main/java/garden/ai/GardenRenderer.java`: CLI renderer, now utilizing TraitRegistry for trait counting.
 - `src/main/java/garden/ai/GardenStateStore.java`: Persistence for `data/garden-state.txt`.

@@ -11,7 +11,7 @@ public class ContributionCalculator {
     public static ContributionResult calculate(ContributionPhaseContext context) {
         long releaserCount = TraitRegistry.count(context.organisms(), "buffer-releaser");
         int rootContribution = calculateRootContribution(context.organisms(), context.environment(), releaserCount);
-        int fungalContribution = calculateFungalContribution(context.organisms());
+        int fungalContribution = calculateFungalContribution(context.organisms(), context.environment());
         int fungalAttractorContribution = (TraitRegistry.count(context.organisms(), "fungal-attractor", OrganismType.ROOT_NETWORK) > 0 && fungalContribution > 0) ? 1 : 0;
         int mossContribution = context.organisms().stream().anyMatch(organism -> organism.type() == OrganismType.MOSS) ? 1 : 0;
         return new ContributionResult(rootContribution, fungalContribution, fungalAttractorContribution, mossContribution);
@@ -47,7 +47,7 @@ public class ContributionCalculator {
         return RootContributionCalculator.calculate(context);
     }
 
-    public static int calculateFungalContribution(List<Organism> organisms) {
+    public static int calculateFungalContribution(List<Organism> organisms, Environment environment) {
         return FungalContributionCalculator.calculate(new FungalContributionCalculator.FungalContributionContext(
                 countType(organisms, OrganismType.FUNGUS),
                 TraitRegistry.count(organisms, "nutrient-decomposer", OrganismType.FUNGUS),
@@ -61,7 +61,8 @@ public class ContributionCalculator {
                 TraitRegistry.countAnimalTrait(organisms, "fungal-fertilizer"),
                 countType(organisms, OrganismType.ROOT_NETWORK),
                 TraitRegistry.count(organisms, "mycelial-synergizer", OrganismType.ROOT_NETWORK),
-                TraitRegistry.count(organisms, "fungal-decomposer-mimic", OrganismType.ROOT_NETWORK)
+                TraitRegistry.count(organisms, "fungal-decomposer-mimic", OrganismType.ROOT_NETWORK),
+                environment.nutrientBuffer()
         ));
     }
 }

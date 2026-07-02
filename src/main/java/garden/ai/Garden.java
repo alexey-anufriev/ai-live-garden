@@ -74,7 +74,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
     }
 
     public int fungalContribution() {
-        return ContributionCalculator.calculateFungalContribution(organisms);
+        return ContributionCalculator.calculateFungalContribution(organisms, environment);
     }
 
     public int fungalAttractorContribution() {

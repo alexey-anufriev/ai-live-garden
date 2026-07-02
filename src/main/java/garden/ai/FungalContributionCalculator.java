@@ -18,17 +18,19 @@ public class FungalContributionCalculator {
             long fungalFertilizerCount,
             long rootNetworkCount,
             long mycelialSynergizerCount,
-            long fungalDecomposerMimicCount
+            long fungalDecomposerMimicCount,
+            int nutrientBuffer
     ) {}
 
     public static int calculate(FungalContributionContext context) {
         int connectorBonus = (context.rootNetworkCount() > 0) ? 6 : 4;
         int synergizerBonus = (context.mycelialSynergizerCount() > 0 && context.fungusCount() > 0) ? 5 : 0;
+        int bufferBonus = (context.nutrientBuffer() > 20) ? 2 : 1;
 
-        return (int) (context.fungusCount() * 2 +
-                      context.decomposerCount() * 3 +
-                      context.soilEnricherCount() * 5 +
-                      context.networkConnectorCount() * connectorBonus +
+        return (int) (context.fungusCount() * 2 * bufferBonus +
+                      context.decomposerCount() * 3 * bufferBonus +
+                      context.soilEnricherCount() * 5 * bufferBonus +
+                      context.networkConnectorCount() * connectorBonus * bufferBonus +
                       context.fungalSymbioteCount() * 2 +
                       context.fungalAcceleratorCount() * 10 +
                       context.fungalEnhancerCount() * 8 +
