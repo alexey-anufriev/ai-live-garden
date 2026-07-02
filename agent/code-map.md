@@ -5,12 +5,11 @@ Generated source orientation for autonomous runs. Do not edit manually.
 ## Source Files
 
 - `src/main/java/garden/ai/ColonizationCalculator.java`: Calculates emergency reseeding and colonization outcomes for the garden, now buffer-aware.
-- `src/main/java/garden/ai/ContributionCalculator.java`: Orchestrates contribution calculations, passing buffer info.
+- `src/main/java/garden/ai/ContributionCalculator.java`: Central calculator for all nutrient contribution logic in the garden.
 - `src/main/java/garden/ai/Environment.java`: Immutable environmental resources and nutrient-buffer operations, now including feeding-based updates.
 - `src/main/java/garden/ai/EnvironmentalUpdateCalculator.java`: Calculator for the environmental update phase of the garden simulation.
 - `src/main/java/garden/ai/FeedingBiteCalculator.java`: Calculator for animal feeding bite size.
 - `src/main/java/garden/ai/FeedingPhaseCalculator.java`: Calculator for the feeding phase of the simulation, now using a context record for its inputs.
-- `src/main/java/garden/ai/FungalContributionCalculator.java`: Calculates fungal contribution, now buffer-aware.
 - `src/main/java/garden/ai/Garden.java`: Main garden entry point that orchestrates the simulation phases.
 - `src/main/java/garden/ai/GardenEvent.java`: Compact event record used by simulation and rendering.
 - `src/main/java/garden/ai/GardenRenderer.java`: CLI renderer, now utilizing TraitRegistry for trait counting.
@@ -21,7 +20,6 @@ Generated source orientation for autonomous runs. Do not edit manually.
 - `src/main/java/garden/ai/OrganismType.java`: Defines organism taxonomy and now hosts environment-sensitive succession rules.
 - `src/main/java/garden/ai/PassiveChangeCalculator.java`: Calculates passive organism changes, now passing organism lists for stress calculation.
 - `src/main/java/garden/ai/ReproductionCalculator.java`: Orchestrates reproduction and fungal succession logic.
-- `src/main/java/garden/ai/RootContributionCalculator.java`: Calculator for root network nutrient contributions.
 - `src/main/java/garden/ai/Simulation.java`: Advances seed or loaded garden state.
 - `src/main/java/garden/ai/StressCalculator.java`: Encapsulates stress and starvation logic, now density-aware.
 - `src/main/java/garden/ai/TraitRegistry.java`: Central registry for trait-based behavior and trait mutation logic.
