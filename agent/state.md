@@ -4,18 +4,18 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 5977
+- Cycle: 5995
 - Health: Flourishing (🟢)
-- Nutrients: 54.
+- Nutrients: 56.
 - NutrientBuffer: 100.
-- Active organisms: 8174 total across beetle, fox fungus, moss root network, spore.
+- Active organisms: 8190 total across beetle, fox fungus, moss root network, spore.
 - Missing roles: none.
-- Latest agent handoff: Buffer-Aware Animal Starvation.
-- Latest result: Modified `StressCalculator.isAnimalStarving` to use a combined threshold of `nutrients + nutrientBuffer / 2` to determine starvation, and updated `StressCalculatorTest` to verify this behavior, ensuring that a healthy nutrient buffer prevents animal starvation..
+- Latest agent handoff: Buffer-Aware Colonization.
+- Latest result: Refactored ColonizationCalculator to accept a Random instance for improved testability and updated the colonization logic to increase the probability of colonization events when the nutrient buffer is higher..
 
 ## Immediate Directions
 
-- Observe animal resilience in low-nutrient conditions.
+- Observe colonization rates relative to buffer health.
 
 ## Constraints & Known Bad Ideas
 

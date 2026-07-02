@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 /**
  * Immutable garden snapshot and rule engine for one digital ecosystem.
@@ -118,7 +119,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         int nextIdentifier = reproduction.nextId();
         
         ColonizationCalculator.ColonizationResult colonization = ColonizationCalculator.calculate(new ColonizationCalculator.ColonizationContext(
-                finalChanged, environment, nextCycle, nextIdentifier, nextEvents));
+                finalChanged, environment, nextCycle, nextIdentifier, nextEvents, new Random()));
         finalChanged = colonization.organisms();
         nextIdentifier = colonization.nextId();
         
