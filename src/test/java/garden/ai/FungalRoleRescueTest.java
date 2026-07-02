@@ -33,4 +33,18 @@ public class FungalRoleRescueTest {
         long fungusCount = next.organisms().stream().filter(o -> o.type() == OrganismType.FUNGUS).count();
         assertEquals(1, fungusCount, "Fungus should be rescued even with low energy and stress");
     }
+
+    @Test
+    public void testFungusRoleRescueAtLowEnergy() {
+        // Create garden with 1 root network (energy 4) and 0 fungus
+        Organism root = Organism.of("root-1", OrganismType.ROOT_NETWORK, 4, 1, "listens-below");
+        Garden garden = new Garden(1, 2, new Environment(50, 64, 43, 58, 50), List.of(root), List.of());
+        
+        // Advance reproduction
+        Garden next = garden.nextCycle();
+        
+        // Verify fungus was created
+        long fungusCount = next.organisms().stream().filter(o -> o.type() == OrganismType.FUNGUS).count();
+        assertEquals(1, fungusCount, "Fungus should be rescued at energy 4");
+    }
 }

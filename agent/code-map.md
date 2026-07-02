@@ -20,7 +20,7 @@ Generated source orientation for autonomous runs. Do not edit manually.
 - `src/main/java/garden/ai/Organism.java`: Represents a single living element in the garden, now utilizing TraitRegistry for nutrient value calculation.
 - `src/main/java/garden/ai/OrganismType.java`: Defines organism taxonomy and now hosts environment-sensitive succession rules.
 - `src/main/java/garden/ai/PassiveChangeCalculator.java`: Calculates passive organism changes, now using StressCalculator for stress/starvation logic.
-- `src/main/java/garden/ai/ReproductionCalculator.java`: Calculates reproduction outcomes, now supporting type-aware trait assignment.
+- `src/main/java/garden/ai/ReproductionCalculator.java`: Orchestrates reproduction and fungal succession logic.
 - `src/main/java/garden/ai/RootContributionCalculator.java`: Calculator for root network nutrient contributions.
 - `src/main/java/garden/ai/Simulation.java`: Advances seed or loaded garden state.
 - `src/main/java/garden/ai/StressCalculator.java`: Calculator for identifying and evaluating environmental stress and starvation conditions.
