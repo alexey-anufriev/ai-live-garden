@@ -1,5 +1,6 @@
 package garden.ai;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -13,8 +14,8 @@ public class StressCalculator {
             Optional<GardenEvent> event
     ) {}
 
-    public static StressResult calculatePlantStressResult(Organism organism, Environment environment, int cycle) {
-        if (!isPlantStressed(organism, environment)) {
+    public static StressResult calculatePlantStressResult(Organism organism, Environment environment, int cycle, List<Organism> allOrganisms) {
+        if (!isPlantStressed(organism, environment, allOrganisms)) {
             return new StressResult(false, 0, Optional.empty());
         }
 
@@ -24,12 +25,15 @@ public class StressCalculator {
         if (environment.nutrients() == 0) {
             energyLoss = 1;
             event = Optional.of(new GardenEvent(cycle, "%s lost energy due to environmental stress.".formatted(organism.id())));
+        } else if (allOrganisms.stream().filter(o -> o.type().isPlant()).count() > 5000) {
+            energyLoss = 1;
+            event = Optional.of(new GardenEvent(cycle, "%s lost energy due to overcrowding.".formatted(organism.id())));
         }
 
         return new StressResult(true, energyLoss, event);
     }
 
-    public static boolean isPlantStressed(Organism organism, Environment environment) {
+    public static boolean isPlantStressed(Organism organism, Environment environment, List<Organism> allOrganisms) {
         if (!organism.type().isPlant()) {
             return false;
         }
@@ -40,17 +44,20 @@ public class StressCalculator {
         boolean isStressResilient = organism.traits().contains("stress-resilient");
         boolean isStressAvoidant = organism.traits().contains("stress-avoidance");
 
-        return !environment.favorsPlants() && !isResilient && !isDormant && !isDeepRooting && !isStressResilient && !isStressAvoidant;
+        boolean crowded = allOrganisms.stream().filter(o -> o.type().isPlant()).count() > 5000;
+
+        return (!environment.favorsPlants() || crowded) && !isResilient && !isDormant && !isDeepRooting && !isStressResilient && !isStressAvoidant;
     }
 
-    public static boolean isAnimalStarving(Organism organism, Environment environment) {
+    public static boolean isAnimalStarving(Organism organism, Environment environment, List<Organism> allOrganisms) {
         if (!organism.type().isAnimal()) {
             return false;
         }
 
         boolean isResilient = organism.traits().contains("resilient");
         boolean isDormant = organism.traits().contains("dormancy");
+        boolean overcrowded = allOrganisms.stream().filter(o -> o.type().isAnimal()).count() > 2500;
 
-        return (environment.nutrients() + environment.nutrientBuffer() / 2) < 25 && !isResilient && !isDormant;
+        return ((environment.nutrients() + environment.nutrientBuffer() / 2) < 25 || overcrowded) && !isResilient && !isDormant;
     }
 }

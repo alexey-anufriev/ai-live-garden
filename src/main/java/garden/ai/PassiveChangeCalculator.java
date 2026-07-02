@@ -64,7 +64,7 @@ public class PassiveChangeCalculator {
         }
 
         if (organism.type().isPlant()) {
-            StressCalculator.StressResult stress = StressCalculator.calculatePlantStressResult(changed, context.environment(), context.cycle());
+            StressCalculator.StressResult stress = StressCalculator.calculatePlantStressResult(changed, context.environment(), context.cycle(), context.allOrganisms());
             if (stress.isStressed()) {
                 changed = changed.withEnergy(Math.max(0, changed.energy() - stress.energyLoss()));
                 stress.event().ifPresent(context.events()::add);
@@ -73,7 +73,7 @@ public class PassiveChangeCalculator {
                 changed = changed.withoutTrait("stressed");
             }
         } else if (organism.type().isAnimal()) {
-            if (StressCalculator.isAnimalStarving(changed, context.environment())) {
+            if (StressCalculator.isAnimalStarving(changed, context.environment(), context.allOrganisms())) {
                 changed = changed.withTrait("starving");
             } else {
                 changed = changed.withoutTrait("starving");
