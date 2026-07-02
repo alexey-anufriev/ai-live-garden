@@ -19,15 +19,16 @@ Generated source orientation for autonomous runs. Do not edit manually.
 - `src/main/java/garden/ai/MetabolismCalculator.java`: Calculates organism metabolism, now using a consolidated ContributionContext.
 - `src/main/java/garden/ai/Organism.java`: Represents a single living element in the garden, now utilizing TraitRegistry for nutrient value calculation.
 - `src/main/java/garden/ai/OrganismType.java`: Defines organism taxonomy and now hosts environment-sensitive succession rules.
-- `src/main/java/garden/ai/PassiveChangeCalculator.java`: Calculates passive organism changes, now accepting a list of organisms in the context.
+- `src/main/java/garden/ai/PassiveChangeCalculator.java`: Calculates passive organism changes, now using StressCalculator for stress/starvation logic.
 - `src/main/java/garden/ai/ReproductionCalculator.java`: Calculates reproduction outcomes for organisms based on environment and traits.
 - `src/main/java/garden/ai/RootContributionCalculator.java`: Calculator for root network nutrient contributions.
 - `src/main/java/garden/ai/Simulation.java`: Advances seed or loaded garden state.
+- `src/main/java/garden/ai/StressCalculator.java`: Calculator for identifying and evaluating environmental stress and starvation conditions.
 - `src/main/java/garden/ai/TraitRegistry.java`: Central registry for trait-based behavior, now hosting trait counting methods.
 
 ## Tests
 
 - Tests live under `src/test/java/garden/ai/`.
-- Current Java test files: 58.
+- Current Java test files: 59.
 - Prefer focused behavior tests for changed simulation rules.
 - Add or inspect exact test files only when the chosen task needs them.

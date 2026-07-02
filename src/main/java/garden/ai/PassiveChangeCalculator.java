@@ -63,24 +63,17 @@ public class PassiveChangeCalculator {
             context.events().add(new GardenEvent(context.cycle(), "%s is at a critical energy level.".formatted(changed.id())));
         }
 
-        boolean isResilient = changed.traits().contains("resilient");
-        boolean isDormant = changed.traits().contains("dormancy") && context.environment().nutrients() < 15;
-        boolean isDeepRooting = changed.traits().contains("deep-rooting") && context.environment().moisture() < 30;
-        boolean isStressResilient = changed.traits().contains("stress-resilient");
-        boolean isStressAvoidant = changed.traits().contains("stress-avoidance");
-
         if (organism.type().isPlant()) {
-            if (!context.environment().favorsPlants() && !isResilient && !isDormant && !isDeepRooting && !isStressResilient && !isStressAvoidant) {
-                if (context.environment().nutrients() == 0) {
-                    changed = changed.withEnergy(Math.max(0, changed.energy() - 1));
-                    context.events().add(new GardenEvent(context.cycle(), "%s lost energy due to environmental stress.".formatted(changed.id())));
-                }
+            StressCalculator.StressResult stress = StressCalculator.calculatePlantStressResult(changed, context.environment(), context.cycle());
+            if (stress.isStressed()) {
+                changed = changed.withEnergy(Math.max(0, changed.energy() - stress.energyLoss()));
+                stress.event().ifPresent(context.events()::add);
                 changed = changed.withTrait("stressed");
             } else {
                 changed = changed.withoutTrait("stressed");
             }
         } else if (organism.type().isAnimal()) {
-            if (context.environment().nutrients() < 25 && !isResilient && !isDormant) {
+            if (StressCalculator.isAnimalStarving(changed, context.environment())) {
                 changed = changed.withTrait("starving");
             } else {
                 changed = changed.withoutTrait("starving");
