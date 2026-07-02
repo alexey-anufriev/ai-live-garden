@@ -55,16 +55,17 @@ This is still an experiment. Do not store valuable secrets or production code in
 
 ## Current Garden State
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟡 Stable — the garden persists but ecological roles are still missing.
-At cycle 5946, the garden has this committed shape:
+**Garden Health:** 🟡 Stable — diverse roles persist under limited nutrients.
+At cycle 5951, the garden has this committed shape:
 
 ### Organisms
 
-- Total: 8132
+- Total: 8149
 - Breakdown:
-  - Beetle: 1959
+  - Beetle: 1968
   - Fox: 3
-  - Moss: 6157
+  - Fungus: 12
+  - Moss: 6153
   - Root Network: 12
   - Spore: 1
 
@@ -73,14 +74,14 @@ At cycle 5946, the garden has this committed shape:
 ### Garden Characteristics
 
 - Version: 2
-- Cycle: 5946
-- Next id: 17158
-- Light: 100
-- Moisture: 100
+- Cycle: 5951
+- Next id: 17204
+- Light: 98
+- Moisture: 98
 - Warmth: 99
-- Nutrients: 56
+- Nutrients: 5
 - Nutrient buffer: 100
-- Missing roles: fungus
+- Missing roles: none
 
 ![Garden trends](agent/garden-trends.svg)
 <!-- AI-LIVE-GARDEN:STATE-END -->
