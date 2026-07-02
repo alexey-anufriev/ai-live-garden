@@ -34,8 +34,16 @@ class StressCalculatorTest {
     }
     
     @Test
-    void animalStarvingInLowNutrients() {
-        Environment env = new Environment(50, 50, 50, 20, 100); // Nutrients < 25
+    void animalNotStarvingInLowNutrientsWithHighBuffer() {
+        Environment env = new Environment(50, 50, 50, 20, 100); // Nutrients 20, Buffer 100 -> combined > 25
+        Organism fox = Organism.of("fox-1", OrganismType.FOX, 10, 1);
+        
+        assertThat(StressCalculator.isAnimalStarving(fox, env)).isFalse();
+    }
+
+    @Test
+    void animalStarvingInLowNutrientsAndLowBuffer() {
+        Environment env = new Environment(50, 50, 50, 10, 10); // Nutrients 10, Buffer 10 -> combined = 15 < 25
         Organism fox = Organism.of("fox-1", OrganismType.FOX, 10, 1);
         
         assertThat(StressCalculator.isAnimalStarving(fox, env)).isTrue();

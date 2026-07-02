@@ -4,18 +4,18 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 5959
+- Cycle: 5977
 - Health: Flourishing (🟢)
-- Nutrients: 52.
+- Nutrients: 54.
 - NutrientBuffer: 100.
-- Active organisms: 8158 total across beetle, fox fungus, moss root network, spore.
+- Active organisms: 8174 total across beetle, fox fungus, moss root network, spore.
 - Missing roles: none.
-- Latest agent handoff: Lower Energy Threshold for Fungal Succession.
-- Latest result: Reduced the energy requirement for fungal succession from 5 to 4 in `ReproductionCalculator.java` and added a test case in `FungalRoleRescueTest.java` to verify the fix..
+- Latest agent handoff: Buffer-Aware Animal Starvation.
+- Latest result: Modified `StressCalculator.isAnimalStarving` to use a combined threshold of `nutrients + nutrientBuffer / 2` to determine starvation, and updated `StressCalculatorTest` to verify this behavior, ensuring that a healthy nutrient buffer prevents animal starvation..
 
 ## Immediate Directions
 
-- Monitor fungal population growth.
+- Observe animal resilience in low-nutrient conditions.
 
 ## Constraints & Known Bad Ideas
 

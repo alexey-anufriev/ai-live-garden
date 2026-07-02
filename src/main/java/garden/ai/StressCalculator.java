@@ -51,6 +51,6 @@ public class StressCalculator {
         boolean isResilient = organism.traits().contains("resilient");
         boolean isDormant = organism.traits().contains("dormancy");
 
-        return environment.nutrients() < 25 && !isResilient && !isDormant;
+        return (environment.nutrients() + environment.nutrientBuffer() / 2) < 25 && !isResilient && !isDormant;
     }
 }
