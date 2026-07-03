@@ -63,7 +63,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
     }
 
     public int rootContribution() {
-        return EnvironmentalDynamicsCalculator.calculateRootContribution(organisms, environment, TraitRegistry.count(organisms, "buffer-releaser"));
+        return OrganismInteractionCalculator.calculateRootContribution(organisms, environment, TraitRegistry.count(organisms, "buffer-releaser"));
     }
 
     public long blockedPlantCount() {
@@ -75,7 +75,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
     }
 
     public int fungalContribution() {
-        return EnvironmentalDynamicsCalculator.calculateFungalContribution(organisms, environment);
+        return OrganismInteractionCalculator.calculateFungalContribution(organisms, environment);
     }
 
     public int fungalAttractorContribution() {
@@ -96,8 +96,8 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
      */
     public Garden nextCycle() {
         int nextCycle = cycle + 1;
-        EnvironmentalDynamicsCalculator.EnvironmentalDynamicsResult dynamics = EnvironmentalDynamicsCalculator.calculate(new EnvironmentalDynamicsCalculator.EnvironmentalDynamicsContext(organisms, environment, nextCycle, new ArrayList<>(events)));
-        EnvironmentalDynamicsCalculator.ContributionResult contribution = dynamics.contribution();
+        OrganismInteractionCalculator.EnvironmentalDynamicsResult dynamics = OrganismInteractionCalculator.calculateEnvironmentalDynamics(new OrganismInteractionCalculator.EnvironmentalDynamicsContext(organisms, environment, nextCycle, new ArrayList<>(events)));
+        OrganismInteractionCalculator.ContributionResult contribution = dynamics.contribution();
         Environment nextEnvironment = dynamics.nextEnvironment();
         List<GardenEvent> nextEvents = dynamics.updatedEvents();
 
