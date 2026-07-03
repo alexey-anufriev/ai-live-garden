@@ -4,14 +4,14 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 6307
+- Cycle: 6325
 - Health: Flourishing (🟢)
 - Nutrients: 100.
 - NutrientBuffer: 100.
-- Active organisms: 8471 total across beetle, fox fungus, moss root network, spore.
+- Active organisms: 8485 total across beetle, fox fungus, moss root network, spore.
 - Missing roles: none.
-- Latest agent handoff: Consolidate Contribution and Environmental Calculators.
-- Latest result: Created EnvironmentalDynamicsCalculator and consolidated all contribution and environmental update logic into it. Updated Garden.nextCycle to use the new calculator and deleted the now-redundant ContributionCalculator and EnvironmentalUpdateCalculator classes..
+- Latest agent handoff: Consolidate PassiveChangeCalculator and OrganismStateCalculator.
+- Latest result: Consolidated OrganismStateCalculator logic into PassiveChangeCalculator and updated tests to reflect the new structure. Deleted the obsolete OrganismStateCalculator class and its corresponding test file..
 
 ## Immediate Directions
 
