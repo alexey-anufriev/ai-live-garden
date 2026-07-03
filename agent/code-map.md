@@ -15,13 +15,12 @@ Generated source orientation for autonomous runs. Do not edit manually.
 - `src/main/java/garden/ai/GardenRenderer.java`: CLI renderer, now utilizing TraitRegistry for trait counting.
 - `src/main/java/garden/ai/GardenStateStore.java`: Persistence for `data/garden-state.txt`.
 - `src/main/java/garden/ai/Main.java`: CLI entry point for `inspect` and `tick`.
-- `src/main/java/garden/ai/MetabolismCalculator.java`: Calculates organism metabolism, now using a consolidated ContributionContext.
 - `src/main/java/garden/ai/Organism.java`: Represents a single living element in the garden, now utilizing TraitRegistry for nutrient value calculation.
+- `src/main/java/garden/ai/OrganismStateCalculator.java`: Central calculator for organism energy adjustments, metabolism, stress, and starvation logic, consolidated from MetabolismCalculator and StressCalculator.
 - `src/main/java/garden/ai/OrganismType.java`: Defines organism taxonomy and now hosts environment-sensitive succession rules.
-- `src/main/java/garden/ai/PassiveChangeCalculator.java`: Calculates passive organism changes, now passing organism lists for stress calculation.
+- `src/main/java/garden/ai/PassiveChangeCalculator.java`: Orchestrates organism passive changes, now using OrganismStateCalculator.
 - `src/main/java/garden/ai/ReproductionCalculator.java`: Orchestrates reproduction and fungal succession logic.
 - `src/main/java/garden/ai/Simulation.java`: Advances seed or loaded garden state.
-- `src/main/java/garden/ai/StressCalculator.java`: Encapsulates stress and starvation logic, now density-aware.
 - `src/main/java/garden/ai/TraitRegistry.java`: Central registry for trait-based behavior and trait mutation logic.
 
 ## Tests

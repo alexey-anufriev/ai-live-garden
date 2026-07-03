@@ -51,7 +51,7 @@ public class PassiveChangeCalculator {
             }
             changed = changed.withEnergy(changed.energy() + growth);
         } else {
-            MetabolismCalculator.MetabolicResult result = MetabolismCalculator.calculate(context.cycle(), changed, context.environment(), new MetabolismCalculator.ContributionContext(context.contribution().mossContribution(), context.contribution().fungalContribution(), context.contribution().fungalAttractorContribution()));
+            OrganismStateCalculator.MetabolicResult result = OrganismStateCalculator.calculateMetabolism(context.cycle(), changed, context.environment(), new OrganismStateCalculator.ContributionContext(context.contribution().mossContribution(), context.contribution().fungalContribution(), context.contribution().fungalAttractorContribution()));
             context.events().addAll(result.events());
             changed = changed.withEnergy(changed.energy() + result.energyBonus() - result.metabolism())
                     .withCuriosity(changed.curiosity() + (context.cycle() % 4 == 0 ? 1 : 0));
@@ -64,7 +64,7 @@ public class PassiveChangeCalculator {
         }
 
         if (organism.type().isPlant()) {
-            StressCalculator.StressResult stress = StressCalculator.calculatePlantStressResult(changed, context.environment(), context.cycle(), context.allOrganisms());
+            OrganismStateCalculator.StressResult stress = OrganismStateCalculator.calculatePlantStressResult(changed, context.environment(), context.cycle(), context.allOrganisms());
             if (stress.isStressed()) {
                 changed = changed.withEnergy(Math.max(0, changed.energy() - stress.energyLoss()));
                 stress.event().ifPresent(context.events()::add);
@@ -73,7 +73,7 @@ public class PassiveChangeCalculator {
                 changed = changed.withoutTrait("stressed");
             }
         } else if (organism.type().isAnimal()) {
-            if (StressCalculator.isAnimalStarving(changed, context.environment(), context.allOrganisms())) {
+            if (OrganismStateCalculator.isAnimalStarving(changed, context.environment(), context.allOrganisms())) {
                 changed = changed.withTrait("starving");
             } else {
                 changed = changed.withoutTrait("starving");
