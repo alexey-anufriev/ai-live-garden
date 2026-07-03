@@ -112,7 +112,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
                 feeding.totalMoistureContribution(),
                 feeding.nutrientBufferBoost());
         
-        PopulationDynamicsCalculator.PopulationResult population = PopulationDynamicsCalculator.calculate(new PopulationDynamicsCalculator.PopulationContext(
+        OrganismInteractionCalculator.PopulationDynamicsResult population = OrganismInteractionCalculator.calculatePopulationDynamics(new OrganismInteractionCalculator.PopulationDynamicsContext(
                 environment, feeding.organisms(), nextCycle, nextId, nextEvents, contribution.fungalContribution(), new Random()));
         List<Organism> finalChanged = population.organisms();
         int nextIdentifier = population.nextId();

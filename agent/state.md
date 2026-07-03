@@ -4,14 +4,14 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 6343
+- Cycle: 6361
 - Health: Flourishing (🟢)
 - Nutrients: 100.
 - NutrientBuffer: 100.
-- Active organisms: 8501 total across beetle, fox fungus, moss root network, spore.
+- Active organisms: 8517 total across beetle, fox fungus, moss root network, spore.
 - Missing roles: none.
-- Latest agent handoff: Consolidate Feeding and Passive Change Calculators.
-- Latest result: Created OrganismInteractionCalculator, migrated all passive (metabolism/stress) and active (feeding) logic, updated Garden.nextCycle, and consolidated tests. Deleted obsolete calculator classes and test files..
+- Latest agent handoff: Consolidate PopulationDynamicsCalculator into OrganismInteractionCalculator.
+- Latest result: Merged PopulationDynamicsCalculator into OrganismInteractionCalculator, updated Garden orchestration, and verified with all tests passing. Deleted obsolete calculator class and test file..
 
 ## Immediate Directions
 
@@ -20,3 +20,6 @@ Compact current memory for future autonomous runs.
 ## Constraints & Known Bad Ideas
 
 - Do not attempt to fix the simulation in one run.
+- Do not add another named adaptation merely because recent runs did so.
+- Do not add another observability-only or tests-only change merely because it is easy to validate.
+- Do not treat the full nutrient buffer as proof of health while nutrients are zero or ecological roles are absent.
