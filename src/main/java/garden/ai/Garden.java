@@ -101,9 +101,9 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
         Environment nextEnvironment = dynamics.nextEnvironment();
         List<GardenEvent> nextEvents = dynamics.updatedEvents();
 
-        List<Organism> changed = PassiveChangeCalculator.calculate(new PassiveChangeCalculator.PassiveChangeContext(environment, nextCycle, nextEvents, contribution, organisms));
+        List<Organism> changed = OrganismInteractionCalculator.calculatePassiveChanges(new OrganismInteractionCalculator.PassiveChangeContext(environment, nextCycle, nextEvents, contribution, organisms));
 
-        FeedingPhaseCalculator.FeedingResult feeding = FeedingPhaseCalculator.calculate(new FeedingPhaseCalculator.FeedingPhaseContext(changed, environment, nextCycle, nextEvents));
+        OrganismInteractionCalculator.FeedingResult feeding = OrganismInteractionCalculator.calculateFeeding(new OrganismInteractionCalculator.FeedingPhaseContext(changed, environment, nextCycle, nextEvents));
         
         // Add nutrients and moisture based on deaths
         Environment environmentWithNutrientsAndMoisture = nextEnvironment.applyFeeding(
