@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
+import garden.ai.Garden;
 
 /**
  * Consolidated calculator for organism-level interactions: 
@@ -671,5 +672,35 @@ public class OrganismInteractionCalculator {
             threshold += TraitRegistry.getReproductionThresholdModifier(trait, environment, fungalContribution);
         }
         return threshold;
+    }
+
+    public static Garden advance(Garden garden) {
+        int nextCycle = garden.cycle() + 1;
+        
+        EnvironmentalDynamicsResult dynamics = calculateEnvironmentalDynamics(new EnvironmentalDynamicsContext(garden.organisms(), garden.environment(), nextCycle, new ArrayList<>(garden.events())));
+        ContributionResult contribution = dynamics.contribution();
+        Environment nextEnvironment = dynamics.nextEnvironment();
+        List<GardenEvent> nextEvents = dynamics.updatedEvents();
+
+        List<Organism> changed = calculatePassiveChanges(new PassiveChangeContext(garden.environment(), nextCycle, nextEvents, contribution, garden.organisms()));
+
+        FeedingResult feeding = calculateFeeding(new FeedingPhaseContext(changed, garden.environment(), nextCycle, nextEvents));
+        
+        // Add nutrients and moisture based on deaths
+        Environment environmentWithNutrientsAndMoisture = nextEnvironment.applyFeeding(
+                feeding.totalNutrientContribution(),
+                feeding.predatorNutrientContribution(),
+                feeding.totalMoistureContribution(),
+                feeding.nutrientBufferBoost());
+        
+        PopulationDynamicsResult population = calculatePopulationDynamics(new PopulationDynamicsContext(
+                garden.environment(), feeding.organisms(), nextCycle, garden.nextId(), nextEvents, contribution.fungalContribution(), new Random()));
+        List<Organism> finalChanged = population.organisms();
+        int nextIdentifier = population.nextId();
+        
+        nextEvents.add(new GardenEvent(nextCycle,
+                "The garden becomes %s after cycle %d.".formatted(environmentWithNutrientsAndMoisture.mood(), nextCycle)));
+        
+        return new Garden(nextCycle, nextIdentifier, environmentWithNutrientsAndMoisture, finalChanged, nextEvents);
     }
 }

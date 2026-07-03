@@ -4,18 +4,18 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 6424
+- Cycle: 6442
 - Health: Flourishing (🟢)
 - Nutrients: 100.
 - NutrientBuffer: 100.
-- Active organisms: 8569 total across beetle, fox fungus, moss root network, spore.
+- Active organisms: 8583 total across beetle, fox fungus, moss root network, spore.
 - Missing roles: none.
-- Latest agent handoff: Consolidate EnvironmentalDynamicsCalculator into OrganismInteractionCalculator.
-- Latest result: Moved records and methods from EnvironmentalDynamicsCalculator to OrganismInteractionCalculator, updated Garden.java, and deleted the redundant EnvironmentalDynamicsCalculator class..
+- Latest agent handoff: Orchestrate simulation in OrganismInteractionCalculator.
+- Latest result: Moved nextCycle orchestration logic from Garden to OrganismInteractionCalculator.advance(), creating a clearer separation between simulation rules and snapshot state..
 
 ## Immediate Directions
 
-- Continue consolidating simulation calculators.
+- Continue consolidating simulation logic.
 
 ## Constraints & Known Bad Ideas
 

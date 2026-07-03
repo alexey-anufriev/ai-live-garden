@@ -95,34 +95,8 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
      * @return a new garden snapshot after one completed cycle
      */
     public Garden nextCycle() {
-        int nextCycle = cycle + 1;
-        OrganismInteractionCalculator.EnvironmentalDynamicsResult dynamics = OrganismInteractionCalculator.calculateEnvironmentalDynamics(new OrganismInteractionCalculator.EnvironmentalDynamicsContext(organisms, environment, nextCycle, new ArrayList<>(events)));
-        OrganismInteractionCalculator.ContributionResult contribution = dynamics.contribution();
-        Environment nextEnvironment = dynamics.nextEnvironment();
-        List<GardenEvent> nextEvents = dynamics.updatedEvents();
-
-        List<Organism> changed = OrganismInteractionCalculator.calculatePassiveChanges(new OrganismInteractionCalculator.PassiveChangeContext(environment, nextCycle, nextEvents, contribution, organisms));
-
-        OrganismInteractionCalculator.FeedingResult feeding = OrganismInteractionCalculator.calculateFeeding(new OrganismInteractionCalculator.FeedingPhaseContext(changed, environment, nextCycle, nextEvents));
-        
-        // Add nutrients and moisture based on deaths
-        Environment environmentWithNutrientsAndMoisture = nextEnvironment.applyFeeding(
-                feeding.totalNutrientContribution(),
-                feeding.predatorNutrientContribution(),
-                feeding.totalMoistureContribution(),
-                feeding.nutrientBufferBoost());
-        
-        OrganismInteractionCalculator.PopulationDynamicsResult population = OrganismInteractionCalculator.calculatePopulationDynamics(new OrganismInteractionCalculator.PopulationDynamicsContext(
-                environment, feeding.organisms(), nextCycle, nextId, nextEvents, contribution.fungalContribution(), new Random()));
-        List<Organism> finalChanged = population.organisms();
-        int nextIdentifier = population.nextId();
-        
-        nextEvents.add(new GardenEvent(nextCycle,
-                "The garden becomes %s after cycle %d.".formatted(environmentWithNutrientsAndMoisture.mood(), nextCycle)));
-        
-        return new Garden(nextCycle, nextIdentifier, environmentWithNutrientsAndMoisture, finalChanged, nextEvents);
+        return OrganismInteractionCalculator.advance(this);
     }
-
 
 
 
