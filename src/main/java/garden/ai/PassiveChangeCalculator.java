@@ -10,7 +10,7 @@ public class PassiveChangeCalculator {
             Environment environment,
             int cycle,
             List<GardenEvent> events,
-            ContributionCalculator.ContributionResult contribution,
+            EnvironmentalDynamicsCalculator.ContributionResult contribution,
             List<Organism> allOrganisms
     ) {}
 

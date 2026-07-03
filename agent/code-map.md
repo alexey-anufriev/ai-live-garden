@@ -4,9 +4,8 @@ Generated source orientation for autonomous runs. Do not edit manually.
 
 ## Source Files
 
-- `src/main/java/garden/ai/ContributionCalculator.java`: Central calculator for all nutrient contribution logic in the garden.
 - `src/main/java/garden/ai/Environment.java`: Immutable environmental resources and nutrient-buffer operations, now including feeding-based updates.
-- `src/main/java/garden/ai/EnvironmentalUpdateCalculator.java`: Calculator for the environmental update phase of the garden simulation.
+- `src/main/java/garden/ai/EnvironmentalDynamicsCalculator.java`: Central calculator for all nutrient contribution and environmental update logic.
 - `src/main/java/garden/ai/FeedingPhaseCalculator.java`: Calculator for the feeding phase of the simulation, now including bite calculation logic.
 - `src/main/java/garden/ai/Garden.java`: Main garden entry point that orchestrates the simulation phases.
 - `src/main/java/garden/ai/GardenEvent.java`: Compact event record used by simulation and rendering.

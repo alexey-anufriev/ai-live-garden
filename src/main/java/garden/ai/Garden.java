@@ -63,7 +63,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
     }
 
     public int rootContribution() {
-        return ContributionCalculator.calculateRootContribution(organisms, environment, TraitRegistry.count(organisms, "buffer-releaser"));
+        return EnvironmentalDynamicsCalculator.calculateRootContribution(organisms, environment, TraitRegistry.count(organisms, "buffer-releaser"));
     }
 
     public long blockedPlantCount() {
@@ -75,7 +75,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
     }
 
     public int fungalContribution() {
-        return ContributionCalculator.calculateFungalContribution(organisms, environment);
+        return EnvironmentalDynamicsCalculator.calculateFungalContribution(organisms, environment);
     }
 
     public int fungalAttractorContribution() {
@@ -96,11 +96,10 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
      */
     public Garden nextCycle() {
         int nextCycle = cycle + 1;
-        ContributionCalculator.ContributionResult contribution = ContributionCalculator.calculate(new ContributionCalculator.ContributionPhaseContext(organisms, environment));
-        
-        EnvironmentalUpdateCalculator.EnvironmentalUpdateResult envUpdate = EnvironmentalUpdateCalculator.calculate(new EnvironmentalUpdateCalculator.EnvironmentalUpdateContext(organisms, environment, nextCycle, events, contribution.rootContribution(), contribution.fungalContribution()));
-        Environment nextEnvironment = envUpdate.nextEnvironment();
-        List<GardenEvent> nextEvents = envUpdate.updatedEvents();
+        EnvironmentalDynamicsCalculator.EnvironmentalDynamicsResult dynamics = EnvironmentalDynamicsCalculator.calculate(new EnvironmentalDynamicsCalculator.EnvironmentalDynamicsContext(organisms, environment, nextCycle, new ArrayList<>(events)));
+        EnvironmentalDynamicsCalculator.ContributionResult contribution = dynamics.contribution();
+        Environment nextEnvironment = dynamics.nextEnvironment();
+        List<GardenEvent> nextEvents = dynamics.updatedEvents();
 
         List<Organism> changed = PassiveChangeCalculator.calculate(new PassiveChangeCalculator.PassiveChangeContext(environment, nextCycle, nextEvents, contribution, organisms));
 
