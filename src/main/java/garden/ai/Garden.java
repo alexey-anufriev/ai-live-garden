@@ -113,15 +113,10 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
                 feeding.totalMoistureContribution(),
                 feeding.nutrientBufferBoost());
         
-        ReproductionCalculator.ReproductionResult reproduction = ReproductionCalculator.calculate(new ReproductionCalculator.ReproductionContext(
-                environment, feeding.organisms(), nextCycle, nextId, nextEvents, contribution.fungalContribution()));
-        List<Organism> finalChanged = reproduction.organisms();
-        int nextIdentifier = reproduction.nextId();
-        
-        ColonizationCalculator.ColonizationResult colonization = ColonizationCalculator.calculate(new ColonizationCalculator.ColonizationContext(
-                finalChanged, environment, nextCycle, nextIdentifier, nextEvents, new Random()));
-        finalChanged = colonization.organisms();
-        nextIdentifier = colonization.nextId();
+        PopulationDynamicsCalculator.PopulationResult population = PopulationDynamicsCalculator.calculate(new PopulationDynamicsCalculator.PopulationContext(
+                environment, feeding.organisms(), nextCycle, nextId, nextEvents, contribution.fungalContribution(), new Random()));
+        List<Organism> finalChanged = population.organisms();
+        int nextIdentifier = population.nextId();
         
         nextEvents.add(new GardenEvent(nextCycle,
                 "The garden becomes %s after cycle %d.".formatted(environmentWithNutrientsAndMoisture.mood(), nextCycle)));

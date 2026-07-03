@@ -4,7 +4,6 @@ Generated source orientation for autonomous runs. Do not edit manually.
 
 ## Source Files
 
-- `src/main/java/garden/ai/ColonizationCalculator.java`: Calculates emergency reseeding and colonization outcomes for the garden, now buffer-aware.
 - `src/main/java/garden/ai/ContributionCalculator.java`: Central calculator for all nutrient contribution logic in the garden.
 - `src/main/java/garden/ai/Environment.java`: Immutable environmental resources and nutrient-buffer operations, now including feeding-based updates.
 - `src/main/java/garden/ai/EnvironmentalUpdateCalculator.java`: Calculator for the environmental update phase of the garden simulation.
@@ -18,7 +17,7 @@ Generated source orientation for autonomous runs. Do not edit manually.
 - `src/main/java/garden/ai/OrganismStateCalculator.java`: Central calculator for organism energy adjustments, metabolism, stress, and starvation logic, consolidated from MetabolismCalculator and StressCalculator.
 - `src/main/java/garden/ai/OrganismType.java`: Defines organism taxonomy and now hosts environment-sensitive succession rules.
 - `src/main/java/garden/ai/PassiveChangeCalculator.java`: Orchestrates organism passive changes, now using OrganismStateCalculator.
-- `src/main/java/garden/ai/ReproductionCalculator.java`: Orchestrates reproduction and fungal succession logic.
+- `src/main/java/garden/ai/PopulationDynamicsCalculator.java`: Consolidated calculator for both reproduction and colonization simulation phases.
 - `src/main/java/garden/ai/Simulation.java`: Advances seed or loaded garden state.
 - `src/main/java/garden/ai/TraitRegistry.java`: Central registry for trait-based behavior and trait mutation logic.
 
