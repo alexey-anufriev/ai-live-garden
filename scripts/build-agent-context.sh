@@ -242,16 +242,41 @@ commit_domain_terms() {
     sort -u
 }
 
+commit_work_style_terms() {
+  local commit="$1"
+  {
+    commit_title "$commit"
+    git show --name-only --format='' "$commit" 2>/dev/null |
+      awk '/^agent\/journal\/[^/]+[.]md$/ { print }' |
+      while IFS= read -r journal; do
+        [[ -n "$journal" ]] || continue
+        git show "${commit}:${journal}" 2>/dev/null | sed -n '1,80p' || true
+      done
+  } |
+    tr '[:upper:]' '[:lower:]' |
+    awk '
+      /no immediate (behavior|behaviour|effect|change)/ { print "behavior-neutral" }
+      /no (functional|behavioral|behavioural) changes?/ { print "behavior-neutral" }
+      /refactor(ed|ing)?/ { print "refactor" }
+      /centraliz(e|ed|es|ing|ation)/ { print "centralization" }
+      /consolidat(e|ed|es|ing|ion)/ { print "consolidation" }
+      /maintainability|maintenance|cleaner code|cleaner structure|readability|extensibility/ { print "maintenance-only" }
+    ' |
+    sort -u
+}
+
 append_recent_implementation_pattern() {
   local commits=()
   local commit
   local source_file
   local term
+  local style
   declare -A source_count=()
   declare -A term_count=()
+  declare -A style_count=()
   local repetition_lines=()
 
-  mapfile -t commits < <(autonomous_commits 3)
+  mapfile -t commits < <(autonomous_commits 5)
 
   echo "## Recent Autonomous Coding Pattern"
   echo
@@ -271,6 +296,10 @@ append_recent_implementation_pattern() {
       [[ -n "$term" ]] || continue
       term_count["$term"]=$(( ${term_count["$term"]:-0} + 1 ))
     done < <(commit_domain_terms "$commit")
+    while IFS= read -r style; do
+      [[ -n "$style" ]] || continue
+      style_count["$style"]=$(( ${style_count["$style"]:-0} + 1 ))
+    done < <(commit_work_style_terms "$commit")
   done
 
   echo
@@ -286,10 +315,16 @@ append_recent_implementation_pattern() {
       repetition_lines+=("- Domain term repeated in ${term_count["$term"]} of the last ${#commits[@]} coding runs: ${term}.")
     fi
   done
+  for style in "${!style_count[@]}"; do
+    if (( style_count["$style"] >= 2 )); then
+      repetition_lines+=("- Work style repeated in ${style_count["$style"]} of the last ${#commits[@]} coding runs: ${style}.")
+    fi
+  done
 
   if (( ${#repetition_lines[@]} > 0 )); then
     printf '%s\n' "${repetition_lines[@]}" | sort
-    echo "- When recent work repeats the same file or domain term, prefer consolidation, simplification, or a different high-value area over another narrow exception."
+    echo "- When recent work repeats the same file or domain term, avoid another centralization, extraction, consolidation, or behavior-neutral cleanup in that area. Prefer a different ecological pressure or an outcome-changing behavior."
+    echo "- If two or more of the latest five coding runs were refactors, centralization, consolidation, or maintenance-only work, do not choose another refactor. Choose ecological behavior or required repair."
   else
     echo "- No strong repetition signal detected."
   fi
@@ -323,19 +358,23 @@ append_compact_journal_entry() {
   echo "## Non-Negotiable Run Contract"
   echo
   echo "- Choose exactly one focused bounded improvement with a visible expected future effect."
+  echo "- Unless this run is repairing a failing baseline, the task must change future simulation behavior, rendered garden state, or persisted state semantics in a way that can be observed in future ticks."
   echo "- Prefer continuity over novelty and ecological depth over disconnected additions."
-  echo "- Choose by expected garden value: continuity, expressive behavior, understandable state, resilience, evolvability, and observable consequences over time."
-  echo "- Prefer changes whose value remains visible beyond the current run by making the garden more coherent, alive, inspectable, or able to keep evolving."
-  echo "- Prefer changes that increase future autonomous development capacity: clearer domain boundaries, more expressive state transitions, visible behavioral consequences in future ticks, reusable simulation concepts, or mechanics that create new future possibilities."
+  echo "- Choose by expected garden value: continuity, expressive behavior, understandable state, resilience, ecological recovery, and observable consequences over time."
+  echo "- Prefer changes whose value remains visible beyond the current run by making the garden more coherent, alive, inspectable, or responsive to its state."
+  echo "- Prefer changes that increase future autonomous development capacity through behavior: expressive state transitions, visible consequences in future ticks, reusable simulation concepts that affect outcomes, or mechanics that create new ecological possibilities."
   echo "- Do not choose a task merely because it is the easiest way to satisfy validators. Memory, journal, summaries, tests, and validators support autonomy; they are not the purpose of the run."
-  echo "- Do not repeat the recent implementation pattern by default. If recent runs mostly added similar named mechanisms, diagnostics, event logs, counters, or tests, treat those categories as saturated."
+  echo "- Do not repeat the recent implementation pattern by default. If recent runs mostly added similar named mechanisms, diagnostics, event logs, counters, tests, centralization, extraction, or refactoring, treat those categories as saturated."
   echo "- If the Baseline Maven Test Result says \`failed\`, repairing the existing Java source or tests is the run's required first task. Do not add unrelated behavior until \`mvn test\` passes."
+  echo "- If the Baseline Worktree Policy Result says \`deferred-repair\`, repairing those policy violations is the run's required first task. Do not add unrelated behavior until the policy violations are cleared."
+  echo "- Do not choose behavior-neutral refactoring, centralization, extraction, renaming, relocation, or cleanup as the main task. These are allowed only as supporting edits needed for a behavior-changing task or a baseline repair."
+  echo "- A valid \`expectedGardenEffect\` must describe a future ecological consequence. Invalid effects include \`no immediate behavioral change\`, \`easier maintenance\`, \`cleaner code\`, \`centralized logic\`, \`better extensibility\`, or \`simpler future changes\`."
   echo "- A run that only adds a named trait, diagnostic field, renderer line, event-log message, counter, or test coverage is low value unless it directly changes future garden behavior or removes a current obstacle to ecological recovery."
   echo "- If a candidate change would only add a name, counter, log line, renderer phrase, or isolated test, choose a stronger task."
-  echo "- Prefer outcome-changing work: consolidate duplicate mechanics, connect existing rules into feedback loops, make missing ecological roles recover through simulation, simplify state transitions, or convert existing observations into behavior that affects future ticks."
+  echo "- Prefer outcome-changing work: make an overfull nutrient buffer change release behavior under drought or starvation; make missing roles recover based on current population pressure; make fungi, moss, roots, predators, or herbivores respond to measurable environmental stress; make reproduction, starvation, predation, or decay depend on existing garden state in a new observable way; or convert existing observations into behavior that affects future ticks."
   echo "- Tests are supporting evidence for meaningful behavior, not a substitute for garden value."
   echo "- Focused does not mean tiny. A bounded medium improvement may span several files when it has one clear behavioral purpose and leaves the project coherent."
-  echo "- Good bounded medium tasks include consolidating duplicate nutrient-buffer mechanics, making a missing ecological role recoverable from the current state, simplifying survival or reproduction flow, introducing a reusable resource-flow concept that replaces duplicated code, or making state-format evolution explicit."
+  echo "- Good bounded medium tasks include making a missing ecological role recoverable from the current state, making nutrient pressure affect survival or reproduction, making state-format evolution explicit when it changes persisted simulation meaning, or introducing a resource-flow concept that directly changes future tick outcomes."
   echo "- A focused new file is acceptable when it is the cleanest design."
   echo "- Keep scope tight: change only files needed for the chosen task."
   echo "- Do not edit unrelated tests or behavior, and do not replace an existing unrelated test with a new one."

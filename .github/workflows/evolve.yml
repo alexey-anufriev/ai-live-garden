@@ -85,6 +85,9 @@ jobs:
       - name: Validate agent handoff
         id: agent_handoff
         shell: bash
+        env:
+          AGENT_BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
+          AGENT_BASELINE_POLICY_OUTCOME: ${{ steps.baseline_policy.outcome }}
         run: scripts/validate-agent-handoff.sh .agent-run.json
 
       - name: Validate tests after Gemini changes

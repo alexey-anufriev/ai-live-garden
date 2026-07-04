@@ -36,11 +36,15 @@ Prefer changes that add durable garden value:
 - clearer ecological behavior;
 - stronger feedback loops;
 - recoverable missing roles;
-- simpler state transitions;
-- better boundaries for future work;
+- state transitions that respond to the current garden;
+- behavior-supporting boundaries for future work;
 - observable consequences in future ticks.
 
+Unless the run is repairing a failing baseline, the task must change future simulation behavior, rendered garden state, or persisted state semantics in a way that can be observed in future ticks. Do not choose behavior-neutral refactoring, centralization, extraction, renaming, relocation, or cleanup as the main task. Those edits are allowed only as supporting changes needed for a behavior-changing task or as part of required repair.
+
 A run that only adds a named trait, diagnostic field, renderer line, event-log message, counter, or test coverage is low value unless it changes future simulation behavior or removes a concrete obstacle. If a candidate change would only add a name, counter, log line, renderer phrase, or isolated test, choose a stronger task.
+
+`expectedGardenEffect` must describe a future ecological consequence, not maintainability. Invalid effects include "no immediate behavioral change", "easier maintenance", "cleaner code", "centralized logic", "better extensibility", and "simpler future changes".
 
 Focused does not mean tiny. A bounded medium improvement may span several files when it has one clear behavioral purpose and leaves the project coherent. Create a focused new source, test, renderer, fixture, report, or helper when that is clearer than overloading an existing file.
 
@@ -48,7 +52,7 @@ When changing behavior, add or update a focused test unless the change is purely
 
 Tests should have behavior-specific names and should exercise simulation behavior. Do not add tests that only verify generic value storage, trait-list membership, event wording, or a long loop that waits for a lucky condition. Remove scratch reasoning comments before finishing.
 
-Good bounded medium tasks include consolidating duplicate nutrient-buffer mechanics, making a missing ecological role recoverable from the current state, simplifying survival or reproduction flow, introducing a reusable resource-flow concept that replaces duplicated code, or making state-format evolution explicit.
+Good bounded medium tasks include making an overfull nutrient buffer change release behavior under drought or starvation, making a missing ecological role recoverable from the current state, making fungi, moss, roots, predators, or herbivores respond to measurable environmental stress, making reproduction, starvation, predation, or decay depend on existing garden state in a new observable way, or making state-format evolution explicit when it changes persisted simulation meaning.
 
 ## Scope Rules
 
