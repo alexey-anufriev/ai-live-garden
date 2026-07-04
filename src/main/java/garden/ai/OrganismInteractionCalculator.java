@@ -242,7 +242,7 @@ public class OrganismInteractionCalculator {
 
             int index = preyIndex.get();
             Organism prey = mutable.get(index);
-            FeedingBiteResult biteResult = calculateBite(hunter, prey, environment, cycle, rootNetworkCount);
+            TraitRegistry.BiteEffect biteResult = TraitRegistry.calculateBite(hunter, prey, environment, cycle, rootNetworkCount);
             int bite = biteResult.biteSize();
             events.addAll(biteResult.events());
             
@@ -295,34 +295,6 @@ public class OrganismInteractionCalculator {
             }
         }
         return new FeedingResult(survivors, totalNutrientContribution, totalMoistureContribution, bufferBoost, deadOrganisms, predatorNutrientContribution);
-    }
-
-    private record FeedingBiteResult(int biteSize, List<GardenEvent> events) {}
-
-    private static FeedingBiteResult calculateBite(Organism hunter, Organism prey, Environment environment, int cycle, long rootNetworkCount) {
-        List<GardenEvent> events = new ArrayList<>();
-        int bite = hunter.type() == OrganismType.FOX ? 3 : 2;
-        if (hunter.traits().contains("nutrient-finder")) bite += 1;
-        if (hunter.traits().contains("scavenger") && environment.nutrients() < 25) bite += 1;
-        if (hunter.traits().contains("nutrient-hoarder")) bite += 1;
-        if (hunter.type() == OrganismType.FOX && hunter.traits().contains("predator-focus")) bite += 1;
-        if (hunter.traits().contains("root-tapper") && rootNetworkCount > 0) bite += 1;
-        if (hunter.traits().contains("nutrient-refiner")) {
-            if (!hunter.traits().contains("stressed") || hunter.traits().contains("starving")) {
-                bite += 1;
-                if (hunter.traits().contains("starving")) events.add(new GardenEvent(cycle, "%s refined nutrients while starving.".formatted(hunter.id())));
-            }
-        }
-        if (hunter.traits().contains("gentle-feeder")) bite = Math.max(1, bite - 1);
-        if (hunter.traits().contains("nutrient-reclaimer") && prey.traits().contains("nutrient-storer")) {
-            bite += 2;
-            events.add(new GardenEvent(cycle, "%s reclaimed extra nutrients from %s.".formatted(hunter.id(), prey.id())));
-        }
-        if (hunter.traits().contains("nutrient-harvester")) {
-            bite += 1;
-            events.add(new GardenEvent(cycle, "%s harvested additional nutrients.".formatted(hunter.id())));
-        }
-        return new FeedingBiteResult(bite, events);
     }
 
     private static Optional<Integer> findPreyIndex(List<Organism> organisms, Organism hunter, int hunterIndex, int cycle, Environment environment, List<GardenEvent> events) {
