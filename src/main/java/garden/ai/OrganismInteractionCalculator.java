@@ -76,11 +76,11 @@ public class OrganismInteractionCalculator {
         long plantCount = context.organisms().stream().filter(organism -> organism.type().isPlant()).count();
         long animalCount = context.organisms().stream().filter(organism -> organism.type().isAnimal()).count();
         
-        long mossCount = context.organisms().stream().filter(o -> o.type() == OrganismType.MOSS).count();
-        long fernCount = context.organisms().stream().filter(o -> o.type() == OrganismType.FERN).count();
-        long sporeCount = context.organisms().stream().filter(o -> o.type() == OrganismType.SPORE).count();
-        long rootNetworkCount = context.organisms().stream().filter(o -> o.type() == OrganismType.ROOT_NETWORK).count();
-        long fungusCount = context.organisms().stream().filter(o -> o.type() == OrganismType.FUNGUS).count();
+        long mossCount = TraitRegistry.count(context.organisms(), OrganismType.MOSS);
+        long fernCount = TraitRegistry.count(context.organisms(), OrganismType.FERN);
+        long sporeCount = TraitRegistry.count(context.organisms(), OrganismType.SPORE);
+        long rootNetworkCount = TraitRegistry.count(context.organisms(), OrganismType.ROOT_NETWORK);
+        long fungusCount = TraitRegistry.count(context.organisms(), OrganismType.FUNGUS);
         long mossConserverCount = TraitRegistry.count(context.organisms(), "nutrient-conserver", OrganismType.MOSS);
         long mossScavengerCount = TraitRegistry.count(context.organisms(), "moss-nutrient-scavenger", OrganismType.MOSS);
         long fernConserverCount = TraitRegistry.count(context.organisms(), "nutrient-conserver", OrganismType.FERN);
@@ -142,11 +142,11 @@ public class OrganismInteractionCalculator {
     }
 
     public static int calculateRootContribution(List<Organism> organisms, Environment environment, long releaserCount) {
-        long fungusCount = countType(organisms, OrganismType.FUNGUS);
+        long fungusCount = TraitRegistry.count(organisms, OrganismType.FUNGUS);
         long mycelialRootMediatorCount = (fungusCount > 0) ? TraitRegistry.countAnimalTrait(organisms, "mycelial-root-mediator") : 0;
 
         var context = new RootContributionContext(
-                countType(organisms, OrganismType.ROOT_NETWORK),
+                TraitRegistry.count(organisms, OrganismType.ROOT_NETWORK),
                 TraitRegistry.count(organisms, "nutrient-weaver", OrganismType.ROOT_NETWORK),
                 TraitRegistry.count(organisms, "nutrient-sharer", OrganismType.ROOT_NETWORK),
                 TraitRegistry.count(organisms, "buffer-optimizer", OrganismType.ROOT_NETWORK),
@@ -182,7 +182,7 @@ public class OrganismInteractionCalculator {
 
     public static int calculateFungalContribution(List<Organism> organisms, Environment environment) {
         var context = new FungalContributionContext(
-                countType(organisms, OrganismType.FUNGUS),
+                TraitRegistry.count(organisms, OrganismType.FUNGUS),
                 TraitRegistry.count(organisms, "nutrient-decomposer", OrganismType.FUNGUS),
                 TraitRegistry.count(organisms, "fungus-soil-enricher", OrganismType.FUNGUS),
                 TraitRegistry.count(organisms, "fungal-network-connector", OrganismType.FUNGUS),
@@ -192,7 +192,7 @@ public class OrganismInteractionCalculator {
                 TraitRegistry.count(organisms, "fungal-buffer-stabilizer", OrganismType.FUNGUS),
                 TraitRegistry.countAnimalTrait(organisms, "fungal-gardener"),
                 TraitRegistry.countAnimalTrait(organisms, "fungal-fertilizer"),
-                countType(organisms, OrganismType.ROOT_NETWORK),
+                TraitRegistry.count(organisms, OrganismType.ROOT_NETWORK),
                 TraitRegistry.count(organisms, "mycelial-synergizer", OrganismType.ROOT_NETWORK),
                 TraitRegistry.count(organisms, "fungal-decomposer-mimic", OrganismType.ROOT_NETWORK),
                 environment.nutrientBuffer()
@@ -216,10 +216,6 @@ public class OrganismInteractionCalculator {
                       context.fungalGardenerCount() * 5 +
                       context.fungalFertilizerCount() * 7 +
                       context.fungalDecomposerMimicCount() * 5) + synergizerBonus;
-    }
-
-    private static long countType(List<Organism> organisms, OrganismType type) {
-        return organisms.stream().filter(o -> o.type() == type).count();
     }
 
     // --- Passive Change / Metabolic Logic ---

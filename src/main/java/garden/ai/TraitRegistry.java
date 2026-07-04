@@ -168,6 +168,10 @@ public class TraitRegistry {
         return organisms.stream().filter(o -> o.traits().contains(trait)).count();
     }
 
+    public static long count(List<Organism> organisms, OrganismType type) {
+        return organisms.stream().filter(o -> o.type() == type).count();
+    }
+
     public static long count(List<Organism> organisms, String trait, OrganismType type) {
         return organisms.stream().filter(o -> o.type() == type && o.traits().contains(trait)).count();
     }
