@@ -12,7 +12,7 @@ Generated source orientation for autonomous runs. Do not edit manually.
 - `src/main/java/garden/ai/Main.java`: CLI entry point for `inspect` and `tick`.
 - `src/main/java/garden/ai/Organism.java`: Represents a single living element in the garden, now utilizing TraitRegistry for nutrient value calculation.
 - `src/main/java/garden/ai/OrganismInteractionCalculator.java`: Central rule engine and simulation orchestrator.
-- `src/main/java/garden/ai/OrganismType.java`: Defines organism taxonomy and now hosts environment-sensitive succession rules.
+- `src/main/java/garden/ai/OrganismType.java`: Defines taxonomy and environmental succession rules for organisms.
 - `src/main/java/garden/ai/Simulation.java`: Advances seed or loaded garden state.
 - `src/main/java/garden/ai/TraitRegistry.java`: Central registry for trait-based behavior and trait mutation logic.
 

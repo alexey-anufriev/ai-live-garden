@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FungalSuccessionTest {
 
-    private final Environment env = new Environment(50, 50, 50, 50, 50);
+    private final Environment env = new Environment(50, 50, 50, 10, 50);
 
     @Test
     public void testRootNetworkProducesFungus() {
