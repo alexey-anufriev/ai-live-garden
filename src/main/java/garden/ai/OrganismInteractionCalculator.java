@@ -230,7 +230,7 @@ public class OrganismInteractionCalculator {
                 events.add(new GardenEvent(cycle, "%s skipped feeding to conserve energy.".formatted(hunter.id())));
                 continue;
             }
-            Optional<Integer> preyIndex = findPreyIndex(mutable, hunter, hunterIndex, cycle, environment, events);
+            Optional<Integer> preyIndex = TraitRegistry.findPreyIndex(mutable, hunter, hunterIndex, cycle, environment, events);
             if (preyIndex.isEmpty()) {
                 if (hunter.traits().contains("starving")) {
                     events.add(new GardenEvent(cycle, "%s is desperately searching for prey in the scarce garden.".formatted(hunter.id())));
@@ -297,65 +297,6 @@ public class OrganismInteractionCalculator {
         return new FeedingResult(survivors, totalNutrientContribution, totalMoistureContribution, bufferBoost, deadOrganisms, predatorNutrientContribution);
     }
 
-    private static Optional<Integer> findPreyIndex(List<Organism> organisms, Organism hunter, int hunterIndex, int cycle, Environment environment, List<GardenEvent> events) {
-        boolean nutrientScout = hunter.traits().contains("nutrient-scout");
-        boolean preyTracker = hunter.traits().contains("prey-tracker");
-        boolean resourceTracker = hunter.traits().contains("resource-tracker");
-        boolean mycelialNetworkScout = hunter.traits().contains("mycelial-network-scout");
-        boolean stealthHunter = hunter.traits().contains("stealth-hunter");
-
-        java.util.function.Predicate<Organism> isValidPrey = candidate -> {
-            if (candidate.energy() <= 0 || !TraitRegistry.canEat(hunter.type(), candidate.type())) return false;
-            if (!stealthHunter) {
-                if (candidate.traits().contains("shadow-stepper") && (candidate.id().hashCode() + cycle) % 2 == 0) return false;
-                if (candidate.traits().contains("camouflaged") && (candidate.id().hashCode() + cycle) % 3 == 0) return false;
-            }
-            return true;
-        };
-
-        if (nutrientScout || resourceTracker) {
-            for (int i = 0; i < organisms.size(); i++) {
-                if (i == hunterIndex) continue;
-                Organism candidate = organisms.get(i);
-                if (isValidPrey.test(candidate) && candidate.traits().contains("nutrient-hoarder")) return Optional.of(i);
-            }
-        }
-        
-        if (mycelialNetworkScout) {
-            long fungusCount = organisms.stream().filter(o -> o.type() == OrganismType.FUNGUS).count();
-            if (fungusCount > 0) {
-                for (int i = 0; i < organisms.size(); i++) {
-                    if (i == hunterIndex) continue;
-                    Organism candidate = organisms.get(i);
-                    if (isValidPrey.test(candidate)) {
-                        events.add(new GardenEvent(cycle, "%s scouted prey using the fungal network.".formatted(hunter.id())));
-                        return Optional.of(i);
-                    }
-                }
-            }
-        }
-
-        if (preyTracker) {
-            int maxEnergy = -1;
-            int bestIndex = -1;
-            for (int i = 0; i < organisms.size(); i++) {
-                if (i == hunterIndex) continue;
-                Organism candidate = organisms.get(i);
-                if (isValidPrey.test(candidate) && candidate.energy() > maxEnergy) {
-                    maxEnergy = candidate.energy();
-                    bestIndex = i;
-                }
-            }
-            if (bestIndex != -1) return Optional.of(bestIndex);
-        }
-
-        for (int i = 0; i < organisms.size(); i++) {
-            if (i == hunterIndex) continue;
-            Organism candidate = organisms.get(i);
-            if (isValidPrey.test(candidate)) return Optional.of(i);
-        }
-        return Optional.empty();
-    }
 
     // --- Population Dynamics Logic ---
 

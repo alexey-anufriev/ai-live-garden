@@ -3,6 +3,8 @@ package garden.ai;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 public class TraitRegistry {
     private static final Map<String, Integer> NUTRIENT_VALUES = Map.of(
@@ -61,6 +63,66 @@ public class TraitRegistry {
             long fungalDecomposerMimicCount,
             int nutrientBuffer
     ) {}
+
+    public static Optional<Integer> findPreyIndex(List<Organism> organisms, Organism hunter, int hunterIndex, int cycle, Environment environment, List<GardenEvent> events) {
+        boolean nutrientScout = hunter.traits().contains("nutrient-scout");
+        boolean preyTracker = hunter.traits().contains("prey-tracker");
+        boolean resourceTracker = hunter.traits().contains("resource-tracker");
+        boolean mycelialNetworkScout = hunter.traits().contains("mycelial-network-scout");
+        boolean stealthHunter = hunter.traits().contains("stealth-hunter");
+
+        Predicate<Organism> isValidPrey = candidate -> {
+            if (candidate.energy() <= 0 || !TraitRegistry.canEat(hunter.type(), candidate.type())) return false;
+            if (!stealthHunter) {
+                if (candidate.traits().contains("shadow-stepper") && (candidate.id().hashCode() + cycle) % 2 == 0) return false;
+                if (candidate.traits().contains("camouflaged") && (candidate.id().hashCode() + cycle) % 3 == 0) return false;
+            }
+            return true;
+        };
+
+        if (nutrientScout || resourceTracker) {
+            for (int i = 0; i < organisms.size(); i++) {
+                if (i == hunterIndex) continue;
+                Organism candidate = organisms.get(i);
+                if (isValidPrey.test(candidate) && candidate.traits().contains("nutrient-hoarder")) return Optional.of(i);
+            }
+        }
+        
+        if (mycelialNetworkScout) {
+            long fungusCount = organisms.stream().filter(o -> o.type() == OrganismType.FUNGUS).count();
+            if (fungusCount > 0) {
+                for (int i = 0; i < organisms.size(); i++) {
+                    if (i == hunterIndex) continue;
+                    Organism candidate = organisms.get(i);
+                    if (isValidPrey.test(candidate)) {
+                        events.add(new GardenEvent(cycle, "%s scouted prey using the fungal network.".formatted(hunter.id())));
+                        return Optional.of(i);
+                    }
+                }
+            }
+        }
+
+        if (preyTracker) {
+            int maxEnergy = -1;
+            int bestIndex = -1;
+            for (int i = 0; i < organisms.size(); i++) {
+                if (i == hunterIndex) continue;
+                Organism candidate = organisms.get(i);
+                if (isValidPrey.test(candidate) && candidate.energy() > maxEnergy) {
+                    maxEnergy = candidate.energy();
+                    bestIndex = i;
+                }
+            }
+            if (bestIndex != -1) return Optional.of(bestIndex);
+        }
+
+        for (int i = 0; i < organisms.size(); i++) {
+            if (i == hunterIndex) continue;
+            Organism candidate = organisms.get(i);
+            if (isValidPrey.test(candidate)) return Optional.of(i);
+        }
+        return Optional.empty();
+    }
 
     public static MetabolicEffect calculateMetabolism(int cycle, Organism organism, Environment environment, int mossContribution, int fungalContribution, int fungalAttractorContribution) {
         int metabolism = organism.type().metabolism();
