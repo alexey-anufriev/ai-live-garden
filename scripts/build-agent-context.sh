@@ -104,7 +104,7 @@ append_context_manifest() {
   echo "## Context Manifest"
   echo
   echo "- README state, summaries, journal, and current memory are generated after the agent step by scripts."
-  echo "- Continuity sources include \`agent/state.md\`, \`agent/code-map.md\`, \`agent/requests.md\`, latest active summaries, and recent active journal files."
+  echo "- Continuity sources include \`agent/state.md\`, \`agent/code-map.md\`, \`agent/requests.md\`, \`agent/plans/latest.md\` when present, latest active summaries, and recent active journal files."
   echo "- Recent active journal source set: latest ${recent_journal_limit} of ${journal_count} directly under \`agent/journal/\`."
   echo "- Persistent garden state is included as an exact computed digest, not as raw organism lines."
   echo "- Project source is summarized in \`agent/code-map.md\`; inspect exact source files only when needed for the chosen task."
@@ -337,7 +337,7 @@ append_project_manager_direction() {
   echo "## Project Manager Direction"
   echo
   if [[ -f "$latest_plan" ]]; then
-    echo "Advisory daily direction from the Project Manager workflow. Baseline Maven or worktree-policy repair still takes precedence. Choose one direction only when it fits the current run and produces observable garden behavior."
+    echo "Highest product priority for normal autonomous runs. Baseline Maven or worktree-policy repair is the only higher priority. If repair is not required, choose exactly one listed PM direction, set \`pmDirection\` in \`.agent-run.json\` to its label, and do not invent unrelated work."
     echo
     echo '```markdown'
     sed -n '1,220p' "$latest_plan"
@@ -384,6 +384,7 @@ append_compact_journal_entry() {
   echo "- Do not repeat the recent implementation pattern by default. If recent runs mostly added similar named mechanisms, diagnostics, event logs, counters, tests, centralization, extraction, or refactoring, treat those categories as saturated."
   echo "- If the Baseline Maven Test Result says \`failed\`, repairing the existing Java source or tests is the run's required first task. Do not add unrelated behavior until \`mvn test\` passes."
   echo "- If the Baseline Worktree Policy Result says \`deferred-repair\`, repairing those policy violations is the run's required first task. Do not add unrelated behavior until the policy violations are cleared."
+  echo "- If Project Manager Direction exists and no baseline repair is required, choose exactly one PM direction A-D as the run's highest product priority. Set \`pmDirection\` in \`.agent-run.json\` to the selected label."
   echo "- Do not choose behavior-neutral refactoring, centralization, extraction, renaming, relocation, or cleanup as the main task. These are allowed only as supporting edits needed for a behavior-changing task or a baseline repair."
   echo "- A valid \`expectedGardenEffect\` must describe a future ecological consequence. Invalid effects include \`no immediate behavioral change\`, \`easier maintenance\`, \`cleaner code\`, \`centralized logic\`, \`better extensibility\`, or \`simpler future changes\`."
   echo "- A run that only adds a named trait, diagnostic field, renderer line, event-log message, counter, or test coverage is low value unless it directly changes future garden behavior or removes a current obstacle to ecological recovery."
@@ -401,7 +402,7 @@ append_compact_journal_entry() {
   echo "- Do not weaken assertions to make tests pass or leave uncertainty comments in tests such as \"maybe\", \"wait\", \"not sure\", or \"does not distinguish\"."
   echo "- Run \`mvn test\` if possible and leave the code in a testable state."
   echo "- Do not fabricate large arbitrary edits to \`data/garden-state.txt\`; normal evolution happens by simulation."
-  echo "- Do not edit generated memory files: \`README.md\`, \`agent/state.md\`, \`agent/requests.md\`, \`agent/code-map.md\`, \`agent/journal/\`, \`agent/summaries/\`, or \`agent/templates/\`."
+  echo "- Do not edit generated memory or PM direction files: \`README.md\`, \`agent/state.md\`, \`agent/requests.md\`, \`agent/code-map.md\`, \`agent/journal/\`, \`agent/summaries/\`, \`agent/templates/\`, or \`agent/plans/\`."
   echo "- Do not run memory harness scripts. CI post-processing will generate README state, code map, summaries, journal, and current memory from the final diff and garden state."
   echo "- Write \`.agent-run.json\` as the machine-readable handoff described below. This file is required."
   echo "- Also include the same JSON object in your final response between \`AGENT_RUN_JSON_START\` and \`AGENT_RUN_JSON_END\` markers so the harness can recover the handoff if direct file creation fails."
@@ -431,6 +432,7 @@ append_compact_journal_entry() {
   "observations": "One short paragraph describing what was learned or any limitations.",
   "next": "One concrete possible next direction.",
   "expectedGardenEffect": "What future ticks should do differently because of this change.",
+  "pmDirection": "A, B, C, D, or none when no PM plan exists or this run is required repair.",
   "codeMap": [
     {
       "path": "src/main/java/garden/ai/FileChangedByThisRun.java",

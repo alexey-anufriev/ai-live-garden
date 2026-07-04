@@ -158,7 +158,7 @@ append_latest_plan() {
   echo "- Do not propose refactoring, centralization, extraction, cleanup, renaming, or maintainability-only work."
   echo "- Each direction must describe an observable garden outcome for future ticks: population balance, nutrients, buffer pressure, survival, reproduction, predation, decay, succession, recovery, or environment response."
   echo "- Suggest directions, not implementation files. The autonomous agent will inspect code later if it chooses a direction."
-  echo "- Baseline repair always takes precedence during agent runs; your directions are advisory once repair is clear."
+  echo "- Baseline repair always takes precedence during agent runs. Once repair is clear, your directions are the highest product priority for autonomous agents that day."
   echo "- Produce exactly four directions labeled A, B, C, and D."
   echo "- Write \`.project-plan.json\` with the JSON shape below. Also include the same JSON in your final response between \`PROJECT_PLAN_JSON_START\` and \`PROJECT_PLAN_JSON_END\`."
   echo

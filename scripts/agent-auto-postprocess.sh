@@ -72,8 +72,8 @@ json_array_lines() {
 }
 
 restore_generated_memory() {
-  git restore README.md agent/state.md agent/requests.md agent/code-map.md agent/templates agent/journal agent/summaries agent/garden-trends.svg agent/organism-trends.svg 2>/dev/null || true
-  git clean -fd agent/journal agent/summaries 2>/dev/null || true
+  git restore README.md agent/state.md agent/requests.md agent/code-map.md agent/templates agent/journal agent/summaries agent/plans agent/garden-trends.svg agent/organism-trends.svg 2>/dev/null || true
+  git clean -fd agent/journal agent/summaries agent/plans 2>/dev/null || true
 }
 
 changed_files() {
@@ -340,6 +340,14 @@ observations_text="$(json_value '.observations')"
 next_text="$(json_value '.next')"
 expected_effect="$(json_value '.expectedGardenEffect')"
 expected_effect="${expected_effect%.}"
+pm_direction="$(json_value '.pmDirection')"
+if [[ -z "$pm_direction" ]]; then
+  pm_direction="none"
+fi
+pm_context=""
+if [[ "$pm_direction" != "none" ]]; then
+  pm_context=" PM direction: ${pm_direction}."
+fi
 changed_list="$(changed_files_csv)"
 cycle="$(state_value cycle)"
 nutrients="$(state_value nutrients)"
@@ -375,7 +383,7 @@ else
   garden_result="The workflow skipped the garden tick because the garden advance step did not complete successfully; the committed garden state remains at cycle ${cycle} with nutrients ${nutrients}, nutrientBuffer ${buffer}, active types ${active_types:-none}, and missing roles ${missing}."
 fi
 
-summary_body="${summary_text} Expected future effect: ${expected_effect}. Changed files before memory generation: ${changed_list}. ${garden_result} Test validation outcome: ${test_outcome}. Worktree policy severity: ${worktree_policy_severity}."
+summary_body="${summary_text}${pm_context} Expected future effect: ${expected_effect}. Changed files before memory generation: ${changed_list}. ${garden_result} Test validation outcome: ${test_outcome}. Worktree policy severity: ${worktree_policy_severity}."
 scripts/agent-append-summary.sh --cadence daily --timestamp "$timestamp" --title "$change_title" --body "$summary_body" >/dev/null
 append_rollups_if_due
 
@@ -392,7 +400,7 @@ scripts/agent-create-journal-entry.sh \
   --reason "$why_text" \
   --checks "$checks" \
   --test-result "$test_result" \
-  --observations "${observations_text} Expected future effect: ${expected_effect}. ${garden_result} Worktree policy severity: ${worktree_policy_severity}. Automated post-processing refreshed README/state memory from data/garden-state.txt." \
+  --observations "${observations_text}${pm_context} Expected future effect: ${expected_effect}. ${garden_result} Worktree policy severity: ${worktree_policy_severity}. Automated post-processing refreshed README/state memory from data/garden-state.txt." \
   --next "$next_text" >/dev/null
 
 rm -f "$handoff_file"
