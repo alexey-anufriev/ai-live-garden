@@ -5,38 +5,37 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class OrganismTypeSuccessionTest {
 
-    private final Environment env = new Environment(50, 50, 50, 50, 50);
-
     @Test
     public void testSporeSuccession() {
-        // (cycle + generation) % 3 == 0 -> MOSS
-        assertEquals(OrganismType.MOSS, OrganismType.SPORE.offspringType(0, 0, env));
-        assertEquals(OrganismType.SPORE, OrganismType.SPORE.offspringType(1, 0, env));
-        assertEquals(OrganismType.SPORE, OrganismType.SPORE.offspringType(2, 0, env));
-        assertEquals(OrganismType.MOSS, OrganismType.SPORE.offspringType(3, 0, env));
+        Environment highMoisture = new Environment(50, 70, 50, 50, 50);
+        Environment lowMoisture = new Environment(50, 30, 50, 50, 50);
+        assertEquals(OrganismType.MOSS, OrganismType.SPORE.offspringType(0, 0, highMoisture));
+        assertEquals(OrganismType.SPORE, OrganismType.SPORE.offspringType(0, 0, lowMoisture));
     }
 
     @Test
     public void testMossSuccession() {
-        // (cycle + generation) % 5 == 0 -> FERN
-        assertEquals(OrganismType.FERN, OrganismType.MOSS.offspringType(0, 0, env));
-        assertEquals(OrganismType.MOSS, OrganismType.MOSS.offspringType(1, 0, env));
-        assertEquals(OrganismType.FERN, OrganismType.MOSS.offspringType(5, 0, env));
+        Environment favorable = new Environment(70, 60, 50, 50, 50);
+        Environment poorLight = new Environment(50, 60, 50, 50, 50);
+        Environment poorMoisture = new Environment(70, 40, 50, 50, 50);
+        assertEquals(OrganismType.FERN, OrganismType.MOSS.offspringType(0, 0, favorable));
+        assertEquals(OrganismType.MOSS, OrganismType.MOSS.offspringType(0, 0, poorLight));
+        assertEquals(OrganismType.MOSS, OrganismType.MOSS.offspringType(0, 0, poorMoisture));
     }
 
     @Test
     public void testFernSuccession() {
-        // (cycle + generation) % 9 == 0 -> SPORE
-        assertEquals(OrganismType.SPORE, OrganismType.FERN.offspringType(0, 0, env));
-        assertEquals(OrganismType.FERN, OrganismType.FERN.offspringType(1, 0, env));
-        assertEquals(OrganismType.SPORE, OrganismType.FERN.offspringType(9, 0, env));
+        Environment lowMoisture = new Environment(50, 20, 50, 50, 50);
+        Environment highMoisture = new Environment(50, 50, 50, 50, 50);
+        assertEquals(OrganismType.SPORE, OrganismType.FERN.offspringType(0, 0, lowMoisture));
+        assertEquals(OrganismType.FERN, OrganismType.FERN.offspringType(0, 0, highMoisture));
     }
 
     @Test
     public void testHareSuccession() {
-        // (cycle + generation) % 7 == 0 -> BEETLE
-        assertEquals(OrganismType.BEETLE, OrganismType.HARE.offspringType(0, 0, env));
-        assertEquals(OrganismType.HARE, OrganismType.HARE.offspringType(1, 0, env));
-        assertEquals(OrganismType.BEETLE, OrganismType.HARE.offspringType(7, 0, env));
+        Environment warm = new Environment(50, 50, 60, 50, 50);
+        Environment cold = new Environment(50, 50, 30, 50, 50);
+        assertEquals(OrganismType.BEETLE, OrganismType.HARE.offspringType(0, 0, warm));
+        assertEquals(OrganismType.HARE, OrganismType.HARE.offspringType(0, 0, cold));
     }
 }

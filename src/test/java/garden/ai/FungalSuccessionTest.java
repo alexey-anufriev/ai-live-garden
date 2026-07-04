@@ -5,23 +5,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FungalSuccessionTest {
 
-    private final Environment env = new Environment(50, 50, 50, 10, 50);
-
     @Test
     public void testRootNetworkProducesFungus() {
+        Environment lowNutrients = new Environment(50, 50, 50, 10, 50);
         OrganismType rootNetwork = OrganismType.ROOT_NETWORK;
-        // Find a cycle/generation where (cycle + generation) % 11 == 0
-        int cycle = 11;
-        int generation = 0;
-        assertEquals(OrganismType.FUNGUS, rootNetwork.offspringType(cycle, generation, env));
+        assertEquals(OrganismType.FUNGUS, rootNetwork.offspringType(0, 0, lowNutrients));
     }
 
     @Test
     public void testRootNetworkDoesNotAlwaysProduceFungus() {
+        Environment stableNutrients = new Environment(50, 50, 50, 50, 50);
         OrganismType rootNetwork = OrganismType.ROOT_NETWORK;
-        // Find a cycle/generation where (cycle + generation) % 11 != 0
-        int cycle = 10;
-        int generation = 0;
-        assertEquals(OrganismType.ROOT_NETWORK, rootNetwork.offspringType(cycle, generation, env));
+        assertEquals(OrganismType.ROOT_NETWORK, rootNetwork.offspringType(0, 0, stableNutrients));
     }
 }

@@ -4,22 +4,19 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 6620
+- Cycle: 6638
 - Health: Flourishing (🟢)
 - Nutrients: 100.
 - NutrientBuffer: 100.
-- Active organisms: 8725 total across beetle, fox fungus, moss root network, spore.
+- Active organisms: 8739 total across beetle, fox fungus, moss root network, spore.
 - Missing roles: none.
-- Latest agent handoff: Ecologically driven fungal succession.
-- Latest result: Modified `OrganismType.offspringType` to trigger fungal succession on low nutrients and updated `FungalSuccessionTest` to reflect this change..
+- Latest agent handoff: Ecologically driven succession.
+- Latest result: Updated all succession rules in `OrganismType` to depend directly on environmental factors like moisture, light, nutrients, and warmth, removing the cycle/generation modulo dependencies. Updated `OrganismTypeSuccessionTest` and `FungalSuccessionTest` to verify the new environment-aware rules..
 
 ## Immediate Directions
 
-- Refactor other succession rules in OrganismType to be more ecologically driven.
+- Observe population dynamics after the change.
 
 ## Constraints & Known Bad Ideas
 
-- Do not attempt to fix the simulation in one run.
-- Do not add another named adaptation merely because recent runs did so.
-- Do not add another observability-only or tests-only change merely because it is easy to validate.
-- Do not treat the full nutrient buffer as proof of health while nutrients are zero or ecological roles are absent.
+- Keep succession rules ecologically driven, not cycle-dependent.

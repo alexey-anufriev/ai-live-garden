@@ -94,19 +94,19 @@ public enum OrganismType {
      * simple succession behavior over time, now sensitive to environmental conditions.
      */
     public OrganismType offspringType(int cycle, int generation, Environment environment) {
-        if (this == SPORE && (cycle + generation) % 3 == 0 && environment.moisture() > 30) {
+        if (this == SPORE && environment.moisture() > 60) {
             return MOSS;
         }
-        if (this == MOSS && (cycle + generation) % 5 == 0 && environment.light() > 40) {
+        if (this == MOSS && environment.light() > 60 && environment.moisture() > 50) {
             return FERN;
         }
-        if (this == FERN && (cycle + generation) % 9 == 0 && environment.moisture() < 70) {
+        if (this == FERN && environment.moisture() < 30) {
             return SPORE;
         }
-        if (this == ROOT_NETWORK && (cycle + generation) % 11 == 0 && environment.nutrients() < 25) {
+        if (this == ROOT_NETWORK && environment.nutrients() < 25) {
             return FUNGUS;
         }
-        if (this == HARE && (cycle + generation) % 7 == 0 && environment.warmth() > 20) {
+        if (this == HARE && environment.warmth() > 40) {
             return BEETLE;
         }
         return this;
