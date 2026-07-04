@@ -115,10 +115,6 @@ public class OrganismInteractionCalculator {
             List<Organism> allOrganisms
     ) {}
 
-    public record ContributionContext(int moss, int fungal, int fungalAttractor) {}
-    public record MetabolicResult(int metabolism, int energyBonus, List<GardenEvent> events) {}
-    public record StressResult(boolean isStressed, int energyLoss, Optional<GardenEvent> event) {}
-
     public static List<Organism> calculatePassiveChanges(PassiveChangeContext context) {
         return context.allOrganisms().stream()
                 .map(organism -> calculateSingle(organism, context))
@@ -156,9 +152,11 @@ public class OrganismInteractionCalculator {
             }
             changed = changed.withEnergy(changed.energy() + growth);
         } else {
-            MetabolicResult result = calculateMetabolism(context.cycle(), changed, context.environment(), new ContributionContext(context.contribution().mossContribution(), context.contribution().fungalContribution(), context.contribution().fungalAttractorContribution()));
-            context.events().addAll(result.events());
-            changed = changed.withEnergy(changed.energy() + result.energyBonus() - result.metabolism())
+            TraitRegistry.MetabolicEffect result = TraitRegistry.calculateMetabolism(context.cycle(), changed, context.environment(), context.contribution().mossContribution(), context.contribution().fungalContribution(), context.contribution().fungalAttractorContribution());
+            if (result.event() != null) {
+                context.events().add(result.event());
+            }
+            changed = changed.withEnergy(changed.energy() + result.energyBonus() - result.metabolismChange())
                     .withCuriosity(changed.curiosity() + (context.cycle() % 4 == 0 ? 1 : 0));
         }
 
@@ -169,16 +167,16 @@ public class OrganismInteractionCalculator {
         }
 
         if (organism.type().isPlant()) {
-            StressResult stress = calculatePlantStressResult(changed, context.environment(), context.cycle(), context.allOrganisms());
+            TraitRegistry.StressResult stress = TraitRegistry.calculatePlantStress(changed, context.environment(), context.cycle(), context.allOrganisms());
             if (stress.isStressed()) {
                 changed = changed.withEnergy(Math.max(0, changed.energy() - stress.energyLoss()));
-                stress.event().ifPresent(context.events()::add);
+                if (stress.event() != null) context.events().add(stress.event());
                 changed = changed.withTrait("stressed");
             } else {
                 changed = changed.withoutTrait("stressed");
             }
         } else if (organism.type().isAnimal()) {
-            if (isAnimalStarving(changed, context.environment(), context.allOrganisms())) {
+            if (TraitRegistry.isAnimalStarving(changed, context.environment(), context.allOrganisms())) {
                 changed = changed.withTrait("starving");
             } else {
                 changed = changed.withoutTrait("starving");
@@ -186,67 +184,6 @@ public class OrganismInteractionCalculator {
         }
 
         return maybeMutate(changed, context.cycle(), context.events());
-    }
-
-    public static MetabolicResult calculateMetabolism(int cycle, Organism organism, Environment environment, ContributionContext contributions) {
-        int metabolism = organism.type().metabolism();
-        int energyBonus = 0;
-        List<GardenEvent> events = new ArrayList<>();
-
-        for (String trait : organism.traits()) {
-            TraitRegistry.MetabolicEffect effect = TraitRegistry.getMetabolicEffect(trait, cycle, organism, environment, contributions.fungal(), contributions.moss());
-            if (effect != null) {
-                metabolism = Math.max(0, metabolism + effect.metabolismChange());
-                energyBonus += effect.energyBonus();
-                if (effect.event() != null) {
-                    events.add(effect.event());
-                }
-            }
-        }
-
-        if (contributions.fungalAttractor() > 0) {
-            energyBonus += 1;
-            events.add(new GardenEvent(cycle, "%s was attracted to a fungal-rich area.".formatted(organism.id())));
-        }
-        return new MetabolicResult(metabolism, energyBonus, events);
-    }
-
-    public static StressResult calculatePlantStressResult(Organism organism, Environment environment, int cycle, List<Organism> allOrganisms) {
-        if (!isPlantStressed(organism, environment, allOrganisms)) {
-            return new StressResult(false, 0, Optional.empty());
-        }
-
-        int energyLoss = 0;
-        Optional<GardenEvent> event = Optional.empty();
-
-        if (environment.nutrients() == 0) {
-            energyLoss = 1;
-            event = Optional.of(new GardenEvent(cycle, "%s lost energy due to environmental stress.".formatted(organism.id())));
-        } else if (allOrganisms.stream().filter(o -> o.type().isPlant()).count() > 5000) {
-            energyLoss = 1;
-            event = Optional.of(new GardenEvent(cycle, "%s lost energy due to overcrowding.".formatted(organism.id())));
-        }
-
-        return new StressResult(true, energyLoss, event);
-    }
-
-    public static boolean isPlantStressed(Organism organism, Environment environment, List<Organism> allOrganisms) {
-        if (!organism.type().isPlant()) return false;
-        boolean isResilient = organism.traits().contains("resilient");
-        boolean isDormant = organism.traits().contains("dormancy") && environment.nutrients() < 15;
-        boolean isDeepRooting = organism.traits().contains("deep-rooting") && environment.moisture() < 30;
-        boolean isStressResilient = organism.traits().contains("stress-resilient");
-        boolean isStressAvoidant = organism.traits().contains("stress-avoidance");
-        boolean crowded = allOrganisms.stream().filter(o -> o.type().isPlant()).count() > 5000;
-        return (!environment.favorsPlants() || crowded) && !isResilient && !isDormant && !isDeepRooting && !isStressResilient && !isStressAvoidant;
-    }
-
-    public static boolean isAnimalStarving(Organism organism, Environment environment, List<Organism> allOrganisms) {
-        if (!organism.type().isAnimal()) return false;
-        boolean isResilient = organism.traits().contains("resilient");
-        boolean isDormant = organism.traits().contains("dormancy");
-        boolean overcrowded = allOrganisms.stream().filter(o -> o.type().isAnimal()).count() > 2500;
-        return ((environment.nutrients() + environment.nutrientBuffer() / 2) < 25 || overcrowded) && !isResilient && !isDormant;
     }
 
     private static Organism maybeMutate(Organism organism, int cycle, List<GardenEvent> events) {

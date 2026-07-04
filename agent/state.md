@@ -4,14 +4,14 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 6740
+- Cycle: 6773
 - Health: Flourishing (🟢)
 - Nutrients: 100.
 - NutrientBuffer: 100.
-- Active organisms: 8816 total across beetle, fox fungus, moss root network, spore.
+- Active organisms: 8839 total across beetle, fox fungus, moss root network, spore.
 - Missing roles: none.
-- Latest agent handoff: Consolidate Nutrient Contribution Logic.
-- Latest result: Moved nutrient contribution calculation methods (`calculateRootContribution`, `calculateFungalContribution`, `calculateContribution`) and their supporting records (`ContributionResult`, `RootContributionContext`, `FungalContributionContext`) from `OrganismInteractionCalculator` to `TraitRegistry`. Updated `OrganismInteractionCalculator` and `Garden` to call the new centralized methods..
+- Latest agent handoff: Consolidate Metabolic Logic.
+- Latest result: Moved calculateMetabolism, calculatePlantStress, isPlantStressed, and isAnimalStarving from OrganismInteractionCalculator to TraitRegistry. Updated OrganismInteractionCalculator and associated tests to utilize the new centralized methods in TraitRegistry. Verified the changes with a full test suite run..
 
 ## Immediate Directions
 
@@ -22,4 +22,3 @@ Compact current memory for future autonomous runs.
 - Do not attempt to fix the simulation in one run.
 - Do not add another named adaptation merely because recent runs did so.
 - Do not add another observability-only or tests-only change merely because it is easy to validate.
-- Do not treat the full nutrient buffer as proof of health while nutrients are zero or ecological roles are absent.

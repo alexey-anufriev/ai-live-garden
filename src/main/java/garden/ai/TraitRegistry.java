@@ -2,6 +2,7 @@ package garden.ai;
 
 import java.util.Map;
 import java.util.List;
+import java.util.ArrayList;
 
 public class TraitRegistry {
     private static final Map<String, Integer> NUTRIENT_VALUES = Map.of(
@@ -19,6 +20,8 @@ public class TraitRegistry {
     public record MetabolicEffect(int metabolismChange, int energyBonus, GardenEvent event) {}
 
     public record PlantGrowthEffect(int growthChange, GardenEvent event) {}
+
+    public record StressResult(boolean isStressed, int energyLoss, GardenEvent event) {}
 
     public record ContributionResult(int rootContribution, int fungalContribution, int fungalAttractorContribution, int mossContribution) {}
 
@@ -58,6 +61,69 @@ public class TraitRegistry {
             long fungalDecomposerMimicCount,
             int nutrientBuffer
     ) {}
+
+    public static MetabolicEffect calculateMetabolism(int cycle, Organism organism, Environment environment, int mossContribution, int fungalContribution, int fungalAttractorContribution) {
+        int metabolism = organism.type().metabolism();
+        int energyBonus = 0;
+        List<GardenEvent> events = new ArrayList<>();
+
+        for (String trait : organism.traits()) {
+            MetabolicEffect effect = getMetabolicEffect(trait, cycle, organism, environment, fungalContribution, mossContribution);
+            if (effect != null) {
+                metabolism = Math.max(0, metabolism + effect.metabolismChange());
+                energyBonus += effect.energyBonus();
+                if (effect.event() != null) {
+                    events.add(effect.event());
+                }
+            }
+        }
+
+        if (fungalAttractorContribution > 0) {
+            energyBonus += 1;
+            events.add(new GardenEvent(cycle, "%s was attracted to a fungal-rich area.".formatted(organism.id())));
+        }
+        
+        GardenEvent combinedEvent = events.isEmpty() ? null : new GardenEvent(cycle, events.stream().map(GardenEvent::description).collect(java.util.stream.Collectors.joining("; ")));
+        return new MetabolicEffect(metabolism, energyBonus, combinedEvent);
+    }
+
+    public static StressResult calculatePlantStress(Organism organism, Environment environment, int cycle, List<Organism> allOrganisms) {
+        if (!isPlantStressed(organism, environment, allOrganisms)) {
+            return new StressResult(false, 0, null);
+        }
+
+        int energyLoss = 0;
+        GardenEvent event = null;
+
+        if (environment.nutrients() == 0) {
+            energyLoss = 1;
+            event = new GardenEvent(cycle, "%s lost energy due to environmental stress.".formatted(organism.id()));
+        } else if (allOrganisms.stream().filter(o -> o.type().isPlant()).count() > 5000) {
+            energyLoss = 1;
+            event = new GardenEvent(cycle, "%s lost energy due to overcrowding.".formatted(organism.id()));
+        }
+
+        return new StressResult(true, energyLoss, event);
+    }
+
+    public static boolean isPlantStressed(Organism organism, Environment environment, List<Organism> allOrganisms) {
+        if (!organism.type().isPlant()) return false;
+        boolean isResilient = organism.traits().contains("resilient");
+        boolean isDormant = organism.traits().contains("dormancy") && environment.nutrients() < 15;
+        boolean isDeepRooting = organism.traits().contains("deep-rooting") && environment.moisture() < 30;
+        boolean isStressResilient = organism.traits().contains("stress-resilient");
+        boolean isStressAvoidant = organism.traits().contains("stress-avoidance");
+        boolean crowded = allOrganisms.stream().filter(o -> o.type().isPlant()).count() > 5000;
+        return (!environment.favorsPlants() || crowded) && !isResilient && !isDormant && !isDeepRooting && !isStressResilient && !isStressAvoidant;
+    }
+
+    public static boolean isAnimalStarving(Organism organism, Environment environment, List<Organism> allOrganisms) {
+        if (!organism.type().isAnimal()) return false;
+        boolean isResilient = organism.traits().contains("resilient");
+        boolean isDormant = organism.traits().contains("dormancy");
+        boolean overcrowded = allOrganisms.stream().filter(o -> o.type().isAnimal()).count() > 2500;
+        return ((environment.nutrients() + environment.nutrientBuffer() / 2) < 25 || overcrowded) && !isResilient && !isDormant;
+    }
 
     public static ContributionResult calculateContribution(List<Organism> organisms, Environment environment) {
         long releaserCount = TraitRegistry.count(organisms, "buffer-releaser");

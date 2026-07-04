@@ -17,7 +17,7 @@ class OrganismInteractionCalculatorTest {
         Environment env = new Environment(10, 10, 10, 50, 100);
         Organism moss = Organism.of("moss-1", OrganismType.MOSS, 10, 1);
         
-        assertThat(OrganismInteractionCalculator.isPlantStressed(moss, env, List.of())).isTrue();
+        assertThat(TraitRegistry.isPlantStressed(moss, env, List.of())).isTrue();
     }
 
     @Test
@@ -25,7 +25,7 @@ class OrganismInteractionCalculatorTest {
         Environment env = new Environment(60, 60, 60, 50, 100);
         Organism moss = Organism.of("moss-1", OrganismType.MOSS, 10, 1);
         
-        assertThat(OrganismInteractionCalculator.isPlantStressed(moss, env, List.of())).isFalse();
+        assertThat(TraitRegistry.isPlantStressed(moss, env, List.of())).isFalse();
     }
 
     @Test
@@ -33,10 +33,10 @@ class OrganismInteractionCalculatorTest {
         Environment env = new Environment(10, 10, 10, 0, 100);
         Organism moss = Organism.of("moss-1", OrganismType.MOSS, 10, 1);
         
-        OrganismInteractionCalculator.StressResult result = OrganismInteractionCalculator.calculatePlantStressResult(moss, env, 1, List.of());
+        TraitRegistry.StressResult result = TraitRegistry.calculatePlantStress(moss, env, 1, List.of());
         assertThat(result.isStressed()).isTrue();
         assertThat(result.energyLoss()).isEqualTo(1);
-        assertThat(result.event()).isPresent();
+        assertThat(result.event()).isNotNull();
     }
     
     @Test
@@ -44,7 +44,7 @@ class OrganismInteractionCalculatorTest {
         Environment env = new Environment(50, 50, 50, 20, 100);
         Organism fox = Organism.of("fox-1", OrganismType.FOX, 10, 1);
         
-        assertThat(OrganismInteractionCalculator.isAnimalStarving(fox, env, List.of())).isFalse();
+        assertThat(TraitRegistry.isAnimalStarving(fox, env, List.of())).isFalse();
     }
 
     @Test
@@ -52,7 +52,7 @@ class OrganismInteractionCalculatorTest {
         Environment env = new Environment(50, 50, 50, 10, 10);
         Organism fox = Organism.of("fox-1", OrganismType.FOX, 10, 1);
         
-        assertThat(OrganismInteractionCalculator.isAnimalStarving(fox, env, List.of())).isTrue();
+        assertThat(TraitRegistry.isAnimalStarving(fox, env, List.of())).isTrue();
     }
 
     @Test
@@ -63,7 +63,7 @@ class OrganismInteractionCalculatorTest {
                 .mapToObj(i -> Organism.of("moss-" + i, OrganismType.MOSS, 10, 1))
                 .collect(Collectors.toList());
         
-        assertThat(OrganismInteractionCalculator.isPlantStressed(moss, env, manyMoss)).isTrue();
+        assertThat(TraitRegistry.isPlantStressed(moss, env, manyMoss)).isTrue();
     }
 
     // --- Feeding Phase Tests ---
