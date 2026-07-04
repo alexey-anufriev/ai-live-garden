@@ -46,6 +46,10 @@ if [[ -n "${AGENT_BASELINE_TEST_RESULT_FILE:-}" && -f "$AGENT_BASELINE_TEST_RESU
   cp "$AGENT_BASELINE_TEST_RESULT_FILE" "$output_dir/baseline-test-result.md"
 fi
 
+if [[ -n "${AGENT_BASELINE_POLICY_RESULT_FILE:-}" && -f "$AGENT_BASELINE_POLICY_RESULT_FILE" ]]; then
+  cp "$AGENT_BASELINE_POLICY_RESULT_FILE" "$output_dir/baseline-policy-result.md"
+fi
+
 if compgen -G "target/*.dump" > /dev/null || compgen -G "target/*.dumpstream" > /dev/null; then
   mkdir -p "$output_dir/maven-dumps"
   cp target/*.dump target/*.dumpstream "$output_dir/maven-dumps/" 2>/dev/null || true
@@ -95,5 +99,8 @@ fi
   fi
   if [[ -f "$output_dir/baseline-test-result.md" ]]; then
     echo "- Baseline Maven test result copied to \`baseline-test-result.md\`"
+  fi
+  if [[ -f "$output_dir/baseline-policy-result.md" ]]; then
+    echo "- Baseline worktree policy result copied to \`baseline-policy-result.md\`"
   fi
 } > "$output_dir/README.md"

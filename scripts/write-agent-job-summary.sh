@@ -44,6 +44,7 @@ metadata_value() {
   echo "| Phase | Outcome |"
   echo "| --- | --- |"
   echo "| Baseline test | $(value_or_dash "${BASELINE_TEST_OUTCOME:-}") |"
+  echo "| Baseline worktree policy | $(value_or_dash "${BASELINE_POLICY_OUTCOME:-}") |"
   echo "| Gemini autonomous step | $(value_or_dash "${GEMINI_OUTCOME:-}") |"
   echo "| Protected file restore | $(value_or_dash "${RESTORE_PROTECTED_OUTCOME:-}") |"
   echo "| Agent handoff extraction | $(value_or_dash "${EXTRACT_AGENT_HANDOFF_OUTCOME:-}") |"
@@ -58,6 +59,8 @@ metadata_value() {
   echo "| Journal archive | $(value_or_dash "${ARCHIVE_JOURNAL_OUTCOME:-}") |"
   echo "| Summary archive | $(value_or_dash "${ARCHIVE_SUMMARIES_OUTCOME:-}") |"
   echo "| Agent worktree validation | $(value_or_dash "${AGENT_WORKTREE_OUTCOME:-}") |"
+  echo "| Agent worktree repair-input severity | $(value_or_dash "${AGENT_WORKTREE_REPAIR_INPUT_SEVERITY:-}") |"
+  echo "| Agent worktree final severity | $(value_or_dash "${AGENT_WORKTREE_SEVERITY:-}") |"
   echo "| Failure diagnostics collection | $(value_or_dash "${COLLECT_DIAGNOSTICS_OUTCOME:-}") |"
   echo "| Failure diagnostics upload | $(value_or_dash "${UPLOAD_DIAGNOSTICS_OUTCOME:-}") |"
   echo "| Workflow status record | $(value_or_dash "${RECORD_STATUS_OUTCOME:-}") |"
@@ -98,8 +101,10 @@ metadata_value() {
     echo "The run failed while validating required README/state memory updates."
   elif [[ "${JOURNAL_FORMAT_OUTCOME:-}" == "failure" || "${SUMMARY_FORMAT_OUTCOME:-}" == "failure" ]]; then
     echo "The run failed while validating generated memory format."
-  elif [[ "${AGENT_WORKTREE_OUTCOME:-}" == "failure" ]]; then
-    echo "The run failed because the final worktree contained generated artifacts, scratch files, or weak test patterns."
+  elif [[ "${AGENT_WORKTREE_SEVERITY:-}" == "hard" ]]; then
+    echo "The run failed because the final worktree contained hard policy violations that cannot be safely committed as repair input."
+  elif [[ "${AGENT_WORKTREE_SEVERITY:-}" == "deferred" ]]; then
+    echo "Final worktree policy found repairable source-quality violations. The workflow intentionally commits them so the next autonomous run starts with repair."
   elif [[ "${COMMIT_OUTCOME:-}" == "success" ]]; then
     echo "The run reached the commit step."
   else

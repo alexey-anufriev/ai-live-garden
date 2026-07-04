@@ -9,6 +9,7 @@ mkdir -p agent
   echo "- UTC: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
   echo "- Workflow run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
   echo "- Baseline test outcome: ${BASELINE_TEST_OUTCOME}"
+  echo "- Baseline worktree policy outcome: ${BASELINE_POLICY_OUTCOME:-}"
   echo "- Gemini outcome: ${GEMINI_OUTCOME}"
   echo "- Agent handoff extraction outcome: ${EXTRACT_AGENT_HANDOFF_OUTCOME:-}"
   echo "- Agent handoff outcome: ${AGENT_HANDOFF_OUTCOME:-}"
@@ -20,4 +21,6 @@ mkdir -p agent
   echo "- Summary format outcome: ${SUMMARY_FORMAT_OUTCOME}"
   echo "- Summary append-only outcome: ${SUMMARY_APPEND_ONLY_OUTCOME}"
   echo "- Agent worktree validation outcome: ${AGENT_WORKTREE_OUTCOME:-}"
+  echo "- Agent worktree repair-input severity: ${AGENT_WORKTREE_REPAIR_INPUT_SEVERITY:-}"
+  echo "- Agent worktree final severity: ${AGENT_WORKTREE_SEVERITY:-}"
 } > agent/last-run.md

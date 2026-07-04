@@ -37,12 +37,21 @@ jobs:
         continue-on-error: true
         run: scripts/capture-maven-test-result.sh "${RUNNER_TEMP}/baseline-test-result.md"
 
+      - name: Baseline worktree policy
+        id: baseline_policy
+        continue-on-error: true
+        shell: bash
+        env:
+          VALIDATE_AGENT_WORKTREE_SCOPE: baseline
+        run: scripts/capture-agent-worktree-policy-result.sh "${RUNNER_TEMP}/baseline-policy-result.md"
+
       - name: Build Gemini prompt
         id: gemini_prompt
         shell: bash
         env:
           AGENT_CONTEXT_METADATA_FILE: ${{ runner.temp }}/agent-context.metadata
           AGENT_BASELINE_TEST_RESULT_FILE: ${{ runner.temp }}/baseline-test-result.md
+          AGENT_BASELINE_POLICY_RESULT_FILE: ${{ runner.temp }}/baseline-policy-result.md
         run: |
           scripts/build-agent-context.sh "${RUNNER_TEMP}/agent-context.md"
           scripts/write-output-file.sh text "${RUNNER_TEMP}/agent-context.md"
@@ -86,16 +95,33 @@ jobs:
           VALIDATE_REPAIR_VIOLATIONS_FILE: ${{ runner.temp }}/post-test-violations.txt
         run: scripts/validate-tests.sh
 
+      - name: Validate agent worktree before memory
+        id: agent_worktree_repair_input
+        continue-on-error: true
+        shell: bash
+        env:
+          VALIDATE_AGENT_WORKTREE_SCOPE: changed
+          VALIDATE_AGENT_WORKTREE_VIOLATIONS_FILE: ${{ runner.temp }}/agent-worktree-repair-input-violations.txt
+        run: scripts/validate-agent-worktree.sh
+
+      - name: Fail on hard pre-memory worktree policy
+        if: ${{ !cancelled() && steps.agent_worktree_repair_input.outputs.severity == 'hard' }}
+        shell: bash
+        run: |
+          echo "Hard agent worktree policy violations cannot be committed as autonomous repair input."
+          cat "${RUNNER_TEMP}/agent-worktree-repair-input-violations.txt"
+          exit 1
+
       - name: Advance persistent garden state
         id: advance_garden
-        if: ${{ steps.post_test_final.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.post_test_final.outcome == 'success' && steps.agent_worktree_repair_input.outputs.severity == 'clean' }}
         run: mvn -B -q exec:java -Dexec.args="tick --steps 3"
 
       - name: Generate memory artifacts
         id: auto_memory
-        if: ${{ !cancelled() && (steps.post_test_final.outcome == 'success' || steps.post_test_final.outcome == 'failure') }}
+        if: ${{ !cancelled() && (steps.post_test_final.outcome == 'success' || steps.post_test_final.outcome == 'failure') && (steps.agent_worktree_repair_input.outputs.severity == 'clean' || steps.agent_worktree_repair_input.outputs.severity == 'deferred') }}
         shell: bash
-        run: scripts/agent-auto-postprocess.sh --test-outcome "${{ steps.post_test_final.outcome }}" --garden-advance-outcome "${{ steps.advance_garden.outcome }}" --checks "mvn -B test"
+        run: scripts/agent-auto-postprocess.sh --test-outcome "${{ steps.post_test_final.outcome }}" --garden-advance-outcome "${{ steps.advance_garden.outcome }}" --worktree-policy-severity "${{ steps.agent_worktree_repair_input.outputs.severity }}" --checks "mvn -B test"
 
       - name: Validate required memory updates
         id: required_memory_final
@@ -145,10 +171,20 @@ jobs:
       - name: Validate agent worktree
         id: agent_worktree_final
         if: ${{ !cancelled() && steps.archive_summaries.outcome == 'success' }}
+        continue-on-error: true
         shell: bash
         env:
+          VALIDATE_AGENT_WORKTREE_SCOPE: changed
           VALIDATE_AGENT_WORKTREE_VIOLATIONS_FILE: ${{ runner.temp }}/agent-worktree-violations.txt
         run: scripts/validate-agent-worktree.sh
+
+      - name: Fail on hard final worktree policy
+        if: ${{ !cancelled() && steps.agent_worktree_final.outputs.severity == 'hard' }}
+        shell: bash
+        run: |
+          echo "Hard agent worktree policy violations cannot be committed as autonomous repair input."
+          cat "${RUNNER_TEMP}/agent-worktree-violations.txt"
+          exit 1
 
       - name: Collect failure diagnostics
         id: collect_failure_diagnostics
@@ -158,6 +194,7 @@ jobs:
           AGENT_CONTEXT_FILE: ${{ runner.temp }}/agent-context.md
           AGENT_CONTEXT_METADATA_FILE: ${{ runner.temp }}/agent-context.metadata
           AGENT_BASELINE_TEST_RESULT_FILE: ${{ runner.temp }}/baseline-test-result.md
+          AGENT_BASELINE_POLICY_RESULT_FILE: ${{ runner.temp }}/baseline-policy-result.md
         run: scripts/collect-agent-failure-diagnostics.sh "${{ runner.temp }}/agent-failure-diagnostics"
 
       - name: Upload failure diagnostics
@@ -171,10 +208,11 @@ jobs:
 
       - name: Record workflow check status
         id: record_workflow_status
-        if: ${{ !cancelled() && steps.agent_worktree_final.outcome == 'success' }}
+        if: ${{ !cancelled() && (steps.agent_worktree_final.outputs.severity == 'clean' || steps.agent_worktree_final.outputs.severity == 'deferred') }}
         shell: bash
         env:
           BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
+          BASELINE_POLICY_OUTCOME: ${{ steps.baseline_policy.outcome }}
           GEMINI_OUTCOME: ${{ steps.gemini.outcome }}
           EXTRACT_AGENT_HANDOFF_OUTCOME: ${{ steps.extract_agent_handoff.outcome }}
           AGENT_HANDOFF_OUTCOME: ${{ steps.agent_handoff.outcome }}
@@ -186,6 +224,8 @@ jobs:
           SUMMARY_FORMAT_OUTCOME: ${{ steps.summary_format_final.outcome }}
           SUMMARY_APPEND_ONLY_OUTCOME: ${{ steps.summary_append_only_final.outcome }}
           AGENT_WORKTREE_OUTCOME: ${{ steps.agent_worktree_final.outcome }}
+          AGENT_WORKTREE_SEVERITY: ${{ steps.agent_worktree_final.outputs.severity }}
+          AGENT_WORKTREE_REPAIR_INPUT_SEVERITY: ${{ steps.agent_worktree_repair_input.outputs.severity }}
         run: scripts/record-agent-status.sh
 
       - name: Collect change diagnostics
@@ -208,6 +248,7 @@ jobs:
         shell: bash
         env:
           BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
+          BASELINE_POLICY_OUTCOME: ${{ steps.baseline_policy.outcome }}
           GEMINI_OUTCOME: ${{ steps.gemini.outcome }}
           RESTORE_PROTECTED_OUTCOME: ${{ steps.restore_protected.outcome }}
           EXTRACT_AGENT_HANDOFF_OUTCOME: ${{ steps.extract_agent_handoff.outcome }}
@@ -222,6 +263,8 @@ jobs:
           ARCHIVE_JOURNAL_OUTCOME: ${{ steps.archive_journal.outcome }}
           ARCHIVE_SUMMARIES_OUTCOME: ${{ steps.archive_summaries.outcome }}
           AGENT_WORKTREE_OUTCOME: ${{ steps.agent_worktree_final.outcome }}
+          AGENT_WORKTREE_SEVERITY: ${{ steps.agent_worktree_final.outputs.severity }}
+          AGENT_WORKTREE_REPAIR_INPUT_SEVERITY: ${{ steps.agent_worktree_repair_input.outputs.severity }}
           COLLECT_DIAGNOSTICS_OUTCOME: ${{ steps.collect_failure_diagnostics.outcome }}
           UPLOAD_DIAGNOSTICS_OUTCOME: ${{ steps.upload_failure_diagnostics.outcome }}
           RECORD_STATUS_OUTCOME: ${{ steps.record_workflow_status.outcome }}

@@ -13,6 +13,7 @@ recent_journal_limit="${AGENT_CONTEXT_RECENT_JOURNAL_LIMIT:-3}"
 context_warn_lines="${AGENT_CONTEXT_WARN_LINES:-1200}"
 metadata_file="${AGENT_CONTEXT_METADATA_FILE:-${output_file}.metadata}"
 baseline_test_result_file="${AGENT_BASELINE_TEST_RESULT_FILE:-}"
+baseline_policy_result_file="${AGENT_BASELINE_POLICY_RESULT_FILE:-}"
 mkdir -p "$(dirname "$metadata_file")"
 
 latest_files() {
@@ -186,6 +187,17 @@ append_baseline_test_result() {
     sed -n '1,$p' "$baseline_test_result_file"
   else
     echo "No baseline Maven test result file was provided."
+  fi
+  echo
+}
+
+append_baseline_policy_result() {
+  echo "## Baseline Worktree Policy Result"
+  echo
+  if [[ -n "$baseline_policy_result_file" && -f "$baseline_policy_result_file" ]]; then
+    sed -n '1,$p' "$baseline_policy_result_file"
+  else
+    echo "No baseline worktree policy result file was provided."
   fi
   echo
 }
@@ -405,6 +417,7 @@ JSON
   append_summary_entries "Latest Weekly Summary Entry" "agent/summaries/weekly" 1
   append_summary_entries "Latest Monthly Summary Entry" "agent/summaries/monthly" 1
   append_baseline_test_result
+  append_baseline_policy_result
   append_garden_digest
   echo "## Recent Active Journal Entries"
   echo
@@ -446,4 +459,5 @@ fi
   echo "AGENT_CONTEXT_LATEST_MONTHLY_SUMMARY=$(latest_files 1 "agent/summaries/monthly" || true)"
   echo "AGENT_CONTEXT_LATEST_YEARLY_SUMMARY=$(latest_files 1 "agent/summaries/yearly" || true)"
   echo "AGENT_CONTEXT_BASELINE_TEST_RESULT_FILE=${baseline_test_result_file}"
+  echo "AGENT_CONTEXT_BASELINE_POLICY_RESULT_FILE=${baseline_policy_result_file}"
 } > "$metadata_file"
