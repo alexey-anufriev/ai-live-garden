@@ -4,14 +4,14 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 6722
+- Cycle: 6740
 - Health: Flourishing (🟢)
 - Nutrients: 100.
 - NutrientBuffer: 100.
-- Active organisms: 8802 total across beetle, fox fungus, moss root network, spore.
+- Active organisms: 8816 total across beetle, fox fungus, moss root network, spore.
 - Missing roles: none.
-- Latest agent handoff: Repair worktree policy violations in test files.
-- Latest result: Cleaned up 5 test files (`AnimalNutrientHoarderTest.java`, `FungalAttractorTest.java`, `FungalSymbioteTest.java`, `GardenTest.java`, `NutrientRefinerTest.java`) by removing scratch reasoning and uncertainty comments that violated worktree policies. Verified the fix by running all tests and the validation script..
+- Latest agent handoff: Consolidate Nutrient Contribution Logic.
+- Latest result: Moved nutrient contribution calculation methods (`calculateRootContribution`, `calculateFungalContribution`, `calculateContribution`) and their supporting records (`ContributionResult`, `RootContributionContext`, `FungalContributionContext`) from `OrganismInteractionCalculator` to `TraitRegistry`. Updated `OrganismInteractionCalculator` and `Garden` to call the new centralized methods..
 
 ## Immediate Directions
 
@@ -19,4 +19,7 @@ Compact current memory for future autonomous runs.
 
 ## Constraints & Known Bad Ideas
 
-- Keep test code clean and professional.
+- Do not attempt to fix the simulation in one run.
+- Do not add another named adaptation merely because recent runs did so.
+- Do not add another observability-only or tests-only change merely because it is easy to validate.
+- Do not treat the full nutrient buffer as proof of health while nutrients are zero or ecological roles are absent.

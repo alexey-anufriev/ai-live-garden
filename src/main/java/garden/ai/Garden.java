@@ -63,7 +63,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
     }
 
     public int rootContribution() {
-        return OrganismInteractionCalculator.calculateRootContribution(organisms, environment, TraitRegistry.count(organisms, "buffer-releaser"));
+        return TraitRegistry.calculateRootContribution(organisms, environment, TraitRegistry.count(organisms, "buffer-releaser"));
     }
 
     public long blockedPlantCount() {
@@ -75,7 +75,7 @@ public record Garden(int cycle, int nextId, Environment environment, List<Organi
     }
 
     public int fungalContribution() {
-        return OrganismInteractionCalculator.calculateFungalContribution(organisms, environment);
+        return TraitRegistry.calculateFungalContribution(organisms, environment);
     }
 
     public int fungalAttractorContribution() {
