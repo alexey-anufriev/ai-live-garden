@@ -89,7 +89,7 @@ metadata_value() {
   elif [[ "${AGENT_HANDOFF_OUTCOME:-}" == "failure" ]]; then
     echo "The run failed because Gemini did not leave a valid \`.agent-run.json\` handoff."
   elif [[ "${POST_TEST_OUTCOME:-}" == "failure" ]]; then
-    echo "The run failed after Gemini while validating tests. No automatic Gemini repair loop is run; a committed failing baseline is surfaced to the next agent through the prompt."
+    echo "Post-Gemini Maven validation failed. The workflow intentionally commits the failed baseline and deterministic memory so the next autonomous run starts with repair."
   elif [[ "${AUTO_MEMORY_OUTCOME:-}" == "failure" ]]; then
     echo "The run failed while generating deterministic memory artifacts."
   elif [[ "${SUMMARY_APPEND_ONLY_OUTCOME:-}" == "failure" ]]; then

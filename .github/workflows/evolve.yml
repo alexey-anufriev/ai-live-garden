@@ -80,6 +80,7 @@ jobs:
 
       - name: Validate tests after Gemini changes
         id: post_test_final
+        continue-on-error: true
         shell: bash
         env:
           VALIDATE_REPAIR_VIOLATIONS_FILE: ${{ runner.temp }}/post-test-violations.txt
@@ -87,15 +88,18 @@ jobs:
 
       - name: Advance persistent garden state
         id: advance_garden
+        if: ${{ steps.post_test_final.outcome == 'success' }}
         run: mvn -B -q exec:java -Dexec.args="tick --steps 3"
 
       - name: Generate memory artifacts
         id: auto_memory
+        if: ${{ !cancelled() && (steps.post_test_final.outcome == 'success' || steps.post_test_final.outcome == 'failure') }}
         shell: bash
-        run: scripts/agent-auto-postprocess.sh --test-outcome "${{ steps.post_test_final.outcome }}" --checks "mvn -B test"
+        run: scripts/agent-auto-postprocess.sh --test-outcome "${{ steps.post_test_final.outcome }}" --garden-advance-outcome "${{ steps.advance_garden.outcome }}" --checks "mvn -B test"
 
       - name: Validate required memory updates
         id: required_memory_final
+        if: ${{ !cancelled() && steps.auto_memory.outcome == 'success' }}
         shell: bash
         env:
           VALIDATE_REPAIR_VIOLATIONS_FILE: ${{ runner.temp }}/required-memory-violations.txt
@@ -103,6 +107,7 @@ jobs:
 
       - name: Validate journal format
         id: journal_format_final
+        if: ${{ !cancelled() && steps.required_memory_final.outcome == 'success' }}
         shell: bash
         env:
           JOURNAL_MVN_TEST_OUTCOME: ${{ steps.post_test_final.outcome }}
@@ -111,6 +116,7 @@ jobs:
 
       - name: Validate summary format
         id: summary_format_final
+        if: ${{ !cancelled() && steps.journal_format_final.outcome == 'success' }}
         shell: bash
         env:
           VALIDATE_REPAIR_VIOLATIONS_FILE: ${{ runner.temp }}/summary-format-violations.txt
@@ -118,6 +124,7 @@ jobs:
 
       - name: Validate append-only summaries
         id: summary_append_only_final
+        if: ${{ !cancelled() && steps.summary_format_final.outcome == 'success' }}
         shell: bash
         env:
           SUMMARY_APPEND_ONLY_VIOLATIONS_FILE: ${{ runner.temp }}/summary-append-only-violations.txt
@@ -125,16 +132,19 @@ jobs:
 
       - name: Archive old journal entries
         id: archive_journal
+        if: ${{ !cancelled() && steps.summary_append_only_final.outcome == 'success' }}
         shell: bash
         run: scripts/archive-journal.sh
 
       - name: Archive old summary files
         id: archive_summaries
+        if: ${{ !cancelled() && steps.archive_journal.outcome == 'success' }}
         shell: bash
         run: scripts/archive-summaries.sh
 
       - name: Validate agent worktree
         id: agent_worktree_final
+        if: ${{ !cancelled() && steps.archive_summaries.outcome == 'success' }}
         shell: bash
         env:
           VALIDATE_AGENT_WORKTREE_VIOLATIONS_FILE: ${{ runner.temp }}/agent-worktree-violations.txt
@@ -161,6 +171,7 @@ jobs:
 
       - name: Record workflow check status
         id: record_workflow_status
+        if: ${{ !cancelled() && steps.agent_worktree_final.outcome == 'success' }}
         shell: bash
         env:
           BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
@@ -179,11 +190,13 @@ jobs:
 
       - name: Collect change diagnostics
         id: collect_change_diagnostics
+        if: ${{ !cancelled() && steps.record_workflow_status.outcome == 'success' }}
         shell: bash
         run: scripts/collect-agent-change-diagnostics.sh "${{ runner.temp }}/agent-change-diagnostics.md"
 
       - name: Commit changes directly to main
         id: commit_changes
+        if: ${{ !cancelled() && steps.collect_change_diagnostics.outcome == 'success' }}
         shell: bash
         env:
           COMMIT_MESSAGE_PREFIX: "feat: autonomous garden evolution"

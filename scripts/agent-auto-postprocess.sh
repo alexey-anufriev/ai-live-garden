@@ -4,7 +4,7 @@ set -euo pipefail
 usage() {
   cat >&2 <<'USAGE'
 Usage:
-  scripts/agent-auto-postprocess.sh --test-outcome OUTCOME [--checks TEXT] [--handoff-file PATH]
+  scripts/agent-auto-postprocess.sh --test-outcome OUTCOME [--garden-advance-outcome OUTCOME] [--checks TEXT] [--handoff-file PATH]
 
 Restores generated memory files after the agent step, then regenerates README
 state, agent/state.md, agent/code-map.md, daily summary, scheduled rollups,
@@ -18,6 +18,7 @@ test_outcome=""
 checks="mvn -B test"
 timestamp="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 handoff_file="${AGENT_RUN_OUTPUT_FILE:-.agent-run.json}"
+garden_advance_outcome="${GARDEN_ADVANCE_OUTCOME:-unknown}"
 
 while (( $# > 0 )); do
   case "$1" in
@@ -27,6 +28,10 @@ while (( $# > 0 )); do
       ;;
     --checks)
       checks="${2:-}"
+      shift 2
+      ;;
+    --garden-advance-outcome)
+      garden_advance_outcome="${2:-}"
       shift 2
       ;;
     --handoff-file)
@@ -341,18 +346,30 @@ missing="$(missing_roles_csv "$counts")"
 health_record="$(health_status "$counts" "${total:-0}" "${nutrients:-0}" "$missing")"
 IFS='|' read -r health_symbol health_label health_reason <<<"$health_record"
 
-write_agent_state "$cycle" "$nutrients" "$buffer" "${total:-0}" "$active_types" "$missing" "$health_symbol" "$health_label" "$change_title" "$summary_text"
+if [[ "$test_outcome" == "success" ]]; then
+  run_summary="$summary_text"
+else
+  run_summary="${summary_text} Test validation failed; the next autonomous run must repair the committed Maven baseline before unrelated work."
+fi
+
+write_agent_state "$cycle" "$nutrients" "$buffer" "${total:-0}" "$active_types" "$missing" "$health_symbol" "$health_label" "$change_title" "$run_summary"
 append_requests
 scripts/update-readme-garden-state.sh
 
-summary_body="${summary_text} Expected future effect: ${expected_effect}. Changed files before memory generation: ${changed_list}. After the workflow tick, the garden reached cycle ${cycle} with nutrients ${nutrients}, nutrientBuffer ${buffer}, active types ${active_types:-none}, and missing roles ${missing}. Test validation outcome: ${test_outcome}."
+if [[ "$garden_advance_outcome" == "success" ]]; then
+  garden_result="After the workflow tick, the garden reached cycle ${cycle} with nutrients ${nutrients}, nutrientBuffer ${buffer}, active types ${active_types:-none}, and missing roles ${missing}."
+else
+  garden_result="The workflow skipped the garden tick because post-change test validation did not pass; the committed garden state remains at cycle ${cycle} with nutrients ${nutrients}, nutrientBuffer ${buffer}, active types ${active_types:-none}, and missing roles ${missing}."
+fi
+
+summary_body="${summary_text} Expected future effect: ${expected_effect}. Changed files before memory generation: ${changed_list}. ${garden_result} Test validation outcome: ${test_outcome}."
 scripts/agent-append-summary.sh --cadence daily --timestamp "$timestamp" --title "$change_title" --body "$summary_body" >/dev/null
 append_rollups_if_due
 
 if [[ "$test_outcome" == "success" ]]; then
   test_result="Passed."
 else
-  test_result="Final test validation outcome: ${test_outcome}."
+  test_result="Final test validation outcome: ${test_outcome}. The failed Maven baseline is committed for the next autonomous run to repair."
 fi
 
 scripts/agent-create-journal-entry.sh \
@@ -362,7 +379,7 @@ scripts/agent-create-journal-entry.sh \
   --reason "$why_text" \
   --checks "$checks" \
   --test-result "$test_result" \
-  --observations "${observations_text} Expected future effect: ${expected_effect}. Automated post-processing refreshed README/state memory from data/garden-state.txt at cycle ${cycle}." \
+  --observations "${observations_text} Expected future effect: ${expected_effect}. ${garden_result} Automated post-processing refreshed README/state memory from data/garden-state.txt." \
   --next "$next_text" >/dev/null
 
 rm -f "$handoff_file"

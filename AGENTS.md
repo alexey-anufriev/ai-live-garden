@@ -139,7 +139,9 @@ The Agent workflow calls Gemini through `GEMINI_API_KEY` and passes `EXECUTION_M
 
 If Gemini fails because of quota, billing, authentication, or provider availability, the run must fail without committing. Do not work around capacity failures by committing partial changes, suppressing errors, or adding unbounded retries.
 
-The workflow does not run a Gemini repair loop. It captures `mvn -B test` before the agent step and includes that result in the next prompt. If a committed previous run left Java tests failing, the next autonomous run must fix those failures first. After Gemini finishes, CI runs tests once; if they fail, the run fails without committing generated memory or partial results.
+The workflow does not run a Gemini repair loop. It captures `mvn -B test` before the agent step and includes that result in the next prompt. If a committed previous run left Java tests failing, the next autonomous run must fix those failures first. After Gemini finishes, CI runs tests once. If post-change Maven compilation or tests fail, the workflow records that outcome, skips the garden tick, commits the failed source state and deterministic memory, and leaves the failed baseline for the next autonomous run to repair.
+
+Provider failures, missing or invalid `.agent-run.json`, deterministic memory validation failures, protected-file violations, and final worktree policy violations still fail the run without committing. Only post-change Maven compilation or test failure is deferred to the next autonomous repair run.
 
 Journal, summary, state, and README formatting are produced by deterministic scripts and validated directly.
 
