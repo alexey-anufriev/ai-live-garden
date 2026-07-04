@@ -164,6 +164,14 @@ public class TraitRegistry {
         return null;
     }
 
+    public static boolean canEat(OrganismType eater, OrganismType eaten) {
+        return eater.prey().contains(eaten);
+    }
+
+    public static OrganismType offspringType(OrganismType type, int cycle, int generation, Environment environment) {
+        return type.offspringType(cycle, generation, environment);
+    }
+
     public static long count(List<Organism> organisms, String trait) {
         return organisms.stream().filter(o -> o.traits().contains(trait)).count();
     }

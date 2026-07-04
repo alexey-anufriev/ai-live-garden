@@ -509,7 +509,7 @@ public class OrganismInteractionCalculator {
         boolean stealthHunter = hunter.traits().contains("stealth-hunter");
 
         java.util.function.Predicate<Organism> isValidPrey = candidate -> {
-            if (candidate.energy() <= 0 || !hunter.type().canEat(candidate.type())) return false;
+            if (candidate.energy() <= 0 || !TraitRegistry.canEat(hunter.type(), candidate.type())) return false;
             if (!stealthHunter) {
                 if (candidate.traits().contains("shadow-stepper") && (candidate.id().hashCode() + cycle) % 2 == 0) return false;
                 if (candidate.traits().contains("camouflaged") && (candidate.id().hashCode() + cycle) % 3 == 0) return false;
@@ -584,7 +584,7 @@ public class OrganismInteractionCalculator {
         // Reproduction phase
         List<Organism> afterReproduction = new ArrayList<>();
         for (Organism organism : context.organisms()) {
-            OrganismType childType = organism.type().offspringType(context.cycle(), organism.generation(), context.environment());
+            OrganismType childType = TraitRegistry.offspringType(organism.type(), context.cycle(), organism.generation(), context.environment());
             
             // Fungal role rescue mechanism
             if (fungusCount == 0 && organism.type() == OrganismType.ROOT_NETWORK) {

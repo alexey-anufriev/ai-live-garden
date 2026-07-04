@@ -4,14 +4,14 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 6656
+- Cycle: 6674
 - Health: Flourishing (🟢)
 - Nutrients: 100.
 - NutrientBuffer: 100.
-- Active organisms: 8753 total across beetle, fox fungus, moss root network, spore.
+- Active organisms: 8766 total across beetle, fox fungus, moss root network, spore.
 - Missing roles: none.
-- Latest agent handoff: Consolidate organism type counting in TraitRegistry.
-- Latest result: Added a new `count(List<Organism> organisms, OrganismType type)` method to `TraitRegistry` and refactored `OrganismInteractionCalculator` to utilize this method for type-based organism counting, removing the now-redundant private `countType` method..
+- Latest agent handoff: Centralize Interaction Logic in TraitRegistry.
+- Latest result: Moved canEat and offspringType logic from OrganismType to TraitRegistry and updated OrganismInteractionCalculator to use these new centralized methods..
 
 ## Immediate Directions
 
