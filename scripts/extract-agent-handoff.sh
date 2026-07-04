@@ -97,6 +97,48 @@ try_candidate() {
   return 1
 }
 
+try_source_text() {
+  local source_label="$1"
+  local source_text_file="$2"
+  local marked_candidate
+  local fenced_candidate
+  local whole_file_candidate
+
+  marked_candidate="${tmp_dir}/marked.json"
+  extract_marked_block "$source_text_file" "$marked_candidate"
+  if try_candidate "$source_label" "$marked_candidate"; then
+    return 0
+  fi
+
+  fenced_candidate="${tmp_dir}/fenced.json"
+  extract_json_fence "$source_text_file" "$fenced_candidate"
+  if try_candidate "$source_label" "$fenced_candidate"; then
+    return 0
+  fi
+
+  whole_file_candidate="${tmp_dir}/whole-file.json"
+  cp "$source_text_file" "$whole_file_candidate"
+  if try_candidate "$source_label" "$whole_file_candidate"; then
+    return 0
+  fi
+
+  return 1
+}
+
+extract_json_string_field() {
+  local source_file="$1"
+  local field="$2"
+  local output_path="$3"
+
+  jq -er --arg field "$field" '
+    if type == "object" and (.[$field] | type == "string") then
+      .[$field]
+    else
+      empty
+    end
+  ' "$source_file" > "$output_path" 2>/dev/null
+}
+
 extract_marked_block() {
   local source_file="$1"
   local candidate_file="$2"
@@ -125,25 +167,20 @@ trap 'rm -rf "$tmp_dir"' EXIT
 while IFS= read -r source_file; do
   [[ -n "$source_file" && -f "$source_file" ]] || continue
 
-  marked_candidate="${tmp_dir}/marked.json"
-  extract_marked_block "$source_file" "$marked_candidate"
-  if try_candidate "$source_file" "$marked_candidate"; then
+  if try_source_text "$source_file" "$source_file"; then
     exit 0
   fi
 
-  fenced_candidate="${tmp_dir}/fenced.json"
-  extract_json_fence "$source_file" "$fenced_candidate"
-  if try_candidate "$source_file" "$fenced_candidate"; then
-    exit 0
-  fi
-
-  whole_file_candidate="${tmp_dir}/whole-file.json"
-  cp "$source_file" "$whole_file_candidate"
-  if try_candidate "$source_file" "$whole_file_candidate"; then
-    exit 0
-  fi
+  for json_field in response text content output; do
+    decoded_text="${tmp_dir}/decoded-${json_field}.txt"
+    if extract_json_string_field "$source_file" "$json_field" "$decoded_text" && [[ -s "$decoded_text" ]]; then
+      if try_source_text "${source_file}.${json_field}" "$decoded_text"; then
+        exit 0
+      fi
+    fi
+  done
 done < <(candidate_files | sort -u)
 
 echo "Could not create ${output_file}: no valid agent handoff JSON was found in Gemini output." >&2
-echo "Expected either ${output_file} or a JSON block between AGENT_RUN_JSON_START and AGENT_RUN_JSON_END." >&2
+echo "Expected either ${output_file}, a JSON block between AGENT_RUN_JSON_START and AGENT_RUN_JSON_END, or a valid handoff inside a known JSON output field such as .response." >&2
 exit 1
