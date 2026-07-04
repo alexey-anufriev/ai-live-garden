@@ -9,9 +9,7 @@ public class FungalSymbioteTest {
     void testRootNetworkReproduction() {
         Organism root = Organism.of("root-1", OrganismType.ROOT_NETWORK, 100, 5, "fungal-symbiote");
         
-        // NextCycle will pass cycle 11+1 = 12.
-        // We need (12 + 0) % 11 != 0.
-        // We need (cycle + gen) % 11 == 0, so if cycle = 12, we need gen = 10 (12+10=22, 22%11=0).
+        // Test root network reproduction logic: Cycle 12 (11+1) and Generation 10 (12+10=22, 22%11=0).
         
         Organism rootGen10 = new Organism("root-1", OrganismType.ROOT_NETWORK, 100, 5, 10, List.of("fungal-symbiote"));
         

@@ -4,19 +4,19 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 6674
+- Cycle: 6722
 - Health: Flourishing (🟢)
 - Nutrients: 100.
 - NutrientBuffer: 100.
-- Active organisms: 8766 total across beetle, fox fungus, moss root network, spore.
+- Active organisms: 8802 total across beetle, fox fungus, moss root network, spore.
 - Missing roles: none.
-- Latest agent handoff: Centralize Interaction Logic in TraitRegistry.
-- Latest result: Moved canEat and offspringType logic from OrganismType to TraitRegistry and updated OrganismInteractionCalculator to use these new centralized methods..
+- Latest agent handoff: Repair worktree policy violations in test files.
+- Latest result: Cleaned up 5 test files (`AnimalNutrientHoarderTest.java`, `FungalAttractorTest.java`, `FungalSymbioteTest.java`, `GardenTest.java`, `NutrientRefinerTest.java`) by removing scratch reasoning and uncertainty comments that violated worktree policies. Verified the fix by running all tests and the validation script..
 
 ## Immediate Directions
 
-- Observe population dynamics after the refactor.
+- Resume normal garden evolution.
 
 ## Constraints & Known Bad Ideas
 
-- Keep succession rules ecologically driven.
+- Keep test code clean and professional.

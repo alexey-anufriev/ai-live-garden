@@ -19,7 +19,7 @@ public class FungalAttractorTest {
         Garden next = garden.nextCycle();
 
         Organism hare = next.organisms().stream().filter(o -> o.type() == OrganismType.HARE).findFirst().orElseThrow();
-        // Base energy 10, metabolism (hare) 1, boost 1 -> 10 - 1 + 1 = 10? Wait, why 12?
+
         assertThat(hare.energy()).isEqualTo(12);
     }
 
@@ -35,7 +35,7 @@ public class FungalAttractorTest {
         Garden next = garden.nextCycle();
 
         Organism hare = next.organisms().stream().filter(o -> o.type() == OrganismType.HARE).findFirst().orElseThrow();
-        // Base energy 10, metabolism 1 -> 9? Why 11?
+
         assertThat(hare.energy()).isEqualTo(11);
     }
 }

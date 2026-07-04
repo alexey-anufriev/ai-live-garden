@@ -25,7 +25,7 @@ public class NutrientRefinerTest {
 
     @Test
     void testNutrientRefinerBoostsFeedingWhenStarving() {
-        // Starving makes energy drop, so we need high enough initial energy
+        // Starving makes energy drop, so provide high enough initial energy
         Organism hunter = Organism.of("hare-1", OrganismType.HARE, 30, 5, "nutrient-refiner", "starving");
         Organism prey = Organism.of("moss-1", OrganismType.MOSS, 30, 5);
         
