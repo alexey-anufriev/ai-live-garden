@@ -1,0 +1,100 @@
+name: Project Manager Plan
+run-name: "Project Manager Plan - ${{ github.run_number }}"
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: ai-live-garden-project-manager
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+env:
+  EXECUTION_MODEL: gemini-3.1-flash-lite
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Build Project Manager prompt
+        id: pm_prompt
+        shell: bash
+        run: |
+          scripts/build-project-manager-context.sh "${RUNNER_TEMP}/project-manager-context.md"
+          scripts/write-output-file.sh text "${RUNNER_TEMP}/project-manager-context.md"
+
+      - name: Record Gemini model diagnostics
+        shell: bash
+        run: scripts/write-gemini-model-diagnostics.sh
+
+      - name: Run Gemini Project Manager step
+        id: gemini_pm
+        uses: google-github-actions/run-gemini-cli@v0.1.22
+        env:
+          GEMINI_CLI_TRUST_WORKSPACE: "true"
+        with:
+          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+          gemini_model: ${{ env.EXECUTION_MODEL }}
+          prompt: ${{ steps.pm_prompt.outputs.text }}
+          upload_artifacts: true
+
+      - name: Extract project plan from Gemini output
+        id: extract_project_plan
+        shell: bash
+        run: scripts/extract-project-plan.sh --output .project-plan.json gemini-artifacts
+
+      - name: Validate project plan
+        id: validate_project_plan
+        shell: bash
+        run: scripts/validate-project-plan.sh .project-plan.json
+
+      - name: Render project plan
+        id: render_project_plan
+        shell: bash
+        run: scripts/render-project-plan.sh .project-plan.json
+
+      - name: Validate Project Manager worktree
+        id: validate_pm_worktree
+        shell: bash
+        run: scripts/validate-project-plan-worktree.sh
+
+      - name: Commit project plan
+        id: commit_project_plan
+        if: ${{ !cancelled() && steps.validate_pm_worktree.outcome == 'success' }}
+        shell: bash
+        env:
+          COMMIT_MESSAGE_PREFIX: "plan: daily garden direction"
+          COMMIT_TIMESTAMP_FORMAT: "%Y-%m-%d"
+        run: scripts/commit-if-changed.sh agent/plans
+
+      - name: Write workflow summary
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          {
+            echo "## Project Manager Plan Summary"
+            echo
+            echo "- UTC: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo "- Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo "- Gemini outcome: ${{ steps.gemini_pm.outcome }}"
+            echo "- Extract project plan outcome: ${{ steps.extract_project_plan.outcome }}"
+            echo "- Validate project plan outcome: ${{ steps.validate_project_plan.outcome }}"
+            echo "- Render project plan outcome: ${{ steps.render_project_plan.outcome }}"
+            echo "- Validate worktree outcome: ${{ steps.validate_pm_worktree.outcome }}"
+            echo "- Commit outcome: ${{ steps.commit_project_plan.outcome }}"
+            echo
+            if [[ -f agent/plans/latest.md ]]; then
+              echo "### Latest Plan"
+              echo
+              sed -n '1,220p' agent/plans/latest.md
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -331,6 +331,23 @@ append_recent_implementation_pattern() {
   echo
 }
 
+append_project_manager_direction() {
+  local latest_plan="agent/plans/latest.md"
+
+  echo "## Project Manager Direction"
+  echo
+  if [[ -f "$latest_plan" ]]; then
+    echo "Advisory daily direction from the Project Manager workflow. Baseline Maven or worktree-policy repair still takes precedence. Choose one direction only when it fits the current run and produces observable garden behavior."
+    echo
+    echo '```markdown'
+    sed -n '1,220p' "$latest_plan"
+    echo '```'
+  else
+    echo "No Project Manager direction has been generated yet."
+  fi
+  echo
+}
+
 append_compact_journal_entry() {
   local path="$1"
 
@@ -395,6 +412,7 @@ append_compact_journal_entry() {
   echo
   append_context_manifest
   append_recent_implementation_pattern
+  append_project_manager_direction
   echo "## Automatic Post-Processing"
   echo
   echo "After this step, CI runs \`scripts/agent-auto-postprocess.sh\`. It parses \`.agent-run.json\`, restores generated memory files, refreshes \`agent/code-map.md\`, advances documentation from \`data/garden-state.txt\`, appends summaries, creates the journal entry, applies any request entries, removes \`.agent-run.json\`, and leaves those artifacts for validation."
