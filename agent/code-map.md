@@ -14,7 +14,7 @@ Generated source orientation for autonomous runs. Do not edit manually.
 - `src/main/java/garden/ai/OrganismInteractionCalculator.java`: Orchestrates organism interactions; updated to pass environment to mutation logic.
 - `src/main/java/garden/ai/OrganismType.java`: Defines taxonomy and environmental succession rules for organisms.
 - `src/main/java/garden/ai/Simulation.java`: Advances seed or loaded garden state.
-- `src/main/java/garden/ai/TraitRegistry.java`: Central registry for traits; updated for biased mutation logic.
+- `src/main/java/garden/ai/TraitRegistry.java`: Central registry for traits and nutrient contribution calculations.
 
 ## Tests
 
