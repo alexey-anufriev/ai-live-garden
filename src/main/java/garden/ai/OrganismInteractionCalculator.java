@@ -321,7 +321,7 @@ public class OrganismInteractionCalculator {
         // Reproduction phase
         List<Organism> afterReproduction = new ArrayList<>();
         for (Organism organism : context.organisms()) {
-            OrganismType childType = TraitRegistry.offspringType(organism.type(), context.cycle(), organism.generation(), context.environment());
+            OrganismType childType = TraitRegistry.offspringType(organism, context.cycle(), organism.generation(), context.environment());
             
             // Fungal role rescue mechanism
             if (fungusCount == 0 && organism.type() == OrganismType.ROOT_NETWORK) {

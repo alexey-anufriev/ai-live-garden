@@ -112,6 +112,13 @@ public enum OrganismType {
         return this;
     }
 
+    public OrganismType offspringType(int cycle, int generation, Environment environment, java.util.List<String> traits) {
+        if (traits.contains("prolific-spore-producer") && (this == MOSS || this == ROOT_NETWORK)) {
+            return SPORE;
+        }
+        return offspringType(cycle, generation, environment);
+    }
+
     public enum Kingdom {
         PLANT,
         HERBIVORE,
