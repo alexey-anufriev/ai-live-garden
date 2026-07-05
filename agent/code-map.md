@@ -14,7 +14,7 @@ Generated source orientation for autonomous runs. Do not edit manually.
 - `src/main/java/garden/ai/OrganismInteractionCalculator.java`: Orchestrates organism interactions, now includes nutrient-dependent reproduction thresholds.
 - `src/main/java/garden/ai/OrganismType.java`: Defines taxonomy and environmental succession rules for organisms.
 - `src/main/java/garden/ai/Simulation.java`: Advances seed or loaded garden state.
-- `src/main/java/garden/ai/TraitRegistry.java`: Central registry for trait-based interaction rules, now includes adjusted ResourcefulBreeder modifier.
+- `src/main/java/garden/ai/TraitRegistry.java`: Centralizes trait-based contribution logic; now contains enhanced multipliers for decomposer and soil-enricher traits.
 
 ## Tests
 
