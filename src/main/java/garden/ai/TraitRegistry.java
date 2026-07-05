@@ -312,7 +312,7 @@ public class TraitRegistry {
                 modifier -= 3;
                 break;
             case "resourceful-breeder":
-                if (environment.nutrients() < 20) modifier -= 3;
+                if (environment.nutrients() < 25) modifier -= 8;
                 break;
             case "fungal-nurturer":
                 if (fungalContribution > 0) modifier -= 3;

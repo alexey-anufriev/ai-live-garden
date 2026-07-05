@@ -401,6 +401,9 @@ public class OrganismInteractionCalculator {
         } else if (organism.type() == OrganismType.FOX) {
             threshold = 15;
         }
+        if (environment.nutrients() < 25) {
+            threshold += 5;
+        }
         for (String trait : organism.traits()) {
             threshold += TraitRegistry.getReproductionThresholdModifier(trait, environment, fungalContribution);
         }

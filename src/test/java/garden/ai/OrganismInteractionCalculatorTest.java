@@ -84,4 +84,16 @@ class OrganismInteractionCalculatorTest {
         
         assertThat(fedHerbivore.energy()).isEqualTo(13);
     }
+
+    @Test
+    void reproductionThresholdIncreasesInLowNutrients() {
+        Environment highNutrients = new Environment(50, 50, 50, 100, 100);
+        Environment lowNutrients = new Environment(50, 50, 50, 10, 100);
+        Organism moss = Organism.of("moss-1", OrganismType.MOSS, 10, 1);
+        
+        int thresholdHigh = OrganismInteractionCalculator.reproductionThreshold(moss, highNutrients, 0);
+        int thresholdLow = OrganismInteractionCalculator.reproductionThreshold(moss, lowNutrients, 0);
+        
+        assertThat(thresholdLow).isGreaterThan(thresholdHigh);
+    }
 }
