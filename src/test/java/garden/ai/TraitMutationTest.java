@@ -19,7 +19,7 @@ public class TraitMutationTest {
         }
         
         // Plant/Animal check: BEETLE is animal -> should get metabolic-efficiency
-        // 20% bias -> expect around 400. Even with deterministic fallback, should be > 10%
-        assertTrue(metabolicEfficiencyCount > iterations * 0.1, "Metabolic efficiency should be frequent: " + metabolicEfficiencyCount);
+        // 30% bias -> expect around 600. Even with deterministic fallback, should be > 20%
+        assertTrue(metabolicEfficiencyCount > iterations * 0.2, "Metabolic efficiency should be frequent: " + metabolicEfficiencyCount);
     }
 }

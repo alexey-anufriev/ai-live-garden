@@ -336,7 +336,7 @@ public class TraitRegistry {
             String[] fungalTraits = {"nutrient-decomposer", "fungus-soil-enricher", "fungal-network-connector", "fungal-accelerator", "fungal-enhancer", "fungal-buffer-stabilizer", "nutrient-synthesizer", "buffer-tapper"};
             return fungalTraits[Math.floorMod(cycle + organism.generation(), fungalTraits.length)];
         }
-        if (environment.nutrients() < 25 && Math.random() < 0.2) {
+        if (environment.nutrients() < 40 && Math.random() < 0.3) {
             if (childType.isPlant()) return "dormancy";
             if (childType.isAnimal()) return "metabolic-efficiency";
         }
