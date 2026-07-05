@@ -1,5 +1,5 @@
-name: Project Manager Plan
-run-name: "Project Manager Plan - ${{ github.run_number }}"
+name: PM Plan
+run-name: "PM Plan - ${{ github.run_number }}"
 
 on:
   workflow_dispatch:
