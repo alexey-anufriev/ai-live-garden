@@ -322,10 +322,14 @@ public class TraitRegistry {
         return modifier;
     }
 
-    public static String getMutationTrait(int cycle, Organism organism, OrganismType childType) {
+    public static String getMutationTrait(int cycle, Organism organism, OrganismType childType, Environment environment) {
         if (childType == OrganismType.FUNGUS && Math.random() < 0.5) {
             String[] fungalTraits = {"nutrient-decomposer", "fungus-soil-enricher", "fungal-network-connector", "fungal-accelerator", "fungal-enhancer", "fungal-buffer-stabilizer", "nutrient-synthesizer", "buffer-tapper"};
             return fungalTraits[Math.floorMod(cycle + organism.generation(), fungalTraits.length)];
+        }
+        if (environment.nutrients() < 25 && Math.random() < 0.2) {
+            if (childType.isPlant()) return "dormancy";
+            if (childType.isAnimal()) return "metabolic-efficiency";
         }
         int index = Math.floorMod(organism.id().hashCode() + cycle + organism.generation(), TRAITS.length);
         return TRAITS[index];

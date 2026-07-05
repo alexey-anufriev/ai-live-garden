@@ -183,16 +183,16 @@ public class OrganismInteractionCalculator {
             }
         }
 
-        return maybeMutate(changed, context.cycle(), context.events());
+        return maybeMutate(changed, context.cycle(), context.events(), context.environment());
     }
 
-    private static Organism maybeMutate(Organism organism, int cycle, List<GardenEvent> events) {
+    private static Organism maybeMutate(Organism organism, int cycle, List<GardenEvent> events, Environment environment) {
         if ((organism.energy() + organism.curiosity() + cycle + organism.generation()) % 11 != 0) return organism;
         String trait;
         if (organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("stressed") && (organism.id().hashCode() + cycle) % 5 == 0) {
             trait = "fungal-symbiote";
         } else {
-            trait = TraitRegistry.getMutationTrait(cycle, organism, organism.type());
+            trait = TraitRegistry.getMutationTrait(cycle, organism, organism.type(), environment);
         }
         Organism changed = organism.withTrait(trait).withCuriosity(organism.curiosity() + 1);
         events.add(new GardenEvent(cycle, "%s adapted a %s trait.".formatted(organism.id(), trait)));
@@ -344,7 +344,7 @@ public class OrganismInteractionCalculator {
             if (canReproduce) {
                 String childId = childType.name().toLowerCase(Locale.ROOT).replace('_', '-') + "-" + identifier;
                 Organism parentAfterBirth = organism.withEnergy(organism.energy() / 2);
-                Organism child = organism.child(childId, childType, TraitRegistry.getMutationTrait(context.cycle(), organism, childType));
+                Organism child = organism.child(childId, childType, TraitRegistry.getMutationTrait(context.cycle(), organism, childType, context.environment()));
                 afterReproduction.add(parentAfterBirth);
                 afterReproduction.add(child);
                 context.events().add(new GardenEvent(context.cycle(), "%s released %s as a new %s.".formatted(

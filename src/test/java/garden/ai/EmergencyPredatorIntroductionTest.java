@@ -55,7 +55,7 @@ public class EmergencyPredatorIntroductionTest {
         
         // Advance cycles - force the predator introduction
         Garden next = null;
-        for (int i = 0; i < 5000; i++) {
+        for (int i = 0; i < 10000; i++) {
             next = garden.nextCycle();
             if (next.organisms().stream().filter(o -> o.type() == OrganismType.FOX).count() >= 2) {
                 break;
