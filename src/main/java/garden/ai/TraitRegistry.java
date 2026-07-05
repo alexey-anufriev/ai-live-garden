@@ -270,7 +270,7 @@ public class TraitRegistry {
                       context.fungalAcceleratorCount() * 15 +
                       context.fungalEnhancerCount() * 8 +
                       context.fungalBufferStabilizerCount() * 12 +
-                      context.fungalDecomposerAcceleratorCount() * 20 +
+                      context.fungalDecomposerAcceleratorCount() * 30 +
                       context.fungalGardenerCount() * 5 +
                       context.fungalFertilizerCount() * 7 +
                       context.fungalDecomposerMimicCount() * 5) + synergizerBonus;
