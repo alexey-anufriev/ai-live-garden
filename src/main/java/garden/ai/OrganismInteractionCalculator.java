@@ -362,6 +362,12 @@ public class OrganismInteractionCalculator {
         int bufferBonus = context.environment().nutrientBuffer() / 10;
         Random random = context.random() != null ? context.random() : new Random();
 
+        // Spore dispersal adaptor: boost colonization chance
+        long sporeDispersalAdaptorCount = next.stream().filter(o -> o.type() == OrganismType.SPORE && o.traits().contains("spore-dispersal-adaptor")).count();
+        int dispersalBonus = (int) Math.min(sporeDispersalAdaptorCount * 2, 10);
+        int colonizationChance = 20 - bufferBonus - dispersalBonus;
+        if (colonizationChance < 2) colonizationChance = 2;
+
         if (next.isEmpty()) {
             OrganismType[] plantTypes = {OrganismType.MOSS, OrganismType.SPORE, OrganismType.FERN, OrganismType.FUNGUS};
             OrganismType selected = plantTypes[random.nextInt(plantTypes.length)];
@@ -373,7 +379,7 @@ public class OrganismInteractionCalculator {
 
         long currentAnimalCount = next.stream().filter(o -> o.type().isAnimal()).count();
         long currentPlantCount = next.stream().filter(o -> o.type().isPlant()).count();
-        if (currentAnimalCount == 0 && currentPlantCount > 200 && !Boolean.getBoolean("disable.emergency.colonization") && random.nextInt(20 - bufferBonus) == 0) {
+        if (currentAnimalCount == 0 && currentPlantCount > 200 && !Boolean.getBoolean("disable.emergency.colonization") && random.nextInt(colonizationChance) == 0) {
             OrganismType herbivore = OrganismType.BEETLE;
             String id = herbivore.name().toLowerCase(Locale.ROOT).replace('_', '-') + "-" + identifier;
             next.add(Organism.of(id, herbivore, 5, 2, "emergency-colonizer"));
@@ -383,7 +389,7 @@ public class OrganismInteractionCalculator {
 
         long herbivoreCount = next.stream().filter(o -> o.type().kingdom() == OrganismType.Kingdom.HERBIVORE).count();
         long predatorCount = next.stream().filter(o -> o.type().kingdom() == OrganismType.Kingdom.PREDATOR).count();
-        if (herbivoreCount > 0 && predatorCount < 3 && !Boolean.getBoolean("disable.emergency.colonization") && random.nextInt(20 - bufferBonus) == 0) {
+        if (herbivoreCount > 0 && predatorCount < 3 && !Boolean.getBoolean("disable.emergency.colonization") && random.nextInt(colonizationChance) == 0) {
             OrganismType predator = OrganismType.FOX;
             String id = predator.name().toLowerCase(Locale.ROOT).replace('_', '-') + "-" + identifier;
             next.add(Organism.of(id, predator, 5, 8, "emergency-colonizer"));
