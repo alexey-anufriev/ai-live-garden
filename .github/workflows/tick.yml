@@ -31,18 +31,29 @@ jobs:
 
       - name: Baseline test
         id: baseline_test
-        run: mvn -B test
+        shell: bash
+        env:
+          BASELINE_TEST_OUTPUT_LINES: "120"
+        run: scripts/capture-tick-baseline-test.sh "${RUNNER_TEMP}/tick-baseline-test.md"
+
+      - name: Record skipped tick
+        if: steps.baseline_test.outputs.passed != 'true'
+        shell: bash
+        run: scripts/write-skipped-tick-summary.sh "${RUNNER_TEMP}/tick-baseline-test.md"
 
       - name: Advance persistent garden state
         id: advance_garden
+        if: steps.baseline_test.outputs.passed == 'true'
         run: mvn -B -q exec:java -Dexec.args="tick --steps 5"
 
       - name: Update README garden state
         id: update_readme_state
+        if: steps.baseline_test.outputs.passed == 'true'
         shell: bash
         run: scripts/update-readme-garden-state.sh
 
       - name: Commit changes directly to main
+        if: steps.baseline_test.outputs.passed == 'true'
         shell: bash
         env:
           COMMIT_MESSAGE_PREFIX: "feat: garden tick"
