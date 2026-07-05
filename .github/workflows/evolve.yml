@@ -83,7 +83,6 @@ jobs:
         env:
           AGENT_BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
           AGENT_BASELINE_POLICY_OUTCOME: ${{ steps.baseline_policy.outcome }}
-          AGENT_PM_PLAN_FILE: agent/plans/latest.md
         run: scripts/extract-agent-handoff.sh --output .agent-run.json gemini-artifacts
 
       - name: Validate agent handoff
@@ -92,7 +91,6 @@ jobs:
         env:
           AGENT_BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
           AGENT_BASELINE_POLICY_OUTCOME: ${{ steps.baseline_policy.outcome }}
-          AGENT_PM_PLAN_FILE: agent/plans/latest.md
         run: scripts/validate-agent-handoff.sh .agent-run.json
 
       - name: Validate tests after Gemini changes

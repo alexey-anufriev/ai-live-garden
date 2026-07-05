@@ -8,7 +8,6 @@ scripts/validate-project-plan.sh "$plan_file" >/dev/null
 plan_date="$(jq -r '.date' "$plan_file")"
 output_dir="agent/plans"
 dated_plan="${output_dir}/${plan_date}.md"
-latest_plan="${output_dir}/latest.md"
 
 mkdir -p "$output_dir"
 
@@ -45,7 +44,6 @@ render_plan() {
 }
 
 render_plan > "$dated_plan"
-cp "$dated_plan" "$latest_plan"
 rm -f "$plan_file"
 
-echo "Rendered project plan to ${dated_plan} and ${latest_plan}."
+echo "Rendered project plan to ${dated_plan}."

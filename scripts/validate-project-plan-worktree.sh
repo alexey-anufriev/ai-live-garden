@@ -10,10 +10,10 @@ add_violation() {
 while IFS= read -r path; do
   [[ -n "$path" ]] || continue
   case "$path" in
-    agent/plans/*.md|agent/plans/.gitkeep)
+    agent/plans/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].md|agent/plans/.gitkeep)
       ;;
     *)
-      add_violation "Project Manager workflow may only change agent/plans files: ${path}"
+      add_violation "Project Manager workflow may only change dated agent/plans/YYYY-MM-DD.md files: ${path}"
       ;;
   esac
 done < <(
@@ -22,10 +22,6 @@ done < <(
     git ls-files --others --exclude-standard -- .
   } | sort -u
 )
-
-if [[ ! -f agent/plans/latest.md ]]; then
-  add_violation "Missing rendered latest project plan: agent/plans/latest.md"
-fi
 
 if ! find agent/plans -maxdepth 1 -type f -name '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].md' -print -quit | grep -q .; then
   add_violation "Missing dated project plan under agent/plans/YYYY-MM-DD.md"

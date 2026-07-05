@@ -10,7 +10,7 @@ output_file="$1"
 mkdir -p "$(dirname "$output_file")"
 
 latest_plan() {
-  find agent/plans -maxdepth 1 -type f -name '*.md' ! -name 'latest.md' -print 2>/dev/null | sort -V | tail -n 1
+  find agent/plans -maxdepth 1 -type f -name '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].md' -print 2>/dev/null | sort -V | tail -n 1
 }
 
 append_full_file() {

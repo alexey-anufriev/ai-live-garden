@@ -104,7 +104,7 @@ append_context_manifest() {
   echo "## Context Manifest"
   echo
   echo "- README state, summaries, journal, and current memory are generated after the agent step by scripts."
-  echo "- Continuity sources include \`agent/state.md\`, \`agent/code-map.md\`, \`agent/requests.md\`, \`agent/plans/latest.md\` when present, latest active summaries, and recent active journal files."
+  echo "- Continuity sources include \`agent/state.md\`, \`agent/code-map.md\`, \`agent/requests.md\`, the newest dated \`agent/plans/YYYY-MM-DD.md\` file when present, latest active summaries, and recent active journal files."
   echo "- Recent active journal source set: latest ${recent_journal_limit} of ${journal_count} directly under \`agent/journal/\`."
   echo "- Persistent garden state is included as an exact computed digest, not as raw organism lines."
   echo "- Project source is summarized in \`agent/code-map.md\`; inspect exact source files only when needed for the chosen task."
@@ -332,12 +332,15 @@ append_recent_implementation_pattern() {
 }
 
 append_project_manager_direction() {
-  local latest_plan="agent/plans/latest.md"
+  local latest_plan
+  latest_plan="$(find agent/plans -maxdepth 1 -type f -name '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].md' -print 2>/dev/null | sort -V | tail -n 1)"
 
   echo "## Project Manager Direction"
   echo
-  if [[ -f "$latest_plan" ]]; then
+  if [[ -n "$latest_plan" && -f "$latest_plan" ]]; then
     echo "Highest product priority for normal autonomous runs. Baseline Maven or worktree-policy repair is the only higher priority. If repair is not required, choose exactly one listed PM direction, set \`pmDirection\` in \`.agent-run.json\` to its label, and do not invent unrelated work."
+    echo
+    echo "Source: \`${latest_plan}\`."
     echo
     echo '```markdown'
     sed -n '1,220p' "$latest_plan"

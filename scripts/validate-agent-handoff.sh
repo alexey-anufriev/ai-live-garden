@@ -72,7 +72,10 @@ if [[ "$repair_allowed" != "true" ]]; then
     exit 1
   fi
 
-  pm_plan_file="${AGENT_PM_PLAN_FILE:-agent/plans/latest.md}"
+  pm_plan_file="${AGENT_PM_PLAN_FILE:-}"
+  if [[ -z "$pm_plan_file" ]]; then
+    pm_plan_file="$(find agent/plans -maxdepth 1 -type f -name '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].md' -print 2>/dev/null | sort -V | tail -n 1)"
+  fi
   if [[ -f "$pm_plan_file" ]]; then
     pm_direction="$(jq -r '.pmDirection // empty' "$handoff_file")"
     if ! grep -Eq '^[A-D]$' <<<"$pm_direction"; then

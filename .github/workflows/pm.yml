@@ -92,9 +92,12 @@ jobs:
             echo "- Validate worktree outcome: ${{ steps.validate_pm_worktree.outcome }}"
             echo "- Commit outcome: ${{ steps.commit_project_plan.outcome }}"
             echo
-            if [[ -f agent/plans/latest.md ]]; then
+            latest_plan="$(find agent/plans -maxdepth 1 -type f -name '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].md' -print 2>/dev/null | sort -V | tail -n 1)"
+            if [[ -n "$latest_plan" && -f "$latest_plan" ]]; then
               echo "### Latest Plan"
               echo
-              sed -n '1,220p' agent/plans/latest.md
+              echo "Source: \`${latest_plan}\`."
+              echo
+              sed -n '1,220p' "$latest_plan"
             fi
           } >> "$GITHUB_STEP_SUMMARY"
