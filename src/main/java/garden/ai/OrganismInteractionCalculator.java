@@ -242,7 +242,7 @@ public class OrganismInteractionCalculator {
 
             int index = preyIndex.get();
             Organism prey = mutable.get(index);
-            TraitRegistry.BiteEffect biteResult = TraitRegistry.calculateBite(hunter, prey, environment, cycle, rootNetworkCount);
+            TraitRegistry.BiteEffect biteResult = TraitRegistry.calculateBite(hunter, prey, environment, cycle, rootNetworkCount, mutable);
             int bite = biteResult.biteSize();
             events.addAll(biteResult.events());
             
