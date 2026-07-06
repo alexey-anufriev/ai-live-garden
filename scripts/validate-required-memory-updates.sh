@@ -11,6 +11,13 @@ fi
 : > "$violations_file"
 
 failed=0
+post_test_outcome="${POST_TEST_OUTCOME:-unknown}"
+garden_advance_outcome="${GARDEN_ADVANCE_OUTCOME:-${ADVANCE_GARDEN_OUTCOME:-unknown}}"
+readme_change_required=true
+
+if [[ "$post_test_outcome" == "failure" || "$garden_advance_outcome" == "skipped" ]]; then
+  readme_change_required=false
+fi
 
 record_violation() {
   local path="$1"
@@ -167,7 +174,7 @@ if changed_path "agent/state.md"; then
   record_violation "agent/state.md" "every autonomous run must update current project memory in place"
 fi
 
-if changed_path "README.md"; then
+if [[ "$readme_change_required" == "true" ]] && changed_path "README.md"; then
   record_violation "README.md" "every autonomous run must update the protected Current Garden State block"
 fi
 

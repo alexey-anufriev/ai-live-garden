@@ -134,6 +134,8 @@ jobs:
         if: ${{ !cancelled() && steps.auto_memory.outcome == 'success' }}
         shell: bash
         env:
+          POST_TEST_OUTCOME: ${{ steps.post_test_final.outcome }}
+          GARDEN_ADVANCE_OUTCOME: ${{ steps.advance_garden.outcome }}
           VALIDATE_REPAIR_VIOLATIONS_FILE: ${{ runner.temp }}/required-memory-violations.txt
         run: scripts/validate-required-memory-updates.sh
 
