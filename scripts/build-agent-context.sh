@@ -219,61 +219,11 @@ commit_source_files() {
     sort -u
 }
 
-commit_domain_terms() {
-  local commit="$1"
-  {
-    commit_title "$commit"
-    git show --name-only --format='' "$commit" 2>/dev/null |
-      awk '/^agent\/journal\/[^/]+[.]md$/ { print }' |
-      while IFS= read -r journal; do
-        [[ -n "$journal" ]] || continue
-        git show "${commit}:${journal}" 2>/dev/null | sed -n '1,24p' || true
-      done
-  } |
-    tr '[:upper:]' '[:lower:]' |
-    awk '
-      {
-        while (match($0, /(fungal|fungus|nutrient|buffer|trait|observability|recovery|succession|predator|herbivore|root|moss|renderer)/)) {
-          print substr($0, RSTART, RLENGTH)
-          $0 = substr($0, RSTART + RLENGTH)
-        }
-      }
-    ' |
-    sort -u
-}
-
-commit_work_style_terms() {
-  local commit="$1"
-  {
-    commit_title "$commit"
-    git show --name-only --format='' "$commit" 2>/dev/null |
-      awk '/^agent\/journal\/[^/]+[.]md$/ { print }' |
-      while IFS= read -r journal; do
-        [[ -n "$journal" ]] || continue
-        git show "${commit}:${journal}" 2>/dev/null | sed -n '1,80p' || true
-      done
-  } |
-    tr '[:upper:]' '[:lower:]' |
-    awk '
-      /no immediate (behavior|behaviour|effect|change)/ { print "behavior-neutral" }
-      /no (functional|behavioral|behavioural) changes?/ { print "behavior-neutral" }
-      /refactor(ed|ing)?/ { print "refactor" }
-      /centraliz(e|ed|es|ing|ation)/ { print "centralization" }
-      /consolidat(e|ed|es|ing|ion)/ { print "consolidation" }
-      /maintainability|maintenance|cleaner code|cleaner structure|readability|extensibility/ { print "maintenance-only" }
-    ' |
-    sort -u
-}
-
 append_recent_implementation_pattern() {
   local commits=()
   local commit
   local source_file
-  local term
-  local style
   declare -A source_count=()
-  declare -A term_count=()
-  declare -A style_count=()
   local repetition_lines=()
 
   mapfile -t commits < <(autonomous_commits 5)
@@ -292,41 +242,21 @@ append_recent_implementation_pattern() {
       [[ -n "$source_file" ]] || continue
       source_count["$source_file"]=$(( ${source_count["$source_file"]:-0} + 1 ))
     done < <(commit_source_files "$commit")
-    while IFS= read -r term; do
-      [[ -n "$term" ]] || continue
-      term_count["$term"]=$(( ${term_count["$term"]:-0} + 1 ))
-    done < <(commit_domain_terms "$commit")
-    while IFS= read -r style; do
-      [[ -n "$style" ]] || continue
-      style_count["$style"]=$(( ${style_count["$style"]:-0} + 1 ))
-    done < <(commit_work_style_terms "$commit")
   done
 
   echo
-  echo "### Repetition Signals"
+  echo "### Repeated Source Files"
   echo
   for source_file in "${!source_count[@]}"; do
     if (( source_count["$source_file"] >= 2 )); then
       repetition_lines+=("- Source repeated in ${source_count["$source_file"]} of the last ${#commits[@]} coding runs: \`${source_file}\`.")
     fi
   done
-  for term in "${!term_count[@]}"; do
-    if (( term_count["$term"] >= 2 )); then
-      repetition_lines+=("- Domain term repeated in ${term_count["$term"]} of the last ${#commits[@]} coding runs: ${term}.")
-    fi
-  done
-  for style in "${!style_count[@]}"; do
-    if (( style_count["$style"] >= 2 )); then
-      repetition_lines+=("- Work style repeated in ${style_count["$style"]} of the last ${#commits[@]} coding runs: ${style}.")
-    fi
-  done
 
   if (( ${#repetition_lines[@]} > 0 )); then
     printf '%s\n' "${repetition_lines[@]}" | sort
-    echo "- When recent work repeats the same file or domain term, avoid another centralization, extraction, consolidation, or behavior-neutral cleanup in that area. Prefer a different ecological pressure or an outcome-changing behavior."
-    echo "- If two or more of the latest five coding runs were refactors, centralization, consolidation, or maintenance-only work, do not choose another refactor. Choose ecological behavior or required repair."
   else
-    echo "- No strong repetition signal detected."
+    echo "- No source file was repeated in multiple recent coding runs."
   fi
   echo
 }
@@ -384,12 +314,12 @@ append_compact_journal_entry() {
   echo "- Prefer changes whose value remains visible beyond the current run by making the garden more coherent, alive, inspectable, or responsive to its state."
   echo "- Prefer changes that increase future autonomous development capacity through behavior: expressive state transitions, visible consequences in future ticks, reusable simulation concepts that affect outcomes, or mechanics that create new ecological possibilities."
   echo "- Do not choose a task merely because it is the easiest way to satisfy validators. Memory, journal, summaries, tests, and validators support autonomy; they are not the purpose of the run."
-  echo "- Do not repeat the recent implementation pattern by default. If recent runs mostly added similar named mechanisms, diagnostics, event logs, counters, tests, centralization, extraction, or refactoring, treat those categories as saturated."
+  echo "- Do not repeat the recent implementation pattern by default; use the recent commit list and source-file repetition signals as context, then choose the highest-value task."
   echo "- If the Baseline Maven Test Result says \`failed\`, repairing the existing Java source or tests is the run's required first task. Do not add unrelated behavior until \`mvn test\` passes."
   echo "- If the Baseline Worktree Policy Result says \`deferred-repair\`, repairing those policy violations is the run's required first task. Do not add unrelated behavior until the policy violations are cleared."
   echo "- If Project Manager Direction exists and no baseline repair is required, choose exactly one PM direction A-D as the run's highest product priority. Set \`pmDirection\` in \`.agent-run.json\` to the selected label."
-  echo "- Do not choose behavior-neutral refactoring, centralization, extraction, renaming, relocation, or cleanup as the main task. These are allowed only as supporting edits needed for a behavior-changing task or a baseline repair."
-  echo "- A valid \`expectedGardenEffect\` must describe a future ecological consequence. Invalid effects include \`no immediate behavioral change\`, \`easier maintenance\`, \`cleaner code\`, \`centralized logic\`, \`better extensibility\`, or \`simpler future changes\`."
+  echo "- Choose a task for its garden value, and let implementation structure follow from that task."
+  echo "- \`expectedGardenEffect\` should explain what future garden behavior or runtime state should change."
   echo "- A run that only adds a named trait, diagnostic field, renderer line, event-log message, counter, or test coverage is low value unless it directly changes future garden behavior or removes a current obstacle to ecological recovery."
   echo "- If a candidate change would only add a name, counter, log line, renderer phrase, or isolated test, choose a stronger task."
   echo "- Prefer outcome-changing work: make an overfull nutrient buffer change release behavior under drought or starvation; make missing roles recover based on current population pressure; make fungi, moss, roots, predators, or herbivores respond to measurable environmental stress; make reproduction, starvation, predation, or decay depend on existing garden state in a new observable way; or convert existing observations into behavior that affects future ticks."

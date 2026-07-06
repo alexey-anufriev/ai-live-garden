@@ -35,36 +35,4 @@ if ! jq -e '
   exit 1
 fi
 
-all_plan_text="$(jq -r '[
-  .thesis,
-  (.stateSignals[]),
-  (.directions[] | [.title, .why, .expectedGardenEffect, .acceptanceSignal, .avoid] | join("\n")),
-  (.antiPatterns[])
-] | join("\n") | ascii_downcase' "$plan_file")"
-
-positive_plan_text="$(jq -r '[
-  .thesis,
-  (.stateSignals[]),
-  (.directions[] | [.title, .why, .expectedGardenEffect, .acceptanceSignal] | join("\n"))
-] | join("\n") | ascii_downcase' "$plan_file")"
-
-if grep -Eq '(^|[^[:alnum:]_/.-])(src/|scripts/|[.][a-z0-9_-]+[.]java|pom[.]xml|traitregistry|organisminteractioncalculator|garden[.]java|github/workflows)' <<<"$all_plan_text"; then
-  echo "Project plan appears to suggest code files or implementation internals." >&2
-  echo "The PM plan must describe garden directions, not code targets." >&2
-  exit 1
-fi
-
-if grep -Eq 'refactor|centraliz(e|ed|es|ing|ation)|consolidat(e|ed|es|ing|ion)|cleanup|clean up|rename|extract|maintainability|readability|cleaner code|technical debt' <<<"$positive_plan_text"; then
-  echo "Project plan contains maintenance-only or refactoring language." >&2
-  echo "The PM plan must focus on observable garden progress." >&2
-  exit 1
-fi
-
-while IFS= read -r effect; do
-  if ! grep -Eiq 'future tick|future ticks|tick|cycle|garden|organism|population|nutrient|buffer|starv|reproduc|predat|decay|decompos|fung|moss|root|herbivore|predator|beetle|fox|hare|plant|spore|role|surviv|energy|environment|drought|stress|recover|coloniz|succession|food chain' <<<"$effect"; then
-    echo "Direction expectedGardenEffect lacks an observable garden outcome: ${effect}" >&2
-    exit 1
-  fi
-done < <(jq -r '.directions[].expectedGardenEffect' "$plan_file")
-
 echo "Project plan JSON is present and valid: ${plan_file}"

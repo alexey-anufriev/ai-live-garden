@@ -32,23 +32,6 @@ normalize_description() {
   echo "$description"
 }
 
-is_change_specific_description() {
-  local description
-
-  description="$(normalize_description "$1")"
-  [[ -n "$description" ]] || return 0
-
-  if grep -Eiq '^(updated|added|implemented|changed|modified|introduced|enhanced|extended|refactored|reworked|adjusted|fixed|removed|created)[[:space:]]' <<<"$description"; then
-    return 0
-  fi
-
-  if grep -Eiq '\b(this run|this change|new trait|new mechanism|new logic|to include|to support|via a new|now handles|now supports)\b' <<<"$description"; then
-    return 0
-  fi
-
-  return 1
-}
-
 default_description_for() {
   local path="$1"
 
@@ -98,9 +81,7 @@ load_existing_descriptions() {
       path="${BASH_REMATCH[1]}"
       description="${BASH_REMATCH[2]}"
       description="$(normalize_description "$description")"
-      if is_change_specific_description "$description"; then
-        continue
-      fi
+      [[ -n "$description" ]] || continue
       descriptions["$path"]="$description"
     fi
   done < "$output_file"
@@ -117,9 +98,7 @@ load_handoff_descriptions() {
   while IFS=$'\t' read -r path description; do
     [[ -n "$path" && -n "$description" ]] || continue
     description="$(normalize_description "$description")"
-    if is_change_specific_description "$description"; then
-      continue
-    fi
+    [[ -n "$description" ]] || continue
     descriptions["$path"]="$description"
   done < <(
     jq -r '

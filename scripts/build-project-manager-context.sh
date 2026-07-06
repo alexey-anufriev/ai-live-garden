@@ -155,7 +155,7 @@ append_latest_plan() {
   echo
   echo "- Use mainly the garden state digest from \`data/garden-state.txt\`, current agent state, open requests, and previous PM direction."
   echo "- Do not inspect Java source files, tests, \`agent/code-map.md\`, or workflow files. This is product/ecology planning, not code review."
-  echo "- Do not propose refactoring, centralization, extraction, cleanup, renaming, or maintainability-only work."
+  echo "- Recommend garden-facing outcomes rather than code-organization work."
   echo "- Each direction must describe an observable garden outcome for future ticks: population balance, nutrients, buffer pressure, survival, reproduction, predation, decay, succession, recovery, or environment response."
   echo "- Suggest directions, not implementation files. The autonomous agent will inspect code later if it chooses a direction."
   echo "- Baseline repair always takes precedence during agent runs. Once repair is clear, your directions are the highest product priority for autonomous agents that day."

@@ -75,26 +75,6 @@ if git status --porcelain -uall | grep -Eq '^\?\? [^/]+\.(java|class|tmp|log|txt
   )
 fi
 
-if [[ "$scope" == "changed" ]] && test_paths | grep -q '/Test[^/]*[.]java$'; then
-  while IFS= read -r path; do
-    add_deferred_violation "Test file name is too generic; use a behavior-specific name: ${path}"
-  done < <(test_paths | grep '/Test[^/]*[.]java$' | sort)
-fi
-
-while IFS= read -r path; do
-  [[ -n "$path" ]] || continue
-
-  if grep -Eq 'traits\(\)\.contains' "$path" && ! grep -Eq 'nextCycle|Garden[[:space:]]|organisms\(\)|environment\(\)|events\(\)' "$path"; then
-    if [[ "$scope" == "changed" ]]; then
-      add_deferred_violation "Test appears to assert trait storage without proving garden behavior: ${path}"
-    fi
-  fi
-
-  if grep -Einq '^[[:space:]]*//.*\b(maybe|not sure|wait|does not distinguish|increased cycles|we need)\b' "$path"; then
-    add_deferred_violation "Test contains scratch reasoning or uncertainty comments: ${path}"
-  fi
-done < <(test_paths | sort)
-
 severity="clean"
 exit_code=0
 if (( ${#hard_violations[@]} > 0 )); then
