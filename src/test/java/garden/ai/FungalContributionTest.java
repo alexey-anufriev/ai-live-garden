@@ -93,4 +93,21 @@ public class FungalContributionTest {
         // Should be 0 since no fungi are present to contribute.
         assertEquals(0, garden.fungalContribution());
     }
+
+    @Test
+    public void testFungalContributionWithDecayPressure() {
+        Organism fungus1 = Organism.of("fungus-1", OrganismType.FUNGUS, 10, 1, "nutrient-decomposer");
+        List<Organism> organisms = new java.util.ArrayList<>();
+        organisms.add(fungus1);
+        for (int i = 0; i < 200; i++) {
+            organisms.add(Organism.of("moss-" + i, OrganismType.MOSS, 10, 1));
+        }
+        // Moss count 200, beetle count 0.
+        // Decay Pressure = 200 / 100 = 2.
+        // FUNGUS: 1 * 2 * 2 (buffer=50, bonus=2) = 4
+        // Decomposer: 1 * (20 + 2) * 2 = 44
+        // Total = 48
+        Garden garden = new Garden(1, 202, new Environment(50, 50, 50, 50, 50), organisms, List.of());
+        assertEquals(48, garden.fungalContribution());
+    }
 }

@@ -63,6 +63,8 @@ public class TraitRegistry {
             long rootNetworkCount,
             long mycelialSynergizerCount,
             long fungalDecomposerMimicCount,
+            long mossCount,
+            long beetleCount,
             int nutrientBuffer
     ) {}
 
@@ -264,6 +266,8 @@ public class TraitRegistry {
                 TraitRegistry.count(organisms, OrganismType.ROOT_NETWORK),
                 TraitRegistry.count(organisms, "mycelial-synergizer", OrganismType.ROOT_NETWORK),
                 TraitRegistry.count(organisms, "fungal-decomposer-mimic", OrganismType.ROOT_NETWORK),
+                TraitRegistry.count(organisms, OrganismType.MOSS),
+                TraitRegistry.count(organisms, OrganismType.BEETLE),
                 environment.nutrientBuffer()
         );
         return calculateFungal(context);
@@ -273,9 +277,10 @@ public class TraitRegistry {
         int connectorBonus = (context.rootNetworkCount() > 0) ? 6 : 4;
         int synergizerBonus = (context.mycelialSynergizerCount() > 0 && context.fungusCount() > 0) ? 5 : 0;
         int bufferBonus = (context.nutrientBuffer() > 20) ? 2 : 1;
+        int decayPressure = (int) Math.min((context.mossCount() + context.beetleCount()) / 100, 10);
 
         return (int) (context.fungusCount() * 2 * bufferBonus +
-                      context.decomposerCount() * 20 * bufferBonus +
+                      context.decomposerCount() * (20 + decayPressure) * bufferBonus +
                       context.soilEnricherCount() * 10 * bufferBonus +
                       context.networkConnectorCount() * connectorBonus * bufferBonus +
                       context.fungalSymbioteCount() * 2 +
