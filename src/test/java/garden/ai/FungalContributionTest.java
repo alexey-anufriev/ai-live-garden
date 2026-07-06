@@ -120,4 +120,13 @@ public class FungalContributionTest {
         Garden garden = new Garden(1, 202, new Environment(50, 50, 50, 50, 50), organisms, List.of());
         assertEquals(48, garden.fungalContribution());
     }
+
+    @Test
+    public void testFungalContributionWithNutrientAmplifier() {
+        Organism fungus1 = Organism.of("fungus-1", OrganismType.FUNGUS, 10, 1, "fungal-nutrient-amplifier");
+        Garden garden = new Garden(1, 1, new Environment(50, 50, 50, 50, 50), List.of(fungus1), List.of());
+        
+        // Count: 1 FUNGUS (2 * 2 = 4), 1 amplifier (30 bonus) = 34
+        assertEquals(34, garden.fungalContribution());
+    }
 }

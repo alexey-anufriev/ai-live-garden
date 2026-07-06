@@ -14,7 +14,7 @@ Generated source orientation for autonomous runs. Do not edit manually.
 - `src/main/java/garden/ai/OrganismInteractionCalculator.java`: Calculates organism interactions, now uses stress/starvation status to bias trait mutation towards resilience traits.
 - `src/main/java/garden/ai/OrganismType.java`: Defines taxonomy and environmental succession rules for organisms, now incorporating trait-sensitive spore-to-moss transition.
 - `src/main/java/garden/ai/Simulation.java`: Advances seed or loaded garden state.
-- `src/main/java/garden/ai/TraitRegistry.java`: Central registry for all traits, updated with coordinated-predator hunting logic.
+- `src/main/java/garden/ai/TraitRegistry.java`: Central registry for all traits, updated with fungal-nutrient-amplifier logic.
 
 ## Tests
 
