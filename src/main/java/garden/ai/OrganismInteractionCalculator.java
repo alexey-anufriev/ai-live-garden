@@ -191,6 +191,9 @@ public class OrganismInteractionCalculator {
         String trait;
         if (organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("stressed") && (organism.id().hashCode() + cycle) % 5 == 0) {
             trait = "fungal-symbiote";
+        } else if ((organism.traits().contains("stressed") || organism.traits().contains("starving")) && Math.random() < 0.4) {
+            String[] resilienceTraits = {"hardy", "dormancy", "metabolic-resilience"};
+            trait = resilienceTraits[Math.floorMod(cycle + organism.generation(), resilienceTraits.length)];
         } else {
             trait = TraitRegistry.getMutationTrait(cycle, organism, organism.type(), environment);
         }
