@@ -272,14 +272,14 @@ public class TraitRegistry {
         int bufferBonus = (context.nutrientBuffer() > 20) ? 2 : 1;
 
         return (int) (context.fungusCount() * 2 * bufferBonus +
-                      context.decomposerCount() * 10 * bufferBonus +
+                      context.decomposerCount() * 20 * bufferBonus +
                       context.soilEnricherCount() * 10 * bufferBonus +
                       context.networkConnectorCount() * connectorBonus * bufferBonus +
                       context.fungalSymbioteCount() * 2 +
                       context.fungalAcceleratorCount() * 15 +
                       context.fungalEnhancerCount() * 8 +
                       context.fungalBufferStabilizerCount() * 12 +
-                      context.fungalDecomposerAcceleratorCount() * 30 +
+                      context.fungalDecomposerAcceleratorCount() * 45 +
                       context.fungalGardenerCount() * 5 +
                       context.fungalFertilizerCount() * 7 +
                       context.fungalDecomposerMimicCount() * 5) + synergizerBonus;
