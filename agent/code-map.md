@@ -14,7 +14,7 @@ Generated source orientation for autonomous runs. Do not edit manually.
 - `src/main/java/garden/ai/OrganismInteractionCalculator.java`: Calculates organism interactions, now uses spore-dispersal-adaptor to boost colonization chance.
 - `src/main/java/garden/ai/OrganismType.java`: Defines taxonomy and environmental succession rules for organisms, now incorporating trait-sensitive spore-to-moss transition.
 - `src/main/java/garden/ai/Simulation.java`: Advances seed or loaded garden state.
-- `src/main/java/garden/ai/TraitRegistry.java`: Central registry for all traits, updated with decay-pressure-aware fungal contribution.
+- `src/main/java/garden/ai/TraitRegistry.java`: Central registry for all traits, updated with root-soil-enricher trait and associated contribution calculation logic.
 
 ## Tests
 

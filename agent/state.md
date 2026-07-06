@@ -4,19 +4,22 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 7438
+- Cycle: 7456
 - Health: Flourishing (🟢)
 - Nutrients: 100.
 - NutrientBuffer: 100.
-- Active organisms: 9267 total across beetle, fox fungus, moss root network, spore.
+- Active organisms: 9277 total across beetle, fox fungus, moss root network, spore.
 - Missing roles: none.
-- Latest agent handoff: Boost Fungal Decomposer Contribution.
-- Latest result: Added mossCount and beetleCount to FungalContributionContext and updated calculateFungal to increase decomposer contribution based on the primary producer/consumer population density ('decay pressure')..
+- Latest agent handoff: Implement Root Soil Enricher Trait.
+- Latest result: Added 'root-soil-enricher' trait to TraitRegistry, updated root contribution calculations in all nutrient scenarios, and added a test case in FungalContributionTest to verify its effectiveness. The trait provides a mechanism to boost root network contribution to the nutrient buffer..
 
 ## Immediate Directions
 
-- Monitor fungal population growth.
+- Monitor the prevalence of 'root-soil-enricher' root networks.
 
 ## Constraints & Known Bad Ideas
 
-- Ensure fungal growth doesn't disproportionately drain the nutrient buffer.
+- Do not attempt to fix the simulation in one run.
+- Do not add another named adaptation merely because recent runs did so.
+- Do not add another observability-only or tests-only change merely because it is easy to validate.
+- Do not treat the full nutrient buffer as proof of health while nutrients are zero or ecological roles are absent.

@@ -67,6 +67,16 @@ public class FungalContributionTest {
     }
 
     @Test
+    public void testRootContributionWithRootSoilEnricher() {
+        Organism root1 = Organism.of("root-1", OrganismType.ROOT_NETWORK, 10, 1, "root-soil-enricher");
+        // Environment: (50, 50, 50, 50, 50) - Nutrients >= 25
+        Garden garden = new Garden(1, 1, new Environment(50, 50, 50, 50, 50), List.of(root1), List.of());
+        
+        // Count: 1 ROOT_NETWORK (1/2 = 0, Math.max(1, 0) = 1), 1 root-soil-enricher (7 bonus) = 8
+        assertEquals(8, garden.rootContribution());
+    }
+
+    @Test
     public void testFungalContributionWithDecomposerAccelerator() {
         Organism fungus1 = Organism.of("fungus-1", OrganismType.FUNGUS, 10, 1, "fungal-decomposer-accelerator");
         Garden garden = new Garden(1, 1, new Environment(50, 50, 50, 50, 50), List.of(fungus1), List.of());
