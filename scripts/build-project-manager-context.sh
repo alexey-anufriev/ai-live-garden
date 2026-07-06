@@ -155,6 +155,8 @@ append_latest_plan() {
   echo
   echo "- Use mainly the garden state digest from \`data/garden-state.txt\`, current agent state, open requests, and previous PM direction."
   echo "- Do not inspect Java source files, tests, \`agent/code-map.md\`, or workflow files. This is product/ecology planning, not code review."
+  echo "- First review whether the previous PM direction appears achieved, partially achieved, not achieved, or unclear based on committed garden/memory state."
+  echo "- Use state evidence only: garden counts, environment values, trait frequencies, agent state, summaries, requests, and the previous PM plan. Do not infer code causes."
   echo "- Recommend garden-facing outcomes rather than code-organization work."
   echo "- Each direction must describe an observable garden outcome for future ticks: population balance, nutrients, buffer pressure, survival, reproduction, predation, decay, succession, recovery, or environment response."
   echo "- Suggest directions, not implementation files. The autonomous agent will inspect code later if it chooses a direction."
@@ -168,6 +170,18 @@ append_latest_plan() {
 ```json
 {
   "date": "YYYY-MM-DD",
+  "review": {
+    "previousPlanDate": "YYYY-MM-DD or none",
+    "overallMark": "achieved, partially achieved, not achieved, unclear, or another concise mark",
+    "summary": "Short PM assessment of whether the previous direction produced the expected garden progress.",
+    "results": [
+      {
+        "label": "A",
+        "mark": "Short mark for this previous direction.",
+        "evidence": "State-based evidence from garden state, agent state, summaries, or previous plan acceptance signals."
+      }
+    ]
+  },
   "thesis": "One paragraph: PM thinks A, B, C, and D will make the most progress today because...",
   "stateSignals": [
     "Garden-state signal that motivates the plan."

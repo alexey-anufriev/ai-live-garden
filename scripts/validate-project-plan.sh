@@ -17,6 +17,17 @@ if ! jq -e '
   . as $root |
   type == "object" and
   (.date | type == "string" and test("^[0-9]{4}-[0-9]{2}-[0-9]{2}$")) and
+  (.review | type == "object") and
+  (.review.previousPlanDate | type == "string" and length > 0) and
+  (.review.overallMark | type == "string" and length > 0) and
+  (.review.summary | type == "string" and length > 0) and
+  (.review.results | type == "array") and
+  (all(.review.results[];
+    type == "object" and
+    ((.label // "") | type == "string" and length > 0) and
+    ((.mark // "") | type == "string" and length > 0) and
+    ((.evidence // "") | type == "string" and length > 0)
+  )) and
   (.thesis | type == "string" and length > 20) and
   (.stateSignals | type == "array" and length >= 3 and all(.[]; type == "string" and length > 0)) and
   (.directions | type == "array" and length == 4) and
