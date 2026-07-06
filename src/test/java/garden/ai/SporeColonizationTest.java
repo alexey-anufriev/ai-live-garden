@@ -9,6 +9,22 @@ import static org.junit.jupiter.api.Assertions.*;
 public class SporeColonizationTest {
 
     @Test
+    public void testSporeDispersalAdaptorBoostsMossColonization() {
+        Environment environment = new Environment(100, 50, 100, 100, 100); // moisture 50
+        List<Organism> organisms = new ArrayList<>();
+        // Add a spore without the adaptor (should not colonize moss at 50 moisture)
+        Organism spore1 = Organism.of("spore-1", OrganismType.SPORE, 10, 1, "test");
+        // Add a spore with the adaptor (should colonize moss at 50 moisture)
+        Organism spore2 = Organism.of("spore-2", OrganismType.SPORE, 10, 1, "spore-dispersal-adaptor");
+
+        OrganismType result1 = spore1.type().offspringType(100, 1, environment, spore1.traits());
+        OrganismType result2 = spore2.type().offspringType(100, 1, environment, spore2.traits());
+
+        assertEquals(OrganismType.SPORE, result1);
+        assertEquals(OrganismType.MOSS, result2);
+    }
+
+    @Test
     public void testSporeDispersalAdaptorBoostsColonization() {
         Environment environment = new Environment(100, 100, 100, 100, 100);
         List<Organism> organisms = new ArrayList<>();

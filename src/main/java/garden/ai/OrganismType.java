@@ -116,6 +116,9 @@ public enum OrganismType {
         if (traits.contains("prolific-spore-producer") && (this == MOSS || this == ROOT_NETWORK)) {
             return SPORE;
         }
+        if (this == SPORE && traits.contains("spore-dispersal-adaptor") && environment.moisture() > 40) {
+            return MOSS;
+        }
         return offspringType(cycle, generation, environment);
     }
 
