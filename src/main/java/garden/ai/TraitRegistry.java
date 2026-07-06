@@ -105,7 +105,7 @@ public class TraitRegistry {
             }
         }
 
-        if (preyTracker) {
+        if (preyTracker || hunter.traits().contains("fox-specialist") || hunter.traits().contains("apex-predator")) {
             int maxEnergy = -1;
             int bestIndex = -1;
             for (int i = 0; i < organisms.size(); i++) {
