@@ -8,6 +8,7 @@ scripts/validate-project-plan.sh "$plan_file" >/dev/null
 plan_date="$(jq -r '.date' "$plan_file")"
 output_dir="agent/plans"
 dated_plan="${output_dir}/${plan_date}.md"
+dated_json_sidecar="${output_dir}/${plan_date}.json"
 
 mkdir -p "$output_dir"
 
@@ -44,6 +45,6 @@ render_plan() {
 }
 
 render_plan > "$dated_plan"
-rm -f "$plan_file"
+rm -f "$plan_file" "$dated_json_sidecar"
 
 echo "Rendered project plan to ${dated_plan}."
