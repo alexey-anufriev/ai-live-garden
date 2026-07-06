@@ -56,16 +56,16 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 <!-- AI-LIVE-GARDEN:STATE-START -->
 **Garden Health:** 🟢 Flourishing — diverse roles persist with usable nutrients.
-At cycle 7520, the garden has this committed shape:
+At cycle 7525, the garden has this committed shape:
 
 ### Organisms
 
-- Total: 9316
+- Total: 9318
 - Breakdown:
-  - Beetle: 4652
+  - Beetle: 4660
   - Fox: 3
   - Fungus: 12
-  - Moss: 4636
+  - Moss: 4630
   - Root Network: 12
   - Spore: 1
 
@@ -74,10 +74,10 @@ At cycle 7520, the garden has this committed shape:
 ### Garden Characteristics
 
 - Version: 2
-- Cycle: 7520
-- Next id: 39134
-- Light: 100
-- Moisture: 98
+- Cycle: 7525
+- Next id: 39204
+- Light: 98
+- Moisture: 99
 - Warmth: 97
 - Nutrients: 100
 - Nutrient buffer: 100
