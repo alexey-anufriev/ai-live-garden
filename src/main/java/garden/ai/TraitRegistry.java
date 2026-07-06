@@ -79,7 +79,12 @@ public class TraitRegistry {
 
         Predicate<Organism> isValidPrey = candidate -> {
             if (candidate.energy() <= 0 || !TraitRegistry.canEat(hunter.type(), candidate.type())) return false;
-            if (!stealthHunter && !isApexPredator) {
+            
+            boolean bypassStealth = stealthHunter || isApexPredator || 
+                (hunter.traits().contains("coordinated-predator") && 
+                 organisms.stream().filter(o -> o.type() == OrganismType.FOX && o.energy() > 0 && !o.id().equals(hunter.id())).count() > 0);
+
+            if (!bypassStealth) {
                 if (candidate.traits().contains("shadow-stepper") && (candidate.id().hashCode() + cycle) % 2 == 0) return false;
                 if (candidate.traits().contains("camouflaged") && (candidate.id().hashCode() + cycle) % 3 == 0) return false;
             }
