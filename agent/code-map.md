@@ -14,11 +14,11 @@ Generated source orientation for autonomous runs. Do not edit manually.
 - `src/main/java/garden/ai/OrganismInteractionCalculator.java`: Orchestrates organism-level interaction and mutation logic, now with prioritized resilience trait propagation.
 - `src/main/java/garden/ai/OrganismType.java`: Defines taxonomy and environmental succession rules for organisms, now incorporating trait-sensitive spore-to-moss transition.
 - `src/main/java/garden/ai/Simulation.java`: Advances seed or loaded garden state.
-- `src/main/java/garden/ai/TraitRegistry.java`: Central registry for all traits, updated to include root-soil-enricher logic.
+- `src/main/java/garden/ai/TraitRegistry.java`: Updated findPreyIndex to prioritize the most energy-dense beetle targets for beetle-specialist foxes.
 
 ## Tests
 
 - Tests live under `src/test/java/garden/ai/`.
-- Current Java test files: 73.
+- Current Java test files: 74.
 - Prefer focused behavior tests for changed simulation rules.
 - Add or inspect exact test files only when the chosen task needs them.

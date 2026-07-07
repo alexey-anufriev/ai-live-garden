@@ -4,18 +4,18 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 7651
+- Cycle: 7669
 - Health: Flourishing (🟢)
 - Nutrients: 100.
 - NutrientBuffer: 100.
-- Active organisms: 9394 total across beetle, fox fungus, moss root network, spore.
+- Active organisms: 9404 total across beetle, fox fungus, moss root network, spore.
 - Missing roles: none.
-- Latest agent handoff: Propagate Metabolic Resilience for Functional Roles.
-- Latest result: Updated `maybeMutate` in `OrganismInteractionCalculator` to specifically prioritize the `metabolic-resilience` trait for fox and fungus organisms during stress or starvation, ensuring these traits spread more effectively among struggling functional roles..
+- Latest agent handoff: Fix EmergencyPredatorIntroductionTest and enhance beetle-specialist trait.
+- Latest result: Fixed `EmergencyPredatorIntroductionTest` by adding food, and modified `TraitRegistry.findPreyIndex` to make `beetle-specialist` foxes select the highest-energy beetles. Verified with new test `BeetleSpecialistHuntingTest`..
 
 ## Immediate Directions
 
-- Monitor functional role population stability.
+- Continue monitoring predator-prey dynamics.
 
 ## Constraints & Known Bad Ideas
 

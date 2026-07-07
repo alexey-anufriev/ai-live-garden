@@ -129,11 +129,17 @@ public class TraitRegistry {
         }
 
         if (hunter.type() == OrganismType.FOX && hunter.traits().contains("beetle-specialist")) {
+            int maxEnergy = -1;
+            int bestIndex = -1;
             for (int i = 0; i < organisms.size(); i++) {
                 if (i == hunterIndex) continue;
                 Organism candidate = organisms.get(i);
-                if (isValidPrey.test(candidate) && candidate.type() == OrganismType.BEETLE) return Optional.of(i);
+                if (isValidPrey.test(candidate) && candidate.type() == OrganismType.BEETLE && candidate.energy() > maxEnergy) {
+                    maxEnergy = candidate.energy();
+                    bestIndex = i;
+                }
             }
+            if (bestIndex != -1) return Optional.of(bestIndex);
         }
 
         for (int i = 0; i < organisms.size(); i++) {

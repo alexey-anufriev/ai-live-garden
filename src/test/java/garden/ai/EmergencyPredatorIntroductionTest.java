@@ -20,9 +20,10 @@ public class EmergencyPredatorIntroductionTest {
 
     @Test
     public void testEmergencyPredatorIntroduction() {
-        // Create a garden with herbivores but no predators
+        // Create a garden with herbivores and food, but no predators
         List<Organism> organisms = new ArrayList<>();
         organisms.add(Organism.of("beetle-1", OrganismType.BEETLE, 5, 2, "test"));
+        organisms.add(Organism.of("moss-1", OrganismType.MOSS, 10, 1, "test"));
         
         Garden garden = new Garden(0, 2, new Environment(50, 50, 50, 50, 50), organisms, List.of());
         
