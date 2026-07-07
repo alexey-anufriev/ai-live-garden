@@ -368,6 +368,12 @@ public class TraitRegistry {
             case "fungal-nurturer":
                 if (fungalContribution > 0) modifier -= 3;
                 break;
+            case "fox-specialist":
+                modifier -= 2;
+                break;
+            case "apex-predator":
+                modifier -= 3;
+                break;
         }
         return modifier;
     }
