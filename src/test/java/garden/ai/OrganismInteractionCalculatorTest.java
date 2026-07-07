@@ -99,7 +99,7 @@ class OrganismInteractionCalculatorTest {
 
     @Test
     void fungalReproductionThresholdIsLowerThanPlants() {
-        Environment env = new Environment(50, 50, 50, 100, 100);
+        Environment env = new Environment(50, 50, 50, 100, 10);
         Organism fungus = Organism.of("fungus-1", OrganismType.FUNGUS, 10, 1);
         Organism moss = Organism.of("moss-1", OrganismType.MOSS, 10, 1);
         

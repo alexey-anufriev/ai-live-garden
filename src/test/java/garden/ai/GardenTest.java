@@ -116,7 +116,7 @@ class GardenTest {
 
     @Test
     void stressedOrStarvingOrganismsDoNotReproduce() {
-        Organism stressedPlant = Organism.of("plant-1", OrganismType.FERN, 20, 1, "stressed");
+        Organism stressedPlant = Organism.of("plant-1", OrganismType.FERN, 20, 1, "stressed", "t1", "t2", "t3", "t4");
         // Environment that does not favor plants (light < 40)
         Garden garden = new Garden(0, 2, new Environment(30, 50, 50, 50, 50), List.of(stressedPlant), List.of());
 

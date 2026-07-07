@@ -411,6 +411,9 @@ public class OrganismInteractionCalculator {
         int threshold = 15;
         if (organism.type() == OrganismType.FUNGUS) {
             threshold = 12;
+            if (environment.nutrientBuffer() > 50) {
+                threshold -= 2;
+            }
         } else if (organism.type().isPlant()) {
             threshold = 14;
         } else if (organism.type() == OrganismType.FOX) {
