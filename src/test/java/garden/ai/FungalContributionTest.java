@@ -31,8 +31,8 @@ public class FungalContributionTest {
         Organism fern1 = Organism.of("fern-1", OrganismType.FERN, 10, 1, "fungal-symbiote");
         Garden garden = new Garden(1, 1, new Environment(50, 50, 50, 50, 50), List.of(fungus1, fern1), List.of());
         
-        // Count: 1 FUNGUS (2 * 2 = 4), 1 decomposer (20 * 2 = 40), 1 symbiote (2 bonus) = 46
-        assertEquals(46, garden.fungalContribution());
+        // Count: 1 FUNGUS (2 * 2 = 4), 1 decomposer (30 * 2 = 60), 1 symbiote (2 bonus) = 66
+        assertEquals(66, garden.fungalContribution());
     }
 
     @Test
@@ -91,8 +91,8 @@ public class FungalContributionTest {
         Organism root1 = Organism.of("root-1", OrganismType.ROOT_NETWORK, 10, 1, "mycelial-synergizer");
         Garden garden = new Garden(1, 1, new Environment(50, 50, 50, 50, 50), List.of(fungus1, root1), List.of());
         
-        // Count: 1 FUNGUS (2 * 2 = 4), 1 decomposer (20 * 2 = 40), 1 synergizer (5 bonus) = 49
-        assertEquals(49, garden.fungalContribution());
+        // Count: 1 FUNGUS (2 * 2 = 4), 1 decomposer (30 * 2 = 60), 1 synergizer (5 bonus) = 69
+        assertEquals(69, garden.fungalContribution());
     }
 
     @Test
@@ -115,10 +115,10 @@ public class FungalContributionTest {
         // Moss count 200, beetle count 0.
         // Decay Pressure = 200 / 100 = 2.
         // FUNGUS: 1 * 2 * 2 (buffer=50, bonus=2) = 4
-        // Decomposer: 1 * (20 + 2) * 2 = 44
-        // Total = 48
+        // Decomposer: 1 * (30 + 2) * 2 = 64
+        // Total = 68
         Garden garden = new Garden(1, 202, new Environment(50, 50, 50, 50, 50), organisms, List.of());
-        assertEquals(48, garden.fungalContribution());
+        assertEquals(68, garden.fungalContribution());
     }
 
     @Test

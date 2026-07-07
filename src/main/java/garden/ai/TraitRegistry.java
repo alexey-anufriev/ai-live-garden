@@ -295,7 +295,7 @@ public class TraitRegistry {
         int decayPressure = (int) Math.min((context.mossCount() + context.beetleCount()) / 100, 10);
 
         return (int) (context.fungusCount() * 2 * bufferBonus +
-                      context.decomposerCount() * (20 + decayPressure) * bufferBonus +
+                      context.decomposerCount() * (30 + decayPressure) * bufferBonus +
                       context.soilEnricherCount() * 10 * bufferBonus +
                       context.networkConnectorCount() * connectorBonus * bufferBonus +
                       context.fungalSymbioteCount() * 2 +

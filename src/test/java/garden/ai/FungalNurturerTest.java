@@ -23,7 +23,7 @@ public class FungalNurturerTest {
         
         Garden next = garden.nextCycle();
         
-        // If reproduction occurred, there should be 3 organisms (parentFox, childFox, fungus).
-        assertEquals(3, next.organisms().size(), "Fox should have reproduced. Organisms: " + next.organisms());
+        // If reproduction occurred, there should be 4 organisms (parentFox, childFox, parentFungus, childFungus).
+        assertEquals(4, next.organisms().size(), "Fox should have reproduced. Organisms: " + next.organisms());
     }
 }

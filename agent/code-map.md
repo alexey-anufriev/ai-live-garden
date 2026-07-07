@@ -11,10 +11,10 @@ Generated source orientation for autonomous runs. Do not edit manually.
 - `src/main/java/garden/ai/GardenStateStore.java`: Persistence for `data/garden-state.txt`.
 - `src/main/java/garden/ai/Main.java`: CLI entry point for `inspect` and `tick`.
 - `src/main/java/garden/ai/Organism.java`: Represents a single living element in the garden, now utilizing TraitRegistry for nutrient value calculation.
-- `src/main/java/garden/ai/OrganismInteractionCalculator.java`: Orchestrates organism-level interaction and mutation logic, now with prioritized resilience trait propagation.
+- `src/main/java/garden/ai/OrganismInteractionCalculator.java`: Calculates organism interactions, now with lowered reproduction threshold for FUNGUS.
 - `src/main/java/garden/ai/OrganismType.java`: Defines taxonomy and environmental succession rules for organisms, now incorporating trait-sensitive spore-to-moss transition.
 - `src/main/java/garden/ai/Simulation.java`: Advances seed or loaded garden state.
-- `src/main/java/garden/ai/TraitRegistry.java`: Updated findPreyIndex to prioritize the most energy-dense beetle targets for beetle-specialist foxes.
+- `src/main/java/garden/ai/TraitRegistry.java`: Registry for trait effects and nutrient calculations, now with increased decomposer contribution rates.
 
 ## Tests
 

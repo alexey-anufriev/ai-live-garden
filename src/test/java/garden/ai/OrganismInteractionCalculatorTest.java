@@ -96,4 +96,17 @@ class OrganismInteractionCalculatorTest {
         
         assertThat(thresholdLow).isGreaterThan(thresholdHigh);
     }
+
+    @Test
+    void fungalReproductionThresholdIsLowerThanPlants() {
+        Environment env = new Environment(50, 50, 50, 100, 100);
+        Organism fungus = Organism.of("fungus-1", OrganismType.FUNGUS, 10, 1);
+        Organism moss = Organism.of("moss-1", OrganismType.MOSS, 10, 1);
+        
+        int fungusThreshold = OrganismInteractionCalculator.reproductionThreshold(fungus, env, 0);
+        int mossThreshold = OrganismInteractionCalculator.reproductionThreshold(moss, env, 0);
+        
+        assertThat(fungusThreshold).isEqualTo(12);
+        assertThat(mossThreshold).isEqualTo(14);
+    }
 }

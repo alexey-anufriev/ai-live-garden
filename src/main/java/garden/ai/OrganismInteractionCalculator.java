@@ -409,7 +409,9 @@ public class OrganismInteractionCalculator {
 
     public static int reproductionThreshold(Organism organism, Environment environment, int fungalContribution) {
         int threshold = 15;
-        if (organism.type().isPlant()) {
+        if (organism.type() == OrganismType.FUNGUS) {
+            threshold = 12;
+        } else if (organism.type().isPlant()) {
             threshold = 14;
         } else if (organism.type() == OrganismType.FOX) {
             threshold = 15;
