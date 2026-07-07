@@ -17,7 +17,7 @@ public class TraitRegistry {
             "nutrient-storer", 6
     );
 
-    private static final String[] TRAITS = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "sun-seeker", "rain-collector", "nutrient-finder", "nutrient-efficient", "shadow-stepper", "hardy", "water-seeker", "dormancy", "nutrient-weaver", "metabolic-efficiency", "scavenger", "nutrient-sharer", "buffer-resonator", "buffer-scavenger", "nutrient-hoarder", "nutrient-scout", "soil-master", "deep-rooting", "buffer-optimizer", "buffer-tapper", "nutrient-translocator", "camouflaged", "shade-thriver", "moisture-retainer", "nutrient-absorber", "nutrient-synthesizer", "prey-tracker", "resource-tracker", "predator-focus", "nutrient-reclaimer", "nutrient-producer", "nutrient-enricher", "moisture-thriver", "prolific", "cautious-feeder", "nutrient-decomposer", "fungus-soil-enricher", "fungal-network-connector", "fungal-feeder", "mycorrhizal-booster", "nutrient-scrounger", "fungal-symbiote", "nutrient-pump", "nutrient-distributor", "resourceful-breeder", "fungal-enhancer", "mycelial-scavenger", "mycelial-harvester", "mycelial-distributor", "mycelial-resonator", "mycelial-network-scout", "fungal-gardener", "fungal-fertilizer", "nutrient-anticipator", "mycelial-protector", "metabolic-economizer", "spore-disperser", "fungal-root-symbiont", "mycelial-root-mediator", "fungal-attractor", "mycelial-conduit", "mycelial-synergizer", "moss-nutrient-scavenger", "cautious-breeder", "stress-resilient", "stress-avoidance", "buffer-siphon", "fungal-decomposer-mimic", "nutrient-harvester", "fungal-buffer-stabilizer", "fox-specialist", "prolific-spore-producer", "fungal-decomposer-accelerator", "predator-synergy", "spore-dispersal-adaptor", "apex-predator", "beetle-specialist", "nutrient-accelerator", "metabolic-resilience", "root-soil-enricher"};
+    private static final String[] TRAITS = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "sun-seeker", "rain-collector", "nutrient-finder", "nutrient-efficient", "shadow-stepper", "hardy", "water-seeker", "dormancy", "nutrient-weaver", "metabolic-efficiency", "scavenger", "nutrient-sharer", "buffer-resonator", "buffer-scavenger", "nutrient-hoarder", "nutrient-scout", "soil-master", "deep-rooting", "buffer-optimizer", "buffer-tapper", "nutrient-translocator", "camouflaged", "shade-thriver", "moisture-retainer", "nutrient-absorber", "nutrient-synthesizer", "prey-tracker", "resource-tracker", "predator-focus", "nutrient-reclaimer", "nutrient-producer", "nutrient-enricher", "moisture-thriver", "prolific", "cautious-feeder", "nutrient-decomposer", "fungus-soil-enricher", "fungal-network-connector", "fungal-feeder", "mycorrhizal-booster", "nutrient-scrounger", "fungal-symbiote", "nutrient-pump", "nutrient-distributor", "resourceful-breeder", "fungal-enhancer", "mycelial-scavenger", "mycelial-harvester", "mycelial-distributor", "mycelial-resonator", "mycelial-network-scout", "fungal-gardener", "fungal-fertilizer", "nutrient-anticipator", "mycelial-protector", "metabolic-economizer", "spore-disperser", "fungal-root-symbiont", "mycelial-root-mediator", "fungal-attractor", "mycelial-conduit", "mycelial-synergizer", "moss-nutrient-scavenger", "cautious-breeder", "stress-resilient", "stress-avoidance", "buffer-siphon", "fungal-decomposer-mimic", "nutrient-harvester", "fungal-buffer-stabilizer", "fox-specialist", "prolific-spore-producer", "fungal-decomposer-accelerator", "predator-synergy", "spore-dispersal-adaptor", "apex-predator", "beetle-specialist", "nutrient-accelerator", "metabolic-resilience", "root-soil-enricher", "predator-scout"};
 
     public record MetabolicEffect(int metabolismChange, int energyBonus, GardenEvent event) {}
 
@@ -77,11 +77,12 @@ public class TraitRegistry {
         boolean mycelialNetworkScout = hunter.traits().contains("mycelial-network-scout");
         boolean stealthHunter = hunter.traits().contains("stealth-hunter");
         boolean isApexPredator = hunter.traits().contains("apex-predator");
+        boolean isPredatorScout = hunter.traits().contains("predator-scout");
 
         Predicate<Organism> isValidPrey = candidate -> {
             if (candidate.energy() <= 0 || !TraitRegistry.canEat(hunter.type(), candidate.type())) return false;
             
-            boolean bypassStealth = stealthHunter || isApexPredator || 
+            boolean bypassStealth = stealthHunter || isApexPredator || isPredatorScout ||
                 (hunter.traits().contains("coordinated-predator") && 
                  organisms.stream().filter(o -> o.type() == OrganismType.FOX && o.energy() > 0 && !o.id().equals(hunter.id())).count() > 0);
 
@@ -498,6 +499,9 @@ public class TraitRegistry {
                 break;
             case "nutrient-scrounger":
                 if (environment.nutrients() < 25) return new MetabolicEffect(0, 1, new GardenEvent(cycle, "%s scrounged for nutrients.".formatted(organism.id())));
+                break;
+            case "predator-scout":
+                if (environment.nutrients() < 25) return new MetabolicEffect(-1, 0, new GardenEvent(cycle, "%s scouted for prey in scarce conditions.".formatted(organism.id())));
                 break;
         }
         return null;
