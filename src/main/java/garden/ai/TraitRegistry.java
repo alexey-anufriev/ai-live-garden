@@ -320,6 +320,7 @@ public class TraitRegistry {
         if (hunter.traits().contains("scavenger") && environment.nutrients() < 25) bite += 1;
         if (hunter.traits().contains("nutrient-hoarder")) bite += 1;
         if (hunter.type() == OrganismType.FOX && hunter.traits().contains("predator-focus")) bite += 1;
+        if (hunter.type() == OrganismType.FOX && hunter.traits().contains("predator-scout")) bite += 1;
         if (hunter.type() == OrganismType.FOX && hunter.traits().contains("fox-specialist")) bite += 2;
         if (hunter.type() == OrganismType.FOX && hunter.traits().contains("apex-predator")) bite += 3;
         if (hunter.type() == OrganismType.FOX && hunter.traits().contains("beetle-specialist") && prey.type() == OrganismType.BEETLE) {
