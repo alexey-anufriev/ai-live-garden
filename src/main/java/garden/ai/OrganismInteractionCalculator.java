@@ -419,6 +419,9 @@ public class OrganismInteractionCalculator {
         if (environment.nutrients() < 25) {
             threshold += 5;
         }
+        if (organism.type() == OrganismType.ROOT_NETWORK && environment.nutrientBuffer() > 50 && organism.traits().contains("buffer-optimizer")) {
+            threshold -= 3;
+        }
         for (String trait : organism.traits()) {
             threshold += TraitRegistry.getReproductionThresholdModifier(trait, environment, fungalContribution);
         }
