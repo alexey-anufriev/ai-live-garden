@@ -431,6 +431,9 @@ public class TraitRegistry {
             case "metabolic-resilience":
                 if (environment.nutrients() < 25) return new PlantGrowthEffect(1, new GardenEvent(cycle, "%s resiliently grew despite scarcity.".formatted(organism.id())));
                 break;
+            case "root-soil-enricher":
+                if (environment.nutrientBuffer() > 50) return new PlantGrowthEffect(2, new GardenEvent(cycle, "%s enriched the soil using the nutrient buffer.".formatted(organism.id())));
+                break;
         }
         return null;
     }
