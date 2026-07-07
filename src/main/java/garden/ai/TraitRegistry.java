@@ -427,6 +427,9 @@ public class TraitRegistry {
                 break;
             case "resilient":
                 return new PlantGrowthEffect(-1, null);
+            case "metabolic-resilience":
+                if (environment.nutrients() < 25) return new PlantGrowthEffect(1, new GardenEvent(cycle, "%s resiliently grew despite scarcity.".formatted(organism.id())));
+                break;
         }
         return null;
     }
@@ -435,6 +438,8 @@ public class TraitRegistry {
         switch (trait) {
             case "resilient":
                 return new MetabolicEffect(1, 0, null);
+            case "metabolic-resilience":
+                return new MetabolicEffect(-1, 0, new GardenEvent(cycle, "%s thrived by managing its metabolism.".formatted(organism.id())));
             case "dormancy":
                 if (environment.nutrients() < 15) return new MetabolicEffect(-2, 0, null);
                 break;

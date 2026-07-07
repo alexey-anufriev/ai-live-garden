@@ -14,7 +14,7 @@ Generated source orientation for autonomous runs. Do not edit manually.
 - `src/main/java/garden/ai/OrganismInteractionCalculator.java`: Calculator for organism interactions, updated to lower reproduction threshold for root networks with high-buffer-aware traits.
 - `src/main/java/garden/ai/OrganismType.java`: Defines taxonomy and environmental succession rules for organisms, now incorporating trait-sensitive spore-to-moss transition.
 - `src/main/java/garden/ai/Simulation.java`: Advances seed or loaded garden state.
-- `src/main/java/garden/ai/TraitRegistry.java`: Registry for trait effects, updated to increase root nutrient contribution for high-buffer-aware traits.
+- `src/main/java/garden/ai/TraitRegistry.java`: Registry for trait effects, updated to make 'metabolic-resilience' provide metabolic and growth benefits.
 
 ## Tests
 

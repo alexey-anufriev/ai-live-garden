@@ -4,18 +4,20 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 7705
+- Cycle: 7724
 - Health: Flourishing (🟢)
 - Nutrients: 100.
 - NutrientBuffer: 100.
-- Active organisms: 9426 total across beetle, fox fungus, moss root network, spore.
+- Active organisms: 9438 total across beetle, fox fungus, moss root network, spore.
 - Missing roles: none.
-- Latest agent handoff: Strengthen Root-Soil Interaction.
-- Latest result: Modified `TraitRegistry.calculateRoot` to increase nutrient contribution from `buffer-optimizer` and `root-soil-enricher` when the buffer is high. Also updated `OrganismInteractionCalculator.reproductionThreshold` to lower the threshold for roots with `buffer-optimizer` when the buffer is high. Added a new test `RootContributionBufferTest` to verify the contribution changes..
+- Latest agent handoff: Enhance Metabolic Resilience for Functional Roles.
+- Latest result: Updated TraitRegistry to include 'metabolic-resilience' in getMetabolicEffect (reducing metabolism for animals) and getPlantGrowthEffect (increasing growth for stressed plants). This provides a concrete survival and growth benefit to functional roles, addressing PM Direction D..
 
 ## Immediate Directions
 
-- Monitor root network population count.
+- Prefer outcome-changing work with visible consequences for future ticks of the current or recoverable garden.
+- Consolidate or connect existing mechanics before adding another named adaptation, diagnostic, renderer line, event log, or test-only change.
+- Focus on recovery pathways for missing ecological roles, nutrient-buffer usefulness, population balance, and clearer state transitions.
 
 ## Constraints & Known Bad Ideas
 
