@@ -400,6 +400,9 @@ public class TraitRegistry {
             case "fungal-root-symbiont":
                 if (organism.type() == OrganismType.ROOT_NETWORK && fungalContribution > 0) modifier -= 3;
                 break;
+            case "root-soil-enricher":
+                if (organism.type() == OrganismType.ROOT_NETWORK && environment.nutrientBuffer() > 40) modifier -= 4;
+                break;
             case "reproductive-efficiency":
                 if (organism.type() == OrganismType.FOX || organism.type() == OrganismType.FUNGUS || organism.type() == OrganismType.ROOT_NETWORK) {
                     modifier -= 3;
