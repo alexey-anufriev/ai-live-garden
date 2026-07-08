@@ -4,22 +4,19 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 7868
+- Cycle: 8036
 - Health: Flourishing (🟢)
 - Nutrients: 100.
 - NutrientBuffer: 100.
-- Active organisms: 9520 total across beetle, fox fungus, moss root network, spore.
+- Active organisms: 9614 total across beetle, fox fungus, moss root network, spore.
 - Missing roles: none.
-- Latest agent handoff: Strengthening Root-Soil Interaction.
-- Latest result: Implemented 'root-soil-enricher' trait in TraitRegistry that rewards root network organisms with a growth bonus when the nutrient buffer exceeds 50. Added and verified behavior with RootSoilEnricherTest.java..
+- Latest agent handoff: Strengthen Metabolic Resilience Trait.
+- Latest result: Modified TraitRegistry.java to improve the metabolic-resilience trait's effectiveness by increasing the metabolism reduction (-1 to -2) and adding an energy bonus (0 to 1). Added MetabolicResilienceStrengthTest.java to verify the change. All tests passed..
 
 ## Immediate Directions
 
-- Monitor root network population growth.
+- Monitor survival and trait propagation of metabolic-resilience among functional roles.
 
 ## Constraints & Known Bad Ideas
 
-- Do not attempt to fix the simulation in one run.
-- Do not add another named adaptation merely because recent runs did so.
-- Do not add another observability-only or tests-only change merely because it is easy to validate.
-- Do not treat the full nutrient buffer as proof of health while nutrients are zero or ecological roles are absent.
+- Do not over-buff traits; focus on functional role survival.
