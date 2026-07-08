@@ -397,14 +397,22 @@ public class TraitRegistry {
             case "fungal-root-symbiont":
                 if (organism.type() == OrganismType.ROOT_NETWORK && fungalContribution > 0) modifier -= 3;
                 break;
+            case "reproductive-efficiency":
+                if (organism.type() == OrganismType.FOX || organism.type() == OrganismType.FUNGUS || organism.type() == OrganismType.ROOT_NETWORK) {
+                    modifier -= 3;
+                }
+                break;
         }
         return modifier;
     }
 
     public static String getMutationTrait(int cycle, Organism organism, OrganismType childType, Environment environment) {
         if (childType == OrganismType.FUNGUS && Math.random() < 0.5) {
-            String[] fungalTraits = {"nutrient-decomposer", "fungus-soil-enricher", "fungal-network-connector", "fungal-accelerator", "fungal-enhancer", "fungal-buffer-stabilizer", "nutrient-synthesizer", "buffer-tapper", "fungal-nutrient-amplifier", "mass-decomposer"};
+            String[] fungalTraits = {"nutrient-decomposer", "fungus-soil-enricher", "fungal-network-connector", "fungal-accelerator", "fungal-enhancer", "fungal-buffer-stabilizer", "nutrient-synthesizer", "buffer-tapper", "fungal-nutrient-amplifier", "mass-decomposer", "reproductive-efficiency"};
             return fungalTraits[Math.floorMod(cycle + organism.generation(), fungalTraits.length)];
+        }
+        if (childType == OrganismType.FOX && Math.random() < 0.3) {
+            return "reproductive-efficiency";
         }
         if (environment.nutrients() < 40 && Math.random() < 0.3) {
             if (childType.isPlant()) return "dormancy";

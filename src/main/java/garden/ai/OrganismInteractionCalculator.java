@@ -191,6 +191,8 @@ public class OrganismInteractionCalculator {
         String trait;
         if (organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("stressed") && (organism.id().hashCode() + cycle) % 5 == 0) {
             trait = "fungal-symbiote";
+        } else if (organism.type() == OrganismType.ROOT_NETWORK && (organism.id().hashCode() + cycle) % 7 == 0) {
+            trait = "reproductive-efficiency";
         } else if ((organism.traits().contains("stressed") || organism.traits().contains("starving")) && Math.random() < 0.4) {
             if (organism.type() == OrganismType.FOX || organism.type() == OrganismType.FUNGUS || organism.type() == OrganismType.ROOT_NETWORK) {
                 trait = "metabolic-resilience";

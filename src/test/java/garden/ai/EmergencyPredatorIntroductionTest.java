@@ -51,6 +51,7 @@ public class EmergencyPredatorIntroductionTest {
         List<Organism> organisms = new ArrayList<>();
         organisms.add(Organism.of("beetle-1", OrganismType.BEETLE, 5, 2, "test"));
         organisms.add(Organism.of("fox-1", OrganismType.FOX, 5, 8, "test"));
+        organisms.add(Organism.of("moss-1", OrganismType.MOSS, 50, 1, "test"));
         
         Garden garden = new Garden(0, 3, new Environment(50, 50, 50, 50, 50), organisms, List.of());
         
