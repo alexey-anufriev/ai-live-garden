@@ -330,6 +330,10 @@ public class TraitRegistry {
             bite += 2;
             events.add(new GardenEvent(cycle, "%s utilized predator-converter to increase energy gain.".formatted(hunter.id())));
         }
+        if (hunter.type() == OrganismType.FOX && hunter.traits().contains("predator-energy-efficiency")) {
+            bite += 4;
+            events.add(new GardenEvent(cycle, "%s optimized energy efficiency using predator-energy-efficiency.".formatted(hunter.id())));
+        }
         if (hunter.type() == OrganismType.FOX && hunter.traits().contains("beetle-specialist") && prey.type() == OrganismType.BEETLE) {
             bite += 2;
             events.add(new GardenEvent(cycle, "%s specialized in beetle hunting.".formatted(hunter.id())));
