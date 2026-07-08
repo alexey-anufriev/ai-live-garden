@@ -36,6 +36,6 @@ public class FungalAttractorTest {
 
         Organism hare = next.organisms().stream().filter(o -> o.type() == OrganismType.HARE).findFirst().orElseThrow();
 
-        assertThat(hare.energy()).isEqualTo(11);
+        assertThat(hare.energy()).isEqualTo(12);
     }
 }

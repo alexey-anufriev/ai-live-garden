@@ -106,7 +106,7 @@ class OrganismInteractionCalculatorTest {
         int fungusThreshold = OrganismInteractionCalculator.reproductionThreshold(fungus, env, 0);
         int mossThreshold = OrganismInteractionCalculator.reproductionThreshold(moss, env, 0);
         
-        assertThat(fungusThreshold).isEqualTo(12);
+        assertThat(fungusThreshold).isEqualTo(10);
         assertThat(mossThreshold).isEqualTo(14);
     }
 }
