@@ -390,6 +390,9 @@ public class TraitRegistry {
             case "fungal-nutrient-amplifier":
                 if (organism.type() == OrganismType.FUNGUS) modifier -= 3;
                 break;
+            case "fungal-root-symbiont":
+                if (organism.type() == OrganismType.ROOT_NETWORK && fungalContribution > 0) modifier -= 3;
+                break;
         }
         return modifier;
     }
