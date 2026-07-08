@@ -11,14 +11,14 @@ Generated source orientation for autonomous runs. Do not edit manually.
 - `src/main/java/garden/ai/GardenStateStore.java`: Persistence for `data/garden-state.txt`.
 - `src/main/java/garden/ai/Main.java`: CLI entry point for `inspect` and `tick`.
 - `src/main/java/garden/ai/Organism.java`: Represents a single living element in the garden, now utilizing TraitRegistry for nutrient value calculation.
-- `src/main/java/garden/ai/OrganismInteractionCalculator.java`: Calculates organism-level interactions and mutations.
+- `src/main/java/garden/ai/OrganismInteractionCalculator.java`: Calculates organism-level interactions; updated to pass organism context to TraitRegistry for threshold calculations.
 - `src/main/java/garden/ai/OrganismType.java`: Defines taxonomy and environmental succession rules for organisms, now incorporating trait-sensitive spore-to-moss transition.
 - `src/main/java/garden/ai/Simulation.java`: Advances seed or loaded garden state.
-- `src/main/java/garden/ai/TraitRegistry.java`: Registry for trait effects, now including the buffer-reproducer trait and threshold logic.
+- `src/main/java/garden/ai/TraitRegistry.java`: Registry for trait effects; updated to link fungal traits to individual energy and reproduction benefits.
 
 ## Tests
 
 - Tests live under `src/test/java/garden/ai/`.
-- Current Java test files: 83.
+- Current Java test files: 84.
 - Prefer focused behavior tests for changed simulation rules.
 - Add or inspect exact test files only when the chosen task needs them.

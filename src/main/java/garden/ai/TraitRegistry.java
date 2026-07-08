@@ -359,7 +359,7 @@ public class TraitRegistry {
         return NUTRIENT_VALUES.getOrDefault(trait, 0);
     }
 
-    public static int getReproductionThresholdModifier(String trait, Environment environment, int fungalContribution) {
+    public static int getReproductionThresholdModifier(String trait, Environment environment, int fungalContribution, Organism organism) {
         int modifier = 0;
         switch (trait) {
             case "prolific":
@@ -379,6 +379,12 @@ public class TraitRegistry {
                 break;
             case "buffer-reproducer":
                 if (environment.nutrientBuffer() > 40) modifier -= 5;
+                break;
+            case "fungal-decomposer-accelerator":
+                if (organism.type() == OrganismType.FUNGUS) modifier -= 4;
+                break;
+            case "fungal-nutrient-amplifier":
+                if (organism.type() == OrganismType.FUNGUS) modifier -= 3;
                 break;
         }
         return modifier;
@@ -515,6 +521,12 @@ public class TraitRegistry {
                 break;
             case "nutrient-scrounger":
                 if (environment.nutrients() < 25) return new MetabolicEffect(0, 1, new GardenEvent(cycle, "%s scrounged for nutrients.".formatted(organism.id())));
+                break;
+            case "fungal-decomposer-accelerator":
+                if (organism.type() == OrganismType.FUNGUS) return new MetabolicEffect(0, 2, new GardenEvent(cycle, "%s accelerated decomposition to gain energy.".formatted(organism.id())));
+                break;
+            case "fungal-nutrient-amplifier":
+                if (organism.type() == OrganismType.FUNGUS) return new MetabolicEffect(0, 1, new GardenEvent(cycle, "%s amplified nutrient intake.".formatted(organism.id())));
                 break;
             case "predator-scout":
                 if (environment.nutrients() < 25) return new MetabolicEffect(-1, 0, new GardenEvent(cycle, "%s scouted for prey in scarce conditions.".formatted(organism.id())));

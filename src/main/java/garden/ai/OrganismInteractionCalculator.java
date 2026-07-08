@@ -426,7 +426,7 @@ public class OrganismInteractionCalculator {
             threshold -= 3;
         }
         for (String trait : organism.traits()) {
-            threshold += TraitRegistry.getReproductionThresholdModifier(trait, environment, fungalContribution);
+            threshold += TraitRegistry.getReproductionThresholdModifier(trait, environment, fungalContribution, organism);
         }
         return threshold;
     }
