@@ -59,6 +59,7 @@ public class TraitRegistry {
             long fungalEnhancerCount,
             long fungalBufferStabilizerCount,
             long fungalDecomposerAcceleratorCount,
+            long fungalDecompositionEfficiencyCount,
             long fungalNutrientAmplifierCount,
             long fungalGardenerCount,
             long fungalFertilizerCount,
@@ -278,6 +279,7 @@ public class TraitRegistry {
                 TraitRegistry.count(organisms, "fungal-enhancer", OrganismType.FUNGUS),
                 TraitRegistry.count(organisms, "fungal-buffer-stabilizer", OrganismType.FUNGUS),
                 TraitRegistry.count(organisms, "fungal-decomposer-accelerator", OrganismType.FUNGUS),
+                TraitRegistry.count(organisms, "fungal-decomposition-efficiency", OrganismType.FUNGUS),
                 TraitRegistry.count(organisms, "fungal-nutrient-amplifier", OrganismType.FUNGUS),
                 TraitRegistry.countAnimalTrait(organisms, "fungal-gardener"),
                 TraitRegistry.countAnimalTrait(organisms, "fungal-fertilizer"),
@@ -307,6 +309,7 @@ public class TraitRegistry {
                       context.fungalEnhancerCount() * 8 +
                       context.fungalBufferStabilizerCount() * 12 +
                       context.fungalDecomposerAcceleratorCount() * 45 +
+                      context.fungalDecompositionEfficiencyCount() * 60 +
                       context.fungalNutrientAmplifierCount() * 30 +
                       context.fungalGardenerCount() * 5 +
                       context.fungalFertilizerCount() * 7 +
@@ -408,7 +411,7 @@ public class TraitRegistry {
 
     public static String getMutationTrait(int cycle, Organism organism, OrganismType childType, Environment environment) {
         if (childType == OrganismType.FUNGUS && Math.random() < 0.5) {
-            String[] fungalTraits = {"nutrient-decomposer", "fungus-soil-enricher", "fungal-network-connector", "fungal-accelerator", "fungal-enhancer", "fungal-buffer-stabilizer", "nutrient-synthesizer", "buffer-tapper", "fungal-nutrient-amplifier", "mass-decomposer", "reproductive-efficiency"};
+            String[] fungalTraits = {"nutrient-decomposer", "fungus-soil-enricher", "fungal-network-connector", "fungal-accelerator", "fungal-enhancer", "fungal-buffer-stabilizer", "nutrient-synthesizer", "buffer-tapper", "fungal-nutrient-amplifier", "mass-decomposer", "reproductive-efficiency", "fungal-decomposition-efficiency"};
             return fungalTraits[Math.floorMod(cycle + organism.generation(), fungalTraits.length)];
         }
         if (childType == OrganismType.FOX && Math.random() < 0.3) {
@@ -540,6 +543,9 @@ public class TraitRegistry {
                 break;
             case "nutrient-scrounger":
                 if (environment.nutrients() < 25) return new MetabolicEffect(0, 1, new GardenEvent(cycle, "%s scrounged for nutrients.".formatted(organism.id())));
+                break;
+            case "fungal-decomposition-efficiency":
+                if (organism.type() == OrganismType.FUNGUS) return new MetabolicEffect(0, 3, new GardenEvent(cycle, "%s optimized its decomposition to gain energy.".formatted(organism.id())));
                 break;
             case "fungal-decomposer-accelerator":
                 if (organism.type() == OrganismType.FUNGUS) return new MetabolicEffect(0, 2, new GardenEvent(cycle, "%s accelerated decomposition to gain energy.".formatted(organism.id())));
