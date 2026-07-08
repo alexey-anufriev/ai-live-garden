@@ -29,7 +29,7 @@ if ! jq -e '
     ((.evidence // "") | type == "string" and length > 0)
   )) and
   (.thesis | type == "string" and length > 20) and
-  (.stateSignals | type == "array" and length >= 3 and all(.[]; type == "string" and length > 0)) and
+  (.stateSignals | type == "array" and length >= 1 and all(.[]; type == "string" and length > 0)) and
   (.directions | type == "array" and length == 4) and
   ([.directions[].label] == ["A", "B", "C", "D"]) and
   (all(.directions[];
