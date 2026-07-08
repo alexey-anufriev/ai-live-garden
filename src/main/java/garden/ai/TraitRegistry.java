@@ -532,6 +532,9 @@ public class TraitRegistry {
             case "fungal-nutrient-amplifier":
                 if (organism.type() == OrganismType.FUNGUS) return new MetabolicEffect(0, 1, new GardenEvent(cycle, "%s amplified nutrient intake.".formatted(organism.id())));
                 break;
+            case "mass-decomposer":
+                if (organism.type() == OrganismType.FUNGUS) return new MetabolicEffect(0, 3, new GardenEvent(cycle, "%s decomposed mass to gain energy.".formatted(organism.id())));
+                break;
             case "root-soil-enricher":
                 if (environment.nutrientBuffer() > 50) return new MetabolicEffect(0, 1, new GardenEvent(cycle, "%s enriched the soil and gained energy.".formatted(organism.id())));
                 break;
