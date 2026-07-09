@@ -309,7 +309,7 @@ public class TraitRegistry {
                       context.fungalEnhancerCount() * 8 +
                       context.fungalBufferStabilizerCount() * 12 +
                       context.fungalDecomposerAcceleratorCount() * 45 +
-                      context.fungalDecompositionEfficiencyCount() * 60 +
+                      context.fungalDecompositionEfficiencyCount() * 80 +
                       context.fungalNutrientAmplifierCount() * 30 +
                       context.fungalGardenerCount() * 5 +
                       context.fungalFertilizerCount() * 7 +
@@ -396,6 +396,9 @@ public class TraitRegistry {
                 break;
             case "fungal-nutrient-amplifier":
                 if (organism.type() == OrganismType.FUNGUS) modifier -= 3;
+                break;
+            case "fungal-decomposition-efficiency":
+                if (organism.type() == OrganismType.FUNGUS) modifier -= 4;
                 break;
             case "fungal-root-symbiont":
                 if (organism.type() == OrganismType.ROOT_NETWORK && fungalContribution > 0) modifier -= 3;
