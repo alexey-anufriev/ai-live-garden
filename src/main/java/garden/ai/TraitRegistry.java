@@ -404,7 +404,10 @@ public class TraitRegistry {
                 if (organism.type() == OrganismType.ROOT_NETWORK && fungalContribution > 0) modifier -= 3;
                 break;
             case "root-soil-enricher":
-                if (organism.type() == OrganismType.ROOT_NETWORK && environment.nutrientBuffer() > 40) modifier -= 6;
+                if (organism.type() == OrganismType.ROOT_NETWORK) {
+                    if (environment.nutrientBuffer() > 75) modifier -= 10;
+                    else if (environment.nutrientBuffer() > 40) modifier -= 6;
+                }
                 break;
             case "nutrient-dependent-reproduction":
                 if (environment.nutrients() > 75) modifier -= 8;
@@ -570,7 +573,8 @@ public class TraitRegistry {
                 if (organism.type() == OrganismType.FUNGUS) return new MetabolicEffect(0, 3, new GardenEvent(cycle, "%s decomposed mass to gain energy.".formatted(organism.id())));
                 break;
             case "root-soil-enricher":
-                if (environment.nutrientBuffer() > 50) return new MetabolicEffect(0, 1, new GardenEvent(cycle, "%s enriched the soil and gained energy.".formatted(organism.id())));
+                if (environment.nutrientBuffer() > 75) return new MetabolicEffect(0, 3, new GardenEvent(cycle, "%s heavily enriched the soil and gained significant energy.".formatted(organism.id())));
+                else if (environment.nutrientBuffer() > 50) return new MetabolicEffect(0, 1, new GardenEvent(cycle, "%s enriched the soil and gained energy.".formatted(organism.id())));
                 break;
             case "predator-scout":
                 if (environment.nutrients() < 25) return new MetabolicEffect(-1, 0, new GardenEvent(cycle, "%s scouted for prey in scarce conditions.".formatted(organism.id())));
