@@ -20,8 +20,8 @@ public class FungalDecompositionTraitTest {
         
         // Base contribution for 1 fungus (bufferBonus=2)
         // FungusCount(1) * 2 * bufferBonus(2) = 4
-        // DecomposerEfficiencyCount(1) * 60 = 60
-        // Total = 64
+        // DecomposerEfficiencyCount(1) * 120 = 120
+        // Total = 124
         
         List<Organism> organismsNoTrait = new ArrayList<>();
         organismsNoTrait.add(Organism.of("fungus-2", OrganismType.FUNGUS, 10, 1));

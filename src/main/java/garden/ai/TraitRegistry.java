@@ -309,7 +309,7 @@ public class TraitRegistry {
                       context.fungalEnhancerCount() * 8 +
                       context.fungalBufferStabilizerCount() * 12 +
                       context.fungalDecomposerAcceleratorCount() * 45 +
-                      context.fungalDecompositionEfficiencyCount() * 80 +
+                      context.fungalDecompositionEfficiencyCount() * 120 +
                       context.fungalNutrientAmplifierCount() * 30 +
                       context.fungalGardenerCount() * 5 +
                       context.fungalFertilizerCount() * 7 +
@@ -398,7 +398,7 @@ public class TraitRegistry {
                 if (organism.type() == OrganismType.FUNGUS) modifier -= 3;
                 break;
             case "fungal-decomposition-efficiency":
-                if (organism.type() == OrganismType.FUNGUS) modifier -= 4;
+                if (organism.type() == OrganismType.FUNGUS) modifier -= 6;
                 break;
             case "fungal-root-symbiont":
                 if (organism.type() == OrganismType.ROOT_NETWORK && fungalContribution > 0) modifier -= 3;
@@ -557,7 +557,7 @@ public class TraitRegistry {
                 if (environment.nutrients() < 25) return new MetabolicEffect(0, 1, new GardenEvent(cycle, "%s scrounged for nutrients.".formatted(organism.id())));
                 break;
             case "fungal-decomposition-efficiency":
-                if (organism.type() == OrganismType.FUNGUS) return new MetabolicEffect(0, 3, new GardenEvent(cycle, "%s optimized its decomposition to gain energy.".formatted(organism.id())));
+                if (organism.type() == OrganismType.FUNGUS) return new MetabolicEffect(0, 5, new GardenEvent(cycle, "%s optimized its decomposition to gain energy.".formatted(organism.id())));
                 break;
             case "fungal-decomposer-accelerator":
                 if (organism.type() == OrganismType.FUNGUS) return new MetabolicEffect(0, 2, new GardenEvent(cycle, "%s accelerated decomposition to gain energy.".formatted(organism.id())));
