@@ -14,7 +14,7 @@ Generated source orientation for autonomous runs. Do not edit manually.
 - `src/main/java/garden/ai/OrganismInteractionCalculator.java`: Added mutation logic for `reproductive-efficiency` in root networks.
 - `src/main/java/garden/ai/OrganismType.java`: Defines taxonomy and environmental succession rules for organisms, now incorporating trait-sensitive spore-to-moss transition.
 - `src/main/java/garden/ai/Simulation.java`: Advances seed or loaded garden state.
-- `src/main/java/garden/ai/TraitRegistry.java`: Registry for fungal, animal, and plant traits, updated to enhance predator energy conversion parameters.
+- `src/main/java/garden/ai/TraitRegistry.java`: Registry for fungal, animal, and plant traits, updated to enhance root-soil-enricher efficiency.
 
 ## Tests
 

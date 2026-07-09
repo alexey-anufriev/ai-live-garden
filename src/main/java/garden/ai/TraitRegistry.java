@@ -264,7 +264,7 @@ public class TraitRegistry {
         } else {
             int bufferBonus = (context.nutrientBuffer() > 50) ? 2 : 0;
             int recyclerBonus = (context.nutrientBuffer() > 50 ? 5 : 2) + (int) Math.min(context.releaserCount(), 10);
-            return (int) (Math.max(1, context.rootNetworkCount() / 2) + context.nutrientWeaverCount() + context.nutrientSharerCount() * 2 + context.bufferOptimizerCount() * (2 + bufferBonus) + context.soilMasterCount() * 4 + context.nutrientRecyclerCount() * recyclerBonus + context.nutrientTranslocatorCount() * 4 + context.nutrientSynthesizerCount() * 3 + context.nutrientReclaimerCount() * 3 + context.nutrientProducerCount() * 5 + context.nutrientPumpCount() * 6 + context.nutrientDistributorCount() * 4 + context.nutrientAcceleratorCount() * 5 + context.rootSoilEnricherCount() * (7 + bufferBonus) + context.fungalRootSymbiontCount() * 4 + context.mycelialRootMediatorCount() * 2);
+            return (int) (Math.max(1, context.rootNetworkCount() / 2) + context.nutrientWeaverCount() + context.nutrientSharerCount() * 2 + context.bufferOptimizerCount() * (2 + bufferBonus) + context.soilMasterCount() * 4 + context.nutrientRecyclerCount() * recyclerBonus + context.nutrientTranslocatorCount() * 4 + context.nutrientSynthesizerCount() * 3 + context.nutrientReclaimerCount() * 3 + context.nutrientProducerCount() * 5 + context.nutrientPumpCount() * 6 + context.nutrientDistributorCount() * 4 + context.nutrientAcceleratorCount() * 5 + context.rootSoilEnricherCount() * (10 + bufferBonus) + context.fungalRootSymbiontCount() * 4 + context.mycelialRootMediatorCount() * 2);
         }
     }
 
@@ -404,7 +404,7 @@ public class TraitRegistry {
                 if (organism.type() == OrganismType.ROOT_NETWORK && fungalContribution > 0) modifier -= 3;
                 break;
             case "root-soil-enricher":
-                if (organism.type() == OrganismType.ROOT_NETWORK && environment.nutrientBuffer() > 40) modifier -= 4;
+                if (organism.type() == OrganismType.ROOT_NETWORK && environment.nutrientBuffer() > 40) modifier -= 6;
                 break;
             case "nutrient-dependent-reproduction":
                 if (environment.nutrients() > 50) modifier -= 4;

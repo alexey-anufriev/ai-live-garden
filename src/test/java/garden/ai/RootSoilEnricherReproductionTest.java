@@ -12,7 +12,7 @@ public class RootSoilEnricherReproductionTest {
         
         int modifier = TraitRegistry.getReproductionThresholdModifier("root-soil-enricher", env, 0, root);
         
-        assertThat(modifier).isEqualTo(-4);
+        assertThat(modifier).isEqualTo(-6);
     }
 
     @Test
