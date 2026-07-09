@@ -11,8 +11,8 @@ public class FungalDecompositionReproductionTest {
         int fungalContribution = 10;
         
         // Reproduction threshold is normally 12 for FUNGUS
-        // With "fungal-decomposition-efficiency", it should be 12 - 6 = 6.
+        // With "fungal-decomposition-efficiency", it should be 12 - 8 = 4.
         int threshold = OrganismInteractionCalculator.reproductionThreshold(fungus, env, fungalContribution);
-        assertEquals(6, threshold);
+        assertEquals(4, threshold);
     }
 }

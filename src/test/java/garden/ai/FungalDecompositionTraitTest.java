@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FungalDecompositionTraitTest {
 
@@ -29,5 +30,15 @@ public class FungalDecompositionTraitTest {
         // Total = 4
         
         assertTrue(contribution > contributionNoTrait, "Fungal decomposition efficiency should increase fungal contribution");
+    }
+
+    @Test
+    public void testFungalDecompositionEfficiencyMetabolicBonus() {
+        Organism fungus = Organism.of("fungus-1", OrganismType.FUNGUS, 10, 1, "fungal-decomposition-efficiency");
+        Environment env = new Environment(100, 100, 100, 100, 100);
+        
+        TraitRegistry.MetabolicEffect effect = TraitRegistry.getMetabolicEffect("fungal-decomposition-efficiency", 1, fungus, env, 0, 0);
+        
+        assertEquals(8, effect.energyBonus(), "Fungal decomposition efficiency should provide an energy bonus of 8");
     }
 }
