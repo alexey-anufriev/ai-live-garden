@@ -406,6 +406,9 @@ public class TraitRegistry {
             case "root-soil-enricher":
                 if (organism.type() == OrganismType.ROOT_NETWORK && environment.nutrientBuffer() > 40) modifier -= 4;
                 break;
+            case "nutrient-dependent-reproduction":
+                if (environment.nutrients() > 50) modifier -= 4;
+                break;
             case "reproductive-efficiency":
                 if (organism.type() == OrganismType.FOX || organism.type() == OrganismType.FUNGUS || organism.type() == OrganismType.ROOT_NETWORK) {
                     modifier -= 3;
@@ -417,11 +420,14 @@ public class TraitRegistry {
 
     public static String getMutationTrait(int cycle, Organism organism, OrganismType childType, Environment environment) {
         if (childType == OrganismType.FUNGUS && Math.random() < 0.5) {
-            String[] fungalTraits = {"nutrient-decomposer", "fungus-soil-enricher", "fungal-network-connector", "fungal-accelerator", "fungal-enhancer", "fungal-buffer-stabilizer", "nutrient-synthesizer", "buffer-tapper", "fungal-nutrient-amplifier", "mass-decomposer", "reproductive-efficiency", "fungal-decomposition-efficiency"};
+            String[] fungalTraits = {"nutrient-decomposer", "fungus-soil-enricher", "fungal-network-connector", "fungal-accelerator", "fungal-enhancer", "fungal-buffer-stabilizer", "nutrient-synthesizer", "buffer-tapper", "fungal-nutrient-amplifier", "mass-decomposer", "reproductive-efficiency", "fungal-decomposition-efficiency", "nutrient-dependent-reproduction"};
             return fungalTraits[Math.floorMod(cycle + organism.generation(), fungalTraits.length)];
         }
         if (childType == OrganismType.FOX && Math.random() < 0.3) {
-            return "reproductive-efficiency";
+            return (Math.random() < 0.5) ? "reproductive-efficiency" : "nutrient-dependent-reproduction";
+        }
+        if (childType == OrganismType.ROOT_NETWORK && Math.random() < 0.3) {
+            return (Math.random() < 0.5) ? "reproductive-efficiency" : "nutrient-dependent-reproduction";
         }
         if (environment.nutrients() < 40 && Math.random() < 0.3) {
             if (childType.isPlant()) return "dormancy";
