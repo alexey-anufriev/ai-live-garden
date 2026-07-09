@@ -13,6 +13,7 @@ permissions:
 
 env:
   EXECUTION_MODEL: gemini-3.1-flash-lite
+  GEMINI_CLI_VERSION: "0.50.0"
 
 jobs:
   agent:
@@ -67,6 +68,7 @@ jobs:
           GEMINI_CLI_TRUST_WORKSPACE: "true"
         with:
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+          gemini_cli_version: ${{ env.GEMINI_CLI_VERSION }}
           gemini_model: ${{ env.EXECUTION_MODEL }}
           prompt: ${{ steps.gemini_prompt.outputs.text }}
           upload_artifacts: true
@@ -76,6 +78,45 @@ jobs:
         if: ${{ !cancelled() }}
         shell: bash
         run: scripts/restore-agent-protected-files.sh
+
+      - name: Inspect Gemini autonomous result
+        id: gemini_primary_inspect
+        if: ${{ !cancelled() }}
+        shell: bash
+        run: scripts/inspect-agent-gemini-output.sh gemini-artifacts
+
+      - name: Build Gemini corrective retry prompt
+        id: gemini_retry_prompt
+        if: ${{ !cancelled() && steps.gemini_primary_inspect.outputs.retry_required == 'true' }}
+        shell: bash
+        env:
+          AGENT_PRIMARY_GEMINI_ARTIFACTS_DIR: ${{ runner.temp }}/gemini-artifacts-primary
+        run: scripts/build-agent-retry-prompt-output.sh "${RUNNER_TEMP}/agent-context.md" gemini-artifacts "${RUNNER_TEMP}/agent-retry-context.md"
+
+      - name: Run Gemini corrective retry
+        id: gemini_retry
+        if: ${{ !cancelled() && steps.gemini_primary_inspect.outputs.retry_required == 'true' }}
+        uses: google-github-actions/run-gemini-cli@v0.1.22
+        env:
+          GEMINI_CLI_TRUST_WORKSPACE: "true"
+        with:
+          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+          gemini_cli_version: ${{ env.GEMINI_CLI_VERSION }}
+          gemini_model: ${{ env.EXECUTION_MODEL }}
+          prompt: ${{ steps.gemini_retry_prompt.outputs.text }}
+          upload_artifacts: false
+
+      - name: Restore protected files after retry
+        id: retry_restore_protected
+        if: ${{ !cancelled() && steps.gemini_primary_inspect.outputs.retry_required == 'true' }}
+        shell: bash
+        run: scripts/restore-agent-protected-files.sh
+
+      - name: Fail on Gemini plan-mode no-op
+        id: gemini_final_guard
+        if: ${{ !cancelled() }}
+        shell: bash
+        run: scripts/inspect-agent-gemini-output.sh --fail-on-noop gemini-artifacts
 
       - name: Extract agent handoff from Gemini output
         id: extract_agent_handoff
@@ -203,6 +244,7 @@ jobs:
           AGENT_CONTEXT_METADATA_FILE: ${{ runner.temp }}/agent-context.metadata
           AGENT_BASELINE_TEST_RESULT_FILE: ${{ runner.temp }}/baseline-test-result.md
           AGENT_BASELINE_POLICY_RESULT_FILE: ${{ runner.temp }}/baseline-policy-result.md
+          AGENT_PRIMARY_GEMINI_ARTIFACTS_DIR: ${{ runner.temp }}/gemini-artifacts-primary
         run: scripts/collect-agent-failure-diagnostics.sh "${{ runner.temp }}/agent-failure-diagnostics"
 
       - name: Upload failure diagnostics
@@ -222,6 +264,11 @@ jobs:
           BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
           BASELINE_POLICY_OUTCOME: ${{ steps.baseline_policy.outcome }}
           GEMINI_OUTCOME: ${{ steps.gemini.outcome }}
+          GEMINI_PRIMARY_INSPECT_OUTCOME: ${{ steps.gemini_primary_inspect.outcome }}
+          GEMINI_RETRY_PROMPT_OUTCOME: ${{ steps.gemini_retry_prompt.outcome }}
+          GEMINI_RETRY_OUTCOME: ${{ steps.gemini_retry.outcome }}
+          RETRY_RESTORE_PROTECTED_OUTCOME: ${{ steps.retry_restore_protected.outcome }}
+          GEMINI_FINAL_GUARD_OUTCOME: ${{ steps.gemini_final_guard.outcome }}
           EXTRACT_AGENT_HANDOFF_OUTCOME: ${{ steps.extract_agent_handoff.outcome }}
           AGENT_HANDOFF_OUTCOME: ${{ steps.agent_handoff.outcome }}
           POST_TEST_OUTCOME: ${{ steps.post_test_final.outcome }}
@@ -259,6 +306,11 @@ jobs:
           BASELINE_POLICY_OUTCOME: ${{ steps.baseline_policy.outcome }}
           GEMINI_OUTCOME: ${{ steps.gemini.outcome }}
           RESTORE_PROTECTED_OUTCOME: ${{ steps.restore_protected.outcome }}
+          GEMINI_PRIMARY_INSPECT_OUTCOME: ${{ steps.gemini_primary_inspect.outcome }}
+          GEMINI_RETRY_PROMPT_OUTCOME: ${{ steps.gemini_retry_prompt.outcome }}
+          GEMINI_RETRY_OUTCOME: ${{ steps.gemini_retry.outcome }}
+          RETRY_RESTORE_PROTECTED_OUTCOME: ${{ steps.retry_restore_protected.outcome }}
+          GEMINI_FINAL_GUARD_OUTCOME: ${{ steps.gemini_final_guard.outcome }}
           EXTRACT_AGENT_HANDOFF_OUTCOME: ${{ steps.extract_agent_handoff.outcome }}
           AGENT_HANDOFF_OUTCOME: ${{ steps.agent_handoff.outcome }}
           POST_TEST_OUTCOME: ${{ steps.post_test_final.outcome }}

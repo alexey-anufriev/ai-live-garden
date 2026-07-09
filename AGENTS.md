@@ -28,6 +28,8 @@ Every autonomous run must:
 7. Do not edit generated memory files.
 8. Leave no scratch files, unrelated edits, or misleading test claims.
 
+Autonomous workflow runs are pre-approved execution runs. Do not enter planning mode, ask for confirmation, or stop after proposing a strategy; implement the focused task or fail with a clear handoff.
+
 After the agent step, the workflow advances `data/garden-state.txt` and runs `scripts/agent-auto-postprocess.sh`. That script parses `.agent-run.json`, restores generated memory files, updates README state and its embedded trend charts, rewrites `agent/state.md`, refreshes `agent/code-map.md` from the Java tree, appends summaries, creates the journal entry, appends any request entries, removes `.agent-run.json`, and then validators check the result.
 
 ## Choosing Work

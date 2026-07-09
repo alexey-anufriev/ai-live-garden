@@ -318,6 +318,7 @@ append_compact_journal_entry() {
   echo "- If the Baseline Maven Test Result says \`failed\`, repairing the existing Java source or tests is the run's required first task. Do not add unrelated behavior until \`mvn test\` passes."
   echo "- If the Baseline Worktree Policy Result says \`deferred-repair\`, repairing those policy violations is the run's required first task. Do not add unrelated behavior until the policy violations are cleared."
   echo "- If Project Manager Direction exists and no baseline repair is required, choose exactly one PM direction A-D as the run's highest product priority. Set \`pmDirection\` in \`.agent-run.json\` to the selected label."
+  echo "- The run is pre-approved. Do not enter planning mode, do not ask for confirmation, and do not stop after proposing a strategy."
   echo "- Choose a task for its garden value, and let implementation structure follow from that task."
   echo "- \`expectedGardenEffect\` should explain what future garden behavior or runtime state should change."
   echo "- A run that only adds a named trait, diagnostic field, renderer line, event-log message, counter, or test coverage is low value unless it directly changes future garden behavior or removes a current obstacle to ecological recovery."

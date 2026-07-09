@@ -40,6 +40,7 @@ metadata_value() {
   echo "- Run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
   echo "- Attempt: ${GITHUB_RUN_ATTEMPT:-1}"
   echo "- Gemini execution model: $(value_or_dash "${EXECUTION_MODEL:-}")"
+  echo "- Gemini CLI version: $(value_or_dash "${GEMINI_CLI_VERSION:-}")"
   echo
   echo "| Phase | Outcome |"
   echo "| --- | --- |"
@@ -47,6 +48,11 @@ metadata_value() {
   echo "| Baseline worktree policy | $(value_or_dash "${BASELINE_POLICY_OUTCOME:-}") |"
   echo "| Gemini autonomous step | $(value_or_dash "${GEMINI_OUTCOME:-}") |"
   echo "| Protected file restore | $(value_or_dash "${RESTORE_PROTECTED_OUTCOME:-}") |"
+  echo "| Gemini primary output inspection | $(value_or_dash "${GEMINI_PRIMARY_INSPECT_OUTCOME:-}") |"
+  echo "| Gemini corrective retry prompt | $(value_or_dash "${GEMINI_RETRY_PROMPT_OUTCOME:-}") |"
+  echo "| Gemini corrective retry | $(value_or_dash "${GEMINI_RETRY_OUTCOME:-}") |"
+  echo "| Retry protected file restore | $(value_or_dash "${RETRY_RESTORE_PROTECTED_OUTCOME:-}") |"
+  echo "| Gemini final no-op guard | $(value_or_dash "${GEMINI_FINAL_GUARD_OUTCOME:-}") |"
   echo "| Agent handoff extraction | $(value_or_dash "${EXTRACT_AGENT_HANDOFF_OUTCOME:-}") |"
   echo "| Agent handoff validation | $(value_or_dash "${AGENT_HANDOFF_OUTCOME:-}") |"
   echo "| Post-Gemini test validation | $(value_or_dash "${POST_TEST_OUTCOME:-}") |"
@@ -87,6 +93,14 @@ metadata_value() {
   fi
   if [[ "${GEMINI_OUTCOME:-}" == "failure" ]]; then
     echo "The run failed during the main Gemini call. This is usually provider quota, authentication, or model availability."
+  elif [[ "${GEMINI_PRIMARY_INSPECT_OUTCOME:-}" == "failure" ]]; then
+    echo "The run failed while inspecting Gemini output for plan-mode/no-op behavior."
+  elif [[ "${GEMINI_RETRY_PROMPT_OUTCOME:-}" == "failure" ]]; then
+    echo "The run failed while building the corrective retry prompt after Gemini produced a plan-mode/no-op result."
+  elif [[ "${GEMINI_RETRY_OUTCOME:-}" == "failure" ]]; then
+    echo "The run failed during the corrective Gemini retry. This is usually provider quota, authentication, model availability, or a retry-time CLI failure."
+  elif [[ "${GEMINI_FINAL_GUARD_OUTCOME:-}" == "failure" ]]; then
+    echo "The run failed because Gemini entered planning/no-op behavior and still did not leave a valid handoff or repository changes after the corrective retry path."
   elif [[ "${EXTRACT_AGENT_HANDOFF_OUTCOME:-}" == "failure" ]]; then
     echo "The run failed because Gemini did not leave a valid \`.agent-run.json\` file or marked handoff JSON in its output."
   elif [[ "${AGENT_HANDOFF_OUTCOME:-}" == "failure" ]]; then

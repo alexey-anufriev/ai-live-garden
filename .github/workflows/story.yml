@@ -11,6 +11,9 @@ concurrency:
 permissions:
   contents: write
 
+env:
+  GEMINI_CLI_VERSION: "0.50.0"
+
 jobs:
   story:
     runs-on: ubuntu-latest
@@ -35,6 +38,7 @@ jobs:
           GEMINI_CLI_TRUST_WORKSPACE: "true"
         with:
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+          gemini_cli_version: ${{ env.GEMINI_CLI_VERSION }}
           prompt: ${{ steps.story_context.outputs.text }}
           upload_artifacts: true
 

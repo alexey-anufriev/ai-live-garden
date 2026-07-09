@@ -13,6 +13,7 @@ permissions:
 
 env:
   EXECUTION_MODEL: gemini-3.1-flash-lite
+  GEMINI_CLI_VERSION: "0.50.0"
 
 jobs:
   plan:
@@ -43,6 +44,7 @@ jobs:
           GEMINI_CLI_TRUST_WORKSPACE: "true"
         with:
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+          gemini_cli_version: ${{ env.GEMINI_CLI_VERSION }}
           gemini_model: ${{ env.EXECUTION_MODEL }}
           prompt: ${{ steps.pm_prompt.outputs.text }}
           upload_artifacts: true

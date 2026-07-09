@@ -19,6 +19,16 @@ if [[ -f .agent-run.json ]]; then
   cp .agent-run.json "$output_dir/agent-run.json"
 fi
 
+if [[ -d gemini-artifacts ]]; then
+  mkdir -p "$output_dir/gemini-artifacts"
+  cp -R gemini-artifacts/. "$output_dir/gemini-artifacts/"
+fi
+
+if [[ -n "${AGENT_PRIMARY_GEMINI_ARTIFACTS_DIR:-}" && -d "${AGENT_PRIMARY_GEMINI_ARTIFACTS_DIR}" ]]; then
+  mkdir -p "$output_dir/gemini-artifacts-primary"
+  cp -R "${AGENT_PRIMARY_GEMINI_ARTIFACTS_DIR}/." "$output_dir/gemini-artifacts-primary/"
+fi
+
 if [[ -s "$output_dir/git-untracked-files.txt" ]]; then
   mkdir -p "$output_dir/untracked-files"
   while IFS= read -r path; do
@@ -96,6 +106,12 @@ fi
   fi
   if [[ -f "$output_dir/agent-run.json" ]]; then
     echo "- Agent handoff copied to \`agent-run.json\`"
+  fi
+  if [[ -d "$output_dir/gemini-artifacts" ]]; then
+    echo "- Gemini artifacts copied to \`gemini-artifacts/\`"
+  fi
+  if [[ -d "$output_dir/gemini-artifacts-primary" ]]; then
+    echo "- Primary Gemini artifacts copied to \`gemini-artifacts-primary/\`"
   fi
   if [[ -f "$output_dir/baseline-test-result.md" ]]; then
     echo "- Baseline Maven test result copied to \`baseline-test-result.md\`"
