@@ -330,11 +330,11 @@ public class TraitRegistry {
         if (hunter.type() == OrganismType.FOX && hunter.traits().contains("fox-specialist")) bite += 2;
         if (hunter.type() == OrganismType.FOX && hunter.traits().contains("apex-predator")) bite += 3;
         if (hunter.type() == OrganismType.FOX && hunter.traits().contains("predator-converter")) {
-            bite += 4;
+            bite += 6;
             events.add(new GardenEvent(cycle, "%s utilized predator-converter to increase energy gain.".formatted(hunter.id())));
         }
         if (hunter.type() == OrganismType.FOX && hunter.traits().contains("predator-energy-efficiency")) {
-            bite += 6;
+            bite += 8;
             events.add(new GardenEvent(cycle, "%s optimized energy efficiency using predator-energy-efficiency.".formatted(hunter.id())));
         }
         if (hunter.type() == OrganismType.FOX && hunter.traits().contains("beetle-specialist") && prey.type() == OrganismType.BEETLE) {
