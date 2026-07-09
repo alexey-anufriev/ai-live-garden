@@ -407,7 +407,8 @@ public class TraitRegistry {
                 if (organism.type() == OrganismType.ROOT_NETWORK && environment.nutrientBuffer() > 40) modifier -= 6;
                 break;
             case "nutrient-dependent-reproduction":
-                if (environment.nutrients() > 50) modifier -= 4;
+                if (environment.nutrients() > 75) modifier -= 8;
+                else if (environment.nutrients() > 50) modifier -= 4;
                 break;
             case "reproductive-efficiency":
                 if (organism.type() == OrganismType.FOX || organism.type() == OrganismType.FUNGUS || organism.type() == OrganismType.ROOT_NETWORK) {
