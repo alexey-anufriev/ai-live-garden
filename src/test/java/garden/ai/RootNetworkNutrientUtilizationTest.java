@@ -28,4 +28,16 @@ public class RootNetworkNutrientUtilizationTest {
         // With nutrients > 50 and <= 75, it should be -4
         assertThat(modifier).isEqualTo(-4);
     }
+
+    @Test
+    public void testRootNutrientUtilizerContribution() {
+        Organism root = Organism.of("root-1", OrganismType.ROOT_NETWORK, 10, 1, "root-nutrient-utilizer");
+        Environment env = new Environment(30, 60, 50, 60, 80); // Nutrients > 25 (uses else block)
+        
+        int contribution = TraitRegistry.calculateRootContribution(java.util.List.of(root), env, 0);
+        
+        // Bonus for root-nutrient-utilizer is 15. Plus base contribution of 1 (rootNetworkCount(1)/2 = 0, + 1 = 1)
+        // Math.max(1, 1/2) + 15 = 1 + 15 = 16.
+        assertThat(contribution).isEqualTo(16);
+    }
 }

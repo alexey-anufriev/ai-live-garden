@@ -17,7 +17,7 @@ public class TraitRegistry {
             "nutrient-storer", 6
     );
 
-    private static final String[] TRAITS = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "sun-seeker", "rain-collector", "nutrient-finder", "nutrient-efficient", "shadow-stepper", "hardy", "water-seeker", "dormancy", "nutrient-weaver", "metabolic-efficiency", "scavenger", "nutrient-sharer", "buffer-resonator", "buffer-scavenger", "nutrient-hoarder", "nutrient-scout", "soil-master", "deep-rooting", "buffer-optimizer", "buffer-tapper", "nutrient-translocator", "camouflaged", "shade-thriver", "moisture-retainer", "nutrient-absorber", "nutrient-synthesizer", "prey-tracker", "resource-tracker", "predator-focus", "nutrient-reclaimer", "nutrient-producer", "nutrient-enricher", "moisture-thriver", "prolific", "cautious-feeder", "nutrient-decomposer", "fungus-soil-enricher", "fungal-network-connector", "fungal-feeder", "mycorrhizal-booster", "nutrient-scrounger", "fungal-symbiote", "nutrient-pump", "nutrient-distributor", "resourceful-breeder", "fungal-enhancer", "mycelial-scavenger", "mycelial-harvester", "mycelial-distributor", "mycelial-resonator", "mycelial-network-scout", "fungal-gardener", "fungal-fertilizer", "nutrient-anticipator", "mycelial-protector", "metabolic-economizer", "spore-disperser", "fungal-root-symbiont", "mycelial-root-mediator", "fungal-attractor", "mycelial-conduit", "mycelial-synergizer", "moss-nutrient-scavenger", "cautious-breeder", "stress-resilient", "stress-avoidance", "buffer-siphon", "fungal-decomposer-mimic", "nutrient-harvester", "fungal-buffer-stabilizer", "fox-specialist", "prolific-spore-producer", "fungal-decomposer-accelerator", "predator-synergy", "spore-dispersal-adaptor", "apex-predator", "beetle-specialist", "nutrient-accelerator", "metabolic-resilience", "root-soil-enricher", "predator-scout", "buffer-reproducer", "predator-converter", "fungal-metabolic-amplifier", "fox-energy-converter"};
+    private static final String[] TRAITS = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "sun-seeker", "rain-collector", "nutrient-finder", "nutrient-efficient", "shadow-stepper", "hardy", "water-seeker", "dormancy", "nutrient-weaver", "metabolic-efficiency", "scavenger", "nutrient-sharer", "buffer-resonator", "buffer-scavenger", "nutrient-hoarder", "nutrient-scout", "soil-master", "deep-rooting", "buffer-optimizer", "buffer-tapper", "nutrient-translocator", "camouflaged", "shade-thriver", "moisture-retainer", "nutrient-absorber", "nutrient-synthesizer", "prey-tracker", "resource-tracker", "predator-focus", "nutrient-reclaimer", "nutrient-producer", "nutrient-enricher", "moisture-thriver", "prolific", "cautious-feeder", "nutrient-decomposer", "fungus-soil-enricher", "fungal-network-connector", "fungal-feeder", "mycorrhizal-booster", "nutrient-scrounger", "fungal-symbiote", "nutrient-pump", "nutrient-distributor", "resourceful-breeder", "fungal-enhancer", "mycelial-scavenger", "mycelial-harvester", "mycelial-distributor", "mycelial-resonator", "mycelial-network-scout", "fungal-gardener", "fungal-fertilizer", "nutrient-anticipator", "mycelial-protector", "metabolic-economizer", "spore-disperser", "fungal-root-symbiont", "mycelial-root-mediator", "fungal-attractor", "mycelial-conduit", "mycelial-synergizer", "moss-nutrient-scavenger", "cautious-breeder", "stress-resilient", "stress-avoidance", "buffer-siphon", "fungal-decomposer-mimic", "nutrient-harvester", "fungal-buffer-stabilizer", "fox-specialist", "prolific-spore-producer", "fungal-decomposer-accelerator", "predator-synergy", "spore-dispersal-adaptor", "apex-predator", "beetle-specialist", "nutrient-accelerator", "metabolic-resilience", "root-soil-enricher", "predator-scout", "buffer-reproducer", "predator-converter", "fungal-metabolic-amplifier", "fox-energy-converter", "root-nutrient-utilizer"};
 
     public record MetabolicEffect(int metabolismChange, int energyBonus, GardenEvent event) {}
 
@@ -44,6 +44,7 @@ public class TraitRegistry {
             long rootSoilEnricherCount,
             long fungalRootSymbiontCount,
             long mycelialRootMediatorCount,
+            long rootNutrientUtilizerCount,
             long releaserCount,
             int nutrients,
             int nutrientBuffer
@@ -248,6 +249,7 @@ public class TraitRegistry {
                 TraitRegistry.count(organisms, "root-soil-enricher", OrganismType.ROOT_NETWORK),
                 TraitRegistry.count(organisms, "fungal-root-symbiont", OrganismType.ROOT_NETWORK),
                 mycelialRootMediatorCount,
+                TraitRegistry.count(organisms, "root-nutrient-utilizer", OrganismType.ROOT_NETWORK),
                 releaserCount,
                 environment.nutrients(),
                 environment.nutrientBuffer()
@@ -265,7 +267,7 @@ public class TraitRegistry {
         } else {
             int bufferBonus = (context.nutrientBuffer() > 50) ? 2 : 0;
             int recyclerBonus = (context.nutrientBuffer() > 50 ? 5 : 2) + (int) Math.min(context.releaserCount(), 10);
-            return (int) (Math.max(1, context.rootNetworkCount() / 2) + context.nutrientWeaverCount() + context.nutrientSharerCount() * 2 + context.bufferOptimizerCount() * (2 + bufferBonus) + context.soilMasterCount() * 4 + context.nutrientRecyclerCount() * recyclerBonus + context.nutrientTranslocatorCount() * 4 + context.nutrientSynthesizerCount() * 3 + context.nutrientReclaimerCount() * 3 + context.nutrientProducerCount() * 5 + context.nutrientPumpCount() * 6 + context.nutrientDistributorCount() * 4 + context.nutrientAcceleratorCount() * 5 + context.rootSoilEnricherCount() * (10 + bufferBonus) + context.fungalRootSymbiontCount() * 4 + context.mycelialRootMediatorCount() * 2);
+            return (int) (Math.max(1, context.rootNetworkCount() / 2) + context.nutrientWeaverCount() + context.nutrientSharerCount() * 2 + context.bufferOptimizerCount() * (2 + bufferBonus) + context.soilMasterCount() * 4 + context.nutrientRecyclerCount() * recyclerBonus + context.nutrientTranslocatorCount() * 4 + context.nutrientSynthesizerCount() * 3 + context.nutrientReclaimerCount() * 3 + context.nutrientProducerCount() * 5 + context.nutrientPumpCount() * 6 + context.nutrientDistributorCount() * 4 + context.nutrientAcceleratorCount() * 5 + context.rootSoilEnricherCount() * (10 + bufferBonus) + context.fungalRootSymbiontCount() * 4 + context.mycelialRootMediatorCount() * 2 + context.rootNutrientUtilizerCount() * 15);
         }
     }
 
