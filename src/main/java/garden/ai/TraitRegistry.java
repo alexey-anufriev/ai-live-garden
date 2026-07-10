@@ -415,8 +415,13 @@ public class TraitRegistry {
             case "nutrient-dependent-reproduction":
                 if (environment.nutrients() > 75) {
                     if (environment.nutrientBuffer() > 75) {
-                        if (organism.type() == OrganismType.ROOT_NETWORK) modifier -= 15;
-                        else modifier -= 12;
+                        if (organism.type() == OrganismType.ROOT_NETWORK ||
+                            organism.type() == OrganismType.FUNGUS ||
+                            organism.type() == OrganismType.FOX) {
+                            modifier -= 15;
+                        } else {
+                            modifier -= 12;
+                        }
                     }
                     else modifier -= 10;
                 }

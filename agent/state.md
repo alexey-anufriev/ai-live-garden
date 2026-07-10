@@ -4,19 +4,22 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 8783
+- Cycle: 8796
 - Health: Flourishing (🟢)
 - Nutrients: 100.
 - NutrientBuffer: 100.
-- Active organisms: 10021 total across beetle, fox fungus, moss root network, spore.
+- Active organisms: 10029 total across beetle, fox fungus, moss root network, spore.
 - Missing roles: none.
-- Latest agent handoff: Intensify Root Network Nutrient Utilization.
-- Latest result: Modified `TraitRegistry.java` to increase the reproduction threshold reduction for the `nutrient-dependent-reproduction` trait from -12 to -15 specifically for `ROOT_NETWORK` organisms when both nutrient and nutrient buffer levels exceed 75. Added `RootNetworkNutrientUtilizationTest.java` to verify this trait-based demographic acceleration..
+- Latest agent handoff: Nutrient-Triggered Population Expansion.
+- Latest result: Updated `TraitRegistry.java` to apply a -15 reproduction threshold modifier for functional roles (FOX, FUNGUS, ROOT_NETWORK) when nutrients and buffer both exceed 75. Updated `NutrientDependentReproductionTest.java` to verify the generalized behavior..
 
 ## Immediate Directions
 
-- Monitor ROOT_NETWORK population growth.
+- Monitor functional role population growth.
 
 ## Constraints & Known Bad Ideas
 
-- Focus on active trait-based nutrient coupling for reproduction, not passive growth.
+- Do not attempt to fix the simulation in one run.
+- Do not add another named adaptation merely because recent runs did so.
+- Do not add another observability-only or tests-only change merely because it is easy to validate.
+- Do not treat the full nutrient buffer as proof of health while nutrients are zero or ecological roles are absent.
