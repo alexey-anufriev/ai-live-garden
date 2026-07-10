@@ -63,6 +63,7 @@ public class TraitRegistry {
             long fungalDecompositionEfficiencyCount,
             long fungalMetabolicAmplifierCount,
             long fungalNutrientAmplifierCount,
+            long fungalEnergyConverterCount,
             long fungalGardenerCount,
             long fungalFertilizerCount,
             long rootNetworkCount,
@@ -285,6 +286,7 @@ public class TraitRegistry {
                 TraitRegistry.count(organisms, "fungal-decomposition-efficiency", OrganismType.FUNGUS),
                 TraitRegistry.count(organisms, "fungal-metabolic-amplifier", OrganismType.FUNGUS),
                 TraitRegistry.count(organisms, "fungal-nutrient-amplifier", OrganismType.FUNGUS),
+                TraitRegistry.count(organisms, "fungal-energy-converter", OrganismType.FUNGUS),
                 TraitRegistry.countAnimalTrait(organisms, "fungal-gardener"),
                 TraitRegistry.countAnimalTrait(organisms, "fungal-fertilizer"),
                 TraitRegistry.count(organisms, OrganismType.ROOT_NETWORK),
@@ -316,6 +318,7 @@ public class TraitRegistry {
                       context.fungalDecompositionEfficiencyCount() * 120 +
                       context.fungalMetabolicAmplifierCount() * 150 +
                       context.fungalNutrientAmplifierCount() * 30 +
+                      context.fungalEnergyConverterCount() * 100 * bufferBonus +
                       context.fungalGardenerCount() * 5 +
                       context.fungalFertilizerCount() * 7 +
                       context.fungalDecomposerMimicCount() * 5 +
@@ -448,6 +451,12 @@ public class TraitRegistry {
                     else modifier -= 10;
                 }
                 break;
+            case "fungal-energy-converter":
+                if (organism.type() == OrganismType.FUNGUS) {
+                    if (environment.nutrientBuffer() > 75) modifier -= 20;
+                    else modifier -= 10;
+                }
+                break;
             case "reproductive-efficiency":
                 if (organism.type() == OrganismType.FOX) {
                     if (environment.nutrientBuffer() > 75) modifier -= 10;
@@ -463,7 +472,7 @@ public class TraitRegistry {
 
     public static String getMutationTrait(int cycle, Organism organism, OrganismType childType, Environment environment) {
         if (childType == OrganismType.FUNGUS && Math.random() < 0.5) {
-            String[] fungalTraits = {"nutrient-decomposer", "fungus-soil-enricher", "fungal-network-connector", "fungal-accelerator", "fungal-enhancer", "fungal-buffer-stabilizer", "nutrient-synthesizer", "buffer-tapper", "fungal-nutrient-amplifier", "mass-decomposer", "reproductive-efficiency", "fungal-decomposition-efficiency", "nutrient-dependent-reproduction"};
+            String[] fungalTraits = {"nutrient-decomposer", "fungus-soil-enricher", "fungal-network-connector", "fungal-accelerator", "fungal-enhancer", "fungal-buffer-stabilizer", "nutrient-synthesizer", "buffer-tapper", "fungal-nutrient-amplifier", "mass-decomposer", "reproductive-efficiency", "fungal-decomposition-efficiency", "nutrient-dependent-reproduction", "fungal-energy-converter"};
             return fungalTraits[Math.floorMod(cycle + organism.generation(), fungalTraits.length)];
         }
         if (childType == OrganismType.FOX && Math.random() < 0.3) {
@@ -601,6 +610,9 @@ public class TraitRegistry {
                 break;
             case "nutrient-scrounger":
                 if (environment.nutrients() < 25) return new MetabolicEffect(0, 1, new GardenEvent(cycle, "%s scrounged for nutrients.".formatted(organism.id())));
+                break;
+            case "fungal-energy-converter":
+                if (organism.type() == OrganismType.FUNGUS) return new MetabolicEffect(0, 20, new GardenEvent(cycle, "%s converted buffer nutrients directly into reproductive energy.".formatted(organism.id())));
                 break;
             case "fungal-decomposition-efficiency":
                 if (organism.type() == OrganismType.FUNGUS) return new MetabolicEffect(0, 8, new GardenEvent(cycle, "%s optimized its decomposition to gain energy.".formatted(organism.id())));
