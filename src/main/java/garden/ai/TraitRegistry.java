@@ -410,7 +410,10 @@ public class TraitRegistry {
                 }
                 break;
             case "nutrient-dependent-reproduction":
-                if (environment.nutrients() > 75) modifier -= 8;
+                if (environment.nutrients() > 75) {
+                    if (environment.nutrientBuffer() > 75) modifier -= 12;
+                    else modifier -= 10;
+                }
                 else if (environment.nutrients() > 50) modifier -= 4;
                 break;
             case "reproductive-efficiency":
