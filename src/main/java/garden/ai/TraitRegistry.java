@@ -398,7 +398,10 @@ public class TraitRegistry {
                 if (organism.type() == OrganismType.FUNGUS) modifier -= 3;
                 break;
             case "fungal-decomposition-efficiency":
-                if (organism.type() == OrganismType.FUNGUS) modifier -= 8;
+                if (organism.type() == OrganismType.FUNGUS) {
+                    if (environment.nutrientBuffer() > 75) modifier -= 12;
+                    else modifier -= 8;
+                }
                 break;
             case "fungal-root-symbiont":
                 if (organism.type() == OrganismType.ROOT_NETWORK && fungalContribution > 0) modifier -= 3;

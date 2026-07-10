@@ -15,4 +15,16 @@ public class FungalDecompositionReproductionTest {
         int threshold = OrganismInteractionCalculator.reproductionThreshold(fungus, env, fungalContribution);
         assertEquals(4, threshold);
     }
+
+    @Test
+    public void testFungalDecompositionEfficiencyHighBufferReducesReproductionThresholdFurther() {
+        Organism fungus = Organism.of("fungus-1", OrganismType.FUNGUS, 10, 1, "fungal-decomposition-efficiency");
+        // Nutrients 100, Buffer 80 (High Buffer > 75)
+        Environment env = new Environment(100, 100, 100, 100, 80);
+        int fungalContribution = 10;
+        // Reproduction threshold normally 12 for FUNGUS
+        // Base 12 - 2 (buffer > 50) - 2 (nutrients > 60) - 12 (modifier) = -4.
+        int threshold = OrganismInteractionCalculator.reproductionThreshold(fungus, env, fungalContribution);
+        assertEquals(-4, threshold);
+    }
 }
