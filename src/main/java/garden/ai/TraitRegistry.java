@@ -17,7 +17,7 @@ public class TraitRegistry {
             "nutrient-storer", 6
     );
 
-    private static final String[] TRAITS = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "sun-seeker", "rain-collector", "nutrient-finder", "nutrient-efficient", "shadow-stepper", "hardy", "water-seeker", "dormancy", "nutrient-weaver", "metabolic-efficiency", "scavenger", "nutrient-sharer", "buffer-resonator", "buffer-scavenger", "nutrient-hoarder", "nutrient-scout", "soil-master", "deep-rooting", "buffer-optimizer", "buffer-tapper", "nutrient-translocator", "camouflaged", "shade-thriver", "moisture-retainer", "nutrient-absorber", "nutrient-synthesizer", "prey-tracker", "resource-tracker", "predator-focus", "nutrient-reclaimer", "nutrient-producer", "nutrient-enricher", "moisture-thriver", "prolific", "cautious-feeder", "nutrient-decomposer", "fungus-soil-enricher", "fungal-network-connector", "fungal-feeder", "mycorrhizal-booster", "nutrient-scrounger", "fungal-symbiote", "nutrient-pump", "nutrient-distributor", "resourceful-breeder", "fungal-enhancer", "mycelial-scavenger", "mycelial-harvester", "mycelial-distributor", "mycelial-resonator", "mycelial-network-scout", "fungal-gardener", "fungal-fertilizer", "nutrient-anticipator", "mycelial-protector", "metabolic-economizer", "spore-disperser", "fungal-root-symbiont", "mycelial-root-mediator", "fungal-attractor", "mycelial-conduit", "mycelial-synergizer", "moss-nutrient-scavenger", "cautious-breeder", "stress-resilient", "stress-avoidance", "buffer-siphon", "fungal-decomposer-mimic", "nutrient-harvester", "fungal-buffer-stabilizer", "fox-specialist", "prolific-spore-producer", "fungal-decomposer-accelerator", "predator-synergy", "spore-dispersal-adaptor", "apex-predator", "beetle-specialist", "nutrient-accelerator", "metabolic-resilience", "root-soil-enricher", "predator-scout", "buffer-reproducer", "predator-converter"};
+    private static final String[] TRAITS = {"deeper-memory", "brighter-sense", "quiet-hunger", "rain-wise", "shadow-tuned", "resilient", "sun-lover", "sun-seeker", "rain-collector", "nutrient-finder", "nutrient-efficient", "shadow-stepper", "hardy", "water-seeker", "dormancy", "nutrient-weaver", "metabolic-efficiency", "scavenger", "nutrient-sharer", "buffer-resonator", "buffer-scavenger", "nutrient-hoarder", "nutrient-scout", "soil-master", "deep-rooting", "buffer-optimizer", "buffer-tapper", "nutrient-translocator", "camouflaged", "shade-thriver", "moisture-retainer", "nutrient-absorber", "nutrient-synthesizer", "prey-tracker", "resource-tracker", "predator-focus", "nutrient-reclaimer", "nutrient-producer", "nutrient-enricher", "moisture-thriver", "prolific", "cautious-feeder", "nutrient-decomposer", "fungus-soil-enricher", "fungal-network-connector", "fungal-feeder", "mycorrhizal-booster", "nutrient-scrounger", "fungal-symbiote", "nutrient-pump", "nutrient-distributor", "resourceful-breeder", "fungal-enhancer", "mycelial-scavenger", "mycelial-harvester", "mycelial-distributor", "mycelial-resonator", "mycelial-network-scout", "fungal-gardener", "fungal-fertilizer", "nutrient-anticipator", "mycelial-protector", "metabolic-economizer", "spore-disperser", "fungal-root-symbiont", "mycelial-root-mediator", "fungal-attractor", "mycelial-conduit", "mycelial-synergizer", "moss-nutrient-scavenger", "cautious-breeder", "stress-resilient", "stress-avoidance", "buffer-siphon", "fungal-decomposer-mimic", "nutrient-harvester", "fungal-buffer-stabilizer", "fox-specialist", "prolific-spore-producer", "fungal-decomposer-accelerator", "predator-synergy", "spore-dispersal-adaptor", "apex-predator", "beetle-specialist", "nutrient-accelerator", "metabolic-resilience", "root-soil-enricher", "predator-scout", "buffer-reproducer", "predator-converter", "fungal-metabolic-amplifier"};
 
     public record MetabolicEffect(int metabolismChange, int energyBonus, GardenEvent event) {}
 
@@ -60,6 +60,7 @@ public class TraitRegistry {
             long fungalBufferStabilizerCount,
             long fungalDecomposerAcceleratorCount,
             long fungalDecompositionEfficiencyCount,
+            long fungalMetabolicAmplifierCount,
             long fungalNutrientAmplifierCount,
             long fungalGardenerCount,
             long fungalFertilizerCount,
@@ -280,6 +281,7 @@ public class TraitRegistry {
                 TraitRegistry.count(organisms, "fungal-buffer-stabilizer", OrganismType.FUNGUS),
                 TraitRegistry.count(organisms, "fungal-decomposer-accelerator", OrganismType.FUNGUS),
                 TraitRegistry.count(organisms, "fungal-decomposition-efficiency", OrganismType.FUNGUS),
+                TraitRegistry.count(organisms, "fungal-metabolic-amplifier", OrganismType.FUNGUS),
                 TraitRegistry.count(organisms, "fungal-nutrient-amplifier", OrganismType.FUNGUS),
                 TraitRegistry.countAnimalTrait(organisms, "fungal-gardener"),
                 TraitRegistry.countAnimalTrait(organisms, "fungal-fertilizer"),
@@ -310,6 +312,7 @@ public class TraitRegistry {
                       context.fungalBufferStabilizerCount() * 12 +
                       context.fungalDecomposerAcceleratorCount() * 45 +
                       context.fungalDecompositionEfficiencyCount() * 120 +
+                      context.fungalMetabolicAmplifierCount() * 150 +
                       context.fungalNutrientAmplifierCount() * 30 +
                       context.fungalGardenerCount() * 5 +
                       context.fungalFertilizerCount() * 7 +
@@ -580,6 +583,9 @@ public class TraitRegistry {
                 break;
             case "fungal-decomposition-efficiency":
                 if (organism.type() == OrganismType.FUNGUS) return new MetabolicEffect(0, 8, new GardenEvent(cycle, "%s optimized its decomposition to gain energy.".formatted(organism.id())));
+                break;
+            case "fungal-metabolic-amplifier":
+                if (organism.type() == OrganismType.FUNGUS) return new MetabolicEffect(0, 15, new GardenEvent(cycle, "%s amplified its metabolism to gain significant energy.".formatted(organism.id())));
                 break;
             case "fungal-decomposer-accelerator":
                 if (organism.type() == OrganismType.FUNGUS) return new MetabolicEffect(0, 2, new GardenEvent(cycle, "%s accelerated decomposition to gain energy.".formatted(organism.id())));
