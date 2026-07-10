@@ -375,6 +375,16 @@ public class TraitRegistry {
         return NUTRIENT_VALUES.getOrDefault(trait, 0);
     }
 
+    public static int getGlobalReproductionThresholdModifier(Environment environment, Organism organism) {
+        int modifier = 0;
+        if (environment.nutrients() > 75 && environment.nutrientBuffer() > 75) {
+            if (organism.type() == OrganismType.FOX || organism.type() == OrganismType.FUNGUS || organism.type() == OrganismType.ROOT_NETWORK) {
+                modifier -= 5;
+            }
+        }
+        return modifier;
+    }
+
     public static int getReproductionThresholdModifier(String trait, Environment environment, int fungalContribution, Organism organism) {
         int modifier = 0;
         switch (trait) {

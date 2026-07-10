@@ -23,8 +23,8 @@ public class FungalDecompositionReproductionTest {
         Environment env = new Environment(100, 100, 100, 100, 80);
         int fungalContribution = 10;
         // Reproduction threshold normally 12 for FUNGUS
-        // Base 12 - 2 (buffer > 50) - 2 (nutrients > 60) - 12 (modifier) = -4.
+        // Base 12 - 2 (buffer > 50) - 2 (nutrients > 60) - 12 (modifier) - 5 (global modifier) = -9.
         int threshold = OrganismInteractionCalculator.reproductionThreshold(fungus, env, fungalContribution);
-        assertEquals(-4, threshold);
+        assertEquals(-9, threshold);
     }
 }
