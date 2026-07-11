@@ -7,12 +7,19 @@ public class OrganismTypeSuccessionTest {
 
     @Test
     public void testSporeSuccession() {
-        Environment highMoisture = new Environment(50, 70, 50, 50, 50);
-        Environment lowMoisture = new Environment(50, 30, 50, 50, 50);
-        Environment highBuffer = new Environment(50, 30, 50, 50, 70);
-        assertEquals(OrganismType.MOSS, OrganismType.SPORE.offspringType(0, 0, highMoisture));
-        assertEquals(OrganismType.FUNGUS, OrganismType.SPORE.offspringType(0, 0, highBuffer));
-        assertEquals(OrganismType.SPORE, OrganismType.SPORE.offspringType(0, 0, lowMoisture));
+        Environment highMoistureFavorable = new Environment(50, 70, 50, 50, 50); // buffer 50
+        Environment lowMoistureLowBuffer = new Environment(50, 30, 50, 50, 20); // buffer 20
+        Environment highBufferOnly = new Environment(50, 30, 50, 50, 70); // buffer 70
+        Environment moderateBuffer = new Environment(50, 30, 50, 50, 40); // buffer 40
+
+        // Spore tests:
+        // Rule 1: FUNGUS if buffer > 30.
+        // Rule 2: MOSS if moisture > 60.
+        
+        assertEquals(OrganismType.FUNGUS, OrganismType.SPORE.offspringType(0, 0, highMoistureFavorable));
+        assertEquals(OrganismType.FUNGUS, OrganismType.SPORE.offspringType(0, 0, highBufferOnly));
+        assertEquals(OrganismType.FUNGUS, OrganismType.SPORE.offspringType(0, 0, moderateBuffer));
+        assertEquals(OrganismType.SPORE, OrganismType.SPORE.offspringType(0, 0, lowMoistureLowBuffer));
     }
 
     @Test

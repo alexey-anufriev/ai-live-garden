@@ -94,7 +94,7 @@ public enum OrganismType {
      * simple succession behavior over time, now sensitive to environmental conditions.
      */
     public OrganismType offspringType(int cycle, int generation, Environment environment) {
-        if (this == SPORE && environment.nutrientBuffer() > 50) {
+        if (this == SPORE && environment.nutrientBuffer() > 30) {
             return FUNGUS;
         }
         if (this == SPORE && environment.moisture() > 60) {
