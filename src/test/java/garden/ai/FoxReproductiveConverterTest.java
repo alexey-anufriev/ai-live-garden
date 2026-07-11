@@ -16,11 +16,11 @@ public class FoxReproductiveConverterTest {
         assertEquals(20, metabolic.energyBonus(), "Fox reproductive converter should provide +20 energy bonus");
         
         // Test reproduction threshold modifier
-        int modifier = TraitRegistry.getReproductionThresholdModifier("fox-reproductive-converter", environment, 0, fox);
+        int modifier = TraitRegistry.getReproductionThresholdModifier("fox-reproductive-converter", environment, 0, 0L, fox);
         assertEquals(-20, modifier, "Fox reproductive converter should reduce reproduction threshold by 20 in high buffer environment");
         
         Environment lowBufferEnvironment = new Environment(100, 100, 100, 100, 10);
-        int lowBufferModifier = TraitRegistry.getReproductionThresholdModifier("fox-reproductive-converter", lowBufferEnvironment, 0, fox);
+        int lowBufferModifier = TraitRegistry.getReproductionThresholdModifier("fox-reproductive-converter", lowBufferEnvironment, 0, 0L, fox);
         assertEquals(-10, lowBufferModifier, "Fox reproductive converter should reduce reproduction threshold by 10 in low buffer environment");
     }
 }

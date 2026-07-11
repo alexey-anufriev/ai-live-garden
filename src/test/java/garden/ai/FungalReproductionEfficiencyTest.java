@@ -11,7 +11,7 @@ public class FungalReproductionEfficiencyTest {
         Organism fungus = Organism.of("fungus-1", OrganismType.FUNGUS, 10, 1, "fungal-decomposer-accelerator");
         Environment env = new Environment(50, 50, 50, 50, 50);
         
-        int modifier = TraitRegistry.getReproductionThresholdModifier("fungal-decomposer-accelerator", env, 10, fungus);
+        int modifier = TraitRegistry.getReproductionThresholdModifier("fungal-decomposer-accelerator", env, 10, 0L, fungus);
         
         assertThat(modifier).isEqualTo(-4);
     }
@@ -21,7 +21,7 @@ public class FungalReproductionEfficiencyTest {
         Organism fungus = Organism.of("fungus-1", OrganismType.FUNGUS, 10, 1, "fungal-nutrient-amplifier");
         Environment env = new Environment(50, 50, 50, 50, 50);
         
-        int modifier = TraitRegistry.getReproductionThresholdModifier("fungal-nutrient-amplifier", env, 10, fungus);
+        int modifier = TraitRegistry.getReproductionThresholdModifier("fungal-nutrient-amplifier", env, 10, 0L, fungus);
         
         assertThat(modifier).isEqualTo(-3);
     }
@@ -31,7 +31,7 @@ public class FungalReproductionEfficiencyTest {
         Organism beetle = Organism.of("beetle-1", OrganismType.BEETLE, 10, 1, "fungal-decomposer-accelerator");
         Environment env = new Environment(50, 50, 50, 50, 50);
         
-        int modifier = TraitRegistry.getReproductionThresholdModifier("fungal-decomposer-accelerator", env, 10, beetle);
+        int modifier = TraitRegistry.getReproductionThresholdModifier("fungal-decomposer-accelerator", env, 10, 0L, beetle);
         
         assertThat(modifier).isEqualTo(0);
     }

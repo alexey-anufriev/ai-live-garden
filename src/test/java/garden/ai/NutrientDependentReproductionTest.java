@@ -3,6 +3,7 @@ package garden.ai;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
+import java.util.Collections;
 
 public class NutrientDependentReproductionTest {
 
@@ -22,25 +23,25 @@ public class NutrientDependentReproductionTest {
         Organism root = Organism.of("root-1", OrganismType.ROOT_NETWORK, 10, 1, "nutrient-dependent-reproduction");
         Organism beetle = Organism.of("beetle-1", OrganismType.BEETLE, 10, 1, "nutrient-dependent-reproduction");
 
-        int veryHighModifierFox = TraitRegistry.getReproductionThresholdModifier("nutrient-dependent-reproduction", veryHighEnv, 0, fox);
+        int veryHighModifierFox = TraitRegistry.getReproductionThresholdModifier("nutrient-dependent-reproduction", veryHighEnv, 0, 0L, fox);
         assertEquals(-15, veryHighModifierFox, "Modifier should be -15 for FOX (functional role)");
 
-        int veryHighModifierFungus = TraitRegistry.getReproductionThresholdModifier("nutrient-dependent-reproduction", veryHighEnv, 0, fungus);
+        int veryHighModifierFungus = TraitRegistry.getReproductionThresholdModifier("nutrient-dependent-reproduction", veryHighEnv, 0, 0L, fungus);
         assertEquals(-15, veryHighModifierFungus, "Modifier should be -15 for FUNGUS (functional role)");
 
-        int veryHighModifierRoot = TraitRegistry.getReproductionThresholdModifier("nutrient-dependent-reproduction", veryHighEnv, 0, root);
+        int veryHighModifierRoot = TraitRegistry.getReproductionThresholdModifier("nutrient-dependent-reproduction", veryHighEnv, 0, 0L, root);
         assertEquals(-15, veryHighModifierRoot, "Modifier should be -15 for ROOT_NETWORK (functional role)");
 
-        int veryHighModifierBeetle = TraitRegistry.getReproductionThresholdModifier("nutrient-dependent-reproduction", veryHighEnv, 0, beetle);
+        int veryHighModifierBeetle = TraitRegistry.getReproductionThresholdModifier("nutrient-dependent-reproduction", veryHighEnv, 0, 0L, beetle);
         assertEquals(-12, veryHighModifierBeetle, "Modifier should be -12 for BEETLE (non-functional role)");
 
-        int highModifier = TraitRegistry.getReproductionThresholdModifier("nutrient-dependent-reproduction", highEnv, 0, fox);
+        int highModifier = TraitRegistry.getReproductionThresholdModifier("nutrient-dependent-reproduction", highEnv, 0, 0L, fox);
         assertEquals(-10, highModifier, "Modifier should be -10 for high nutrients (> 75) and low buffer (<= 75)");
 
-        int midModifier = TraitRegistry.getReproductionThresholdModifier("nutrient-dependent-reproduction", midNutrientEnv, 0, fox);
+        int midModifier = TraitRegistry.getReproductionThresholdModifier("nutrient-dependent-reproduction", midNutrientEnv, 0, 0L, fox);
         assertEquals(-4, midModifier, "Modifier should be -4 for mid nutrients (> 50, <= 75)");
 
-        int lowModifier = TraitRegistry.getReproductionThresholdModifier("nutrient-dependent-reproduction", lowNutrientEnv, 0, fox);
+        int lowModifier = TraitRegistry.getReproductionThresholdModifier("nutrient-dependent-reproduction", lowNutrientEnv, 0, 0L, fox);
         assertEquals(0, lowModifier, "Modifier should be 0 for low nutrients");
     }
 }

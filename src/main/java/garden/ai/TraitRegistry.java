@@ -388,7 +388,7 @@ public class TraitRegistry {
         return modifier;
     }
 
-    public static int getReproductionThresholdModifier(String trait, Environment environment, int fungalContribution, Organism organism) {
+    public static int getReproductionThresholdModifier(String trait, Environment environment, int fungalContribution, long rootNetworkCount, Organism organism) {
         int modifier = 0;
         switch (trait) {
             case "prolific":
@@ -423,6 +423,7 @@ public class TraitRegistry {
                 break;
             case "fungal-root-symbiont":
                 if (organism.type() == OrganismType.ROOT_NETWORK && fungalContribution > 0) modifier -= 3;
+                if (organism.type() == OrganismType.FUNGUS && rootNetworkCount > 0) modifier -= 3;
                 break;
             case "root-soil-enricher":
                 if (organism.type() == OrganismType.ROOT_NETWORK) {

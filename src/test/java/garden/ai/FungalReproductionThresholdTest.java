@@ -11,8 +11,8 @@ public class FungalReproductionThresholdTest {
         Environment lowBufferEnv = new Environment(50, 50, 50, 50, 10);
         Environment highBufferEnv = new Environment(50, 50, 50, 50, 100);
 
-        int lowBufferThreshold = OrganismInteractionCalculator.reproductionThreshold(fungus, lowBufferEnv, 0);
-        int highBufferThreshold = OrganismInteractionCalculator.reproductionThreshold(fungus, highBufferEnv, 0);
+        int lowBufferThreshold = OrganismInteractionCalculator.reproductionThreshold(fungus, lowBufferEnv, 0, java.util.Collections.emptyList());
+        int highBufferThreshold = OrganismInteractionCalculator.reproductionThreshold(fungus, highBufferEnv, 0, java.util.Collections.emptyList());
 
         assertThat(highBufferThreshold).isEqualTo(lowBufferThreshold - 2);
         assertThat(highBufferThreshold).isEqualTo(10);

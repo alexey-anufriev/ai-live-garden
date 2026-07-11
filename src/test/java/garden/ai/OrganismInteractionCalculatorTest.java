@@ -91,8 +91,8 @@ class OrganismInteractionCalculatorTest {
         Environment lowNutrients = new Environment(50, 50, 50, 10, 100);
         Organism moss = Organism.of("moss-1", OrganismType.MOSS, 10, 1);
         
-        int thresholdHigh = OrganismInteractionCalculator.reproductionThreshold(moss, highNutrients, 0);
-        int thresholdLow = OrganismInteractionCalculator.reproductionThreshold(moss, lowNutrients, 0);
+        int thresholdHigh = OrganismInteractionCalculator.reproductionThreshold(moss, highNutrients, 0, List.of(moss));
+        int thresholdLow = OrganismInteractionCalculator.reproductionThreshold(moss, lowNutrients, 0, List.of(moss));
         
         assertThat(thresholdLow).isGreaterThan(thresholdHigh);
     }
@@ -103,8 +103,8 @@ class OrganismInteractionCalculatorTest {
         Organism fungus = Organism.of("fungus-1", OrganismType.FUNGUS, 10, 1);
         Organism moss = Organism.of("moss-1", OrganismType.MOSS, 10, 1);
         
-        int fungusThreshold = OrganismInteractionCalculator.reproductionThreshold(fungus, env, 0);
-        int mossThreshold = OrganismInteractionCalculator.reproductionThreshold(moss, env, 0);
+        int fungusThreshold = OrganismInteractionCalculator.reproductionThreshold(fungus, env, 0, List.of(fungus, moss));
+        int mossThreshold = OrganismInteractionCalculator.reproductionThreshold(moss, env, 0, List.of(fungus, moss));
         
         assertThat(fungusThreshold).isEqualTo(10);
         assertThat(mossThreshold).isEqualTo(14);

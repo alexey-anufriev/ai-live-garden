@@ -12,7 +12,7 @@ public class RootNetworkNutrientUtilizationTest {
         Organism root = Organism.of("root-1", OrganismType.ROOT_NETWORK, 10, 1, "nutrient-dependent-reproduction");
         Environment env = new Environment(50, 80, 50, 80, 80); // Nutrients 80 (> 75), Buffer 80 (> 75)
         
-        int modifier = TraitRegistry.getReproductionThresholdModifier("nutrient-dependent-reproduction", env, 0, root);
+        int modifier = TraitRegistry.getReproductionThresholdModifier("nutrient-dependent-reproduction", env, 0, 0L, root);
         
         // With nutrients > 75 and buffer > 75, for root network, it should be -15
         assertThat(modifier).isEqualTo(-15);
@@ -23,7 +23,7 @@ public class RootNetworkNutrientUtilizationTest {
         Organism root = Organism.of("root-1", OrganismType.ROOT_NETWORK, 10, 1, "nutrient-dependent-reproduction");
         Environment env = new Environment(50, 60, 50, 60, 80); // Nutrients 60 (> 50, <= 75), Buffer 80
         
-        int modifier = TraitRegistry.getReproductionThresholdModifier("nutrient-dependent-reproduction", env, 0, root);
+        int modifier = TraitRegistry.getReproductionThresholdModifier("nutrient-dependent-reproduction", env, 0, 0L, root);
         
         // With nutrients > 50 and <= 75, it should be -4
         assertThat(modifier).isEqualTo(-4);

@@ -19,8 +19,8 @@ public class ReproductiveEfficiencyTest {
         // Mid buffer (>40): 15 - 6 = 9.
         // Low buffer (else): 15 - 3 = 12.
         
-        assertEquals(5, OrganismInteractionCalculator.reproductionThreshold(fox, envHighBuffer, 0), "Reproduction threshold for FOX with high buffer (>75) should be 5.");
-        assertEquals(9, OrganismInteractionCalculator.reproductionThreshold(fox, envMidBuffer, 0), "Reproduction threshold for FOX with mid buffer (>40) should be 9.");
-        assertEquals(12, OrganismInteractionCalculator.reproductionThreshold(fox, envLowBuffer, 0), "Reproduction threshold for FOX with low buffer should be 12.");
+        assertEquals(5, OrganismInteractionCalculator.reproductionThreshold(fox, envHighBuffer, 0, java.util.Collections.emptyList()), "Reproduction threshold for FOX with high buffer (>75) should be 5.");
+        assertEquals(9, OrganismInteractionCalculator.reproductionThreshold(fox, envMidBuffer, 0, java.util.Collections.emptyList()), "Reproduction threshold for FOX with mid buffer (>40) should be 9.");
+        assertEquals(12, OrganismInteractionCalculator.reproductionThreshold(fox, envLowBuffer, 0, java.util.Collections.emptyList()), "Reproduction threshold for FOX with low buffer should be 12.");
     }
 }

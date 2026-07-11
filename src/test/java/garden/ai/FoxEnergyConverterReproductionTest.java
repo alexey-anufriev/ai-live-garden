@@ -16,7 +16,7 @@ public class FoxEnergyConverterReproductionTest {
         // High buffer (>75): 15 - 20 = -5.
         // Low buffer (else): 15 - 10 = 5.
         
-        assertEquals(-5, OrganismInteractionCalculator.reproductionThreshold(fox, envHighBuffer, 0), "Reproduction threshold for FOX with fox-energy-converter and high buffer (>75) should be -5.");
-        assertEquals(5, OrganismInteractionCalculator.reproductionThreshold(fox, envLowBuffer, 0), "Reproduction threshold for FOX with fox-energy-converter and low buffer should be 5.");
+        assertEquals(-5, OrganismInteractionCalculator.reproductionThreshold(fox, envHighBuffer, 0, java.util.Collections.emptyList()), "Reproduction threshold for FOX with fox-energy-converter and high buffer (>75) should be -5.");
+        assertEquals(5, OrganismInteractionCalculator.reproductionThreshold(fox, envLowBuffer, 0, java.util.Collections.emptyList()), "Reproduction threshold for FOX with fox-energy-converter and low buffer should be 5.");
     }
 }

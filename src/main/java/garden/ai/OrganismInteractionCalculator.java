@@ -338,7 +338,7 @@ public class OrganismInteractionCalculator {
             }
 
             boolean isFungalSuccession = (organism.type() == OrganismType.ROOT_NETWORK && childType == OrganismType.FUNGUS);
-            boolean canReproduce = (organism.energy() >= reproductionThreshold(organism, context.environment(), context.fungalContribution()) || (isFungalSuccession && organism.energy() >= 4)) && (birthsThisCycle < 2 || isFungalSuccession);
+            boolean canReproduce = (organism.energy() >= reproductionThreshold(organism, context.environment(), context.fungalContribution(), context.organisms()) || (isFungalSuccession && organism.energy() >= 4)) && (birthsThisCycle < 2 || isFungalSuccession);
 
             if (organism.traits().contains("stressed") && !organism.traits().contains("fungal-symbiote") && !isFungalSuccession) {
                 canReproduce = false;
@@ -409,7 +409,7 @@ public class OrganismInteractionCalculator {
         return new PopulationDynamicsResult(next, identifier);
     }
 
-    public static int reproductionThreshold(Organism organism, Environment environment, int fungalContribution) {
+    public static int reproductionThreshold(Organism organism, Environment environment, int fungalContribution, List<Organism> organisms) {
         int threshold = 15;
         if (organism.type() == OrganismType.FUNGUS) {
             threshold = 12;
@@ -432,8 +432,9 @@ public class OrganismInteractionCalculator {
             threshold -= 3;
         }
         threshold += TraitRegistry.getGlobalReproductionThresholdModifier(environment, organism);
+        long rootNetworkCount = organisms.stream().filter(o -> o.type() == OrganismType.ROOT_NETWORK).count();
         for (String trait : organism.traits()) {
-            threshold += TraitRegistry.getReproductionThresholdModifier(trait, environment, fungalContribution, organism);
+            threshold += TraitRegistry.getReproductionThresholdModifier(trait, environment, fungalContribution, rootNetworkCount, organism);
         }
         return threshold;
     }

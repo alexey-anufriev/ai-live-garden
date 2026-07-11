@@ -11,11 +11,11 @@ public class RootSoilInteractionTest {
         Environment env = new Environment(100, 100, 100, 100, 80); // Buffer 80
         Organism root = new Organism("root-1", OrganismType.ROOT_NETWORK, 0, 0, 0, List.of("root-soil-enricher"));
         
-        int modifier = TraitRegistry.getReproductionThresholdModifier("root-soil-enricher", env, 0, root);
+        int modifier = TraitRegistry.getReproductionThresholdModifier("root-soil-enricher", env, 0, 0L, root);
         assertEquals(-10, modifier, "Reproduction modifier should be -10 when buffer > 75");
 
         env = new Environment(100, 100, 100, 100, 50); // Buffer 50
-        modifier = TraitRegistry.getReproductionThresholdModifier("root-soil-enricher", env, 0, root);
+        modifier = TraitRegistry.getReproductionThresholdModifier("root-soil-enricher", env, 0, 0L, root);
         assertEquals(-6, modifier, "Reproduction modifier should be -6 when 40 < buffer <= 75");
     }
 
