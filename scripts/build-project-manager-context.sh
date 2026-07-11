@@ -156,6 +156,8 @@ append_latest_plan() {
   echo "- Use mainly the garden state digest from \`data/garden-state.txt\`, current agent state, open requests, and previous PM direction."
   echo "- Do not inspect Java source files, tests, \`agent/code-map.md\`, or workflow files. This is product/ecology planning, not code review."
   echo "- First review whether the previous PM direction appears achieved, partially achieved, not achieved, or unclear based on committed garden/memory state."
+  echo "- Treat Ecological Outcome History as the outcome ledger. Code changes and trait names are attempts, not evidence that a direction succeeded."
+  echo "- If the same acceptance signal stayed flat across multiple coding runs or two daily plans, do not repeat the same causal hypothesis with new wording. Preserve the desired garden outcome, explicitly identify the evidence gap, and require bottleneck diagnosis before another mechanism is chosen."
   echo "- Use state evidence only: garden counts, environment values, trait frequencies, agent state, summaries, requests, and the previous PM plan. Do not infer code causes."
   echo "- Recommend garden-facing outcomes rather than code-organization work."
   echo "- Each direction must describe an observable garden outcome for future ticks: population balance, nutrients, buffer pressure, survival, reproduction, predation, decay, succession, recovery, or environment response."
@@ -204,6 +206,8 @@ append_latest_plan() {
 JSON
   echo
   append_garden_digest
+  scripts/write-garden-outcome-history.sh
+  echo
   echo "## Current Agent State"
   echo
   append_agent_state

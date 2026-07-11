@@ -315,6 +315,9 @@ append_compact_journal_entry() {
   echo "- Prefer changes that increase future autonomous development capacity through behavior: expressive state transitions, visible consequences in future ticks, reusable simulation concepts that affect outcomes, or mechanics that create new ecological possibilities."
   echo "- Do not choose a task merely because it is the easiest way to satisfy validators. Memory, journal, summaries, tests, and validators support autonomy; they are not the purpose of the run."
   echo "- Do not repeat the recent implementation pattern by default; use the recent commit list and source-file repetition signals as context, then choose the highest-value task."
+  echo "- Treat a PM direction as an outcome target, not as proof of its suggested causal mechanism. Inspect the current state and relevant code before deciding how to achieve it."
+  echo "- When Ecological Outcome History reports stagnation, use a bottleneck-first change: reproduce the blocker from the current persisted population, identify the active gate, and fix that gate with a focused behavior test. Do not add or tune another named trait unless current organisms carry it or the change includes a credible adoption path."
+  echo "- A passing unit test proves the modeled rule, not impact on the living state. Report both current-state evidence and the behavioral verification in the handoff."
   echo "- If the Baseline Maven Test Result says \`failed\`, repairing the existing Java source or tests is the run's required first task. Do not add unrelated behavior until \`mvn test\` passes."
   echo "- If the Baseline Worktree Policy Result says \`deferred-repair\`, repairing those policy violations is the run's required first task. Do not add unrelated behavior until the policy violations are cleared."
   echo "- If Project Manager Direction exists and no baseline repair is required, choose exactly one PM direction A-D as the run's highest product priority. Set \`pmDirection\` in \`.agent-run.json\` to the selected label."
@@ -347,6 +350,8 @@ append_compact_journal_entry() {
   echo
   append_context_manifest
   append_recent_implementation_pattern
+  scripts/write-garden-outcome-history.sh
+  echo
   append_project_manager_direction
   echo "## Automatic Post-Processing"
   echo
@@ -367,6 +372,11 @@ append_compact_journal_entry() {
   "next": "One concrete possible next direction.",
   "expectedGardenEffect": "What future ticks should do differently because of this change.",
   "pmDirection": "A, B, C, D, or none when no PM plan exists or this run is required repair.",
+  "evidence": {
+    "bottleneck": "The concrete current-state gate or missing causal link this run addressed.",
+    "currentState": "Evidence from data/garden-state.txt or a shadow copy showing why the change can affect living organisms.",
+    "verification": "The focused test or command that proves the changed behavior, including the observed result."
+  },
   "codeMap": [
     {
       "path": "src/main/java/garden/ai/FileChangedByThisRun.java",

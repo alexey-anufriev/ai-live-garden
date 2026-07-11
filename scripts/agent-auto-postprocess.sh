@@ -340,6 +340,9 @@ observations_text="$(json_value '.observations')"
 next_text="$(json_value '.next')"
 expected_effect="$(json_value '.expectedGardenEffect')"
 expected_effect="${expected_effect%.}"
+bottleneck_evidence="$(json_value '.evidence.bottleneck')"
+current_state_evidence="$(json_value '.evidence.currentState')"
+verification_evidence="$(json_value '.evidence.verification')"
 pm_direction="$(json_value '.pmDirection')"
 if [[ -z "$pm_direction" ]]; then
   pm_direction="none"
@@ -400,7 +403,7 @@ scripts/agent-create-journal-entry.sh \
   --reason "$why_text" \
   --checks "$checks" \
   --test-result "$test_result" \
-  --observations "${observations_text}${pm_context} Expected future effect: ${expected_effect}. ${garden_result} Worktree policy severity: ${worktree_policy_severity}. Automated post-processing refreshed README/state memory from data/garden-state.txt." \
+  --observations "${observations_text}${pm_context} Bottleneck evidence: ${bottleneck_evidence}. Current-state evidence: ${current_state_evidence}. Behavioral verification: ${verification_evidence}. Expected future effect: ${expected_effect}. ${garden_result} Worktree policy severity: ${worktree_policy_severity}. Automated post-processing refreshed README/state memory from data/garden-state.txt." \
   --next "$next_text" >/dev/null
 
 rm -f "$handoff_file"

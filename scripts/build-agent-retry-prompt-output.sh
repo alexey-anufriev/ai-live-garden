@@ -37,13 +37,17 @@ fi
 {
   echo "# AI Live Garden Corrective Agent Context"
   echo
-  echo "The previous Gemini call completed, but it entered planning behavior and did not leave a valid autonomous-run result."
+  echo "The previous Gemini call completed, but it did not leave a valid autonomous-run handoff."
   echo
   echo "This retry is already authorized. Do not enter plan mode. Do not ask for confirmation. Do not stop after proposing a strategy."
   echo
   echo "Required retry behavior:"
   echo
-  echo "- Implement one focused bounded change now."
+  if [[ -n "$(git status --porcelain -uall)" ]]; then
+    echo "- The previous call already changed the worktree. Inspect and preserve the focused existing change, correct it if needed, and finish its handoff. Do not start a second task."
+  else
+    echo "- Implement one focused bounded change now."
+  fi
   echo "- Leave real repository changes unless a required baseline repair makes that impossible."
   echo "- Write \`.agent-run.json\` before finishing."
   echo "- Repeat the exact same JSON object between \`AGENT_RUN_JSON_START\` and \`AGENT_RUN_JSON_END\` in the final response."

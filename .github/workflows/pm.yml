@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: ai-live-garden-project-manager
+  group: ai-live-garden-main
   cancel-in-progress: false
 
 permissions:

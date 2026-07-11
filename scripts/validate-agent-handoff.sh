@@ -27,6 +27,10 @@ if ! jq -e '
     ((.path // "") | type == "string" and length > 0) and
     ((.description // "") | type == "string" and length > 0)
   )) and
+  ($root.evidence | type == "object") and
+  (all(["bottleneck", "currentState", "verification"][];
+    ($root.evidence[.] | type == "string" and length > 0)
+  )) and
   (($root.state // {}) | type == "object") and
   (($root.state.immediateDirections // []) | type == "array") and
   (($root.state.constraints // []) | type == "array")
