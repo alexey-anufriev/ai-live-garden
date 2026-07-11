@@ -14,11 +14,11 @@ Generated source orientation for autonomous runs. Do not edit manually.
 - `src/main/java/garden/ai/OrganismInteractionCalculator.java`: Calculates organism interactions and reproduction, now including bypass logic for pioneer organisms.
 - `src/main/java/garden/ai/OrganismType.java`: Defines taxonomy and environmental succession rules for organisms.
 - `src/main/java/garden/ai/Simulation.java`: Advances seed or loaded garden state.
-- `src/main/java/garden/ai/TraitRegistry.java`: Registry for trait definitions and effect calculations, now including the 'nutrient-pioneer' trait.
+- `src/main/java/garden/ai/TraitRegistry.java`: Registry for trait definitions and effect calculations, now including the 'mutualist-synergy' trait.
 
 ## Tests
 
 - Tests live under `src/test/java/garden/ai/`.
-- Current Java test files: 104.
+- Current Java test files: 105.
 - Prefer focused behavior tests for changed simulation rules.
 - Add or inspect exact test files only when the chosen task needs them.
