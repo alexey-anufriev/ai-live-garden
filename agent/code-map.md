@@ -14,7 +14,7 @@ Generated source orientation for autonomous runs. Do not edit manually.
 - `src/main/java/garden/ai/OrganismInteractionCalculator.java`: Calculates organism interactions and reproduction; updated to include the global reproduction threshold modifier.
 - `src/main/java/garden/ai/OrganismType.java`: Defines taxonomy and environmental succession rules for organisms, now incorporating trait-sensitive spore-to-moss transition.
 - `src/main/java/garden/ai/Simulation.java`: Advances seed or loaded garden state.
-- `src/main/java/garden/ai/TraitRegistry.java`: Registry for trait definitions and effect calculations for metabolism and reproduction threshold modifiers.
+- `src/main/java/garden/ai/TraitRegistry.java`: Registry for trait definitions and effect calculations, updated with root-soil-enricher logic.
 
 ## Tests
 

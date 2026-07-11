@@ -4,19 +4,22 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 8909
+- Cycle: 9032
 - Health: Flourishing (🟢)
 - Nutrients: 100.
 - NutrientBuffer: 100.
-- Active organisms: 10087 total across beetle, fox fungus, moss root network, spore.
+- Active organisms: 10149 total across beetle, fox fungus, moss root network, spore.
 - Missing roles: none.
-- Latest agent handoff: Boost Predator Reproduction Efficiency.
-- Latest result: Implemented the 'fox-reproductive-converter' trait in TraitRegistry, which provides a +20 energy bonus and reduces reproduction thresholds in high-buffer environments, matching the existing fungal efficiency pattern. Added a corresponding verification test, FoxReproductiveConverterTest..
+- Latest agent handoff: Implement Root-Soil-Enricher Trait.
+- Latest result: Implemented the 'root-soil-enricher' trait in TraitRegistry, which provides growth and reproductive benefits in high-buffer environments for the ROOT_NETWORK type. Added verification via existing tests (RootSoilEnricherTest, RootSoilEnricherGrowthTest, RootSoilEnricherReproductionTest, RootSoilEnricherMetabolicEffectTest)..
 
 ## Immediate Directions
 
-- Monitor fox population count for signs of growth.
+- Monitor root network population count.
 
 ## Constraints & Known Bad Ideas
 
-- Ensure predator reproduction is not just tied to hunting success but also to metabolic efficiency.
+- Do not attempt to fix the simulation in one run.
+- Do not add another named adaptation merely because recent runs did so.
+- Do not add another observability-only or tests-only change merely because it is easy to validate.
+- Do not treat the full nutrient buffer as proof of health while nutrients are zero or ecological roles are absent.
