@@ -4,19 +4,22 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 9166
+- Cycle: 9174
 - Health: Flourishing (🟢)
 - Nutrients: 100.
 - NutrientBuffer: 100.
-- Active organisms: 10218 total across beetle, fox fungus, moss root network, spore.
+- Active organisms: 10222 total across beetle, fox fungus, moss root network, spore.
 - Missing roles: none.
-- Latest agent handoff: Implement Nutrient-Sensitive Root Network Reproduction.
-- Latest result: Implemented a nutrient buffer-sensitive reproduction threshold for ROOT_NETWORK in OrganismInteractionCalculator.reproductionThreshold, lowering the threshold from 14 by 2 or 5 depending on the nutrient buffer level (>50 or >80). Created a new test RootNetworkReproductionSensitivityTest to verify this behavior..
+- Latest agent handoff: Implement Functional Role Synergy Trait for Fox.
+- Latest result: Modified TraitRegistry.java to apply mutualist-synergy trait reduction to FOX reproduction thresholds when ROOT_NETWORK or FUNGUS presence is detected. Included mutualist-synergy in getMutationTrait for FOX to facilitate adoption..
 
 ## Immediate Directions
 
-- Monitor ROOT_NETWORK population growth.
+- Monitor fox, fungus, and root population levels for signs of synergistic growth.
 
 ## Constraints & Known Bad Ideas
 
-- None
+- Do not attempt to fix the simulation in one run.
+- Do not add another named adaptation merely because recent runs did so.
+- Do not add another observability-only or tests-only change merely because it is easy to validate.
+- Do not treat the full nutrient buffer as proof of health while nutrients are zero or ecological roles are absent.

@@ -476,6 +476,7 @@ public class TraitRegistry {
             case "mutualist-synergy":
                 if (organism.type() == OrganismType.FUNGUS && rootNetworkCount > 0) modifier -= 3;
                 if (organism.type() == OrganismType.ROOT_NETWORK && fungalContribution > 0) modifier -= 3;
+                if (organism.type() == OrganismType.FOX && (rootNetworkCount > 0 || fungalContribution > 0)) modifier -= 3;
                 break;
         }
         return modifier;
@@ -488,9 +489,10 @@ public class TraitRegistry {
         }
         if (childType == OrganismType.FOX && Math.random() < 0.3) {
             double r = Math.random();
-            if (r < 0.33) return "reproductive-efficiency";
-            else if (r < 0.66) return "nutrient-dependent-reproduction";
-            else return "fox-energy-converter";
+            if (r < 0.25) return "reproductive-efficiency";
+            else if (r < 0.50) return "nutrient-dependent-reproduction";
+            else if (r < 0.75) return "fox-energy-converter";
+            else return "mutualist-synergy";
         }
         if (childType == OrganismType.ROOT_NETWORK && Math.random() < 0.3) {
             double r = Math.random();

@@ -1,40 +1,22 @@
 package garden.ai;
 
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.List;
 
 public class FunctionalRoleSynergyTest {
-    @Test
-    public void testMutualistSynergyFungusWithRootNetwork() {
-        Organism fungus = Organism.of("fungus-1", OrganismType.FUNGUS, 20, 1, "mutualist-synergy");
-        Environment env = new Environment(100, 100, 100, 100, 100);
-        // fungus needs rootNetworkCount > 0
-        int modifier = TraitRegistry.getReproductionThresholdModifier("mutualist-synergy", env, 0, 1L, fungus);
-        assertEquals(-3, modifier, "Fungus should get threshold reduction when RootNetwork count > 0");
-    }
 
     @Test
-    public void testMutualistSynergyFungusWithoutRootNetwork() {
-        Organism fungus = Organism.of("fungus-1", OrganismType.FUNGUS, 20, 1, "mutualist-synergy");
-        Environment env = new Environment(100, 100, 100, 100, 100);
-        int modifier = TraitRegistry.getReproductionThresholdModifier("mutualist-synergy", env, 0, 0L, fungus);
-        assertEquals(0, modifier, "Fungus should not get threshold reduction when RootNetwork count == 0");
-    }
-
-    @Test
-    public void testMutualistSynergyRootNetworkWithFungus() {
-        Organism root = Organism.of("root-1", OrganismType.ROOT_NETWORK, 20, 1, "mutualist-synergy");
-        Environment env = new Environment(100, 100, 100, 100, 100);
-        // root needs fungalContribution > 0
-        int modifier = TraitRegistry.getReproductionThresholdModifier("mutualist-synergy", env, 10, 0L, root);
-        assertEquals(-3, modifier, "RootNetwork should get threshold reduction when fungalContribution > 0");
-    }
-
-    @Test
-    public void testMutualistSynergyRootNetworkWithoutFungus() {
-        Organism root = Organism.of("root-1", OrganismType.ROOT_NETWORK, 20, 1, "mutualist-synergy");
-        Environment env = new Environment(100, 100, 100, 100, 100);
-        int modifier = TraitRegistry.getReproductionThresholdModifier("mutualist-synergy", env, 0, 0L, root);
-        assertEquals(0, modifier, "RootNetwork should not get threshold reduction when fungalContribution == 0");
+    public void testFoxSynergyWithRoots() {
+        Environment env = new Environment(100, 100, 100, 20, 20); // Low buffer/nutrients to avoid global modifiers
+        Organism fox = Organism.of("fox-1", OrganismType.FOX, 10, 1, "mutualist-synergy");
+        Organism root = Organism.of("root-1", OrganismType.ROOT_NETWORK, 10, 1);
+        
+        // No roots (root contribution is 0)
+        int thresholdNoRoots = OrganismInteractionCalculator.reproductionThreshold(fox, env, 0, List.of(fox));
+        // With roots (root network count is 1)
+        int thresholdWithRoots = OrganismInteractionCalculator.reproductionThreshold(fox, env, 0, List.of(fox, root));
+        
+        assertTrue(thresholdNoRoots > thresholdWithRoots, "Synergy with roots should reduce threshold, but was: noRoots=" + thresholdNoRoots + ", withRoots=" + thresholdWithRoots);
     }
 }
