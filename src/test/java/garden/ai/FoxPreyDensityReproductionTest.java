@@ -12,17 +12,29 @@ public class FoxPreyDensityReproductionTest {
         Environment env = new Environment(50, 50, 50, 50, 50);
         Organism fox = Organism.of("fox-1", OrganismType.FOX, 10, 1, "none");
         
-        // Setup: Many beetles (3000)
-        List<Organism> organisms = new ArrayList<>();
-        organisms.add(fox);
+        // Setup: 3000 beetles (should trigger -5 reduction)
+        List<Organism> organisms3000 = new ArrayList<>();
+        organisms3000.add(fox);
         for (int i = 0; i < 3000; i++) {
-            organisms.add(Organism.of("beetle-" + i, OrganismType.BEETLE, 5, 1, "none"));
+            organisms3000.add(Organism.of("beetle-" + i, OrganismType.BEETLE, 5, 1, "none"));
         }
+        assertEquals(10, OrganismInteractionCalculator.reproductionThreshold(fox, env, 0, organisms3000), "Reproduction threshold for FOX with 3000 beetles should be 10.");
+
+        // Setup: 5000 beetles (should trigger -8 reduction)
+        List<Organism> organisms5000 = new ArrayList<>();
+        organisms5000.add(fox);
+        for (int i = 0; i < 5000; i++) {
+            organisms5000.add(Organism.of("beetle-" + i, OrganismType.BEETLE, 5, 1, "none"));
+        }
+        assertEquals(7, OrganismInteractionCalculator.reproductionThreshold(fox, env, 0, organisms5000), "Reproduction threshold for FOX with 5000 beetles should be 7.");
         
-        int threshold = OrganismInteractionCalculator.reproductionThreshold(fox, env, 0, organisms);
-        
-        // Expected: Normally threshold is 15. With high prey (>2000), it should be reduced (e.g., -5 -> 10).
-        assertEquals(10, threshold, "Reproduction threshold for FOX with high prey density should be reduced to 10.");
+        // Setup: 7000 beetles (should trigger -10 reduction)
+        List<Organism> organisms7000 = new ArrayList<>();
+        organisms7000.add(fox);
+        for (int i = 0; i < 7000; i++) {
+            organisms7000.add(Organism.of("beetle-" + i, OrganismType.BEETLE, 5, 1, "none"));
+        }
+        assertEquals(5, OrganismInteractionCalculator.reproductionThreshold(fox, env, 0, organisms7000), "Reproduction threshold for FOX with 7000 beetles should be 5.");
     }
 
     @Test

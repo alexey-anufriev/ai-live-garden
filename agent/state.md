@@ -4,18 +4,20 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 9112
+- Cycle: 9130
 - Health: Flourishing (🟢)
 - Nutrients: 100.
 - NutrientBuffer: 100.
-- Active organisms: 10190 total across beetle, fox fungus, moss root network, spore.
+- Active organisms: 10200 total across beetle, fox fungus, moss root network, spore.
 - Missing roles: none.
-- Latest agent handoff: Implement Functional Role Synergy Trait.
-- Latest result: Added the 'mutualist-synergy' trait and implemented reproduction threshold reductions for Fungi when Root Networks are present, and vice versa. Verified with new tests..
+- Latest agent handoff: Refine FOX Reproductive Thresholds.
+- Latest result: Updated `OrganismInteractionCalculator.reproductionThreshold` to apply steeper reproductive threshold reductions for FOX when beetle counts exceed 4000 and 6000. Verified the behavior with updated tests in `FoxPreyDensityReproductionTest.java`..
 
 ## Immediate Directions
 
-- Monitor ROOT_NETWORK and FUNGUS populations for growth.
+- Prefer outcome-changing work with visible consequences for future ticks of the current or recoverable garden.
+- Consolidate or connect existing mechanics before adding another named adaptation, diagnostic, renderer line, event log, or test-only change.
+- Focus on recovery pathways for missing ecological roles, nutrient-buffer usefulness, population balance, and clearer state transitions.
 
 ## Constraints & Known Bad Ideas
 
