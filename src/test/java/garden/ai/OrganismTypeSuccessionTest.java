@@ -9,7 +9,9 @@ public class OrganismTypeSuccessionTest {
     public void testSporeSuccession() {
         Environment highMoisture = new Environment(50, 70, 50, 50, 50);
         Environment lowMoisture = new Environment(50, 30, 50, 50, 50);
+        Environment highBuffer = new Environment(50, 30, 50, 50, 70);
         assertEquals(OrganismType.MOSS, OrganismType.SPORE.offspringType(0, 0, highMoisture));
+        assertEquals(OrganismType.FUNGUS, OrganismType.SPORE.offspringType(0, 0, highBuffer));
         assertEquals(OrganismType.SPORE, OrganismType.SPORE.offspringType(0, 0, lowMoisture));
     }
 

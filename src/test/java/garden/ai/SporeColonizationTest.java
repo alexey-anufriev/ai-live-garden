@@ -10,7 +10,7 @@ public class SporeColonizationTest {
 
     @Test
     public void testSporeDispersalAdaptorBoostsMossColonization() {
-        Environment environment = new Environment(100, 50, 100, 100, 100); // moisture 50
+        Environment environment = new Environment(100, 50, 100, 100, 20); // moisture 50, nutrientBuffer 20
         List<Organism> organisms = new ArrayList<>();
         // Add a spore without the adaptor (should not colonize moss at 50 moisture)
         Organism spore1 = Organism.of("spore-1", OrganismType.SPORE, 10, 1, "test");
