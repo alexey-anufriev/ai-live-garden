@@ -417,6 +417,13 @@ public class OrganismInteractionCalculator {
             if (environment.nutrientBuffer() > 50) {
                 threshold -= 2;
             }
+        } else if (organism.type() == OrganismType.ROOT_NETWORK) {
+            threshold = 14;
+            if (environment.nutrientBuffer() > 80) {
+                threshold -= 5;
+            } else if (environment.nutrientBuffer() > 50) {
+                threshold -= 2;
+            }
         } else if (organism.type().isPlant()) {
             threshold = 14;
         } else if (organism.type() == OrganismType.FOX) {
