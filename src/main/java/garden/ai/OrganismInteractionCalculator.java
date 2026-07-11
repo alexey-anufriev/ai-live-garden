@@ -428,6 +428,12 @@ public class OrganismInteractionCalculator {
                 threshold -= 2;
             }
         }
+        if (organism.type() == OrganismType.FOX) {
+            long beetleCount = organisms.stream().filter(o -> o.type() == OrganismType.BEETLE).count();
+            if (beetleCount > 2000) {
+                threshold -= 5;
+            }
+        }
         if (organism.type() == OrganismType.ROOT_NETWORK && environment.nutrientBuffer() > 50 && organism.traits().contains("buffer-optimizer")) {
             threshold -= 3;
         }
