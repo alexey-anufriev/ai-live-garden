@@ -4,22 +4,19 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 9192
+- Cycle: 9320
 - Health: Flourishing (🟢)
 - Nutrients: 100.
 - NutrientBuffer: 100.
-- Active organisms: 10231 total across beetle, fox fungus, moss root network, spore.
+- Active organisms: 10295 total across beetle, fox fungus, moss root network, spore.
 - Missing roles: none.
-- Latest agent handoff: Increasing adoption of 'mutualist-synergy' trait.
-- Latest result: Modified TraitRegistry.java to include 'mutualist-synergy' as a potential mutation trait for FUNGUS and ROOT_NETWORK types, facilitating its spread across the population..
+- Latest agent handoff: Investigate Demographic Stagnation Bottlenecks.
+- Latest result: I diagnosed that a hard limit of 2 births per cycle in `calculatePopulationDynamics` is preventing demographic expansion. I documented this bottleneck in a new journal entry..
 
 ## Immediate Directions
 
-- Monitor synergy trait adoption.
+- Address the birth limit bottleneck identified in the journal.
 
 ## Constraints & Known Bad Ideas
 
-- Do not attempt to fix the simulation in one run.
-- Do not add another named adaptation merely because recent runs did so.
-- Do not add another observability-only or tests-only change merely because it is easy to validate.
-- Do not treat the full nutrient buffer as proof of health while nutrients are zero or ecological roles are absent.
+- Do not add more traits until the birth limit is addressed.
