@@ -339,7 +339,7 @@ public class OrganismInteractionCalculator {
 
             boolean isFungalSuccession = (organism.type() == OrganismType.ROOT_NETWORK && childType == OrganismType.FUNGUS);
             boolean isNutrientPioneer = (organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("nutrient-pioneer") && context.environment().nutrientBuffer() > 80);
-            boolean canReproduce = (organism.energy() >= reproductionThreshold(organism, context.environment(), context.fungalContribution(), context.organisms()) || (isFungalSuccession && organism.energy() >= 4)) && (birthsThisCycle < 2 || isFungalSuccession || isNutrientPioneer);
+            boolean canReproduce = (organism.energy() >= reproductionThreshold(organism, context.environment(), context.fungalContribution(), context.organisms()) || (isFungalSuccession && organism.energy() >= 4));
 
             if (organism.traits().contains("stressed") && !organism.traits().contains("fungal-symbiote") && !isFungalSuccession && !isNutrientPioneer) {
                 canReproduce = false;
