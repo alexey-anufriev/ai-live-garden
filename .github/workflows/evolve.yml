@@ -36,6 +36,7 @@ jobs:
       - name: Baseline test
         id: baseline_test
         continue-on-error: true
+        timeout-minutes: 4
         run: scripts/capture-maven-test-result.sh "${RUNNER_TEMP}/baseline-test-result.md"
 
       - name: Baseline worktree policy
@@ -137,6 +138,7 @@ jobs:
       - name: Validate tests after Gemini changes
         id: post_test_final
         continue-on-error: true
+        timeout-minutes: 4
         shell: bash
         env:
           VALIDATE_REPAIR_VIOLATIONS_FILE: ${{ runner.temp }}/post-test-violations.txt

@@ -13,12 +13,12 @@ tmp_log="$(mktemp)"
 trap 'rm -f "$tmp_log"' EXIT
 
 set +e
-mvn -B test 2>&1 | tee "$tmp_log"
+scripts/run-maven-tests-with-timeout.sh 2>&1 | tee "$tmp_log"
 status="${PIPESTATUS[0]}"
 set -e
 
 {
-  echo "- Command: \`mvn -B test\`"
+  echo "- Command: \`scripts/run-maven-tests-with-timeout.sh\`"
   echo "- Exit code: ${status}"
   if [[ "$status" -eq 0 ]]; then
     echo "- Result: passed"
@@ -27,7 +27,11 @@ set -e
   else
     echo "- Result: failed"
     echo
-    echo "The committed project started this run with failing Java tests. The autonomous agent must repair this before choosing unrelated work."
+    if [[ "$status" -eq 124 || "$status" -eq 137 ]]; then
+      echo "The committed test suite exceeded ${MAVEN_TEST_TIMEOUT_SECONDS:-180} seconds and was interrupted. Treat this as a required baseline repair: find the runaway loop, population explosion, or blocked process before doing unrelated work."
+    else
+      echo "The committed project started this run with failing Java tests. The autonomous agent must repair this before choosing unrelated work."
+    fi
     echo
     echo "## Output Tail"
     echo

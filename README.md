@@ -60,10 +60,10 @@ At cycle 9373, the garden has this committed shape:
 
 ### Organisms
 
-- Total: 82299
+- Total: 12000
 - Breakdown:
-  - Beetle: 62975
-  - Fern: 16789
+  - Beetle: 4732
+  - Fern: 4733
   - Fox: 24
   - Fungus: 55
   - Moss: 2407

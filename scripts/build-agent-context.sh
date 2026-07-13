@@ -318,6 +318,8 @@ append_compact_journal_entry() {
   echo "- Treat a PM direction as an outcome target, not as proof of its suggested causal mechanism. Inspect the current state and relevant code before deciding how to achieve it."
   echo "- When Ecological Outcome History reports stagnation, use a bottleneck-first change: reproduce the blocker from the current persisted population, identify the active gate, and fix that gate with a focused behavior test. Do not add or tune another named trait unless current organisms carry it or the change includes a credible adoption path."
   echo "- A passing unit test proves the modeled rule, not impact on the living state. Report both current-state evidence and the behavioral verification in the handoff."
+  echo "- You have god-mode recovery authority when persisted state causes runaway growth, timeouts, corruption, or prevents autonomous recovery. You may deterministically rebalance, cull, reseed, migrate, or directly repair \`data/garden-state.txt\`; prefer the program's \`recover\` command, preserve ecological roles, add an explanatory event, and report before/after counts."
+  echo "- Never wait indefinitely for a random event or population outcome. Tests and diagnostics must be bounded. Use \`scripts/run-maven-tests-with-timeout.sh\`; if it interrupts Maven, treat the timeout as the baseline defect and replace long loops with deterministic phase-level tests."
   echo "- If the Baseline Maven Test Result says \`failed\`, repairing the existing Java source or tests is the run's required first task. Do not add unrelated behavior until \`mvn test\` passes."
   echo "- If the Baseline Worktree Policy Result says \`deferred-repair\`, repairing those policy violations is the run's required first task. Do not add unrelated behavior until the policy violations are cleared."
   echo "- If Project Manager Direction exists and no baseline repair is required, choose exactly one PM direction A-D as the run's highest product priority. Set \`pmDirection\` in \`.agent-run.json\` to the selected label."
@@ -337,8 +339,8 @@ append_compact_journal_entry() {
   echo "- Do not choose a tests-only task unless it exposes an important current uncertainty and the handoff explains why no behavior change was appropriate."
   echo "- Tests must prove the behavior itself, not just a log line or wording change."
   echo "- Do not weaken assertions to make tests pass or leave uncertainty comments in tests such as \"maybe\", \"wait\", \"not sure\", or \"does not distinguish\"."
-  echo "- Run \`mvn test\` if possible and leave the code in a testable state."
-  echo "- Do not fabricate large arbitrary edits to \`data/garden-state.txt\`; normal evolution happens by simulation."
+  echo "- Run \`scripts/run-maven-tests-with-timeout.sh\` if possible and leave the code in a testable state."
+  echo "- Normal evolution happens by simulation. During a demonstrated operability emergency, use the smallest deterministic god-mode state intervention needed and pair it with a recurrence guard."
   echo "- Do not edit generated memory or PM direction files: \`README.md\`, \`agent/state.md\`, \`agent/requests.md\`, \`agent/code-map.md\`, \`agent/journal/\`, \`agent/summaries/\`, \`agent/templates/\`, or \`agent/plans/\`."
   echo "- Do not run memory harness scripts. CI post-processing will generate README state, code map, summaries, journal, and current memory from the final diff and garden state."
   echo "- Write \`.agent-run.json\` as the machine-readable handoff described below. This file is required."
@@ -429,9 +431,10 @@ JSON
   done < <(latest_files "$recent_journal_limit" "agent/journal")
   echo "### Useful Commands"
   echo
-  echo "- \`mvn test\`"
+  echo "- \`scripts/run-maven-tests-with-timeout.sh\`"
   echo "- \`mvn -B -q exec:java -Dexec.args=\"inspect\"\`"
   echo "- \`mvn -B -q exec:java -Dexec.args=\"tick --steps 1\"\`"
+  echo "- \`mvn -B -q exec:java -Dexec.args=\"recover --max-organisms 12000\"\` (emergency only)"
   echo
   echo "## Final Reminder"
   echo

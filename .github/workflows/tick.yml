@@ -31,6 +31,7 @@ jobs:
 
       - name: Baseline test
         id: baseline_test
+        timeout-minutes: 4
         shell: bash
         env:
           BASELINE_TEST_OUTPUT_LINES: "120"

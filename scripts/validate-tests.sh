@@ -11,7 +11,7 @@ tmp_log="$(mktemp)"
 trap 'rm -f "$tmp_log"' EXIT
 
 set +e
-mvn -B test 2>&1 | tee "$tmp_log"
+scripts/run-maven-tests-with-timeout.sh 2>&1 | tee "$tmp_log"
 status="${PIPESTATUS[0]}"
 set -e
 
@@ -21,4 +21,7 @@ if [[ "$status" -eq 0 ]]; then
 fi
 
 cp "$tmp_log" "$violations_file"
+if [[ "$status" -eq 124 || "$status" -eq 137 ]]; then
+  echo "Maven tests exceeded ${MAVEN_TEST_TIMEOUT_SECONDS:-180} seconds and were interrupted. Replace long simulation loops with deterministic phase-level tests or restore bounded population behavior." >> "$violations_file"
+fi
 exit "$status"

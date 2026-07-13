@@ -51,7 +51,7 @@ fi
   echo "- Leave real repository changes unless a required baseline repair makes that impossible."
   echo "- Write \`.agent-run.json\` before finishing."
   echo "- Repeat the exact same JSON object between \`AGENT_RUN_JSON_START\` and \`AGENT_RUN_JSON_END\` in the final response."
-  echo "- Run \`mvn test\` if possible."
+  echo "- Run \`scripts/run-maven-tests-with-timeout.sh\` if possible. Let it interrupt a runaway suite; a timeout must be diagnosed, not ignored."
   echo
   if [[ -s "$previous_response_file" ]]; then
     echo "## Previous Non-Executable Response"

@@ -2,6 +2,7 @@ package garden.ai;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -321,10 +322,42 @@ public class OrganismInteractionCalculator {
 
     public record PopulationDynamicsResult(List<Organism> organisms, int nextId) {}
 
+    private static final int MIN_TOTAL_BIRTH_BUDGET = 8;
+    private static final int MAX_TOTAL_BIRTH_BUDGET = 24;
+    private static final int COMMON_TYPE_BIRTH_BUDGET = 3;
+    private static final int FUNCTIONAL_TYPE_BIRTH_BUDGET = 6;
+    private static final int DENSITY_PRESSURE_MINIMUM_POPULATION = 100;
+
+    static int totalBirthBudget(Environment environment) {
+        int resourceBonus = (environment.nutrients() + environment.nutrientBuffer()) / 20;
+        return Math.clamp(MIN_TOTAL_BIRTH_BUDGET + resourceBonus,
+                MIN_TOTAL_BIRTH_BUDGET, MAX_TOTAL_BIRTH_BUDGET);
+    }
+
+    static int typeBirthBudget(OrganismType childType, List<Organism> organisms) {
+        long total = organisms.size();
+        long typeCount = organisms.stream().filter(organism -> organism.type() == childType).count();
+
+        if (total >= DENSITY_PRESSURE_MINIMUM_POPULATION && typeCount * 2 > total) {
+            return 0;
+        }
+        if (total >= DENSITY_PRESSURE_MINIMUM_POPULATION && typeCount * 4 > total) {
+            return 1;
+        }
+        if (childType == OrganismType.FOX
+                || childType == OrganismType.FUNGUS
+                || childType == OrganismType.ROOT_NETWORK) {
+            return FUNCTIONAL_TYPE_BIRTH_BUDGET;
+        }
+        return COMMON_TYPE_BIRTH_BUDGET;
+    }
+
     public static PopulationDynamicsResult calculatePopulationDynamics(PopulationDynamicsContext context) {
         List<Organism> next = new ArrayList<>(context.organisms());
         int identifier = context.nextId();
         int birthsThisCycle = 0;
+        int totalBirthBudget = totalBirthBudget(context.environment());
+        EnumMap<OrganismType, Integer> birthsByType = new EnumMap<>(OrganismType.class);
         long fungusCount = next.stream().filter(o -> o.type() == OrganismType.FUNGUS).count();
 
         // Reproduction phase
@@ -339,7 +372,12 @@ public class OrganismInteractionCalculator {
 
             boolean isFungalSuccession = (organism.type() == OrganismType.ROOT_NETWORK && childType == OrganismType.FUNGUS);
             boolean isNutrientPioneer = (organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("nutrient-pioneer") && context.environment().nutrientBuffer() > 80);
-            boolean canReproduce = (organism.energy() >= reproductionThreshold(organism, context.environment(), context.fungalContribution(), context.organisms()) || (isFungalSuccession && organism.energy() >= 4));
+            int typeBirthBudget = typeBirthBudget(childType, context.organisms());
+            int birthsForType = birthsByType.getOrDefault(childType, 0);
+            boolean hasBirthCapacity = birthsThisCycle < totalBirthBudget && birthsForType < typeBirthBudget;
+            boolean canReproduce = hasBirthCapacity
+                    && (organism.energy() >= reproductionThreshold(organism, context.environment(), context.fungalContribution(), context.organisms())
+                    || (isFungalSuccession && organism.energy() >= 4));
 
             if (organism.traits().contains("stressed") && !organism.traits().contains("fungal-symbiote") && !isFungalSuccession && !isNutrientPioneer) {
                 canReproduce = false;
@@ -361,6 +399,7 @@ public class OrganismInteractionCalculator {
                         organism.id(), child.id(), childType.displayName())));
                 identifier++;
                 birthsThisCycle++;
+                birthsByType.merge(childType, 1, Integer::sum);
             } else {
                 afterReproduction.add(organism);
             }

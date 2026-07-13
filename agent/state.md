@@ -8,15 +8,16 @@ Compact current memory for future autonomous runs.
 - Health: Flourishing (🟢)
 - Nutrients: 100.
 - NutrientBuffer: 100.
-- Active organisms: 82299 total across beetle, fern fox, fungus moss, root network spore.
+- Active organisms: 12000 total across beetle, fern, fox, fungus, moss, root network, and spore.
 - Missing roles: none.
-- Latest agent handoff: Remove Reproduction Birth Limit.
-- Latest result: Modified `OrganismInteractionCalculator.java` to remove the `birthsThisCycle < 2` restriction on reproduction, allowing populations to expand when energy thresholds are met..
+- Latest agent handoff: Emergency runaway-population recovery.
+- Latest result: Deterministically reduced the persisted garden from 82299 to 12000 organisms while preserving every existing ecological role, and restored bounded resource- and density-aware reproduction.
 
 ## Immediate Directions
 
-- Monitor for demographic recovery of Fox, Fungus, and Root Network populations.
+- Monitor bounded demographic recovery of Fox, Fungus, and Root Network populations without allowing Beetle or Fern dominance to trigger runaway growth.
 
 ## Constraints & Known Bad Ideas
 
-- Do not re-introduce hard population limits unless clearly required for simulation stability.
+- Keep reproduction bounded by total and per-type birth budgets; a timeout or explosive population increase is a required repair, not an ecological outcome to preserve.
+- During an operability emergency, agents may use deterministic god-mode persisted-state recovery while preserving viable roles, coherent identifiers, and an explanatory event.
