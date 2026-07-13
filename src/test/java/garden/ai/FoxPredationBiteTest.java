@@ -52,4 +52,23 @@ public class FoxPredationBiteTest {
         // Total bite should be 3 + 5 + 1 = 9.
         assertEquals(9, biteEffect.biteSize(), "Bite size should be 9 with 1501 beetles");
     }
+
+    @Test
+    public void testBeetlePredationOptimizerAndCoordinatedPredatorSynergy() {
+        // Create a fox with both traits
+        Organism fox = Organism.of("fox-1", OrganismType.FOX, 10, 8, "beetle-predation-optimizer", "coordinated-predator");
+        // Create a beetle to be the prey
+        Organism beetle = Organism.of("beetle-1", OrganismType.BEETLE, 20, 4, "test");
+        
+        Environment env = new Environment(50, 50, 50, 50, 50);
+        
+        // Calculate bite with 1 beetle
+        TraitRegistry.BiteEffect biteEffect = TraitRegistry.calculateBite(fox, beetle, env, 0, 0, List.of(fox, beetle));
+        
+        // Base bite for Fox is 3.
+        // Beetle-predation-optimizer adds +5 base + 0 density bonus.
+        // Coordinated-predator adds +5 synergy bonus.
+        // Total bite should be 3 + 5 + 0 + 5 = 13.
+        assertEquals(13, biteEffect.biteSize(), "Bite size should be 13 with both traits");
+    }
 }

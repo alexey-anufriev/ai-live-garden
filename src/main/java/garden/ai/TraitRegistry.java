@@ -355,7 +355,13 @@ public class TraitRegistry {
             long beetleCount = allOrganisms.stream().filter(o -> o.type() == OrganismType.BEETLE).count();
             int densityBonus = Math.min(10, (int) (beetleCount / 1000));
             bite += 5 + densityBonus;
-            events.add(new GardenEvent(cycle, "%s optimized beetle predation efficiency (base + density bonus: %d).".formatted(hunter.id(), densityBonus)));
+
+            if (hunter.traits().contains("coordinated-predator")) {
+                bite += 5;
+            }
+
+            String synergyBonusText = hunter.traits().contains("coordinated-predator") ? " + synergy bonus: 5" : "";
+            events.add(new GardenEvent(cycle, "%s optimized beetle predation efficiency (base + density bonus: %d%s).".formatted(hunter.id(), densityBonus, synergyBonusText)));
         }
         if (hunter.traits().contains("predator-synergy") && hunter.type() == OrganismType.FOX) {
             long foxCount = allOrganisms.stream().filter(o -> o.type() == OrganismType.FOX && o.energy() > 0 && !o.id().equals(hunter.id())).count();
