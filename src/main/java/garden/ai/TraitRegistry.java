@@ -304,7 +304,7 @@ public class TraitRegistry {
         int connectorBonus = (context.rootNetworkCount() > 0) ? 6 : 4;
         int synergizerBonus = (context.mycelialSynergizerCount() > 0 && context.fungusCount() > 0) ? 5 : 0;
         int bufferBonus = (context.nutrientBuffer() > 20) ? 2 : 1;
-        int decayPressure = (int) Math.min((context.mossCount() + context.beetleCount()) / 100, 10);
+        int decayPressure = (int) Math.min((context.mossCount() + context.beetleCount()) / 50, 20);
 
         return (int) (context.fungusCount() * 2 * bufferBonus +
                       context.decomposerCount() * (30 + decayPressure) * bufferBonus +

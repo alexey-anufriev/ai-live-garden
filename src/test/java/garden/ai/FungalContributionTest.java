@@ -113,12 +113,12 @@ public class FungalContributionTest {
             organisms.add(Organism.of("moss-" + i, OrganismType.MOSS, 10, 1));
         }
         // Moss count 200, beetle count 0.
-        // Decay Pressure = 200 / 100 = 2.
+        // Decay Pressure = 200 / 50 = 4.
         // FUNGUS: 1 * 2 * 2 (buffer=50, bonus=2) = 4
-        // Decomposer: 1 * (30 + 2) * 2 = 64
-        // Total = 68
+        // Decomposer: 1 * (30 + 4) * 2 = 68
+        // Total = 72
         Garden garden = new Garden(1, 202, new Environment(50, 50, 50, 50, 50), organisms, List.of());
-        assertEquals(68, garden.fungalContribution());
+        assertEquals(72, garden.fungalContribution());
     }
 
     @Test
