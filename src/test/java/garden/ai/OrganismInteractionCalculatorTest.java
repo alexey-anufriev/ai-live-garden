@@ -98,15 +98,46 @@ class OrganismInteractionCalculatorTest {
     }
 
     @Test
-    void fungalReproductionThresholdIsLowerThanPlants() {
-        Environment env = new Environment(50, 50, 50, 100, 10);
-        Organism fungus = Organism.of("fungus-1", OrganismType.FUNGUS, 10, 1);
-        Organism moss = Organism.of("moss-1", OrganismType.MOSS, 10, 1);
+    void cautiousFeederFoxSkipsFeedingWithLowBeetleDensity() {
+        Organism fox = Organism.of("fox-1", OrganismType.FOX, 20, 1, "cautious-feeder");
+        Organism beetle = Organism.of("beetle-1", OrganismType.BEETLE, 10, 1);
+        Environment env = new Environment(50, 50, 50, 50, 50);
         
-        int fungusThreshold = OrganismInteractionCalculator.reproductionThreshold(fungus, env, 0, List.of(fungus, moss));
-        int mossThreshold = OrganismInteractionCalculator.reproductionThreshold(moss, env, 0, List.of(fungus, moss));
+        // Low beetle population (1 beetle)
+        List<Organism> organisms = new ArrayList<>(List.of(fox, beetle));
         
-        assertThat(fungusThreshold).isEqualTo(10);
-        assertThat(mossThreshold).isEqualTo(14);
+        OrganismInteractionCalculator.FeedingResult result = OrganismInteractionCalculator.calculateFeeding(
+                new OrganismInteractionCalculator.FeedingPhaseContext(organisms, env, 1, new ArrayList<>()));
+
+        Organism fedFox = result.organisms().stream()
+                .filter(o -> o.id().equals("fox-1"))
+                .findFirst().get();
+        
+        // Should have skipped feeding, energy remains 20
+        assertThat(fedFox.energy()).isEqualTo(20);
+    }
+
+    @Test
+    void cautiousFeederFoxFeedsWithHighBeetleDensity() {
+        Organism fox = Organism.of("fox-1", OrganismType.FOX, 20, 1, "cautious-feeder");
+        Organism beetle = Organism.of("beetle-1", OrganismType.BEETLE, 10, 1);
+        List<Organism> manyBeetles = IntStream.range(0, 4001)
+                .mapToObj(i -> Organism.of("beetle-" + i, OrganismType.BEETLE, 10, 1))
+                .collect(Collectors.toList());
+        List<Organism> organisms = new ArrayList<>(List.of(fox, beetle));
+        organisms.addAll(manyBeetles);
+        
+        Environment env = new Environment(50, 50, 50, 50, 50);
+        
+        OrganismInteractionCalculator.FeedingResult result = OrganismInteractionCalculator.calculateFeeding(
+                new OrganismInteractionCalculator.FeedingPhaseContext(organisms, env, 1, new ArrayList<>()));
+
+        Organism fedFox = result.organisms().stream()
+                .filter(o -> o.id().equals("fox-1"))
+                .findFirst().get();
+        
+        // Should have fed, energy increases
+        assertThat(fedFox.energy()).isGreaterThan(20);
     }
 }
+

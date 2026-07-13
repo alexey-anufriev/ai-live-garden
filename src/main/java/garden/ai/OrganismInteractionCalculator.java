@@ -232,11 +232,12 @@ public class OrganismInteractionCalculator {
 
         int predatorNutrientContribution = 0;
         long rootNetworkCount = organisms.stream().filter(o -> o.type() == OrganismType.ROOT_NETWORK).count();
+        long beetleCount = mutable.stream().filter(o -> o.type() == OrganismType.BEETLE).count();
         
         for (int hunterIndex = 0; hunterIndex < mutable.size(); hunterIndex++) {
             Organism hunter = mutable.get(hunterIndex);
             if (!hunter.type().isAnimal() || hunter.energy() <= 0) continue;
-            if (hunter.traits().contains("cautious-feeder") && hunter.energy() > 15) {
+            if (hunter.traits().contains("cautious-feeder") && hunter.energy() > 15 && beetleCount < 4000) {
                 events.add(new GardenEvent(cycle, "%s skipped feeding to conserve energy.".formatted(hunter.id())));
                 continue;
             }
