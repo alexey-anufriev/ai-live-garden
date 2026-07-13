@@ -28,248 +28,250 @@ public class TraitRegistry {
     public record ContributionResult(int rootContribution, int fungalContribution, int fungalAttractorContribution, int mossContribution) {}
 
     public record RootContributionContext(
-            long rootNetworkCount,
-            long nutrientWeaverCount,
-            long nutrientSharerCount,
-            long bufferOptimizerCount,
-            long soilMasterCount,
-            long nutrientRecyclerCount,
-            long nutrientTranslocatorCount,
-            long nutrientSynthesizerCount,
-            long nutrientReclaimerCount,
-            long nutrientProducerCount,
-            long nutrientPumpCount,
-            long nutrientDistributorCount,
-            long nutrientAcceleratorCount,
-            long rootSoilEnricherCount,
-            long fungalRootSymbiontCount,
-            long mycelialRootMediatorCount,
-            long rootNutrientUtilizerCount,
-            long releaserCount,
-            int nutrients,
-            int nutrientBuffer
+        long rootNetworkCount,
+        long nutrientWeaverCount,
+        long nutrientSharerCount,
+        long bufferOptimizerCount,
+        long soilMasterCount,
+        long nutrientRecyclerCount,
+        long nutrientTranslocatorCount,
+        long nutrientSynthesizerCount,
+        long nutrientReclaimerCount,
+        long nutrientProducerCount,
+        long nutrientPumpCount,
+        long nutrientDistributorCount,
+        long nutrientAcceleratorCount,
+        long rootSoilEnricherCount,
+        long fungalRootSymbiontCount,
+        long mycelialRootMediatorCount,
+        long mycelialSynergizerCount,
+        long rootNutrientUtilizerCount,
+        long releaserCount,
+        int nutrients,
+        int nutrientBuffer
     ) {}
 
     public record FungalContributionContext(
-            long fungusCount,
-            long decomposerCount,
-            long soilEnricherCount,
-            long networkConnectorCount,
-            long fungalSymbioteCount,
-            long fungalAcceleratorCount,
-            long fungalEnhancerCount,
-            long fungalBufferStabilizerCount,
-            long fungalDecomposerAcceleratorCount,
-            long fungalDecompositionEfficiencyCount,
-            long fungalMetabolicAmplifierCount,
-            long fungalNutrientAmplifierCount,
-            long fungalEnergyConverterCount,
-            long fungalGardenerCount,
-            long fungalFertilizerCount,
-            long rootNetworkCount,
-            long mycelialSynergizerCount,
-            long fungalDecomposerMimicCount,
-            long massDecomposerCount,
-            long mossCount,
-            long beetleCount,
-            int nutrientBuffer
+        long fungusCount,
+        long decomposerCount,
+        long soilEnricherCount,
+        long networkConnectorCount,
+        long fungalSymbioteCount,
+        long fungalAcceleratorCount,
+        long fungalEnhancerCount,
+        long fungalBufferStabilizerCount,
+        long fungalDecomposerAcceleratorCount,
+        long fungalDecompositionEfficiencyCount,
+        long fungalMetabolicAmplifierCount,
+        long fungalNutrientAmplifierCount,
+        long fungalEnergyConverterCount,
+        long fungalGardenerCount,
+        long fungalFertilizerCount,
+        long rootNetworkCount,
+        long mycelialSynergizerCount,
+        long fungalDecomposerMimicCount,
+        long massDecomposerCount,
+        long mossCount,
+        long beetleCount,
+        int nutrientBuffer
     ) {}
 
     public static Optional<Integer> findPreyIndex(List<Organism> organisms, Organism hunter, int hunterIndex, int cycle, Environment environment, List<GardenEvent> events) {
-        boolean nutrientScout = hunter.traits().contains("nutrient-scout");
-        boolean preyTracker = hunter.traits().contains("prey-tracker");
-        boolean resourceTracker = hunter.traits().contains("resource-tracker");
-        boolean mycelialNetworkScout = hunter.traits().contains("mycelial-network-scout");
-        boolean stealthHunter = hunter.traits().contains("stealth-hunter");
-        boolean isApexPredator = hunter.traits().contains("apex-predator");
-        boolean isPredatorScout = hunter.traits().contains("predator-scout");
+    boolean nutrientScout = hunter.traits().contains("nutrient-scout");
+    boolean preyTracker = hunter.traits().contains("prey-tracker");
+    boolean resourceTracker = hunter.traits().contains("resource-tracker");
+    boolean mycelialNetworkScout = hunter.traits().contains("mycelial-network-scout");
+    boolean stealthHunter = hunter.traits().contains("stealth-hunter");
+    boolean isApexPredator = hunter.traits().contains("apex-predator");
+    boolean isPredatorScout = hunter.traits().contains("predator-scout");
 
-        Predicate<Organism> isValidPrey = candidate -> {
-            if (candidate.energy() <= 0 || !TraitRegistry.canEat(hunter.type(), candidate.type())) return false;
-            
-            boolean bypassStealth = stealthHunter || isApexPredator || isPredatorScout ||
-                (hunter.traits().contains("coordinated-predator") && 
-                 organisms.stream().filter(o -> o.type() == OrganismType.FOX && o.energy() > 0 && !o.id().equals(hunter.id())).count() > 0);
+    Predicate<Organism> isValidPrey = candidate -> {
+        if (candidate.energy() <= 0 || !TraitRegistry.canEat(hunter.type(), candidate.type())) return false;
 
-            if (!bypassStealth) {
-                if (candidate.traits().contains("shadow-stepper") && (candidate.id().hashCode() + cycle) % 2 == 0) return false;
-                if (candidate.traits().contains("camouflaged") && (candidate.id().hashCode() + cycle) % 3 == 0) return false;
-            }
-            return true;
-        };
+        boolean bypassStealth = stealthHunter || isApexPredator || isPredatorScout ||
+            (hunter.traits().contains("coordinated-predator") && 
+             organisms.stream().filter(o -> o.type() == OrganismType.FOX && o.energy() > 0 && !o.id().equals(hunter.id())).count() > 0);
 
-        if (nutrientScout || resourceTracker) {
-            for (int i = 0; i < organisms.size(); i++) {
-                if (i == hunterIndex) continue;
-                Organism candidate = organisms.get(i);
-                if (isValidPrey.test(candidate) && candidate.traits().contains("nutrient-hoarder")) return Optional.of(i);
-            }
+        if (!bypassStealth) {
+            if (candidate.traits().contains("shadow-stepper") && (candidate.id().hashCode() + cycle) % 2 == 0) return false;
+            if (candidate.traits().contains("camouflaged") && (candidate.id().hashCode() + cycle) % 3 == 0) return false;
         }
-        
-        if (mycelialNetworkScout) {
-            long fungusCount = organisms.stream().filter(o -> o.type() == OrganismType.FUNGUS).count();
-            if (fungusCount > 0) {
-                for (int i = 0; i < organisms.size(); i++) {
-                    if (i == hunterIndex) continue;
-                    Organism candidate = organisms.get(i);
-                    if (isValidPrey.test(candidate)) {
-                        events.add(new GardenEvent(cycle, "%s scouted prey using the fungal network.".formatted(hunter.id())));
-                        return Optional.of(i);
-                    }
-                }
-            }
-        }
+        return true;
+    };
 
-        if (preyTracker || hunter.traits().contains("fox-specialist") || hunter.traits().contains("apex-predator")) {
-            int maxEnergy = -1;
-            int bestIndex = -1;
-            for (int i = 0; i < organisms.size(); i++) {
-                if (i == hunterIndex) continue;
-                Organism candidate = organisms.get(i);
-                if (isValidPrey.test(candidate) && candidate.energy() > maxEnergy) {
-                    maxEnergy = candidate.energy();
-                    bestIndex = i;
-                }
-            }
-            if (bestIndex != -1) return Optional.of(bestIndex);
-        }
-
-        if (hunter.type() == OrganismType.FOX && hunter.traits().contains("beetle-specialist")) {
-            int maxEnergy = -1;
-            int bestIndex = -1;
-            for (int i = 0; i < organisms.size(); i++) {
-                if (i == hunterIndex) continue;
-                Organism candidate = organisms.get(i);
-                if (isValidPrey.test(candidate) && candidate.type() == OrganismType.BEETLE && candidate.energy() > maxEnergy) {
-                    maxEnergy = candidate.energy();
-                    bestIndex = i;
-                }
-            }
-            if (bestIndex != -1) return Optional.of(bestIndex);
-        }
-
+    if (nutrientScout || resourceTracker) {
         for (int i = 0; i < organisms.size(); i++) {
             if (i == hunterIndex) continue;
             Organism candidate = organisms.get(i);
-            if (isValidPrey.test(candidate)) return Optional.of(i);
+            if (isValidPrey.test(candidate) && candidate.traits().contains("nutrient-hoarder")) return Optional.of(i);
         }
-        return Optional.empty();
     }
 
-    public static MetabolicEffect calculateMetabolism(int cycle, Organism organism, Environment environment, int mossContribution, int fungalContribution, int fungalAttractorContribution) {
-        int metabolism = organism.type().metabolism();
-        int energyBonus = 0;
-        List<GardenEvent> events = new ArrayList<>();
-
-        for (String trait : organism.traits()) {
-            MetabolicEffect effect = getMetabolicEffect(trait, cycle, organism, environment, fungalContribution, mossContribution);
-            if (effect != null) {
-                metabolism = Math.max(0, metabolism + effect.metabolismChange());
-                energyBonus += effect.energyBonus();
-                if (effect.event() != null) {
-                    events.add(effect.event());
+    if (mycelialNetworkScout) {
+        long fungusCount = organisms.stream().filter(o -> o.type() == OrganismType.FUNGUS).count();
+        if (fungusCount > 0) {
+            for (int i = 0; i < organisms.size(); i++) {
+                if (i == hunterIndex) continue;
+                Organism candidate = organisms.get(i);
+                if (isValidPrey.test(candidate)) {
+                    events.add(new GardenEvent(cycle, "%s scouted prey using the fungal network.".formatted(hunter.id())));
+                    return Optional.of(i);
                 }
             }
         }
+    }
 
-        if (fungalAttractorContribution > 0) {
-            energyBonus += 1;
-            events.add(new GardenEvent(cycle, "%s was attracted to a fungal-rich area.".formatted(organism.id())));
+    if (preyTracker || hunter.traits().contains("fox-specialist") || hunter.traits().contains("apex-predator")) {
+        int maxEnergy = -1;
+        int bestIndex = -1;
+        for (int i = 0; i < organisms.size(); i++) {
+            if (i == hunterIndex) continue;
+            Organism candidate = organisms.get(i);
+            if (isValidPrey.test(candidate) && candidate.energy() > maxEnergy) {
+                maxEnergy = candidate.energy();
+                bestIndex = i;
+            }
         }
-        
-        GardenEvent combinedEvent = events.isEmpty() ? null : new GardenEvent(cycle, events.stream().map(GardenEvent::description).collect(java.util.stream.Collectors.joining("; ")));
-        return new MetabolicEffect(metabolism, energyBonus, combinedEvent);
+        if (bestIndex != -1) return Optional.of(bestIndex);
+    }
+
+    if (hunter.type() == OrganismType.FOX && hunter.traits().contains("beetle-specialist")) {
+        int maxEnergy = -1;
+        int bestIndex = -1;
+        for (int i = 0; i < organisms.size(); i++) {
+            if (i == hunterIndex) continue;
+            Organism candidate = organisms.get(i);
+            if (isValidPrey.test(candidate) && candidate.type() == OrganismType.BEETLE && candidate.energy() > maxEnergy) {
+                maxEnergy = candidate.energy();
+                bestIndex = i;
+            }
+        }
+        if (bestIndex != -1) return Optional.of(bestIndex);
+    }
+
+    for (int i = 0; i < organisms.size(); i++) {
+        if (i == hunterIndex) continue;
+        Organism candidate = organisms.get(i);
+        if (isValidPrey.test(candidate)) return Optional.of(i);
+    }
+    return Optional.empty();
+    }
+
+    public static MetabolicEffect calculateMetabolism(int cycle, Organism organism, Environment environment, int mossContribution, int fungalContribution, int fungalAttractorContribution) {
+    int metabolism = organism.type().metabolism();
+    int energyBonus = 0;
+    List<GardenEvent> events = new ArrayList<>();
+
+    for (String trait : organism.traits()) {
+        MetabolicEffect effect = getMetabolicEffect(trait, cycle, organism, environment, fungalContribution, mossContribution);
+        if (effect != null) {
+            metabolism = Math.max(0, metabolism + effect.metabolismChange());
+            energyBonus += effect.energyBonus();
+            if (effect.event() != null) {
+                events.add(effect.event());
+            }
+        }
+    }
+
+    if (fungalAttractorContribution > 0) {
+        energyBonus += 1;
+        events.add(new GardenEvent(cycle, "%s was attracted to a fungal-rich area.".formatted(organism.id())));
+    }
+
+    GardenEvent combinedEvent = events.isEmpty() ? null : new GardenEvent(cycle, events.stream().map(GardenEvent::description).collect(java.util.stream.Collectors.joining("; ")));
+    return new MetabolicEffect(metabolism, energyBonus, combinedEvent);
     }
 
     public static StressResult calculatePlantStress(Organism organism, Environment environment, int cycle, List<Organism> allOrganisms) {
-        if (!isPlantStressed(organism, environment, allOrganisms)) {
-            return new StressResult(false, 0, null);
-        }
+    if (!isPlantStressed(organism, environment, allOrganisms)) {
+        return new StressResult(false, 0, null);
+    }
 
-        int energyLoss = 0;
-        GardenEvent event = null;
+    int energyLoss = 0;
+    GardenEvent event = null;
 
-        if (environment.nutrients() == 0) {
-            energyLoss = 1;
-            event = new GardenEvent(cycle, "%s lost energy due to environmental stress.".formatted(organism.id()));
-        } else if (allOrganisms.stream().filter(o -> o.type().isPlant()).count() > 5000) {
-            energyLoss = 1;
-            event = new GardenEvent(cycle, "%s lost energy due to overcrowding.".formatted(organism.id()));
-        }
+    if (environment.nutrients() == 0) {
+        energyLoss = 1;
+        event = new GardenEvent(cycle, "%s lost energy due to environmental stress.".formatted(organism.id()));
+    } else if (allOrganisms.stream().filter(o -> o.type().isPlant()).count() > 5000) {
+        energyLoss = 1;
+        event = new GardenEvent(cycle, "%s lost energy due to overcrowding.".formatted(organism.id()));
+    }
 
-        return new StressResult(true, energyLoss, event);
+    return new StressResult(true, energyLoss, event);
     }
 
     public static boolean isPlantStressed(Organism organism, Environment environment, List<Organism> allOrganisms) {
-        if (!organism.type().isPlant()) return false;
-        boolean isResilient = organism.traits().contains("resilient");
-        boolean isDormant = organism.traits().contains("dormancy") && environment.nutrients() < 15;
-        boolean isDeepRooting = organism.traits().contains("deep-rooting") && environment.moisture() < 30;
-        boolean isStressResilient = organism.traits().contains("stress-resilient");
-        boolean isStressAvoidant = organism.traits().contains("stress-avoidance");
-        boolean crowded = allOrganisms.stream().filter(o -> o.type().isPlant()).count() > 5000;
-        return (!environment.favorsPlants() || crowded) && !isResilient && !isDormant && !isDeepRooting && !isStressResilient && !isStressAvoidant;
+    if (!organism.type().isPlant()) return false;
+    boolean isResilient = organism.traits().contains("resilient");
+    boolean isDormant = organism.traits().contains("dormancy") && environment.nutrients() < 15;
+    boolean isDeepRooting = organism.traits().contains("deep-rooting") && environment.moisture() < 30;
+    boolean isStressResilient = organism.traits().contains("stress-resilient");
+    boolean isStressAvoidant = organism.traits().contains("stress-avoidance");
+    boolean crowded = allOrganisms.stream().filter(o -> o.type().isPlant()).count() > 5000;
+    return (!environment.favorsPlants() || crowded) && !isResilient && !isDormant && !isDeepRooting && !isStressResilient && !isStressAvoidant;
     }
 
     public static boolean isAnimalStarving(Organism organism, Environment environment, List<Organism> allOrganisms) {
-        if (!organism.type().isAnimal()) return false;
-        boolean isResilient = organism.traits().contains("resilient");
-        boolean isDormant = organism.traits().contains("dormancy");
-        boolean isMetabolicResilient = organism.traits().contains("metabolic-resilience");
-        boolean overcrowded = allOrganisms.stream().filter(o -> o.type().isAnimal()).count() > 2500;
-        return ((environment.nutrients() + environment.nutrientBuffer() / 2) < 25 || overcrowded) && !isResilient && !isDormant && !isMetabolicResilient;
+    if (!organism.type().isAnimal()) return false;
+    boolean isResilient = organism.traits().contains("resilient");
+    boolean isDormant = organism.traits().contains("dormancy");
+    boolean isMetabolicResilient = organism.traits().contains("metabolic-resilience");
+    boolean overcrowded = allOrganisms.stream().filter(o -> o.type().isAnimal()).count() > 2500;
+    return ((environment.nutrients() + environment.nutrientBuffer() / 2) < 25 || overcrowded) && !isResilient && !isDormant && !isMetabolicResilient;
     }
 
     public static ContributionResult calculateContribution(List<Organism> organisms, Environment environment) {
-        long releaserCount = TraitRegistry.count(organisms, "buffer-releaser");
-        int rootContribution = calculateRootContribution(organisms, environment, releaserCount);
-        int fungalContribution = calculateFungalContribution(organisms, environment);
-        int fungalAttractorContribution = (TraitRegistry.count(organisms, "fungal-attractor", OrganismType.ROOT_NETWORK) > 0 && fungalContribution > 0) ? 1 : 0;
-        int mossContribution = organisms.stream().anyMatch(organism -> organism.type() == OrganismType.MOSS) ? 1 : 0;
-        return new ContributionResult(rootContribution, fungalContribution, fungalAttractorContribution, mossContribution);
+    long releaserCount = TraitRegistry.count(organisms, "buffer-releaser");
+    int rootContribution = calculateRootContribution(organisms, environment, releaserCount);
+    int fungalContribution = calculateFungalContribution(organisms, environment);
+    int fungalAttractorContribution = (TraitRegistry.count(organisms, "fungal-attractor", OrganismType.ROOT_NETWORK) > 0 && fungalContribution > 0) ? 1 : 0;
+    int mossContribution = organisms.stream().anyMatch(organism -> organism.type() == OrganismType.MOSS) ? 1 : 0;
+    return new ContributionResult(rootContribution, fungalContribution, fungalAttractorContribution, mossContribution);
     }
 
     public static int calculateRootContribution(List<Organism> organisms, Environment environment, long releaserCount) {
-        long fungusCount = TraitRegistry.count(organisms, OrganismType.FUNGUS);
-        long mycelialRootMediatorCount = (fungusCount > 0) ? TraitRegistry.countAnimalTrait(organisms, "mycelial-root-mediator") : 0;
+    long fungusCount = TraitRegistry.count(organisms, OrganismType.FUNGUS);
+    long mycelialRootMediatorCount = (fungusCount > 0) ? TraitRegistry.countAnimalTrait(organisms, "mycelial-root-mediator") : 0;
 
-        var context = new RootContributionContext(
-                TraitRegistry.count(organisms, OrganismType.ROOT_NETWORK),
-                TraitRegistry.count(organisms, "nutrient-weaver", OrganismType.ROOT_NETWORK),
-                TraitRegistry.count(organisms, "nutrient-sharer", OrganismType.ROOT_NETWORK),
-                TraitRegistry.count(organisms, "buffer-optimizer", OrganismType.ROOT_NETWORK),
-                TraitRegistry.count(organisms, "soil-master", OrganismType.ROOT_NETWORK),
-                TraitRegistry.count(organisms, "nutrient-recycler", OrganismType.ROOT_NETWORK),
-                TraitRegistry.count(organisms, "nutrient-translocator", OrganismType.ROOT_NETWORK),
-                TraitRegistry.count(organisms, "nutrient-synthesizer", OrganismType.ROOT_NETWORK),
-                TraitRegistry.count(organisms, "nutrient-reclaimer", OrganismType.ROOT_NETWORK),
-                TraitRegistry.count(organisms, "nutrient-producer", OrganismType.ROOT_NETWORK),
-                TraitRegistry.count(organisms, "nutrient-pump", OrganismType.ROOT_NETWORK),
-                TraitRegistry.count(organisms, "nutrient-distributor", OrganismType.ROOT_NETWORK),
-                TraitRegistry.count(organisms, "nutrient-accelerator", OrganismType.ROOT_NETWORK),
-                TraitRegistry.count(organisms, "root-soil-enricher", OrganismType.ROOT_NETWORK),
-                TraitRegistry.count(organisms, "fungal-root-symbiont", OrganismType.ROOT_NETWORK),
-                mycelialRootMediatorCount,
-                TraitRegistry.count(organisms, "root-nutrient-utilizer", OrganismType.ROOT_NETWORK),
-                releaserCount,
-                environment.nutrients(),
-                environment.nutrientBuffer()
-        );
-        return calculateRoot(context);
+    var context = new RootContributionContext(
+            TraitRegistry.count(organisms, OrganismType.ROOT_NETWORK),
+            TraitRegistry.count(organisms, "nutrient-weaver", OrganismType.ROOT_NETWORK),
+            TraitRegistry.count(organisms, "nutrient-sharer", OrganismType.ROOT_NETWORK),
+            TraitRegistry.count(organisms, "buffer-optimizer", OrganismType.ROOT_NETWORK),
+            TraitRegistry.count(organisms, "soil-master", OrganismType.ROOT_NETWORK),
+            TraitRegistry.count(organisms, "nutrient-recycler", OrganismType.ROOT_NETWORK),
+            TraitRegistry.count(organisms, "nutrient-translocator", OrganismType.ROOT_NETWORK),
+            TraitRegistry.count(organisms, "nutrient-synthesizer", OrganismType.ROOT_NETWORK),
+            TraitRegistry.count(organisms, "nutrient-reclaimer", OrganismType.ROOT_NETWORK),
+            TraitRegistry.count(organisms, "nutrient-producer", OrganismType.ROOT_NETWORK),
+            TraitRegistry.count(organisms, "nutrient-pump", OrganismType.ROOT_NETWORK),
+            TraitRegistry.count(organisms, "nutrient-distributor", OrganismType.ROOT_NETWORK),
+            TraitRegistry.count(organisms, "nutrient-accelerator", OrganismType.ROOT_NETWORK),
+            TraitRegistry.count(organisms, "root-soil-enricher", OrganismType.ROOT_NETWORK),
+            TraitRegistry.count(organisms, "fungal-root-symbiont", OrganismType.ROOT_NETWORK),
+            mycelialRootMediatorCount,
+            TraitRegistry.count(organisms, "mycelial-synergizer", OrganismType.ROOT_NETWORK),
+            TraitRegistry.count(organisms, "root-nutrient-utilizer", OrganismType.ROOT_NETWORK),
+            releaserCount,
+            environment.nutrients(),
+            environment.nutrientBuffer()
+    );
+    return calculateRoot(context);
     }
 
     private static int calculateRoot(RootContributionContext context) {
-        if (context.nutrients() < 5) {
-            return (int) (context.rootNetworkCount() * 10 + context.nutrientWeaverCount() * 10 + context.nutrientSharerCount() * 20 + context.bufferOptimizerCount() * 20 + context.soilMasterCount() * 30 + context.nutrientRecyclerCount() * 10 + context.nutrientTranslocatorCount() * 40 + context.nutrientSynthesizerCount() * 30 + context.nutrientReclaimerCount() * 25 + context.nutrientProducerCount() * 50 + context.nutrientPumpCount() * 60 + context.nutrientDistributorCount() * 40 + context.nutrientAcceleratorCount() * 50 + context.rootSoilEnricherCount() * 70 + context.fungalRootSymbiontCount() * 40 + context.mycelialRootMediatorCount() * 20);
-        } else if (context.nutrients() < 10) {
-            return (int) (context.rootNetworkCount() * 8 + context.nutrientWeaverCount() * 8 + context.nutrientSharerCount() * 16 + context.bufferOptimizerCount() * 16 + context.soilMasterCount() * 24 + context.nutrientRecyclerCount() * 8 + context.nutrientTranslocatorCount() * 32 + context.nutrientSynthesizerCount() * 24 + context.nutrientReclaimerCount() * 20 + context.nutrientProducerCount() * 40 + context.nutrientPumpCount() * 48 + context.nutrientDistributorCount() * 32 + context.nutrientAcceleratorCount() * 40 + context.rootSoilEnricherCount() * 56 + context.fungalRootSymbiontCount() * 32 + context.mycelialRootMediatorCount() * 16);
-        } else if (context.nutrients() < 25) {
-            return (int) (context.rootNetworkCount() * 4 + context.nutrientWeaverCount() * 4 + context.nutrientSharerCount() * 8 + context.bufferOptimizerCount() * 8 + context.soilMasterCount() * 12 + context.nutrientRecyclerCount() * 4 + context.nutrientTranslocatorCount() * 16 + context.nutrientSynthesizerCount() * 12 + context.nutrientReclaimerCount() * 10 + context.nutrientProducerCount() * 20 + context.nutrientPumpCount() * 24 + context.nutrientDistributorCount() * 16 + context.nutrientAcceleratorCount() * 20 + context.rootSoilEnricherCount() * 28 + context.fungalRootSymbiontCount() * 16 + context.mycelialRootMediatorCount() * 8);
-        } else {
-            int bufferBonus = (context.nutrientBuffer() > 50) ? 2 : 0;
-            int recyclerBonus = (context.nutrientBuffer() > 50 ? 5 : 2) + (int) Math.min(context.releaserCount(), 10);
-            return (int) (Math.max(1, context.rootNetworkCount() / 2) + context.nutrientWeaverCount() + context.nutrientSharerCount() * 2 + context.bufferOptimizerCount() * (2 + bufferBonus) + context.soilMasterCount() * 4 + context.nutrientRecyclerCount() * recyclerBonus + context.nutrientTranslocatorCount() * 4 + context.nutrientSynthesizerCount() * 3 + context.nutrientReclaimerCount() * 3 + context.nutrientProducerCount() * 5 + context.nutrientPumpCount() * 6 + context.nutrientDistributorCount() * 4 + context.nutrientAcceleratorCount() * 5 + context.rootSoilEnricherCount() * (10 + bufferBonus) + context.fungalRootSymbiontCount() * 4 + context.mycelialRootMediatorCount() * 2 + context.rootNutrientUtilizerCount() * 15);
-        }
+    if (context.nutrients() < 5) {
+        return (int) (context.rootNetworkCount() * 10 + context.nutrientWeaverCount() * 10 + context.nutrientSharerCount() * 20 + context.bufferOptimizerCount() * 20 + context.soilMasterCount() * 30 + context.nutrientRecyclerCount() * 10 + context.nutrientTranslocatorCount() * 40 + context.nutrientSynthesizerCount() * 30 + context.nutrientReclaimerCount() * 25 + context.nutrientProducerCount() * 50 + context.nutrientPumpCount() * 60 + context.nutrientDistributorCount() * 40 + context.nutrientAcceleratorCount() * 50 + context.rootSoilEnricherCount() * 70 + context.fungalRootSymbiontCount() * 40 + context.mycelialRootMediatorCount() * 20 + context.mycelialSynergizerCount() * 10);
+    } else if (context.nutrients() < 10) {
+        return (int) (context.rootNetworkCount() * 8 + context.nutrientWeaverCount() * 8 + context.nutrientSharerCount() * 16 + context.bufferOptimizerCount() * 16 + context.soilMasterCount() * 24 + context.nutrientRecyclerCount() * 8 + context.nutrientTranslocatorCount() * 32 + context.nutrientSynthesizerCount() * 24 + context.nutrientReclaimerCount() * 20 + context.nutrientProducerCount() * 40 + context.nutrientPumpCount() * 48 + context.nutrientDistributorCount() * 32 + context.nutrientAcceleratorCount() * 40 + context.rootSoilEnricherCount() * 56 + context.fungalRootSymbiontCount() * 32 + context.mycelialRootMediatorCount() * 16 + context.mycelialSynergizerCount() * 8);
+    } else if (context.nutrients() < 25) {
+        return (int) (context.rootNetworkCount() * 4 + context.nutrientWeaverCount() * 4 + context.nutrientSharerCount() * 8 + context.bufferOptimizerCount() * 8 + context.soilMasterCount() * 12 + context.nutrientRecyclerCount() * 4 + context.nutrientTranslocatorCount() * 16 + context.nutrientSynthesizerCount() * 12 + context.nutrientReclaimerCount() * 10 + context.nutrientProducerCount() * 20 + context.nutrientPumpCount() * 24 + context.nutrientDistributorCount() * 16 + context.nutrientAcceleratorCount() * 20 + context.rootSoilEnricherCount() * 28 + context.fungalRootSymbiontCount() * 16 + context.mycelialRootMediatorCount() * 8 + context.mycelialSynergizerCount() * 4);
+    } else {
+        int bufferBonus = (context.nutrientBuffer() > 50) ? 2 : 0;
+        int recyclerBonus = (context.nutrientBuffer() > 50 ? 5 : 2) + (int) Math.min(context.releaserCount(), 10);
+        return (int) (Math.max(1, context.rootNetworkCount() / 2) + context.nutrientWeaverCount() + context.nutrientSharerCount() * 2 + context.bufferOptimizerCount() * (2 + bufferBonus) + context.soilMasterCount() * 4 + context.nutrientRecyclerCount() * recyclerBonus + context.nutrientTranslocatorCount() * 4 + context.nutrientSynthesizerCount() * 3 + context.nutrientReclaimerCount() * 3 + context.nutrientProducerCount() * 5 + context.nutrientPumpCount() * 6 + context.nutrientDistributorCount() * 4 + context.nutrientAcceleratorCount() * 5 + context.rootSoilEnricherCount() * (10 + bufferBonus) + context.fungalRootSymbiontCount() * 4 + context.mycelialRootMediatorCount() * 2 + context.mycelialSynergizerCount() * 5 + context.rootNutrientUtilizerCount() * 15);
+    }
     }
 
     public static int calculateFungalContribution(List<Organism> organisms, Environment environment) {
