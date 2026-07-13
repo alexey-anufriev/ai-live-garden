@@ -344,6 +344,11 @@ public class OrganismInteractionCalculator {
         if (total >= DENSITY_PRESSURE_MINIMUM_POPULATION && typeCount * 4 > total) {
             return 1;
         }
+        // Beetle-specific density restriction: if beetles are > 30% of total population, further restrict their birth budget
+        if (childType == OrganismType.BEETLE && total >= DENSITY_PRESSURE_MINIMUM_POPULATION && typeCount * 3 > total) {
+            return 1;
+        }
+
         if (childType == OrganismType.FOX
                 || childType == OrganismType.FUNGUS
                 || childType == OrganismType.ROOT_NETWORK) {
@@ -468,6 +473,7 @@ public class OrganismInteractionCalculator {
         } else if (organism.type() == OrganismType.FOX) {
             threshold = 15;
         }
+        
         if (environment.nutrients() < 25) {
             threshold += 5;
         } else if (environment.nutrients() > 60) {
