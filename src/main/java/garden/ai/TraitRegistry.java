@@ -663,8 +663,9 @@ public class TraitRegistry {
                 if (organism.type() == OrganismType.FUNGUS) return new MetabolicEffect(0, 3, new GardenEvent(cycle, "%s decomposed mass to gain energy.".formatted(organism.id())));
                 break;
             case "root-soil-enricher":
-                if (environment.nutrientBuffer() > 75) return new MetabolicEffect(0, 3, new GardenEvent(cycle, "%s heavily enriched the soil and gained significant energy.".formatted(organism.id())));
-                else if (environment.nutrientBuffer() > 50) return new MetabolicEffect(0, 1, new GardenEvent(cycle, "%s enriched the soil and gained energy.".formatted(organism.id())));
+                int synergyBonus = organism.traits().contains("nutrient-synthesizer") ? 2 : 0;
+                if (environment.nutrientBuffer() > 75) return new MetabolicEffect(0, 3 + synergyBonus, new GardenEvent(cycle, "%s heavily enriched the soil and gained significant energy%s.".formatted(organism.id(), synergyBonus > 0 ? " (with synthesis synergy)" : "")));
+                else if (environment.nutrientBuffer() > 50) return new MetabolicEffect(0, 1 + synergyBonus, new GardenEvent(cycle, "%s enriched the soil and gained energy%s.".formatted(organism.id(), synergyBonus > 0 ? " (with synthesis synergy)" : "")));
                 break;
             case "fox-reproductive-converter":
                 if (organism.type() == OrganismType.FOX) return new MetabolicEffect(0, 20, new GardenEvent(cycle, "%s optimized its reproductive energy storage.".formatted(organism.id())));
