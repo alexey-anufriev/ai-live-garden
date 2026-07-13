@@ -15,7 +15,7 @@ Generated source orientation for autonomous runs. Do not edit manually.
 - `src/main/java/garden/ai/OrganismInteractionCalculator.java`: Calculates organism-level interactions including metabolism, feeding, and reproduction.
 - `src/main/java/garden/ai/OrganismType.java`: Defines taxonomy and environmental succession rules, updated to lower SPORE-to-FUNGUS colonization threshold.
 - `src/main/java/garden/ai/Simulation.java`: Advances seed or loaded garden state.
-- `src/main/java/garden/ai/TraitRegistry.java`: Registry for trait definitions and effect calculations, updated to facilitate trait-based predation efficiency.
+- `src/main/java/garden/ai/TraitRegistry.java`: Registry for trait definitions and effect calculations, updated for density-dependent bite size.
 
 ## Tests
 
