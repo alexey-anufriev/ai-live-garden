@@ -335,7 +335,7 @@ public class OrganismInteractionCalculator {
                 MIN_TOTAL_BIRTH_BUDGET, MAX_TOTAL_BIRTH_BUDGET);
     }
 
-    static int typeBirthBudget(OrganismType childType, List<Organism> organisms) {
+    static int typeBirthBudget(OrganismType childType, List<Organism> organisms, Environment environment) {
         long total = organisms.size();
         long typeCount = organisms.stream().filter(organism -> organism.type() == childType).count();
 
@@ -345,9 +345,11 @@ public class OrganismInteractionCalculator {
         if (total >= DENSITY_PRESSURE_MINIMUM_POPULATION && typeCount * 4 > total) {
             return 1;
         }
-        // Beetle-specific density restriction: if beetles are > 30% of total population, further restrict their birth budget
-        if (childType == OrganismType.BEETLE && total >= DENSITY_PRESSURE_MINIMUM_POPULATION && typeCount * 3 > total) {
-            return 1;
+        // Beetle-specific density restriction linked to buffer
+        if (childType == OrganismType.BEETLE && total >= DENSITY_PRESSURE_MINIMUM_POPULATION) {
+            if (environment.nutrientBuffer() < 25) return 0;
+            if (environment.nutrientBuffer() < 50) return 1;
+            if (typeCount * 3 > total) return 1;
         }
 
         if (childType == OrganismType.FOX
@@ -378,7 +380,7 @@ public class OrganismInteractionCalculator {
 
             boolean isFungalSuccession = (organism.type() == OrganismType.ROOT_NETWORK && childType == OrganismType.FUNGUS);
             boolean isNutrientPioneer = (organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("nutrient-pioneer") && context.environment().nutrientBuffer() > 80);
-            int typeBirthBudget = typeBirthBudget(childType, context.organisms());
+            int typeBirthBudget = typeBirthBudget(childType, context.organisms(), context.environment());
             int birthsForType = birthsByType.getOrDefault(childType, 0);
             boolean hasBirthCapacity = birthsThisCycle < totalBirthBudget && birthsForType < typeBirthBudget;
             boolean canReproduce = hasBirthCapacity
