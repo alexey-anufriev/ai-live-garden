@@ -62,6 +62,7 @@ public class TraitRegistry {
         long fungalBufferStabilizerCount,
         long fungalDecomposerAcceleratorCount,
         long fungalDecompositionEfficiencyCount,
+        long fungalBeetleSpecialistCount,
         long fungalMetabolicAmplifierCount,
         long fungalNutrientAmplifierCount,
         long fungalEnergyConverterCount,
@@ -286,6 +287,7 @@ public class TraitRegistry {
                 TraitRegistry.count(organisms, "fungal-buffer-stabilizer", OrganismType.FUNGUS),
                 TraitRegistry.count(organisms, "fungal-decomposer-accelerator", OrganismType.FUNGUS),
                 TraitRegistry.count(organisms, "fungal-decomposition-efficiency", OrganismType.FUNGUS),
+                TraitRegistry.count(organisms, "fungal-beetle-specialist", OrganismType.FUNGUS),
                 TraitRegistry.count(organisms, "fungal-metabolic-amplifier", OrganismType.FUNGUS),
                 TraitRegistry.count(organisms, "fungal-nutrient-amplifier", OrganismType.FUNGUS),
                 TraitRegistry.count(organisms, "fungal-energy-converter", OrganismType.FUNGUS),
@@ -320,6 +322,7 @@ public class TraitRegistry {
                       context.fungalBufferStabilizerCount() * 12 +
                       context.fungalDecomposerAcceleratorCount() * 45 +
                       context.fungalDecompositionEfficiencyCount() * (120 + beetlePressure * 5) +
+                      context.fungalBeetleSpecialistCount() * (200 + beetlePressure * 10) +
                       context.fungalMetabolicAmplifierCount() * 150 +
                       context.fungalNutrientAmplifierCount() * 30 +
                       context.fungalEnergyConverterCount() * 100 * bufferBonus +
@@ -500,7 +503,7 @@ public class TraitRegistry {
 
     public static String getMutationTrait(int cycle, Organism organism, OrganismType childType, Environment environment) {
         if (childType == OrganismType.FUNGUS && Math.random() < 0.5) {
-            String[] fungalTraits = {"nutrient-decomposer", "fungus-soil-enricher", "fungal-network-connector", "fungal-accelerator", "fungal-enhancer", "fungal-buffer-stabilizer", "nutrient-synthesizer", "buffer-tapper", "fungal-nutrient-amplifier", "mass-decomposer", "reproductive-efficiency", "fungal-decomposition-efficiency", "nutrient-dependent-reproduction", "fungal-energy-converter", "mutualist-synergy"};
+            String[] fungalTraits = {"nutrient-decomposer", "fungus-soil-enricher", "fungal-network-connector", "fungal-accelerator", "fungal-enhancer", "fungal-buffer-stabilizer", "nutrient-synthesizer", "buffer-tapper", "fungal-nutrient-amplifier", "mass-decomposer", "reproductive-efficiency", "fungal-decomposition-efficiency", "nutrient-dependent-reproduction", "fungal-energy-converter", "mutualist-synergy", "fungal-beetle-specialist"};
             return fungalTraits[Math.floorMod(cycle + organism.generation(), fungalTraits.length)];
         }
         if (childType == OrganismType.FOX && Math.random() < 0.3) {

@@ -15,11 +15,11 @@ Generated source orientation for autonomous runs. Do not edit manually.
 - `src/main/java/garden/ai/OrganismInteractionCalculator.java`: Orchestrates feeding and population dynamics, now includes density-dependent cautious-feeder logic.
 - `src/main/java/garden/ai/OrganismType.java`: Defines taxonomy and environmental succession rules, updated to lower SPORE-to-FUNGUS colonization threshold.
 - `src/main/java/garden/ai/Simulation.java`: Advances seed or loaded garden state.
-- `src/main/java/garden/ai/TraitRegistry.java`: Central registry for trait logic, where the new 'fox-metabolic-efficiency' trait was implemented.
+- `src/main/java/garden/ai/TraitRegistry.java`: Central registry for trait logic where FungalContributionContext, calculateFungalContribution, and calculateFungal were updated.
 
 ## Tests
 
 - Tests live under `src/test/java/garden/ai/`.
-- Current Java test files: 113.
+- Current Java test files: 114.
 - Prefer focused behavior tests for changed simulation rules.
 - Add or inspect exact test files only when the chosen task needs them.
