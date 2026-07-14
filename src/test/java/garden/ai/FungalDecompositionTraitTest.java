@@ -39,6 +39,6 @@ public class FungalDecompositionTraitTest {
         
         TraitRegistry.MetabolicEffect effect = TraitRegistry.getMetabolicEffect("fungal-decomposition-efficiency", 1, fungus, env, 0, 0);
         
-        assertEquals(8, effect.energyBonus(), "Fungal decomposition efficiency should provide an energy bonus of 8");
+        assertEquals(12, effect.energyBonus(), "Fungal decomposition efficiency should provide an energy bonus of 12");
     }
 }

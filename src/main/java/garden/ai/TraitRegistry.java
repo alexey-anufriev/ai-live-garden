@@ -323,7 +323,7 @@ public class TraitRegistry {
                       context.fungalEnhancerCount() * 8 +
                       context.fungalBufferStabilizerCount() * 12 +
                       context.fungalDecomposerAcceleratorCount() * 45 +
-                      context.fungalDecompositionEfficiencyCount() * (120 + beetlePressure * 5) +
+                      context.fungalDecompositionEfficiencyCount() * (150 + beetlePressure * 8) +
                       context.fungalBeetleSpecialistCount() * (200 + beetlePressure * 10) +
                       context.fungalMetabolicAmplifierCount() * 150 +
                       context.fungalNutrientAmplifierCount() * 30 +
@@ -655,7 +655,7 @@ public class TraitRegistry {
                 if (organism.type() == OrganismType.FUNGUS) return new MetabolicEffect(0, 20, new GardenEvent(cycle, "%s converted buffer nutrients directly into reproductive energy.".formatted(organism.id())));
                 break;
             case "fungal-decomposition-efficiency":
-                if (organism.type() == OrganismType.FUNGUS) return new MetabolicEffect(0, 8, new GardenEvent(cycle, "%s optimized its decomposition to gain energy.".formatted(organism.id())));
+                if (organism.type() == OrganismType.FUNGUS) return new MetabolicEffect(0, 12, new GardenEvent(cycle, "%s optimized its decomposition to gain energy.".formatted(organism.id())));
                 break;
             case "fungal-metabolic-amplifier":
                 if (organism.type() == OrganismType.FUNGUS) return new MetabolicEffect(0, 15, new GardenEvent(cycle, "%s amplified its metabolism to gain significant energy.".formatted(organism.id())));
