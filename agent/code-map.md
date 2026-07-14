@@ -15,11 +15,11 @@ Generated source orientation for autonomous runs. Do not edit manually.
 - `src/main/java/garden/ai/OrganismInteractionCalculator.java`: Calculates organism interactions including population dynamics and reproduction limits.
 - `src/main/java/garden/ai/OrganismType.java`: Defines taxonomy and environmental succession rules, updated to lower SPORE-to-FUNGUS colonization threshold.
 - `src/main/java/garden/ai/Simulation.java`: Advances seed or loaded garden state.
-- `src/main/java/garden/ai/TraitRegistry.java`: Central registry for trait logic where FungalContributionContext, calculateFungalContribution, and calculateFungal were updated.
+- `src/main/java/garden/ai/TraitRegistry.java`: Central registry for trait logic.
 
 ## Tests
 
 - Tests live under `src/test/java/garden/ai/`.
-- Current Java test files: 114.
+- Current Java test files: 115.
 - Prefer focused behavior tests for changed simulation rules.
 - Add or inspect exact test files only when the chosen task needs them.

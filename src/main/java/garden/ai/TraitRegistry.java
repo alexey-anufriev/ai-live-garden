@@ -46,6 +46,7 @@ public class TraitRegistry {
         long mycelialRootMediatorCount,
         long mycelialSynergizerCount,
         long rootNutrientUtilizerCount,
+        long rootNutrientAmplifierCount,
         long releaserCount,
         int nutrients,
         int nutrientBuffer
@@ -254,6 +255,7 @@ public class TraitRegistry {
             mycelialRootMediatorCount,
             TraitRegistry.count(organisms, "mycelial-synergizer", OrganismType.ROOT_NETWORK),
             TraitRegistry.count(organisms, "root-nutrient-utilizer", OrganismType.ROOT_NETWORK),
+            TraitRegistry.count(organisms, "root-nutrient-amplifier", OrganismType.ROOT_NETWORK),
             releaserCount,
             environment.nutrients(),
             environment.nutrientBuffer()
@@ -271,7 +273,7 @@ public class TraitRegistry {
     } else {
         int bufferBonus = (context.nutrientBuffer() > 50) ? 2 : 0;
         int recyclerBonus = (context.nutrientBuffer() > 50 ? 5 : 2) + (int) Math.min(context.releaserCount(), 10);
-        return (int) (Math.max(1, context.rootNetworkCount() / 2) + context.nutrientWeaverCount() + context.nutrientSharerCount() * 2 + context.bufferOptimizerCount() * (2 + bufferBonus) + context.soilMasterCount() * 4 + context.nutrientRecyclerCount() * recyclerBonus + context.nutrientTranslocatorCount() * 4 + context.nutrientSynthesizerCount() * 3 + context.nutrientReclaimerCount() * 3 + context.nutrientProducerCount() * 5 + context.nutrientPumpCount() * 6 + context.nutrientDistributorCount() * 4 + context.nutrientAcceleratorCount() * 5 + context.rootSoilEnricherCount() * (10 + bufferBonus) + context.fungalRootSymbiontCount() * 4 + context.mycelialRootMediatorCount() * 2 + context.mycelialSynergizerCount() * 5 + context.rootNutrientUtilizerCount() * 15);
+        return (int) (Math.max(1, context.rootNetworkCount() / 2) + context.nutrientWeaverCount() + context.nutrientSharerCount() * 2 + context.bufferOptimizerCount() * (2 + bufferBonus) + context.soilMasterCount() * 4 + context.nutrientRecyclerCount() * recyclerBonus + context.nutrientTranslocatorCount() * 4 + context.nutrientSynthesizerCount() * 3 + context.nutrientReclaimerCount() * 3 + context.nutrientProducerCount() * 5 + context.nutrientPumpCount() * 6 + context.nutrientDistributorCount() * 4 + context.nutrientAcceleratorCount() * 5 + context.rootSoilEnricherCount() * (10 + bufferBonus) + context.fungalRootSymbiontCount() * 4 + context.mycelialRootMediatorCount() * 2 + context.mycelialSynergizerCount() * 5 + context.rootNutrientUtilizerCount() * 15 + context.rootNutrientAmplifierCount() * 20);
     }
     }
 
@@ -515,10 +517,11 @@ public class TraitRegistry {
         }
         if (childType == OrganismType.ROOT_NETWORK && Math.random() < 0.3) {
             double r = Math.random();
-            if (r < 0.25) return "reproductive-efficiency";
-            else if (r < 0.50) return "nutrient-dependent-reproduction";
-            else if (r < 0.75) return "nutrient-pioneer";
-            else return "mutualist-synergy";
+            if (r < 0.20) return "reproductive-efficiency";
+            else if (r < 0.40) return "nutrient-dependent-reproduction";
+            else if (r < 0.60) return "nutrient-pioneer";
+            else if (r < 0.80) return "mutualist-synergy";
+            else return "root-nutrient-amplifier";
         }
         if (environment.nutrients() < 40 && Math.random() < 0.3) {
             if (childType.isPlant()) return "dormancy";
