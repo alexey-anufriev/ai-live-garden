@@ -16,8 +16,8 @@ public class PredatorEnergyEfficiencyTest {
 
         TraitRegistry.BiteEffect result = TraitRegistry.calculateBite(hunter, prey, environment, 1, 0, allOrganisms);
 
-        // Base bite for fox is 3. Predator-energy-efficiency should add 8. Total should be 11.
-        assertTrue(result.biteSize() >= 11, "Fox with predator-energy-efficiency should have a bite size of at least 11, but was " + result.biteSize());
+        // Base bite for fox is 3. Predator-energy-efficiency should add 12. Total should be 15.
+        assertTrue(result.biteSize() >= 15, "Fox with predator-energy-efficiency should have a bite size of at least 15, but was " + result.biteSize());
         assertTrue(result.events().stream().anyMatch(e -> e.description().contains("predator-energy-efficiency")), "Bite result should contain predator-energy-efficiency event");
     }
 }
