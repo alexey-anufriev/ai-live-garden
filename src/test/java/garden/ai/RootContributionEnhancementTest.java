@@ -22,4 +22,20 @@ public class RootContributionEnhancementTest {
         
         assertEquals(71, garden.rootContribution());
     }
+
+    @Test
+    public void testRootContributionWithPumpAndDistributor() {
+        // Nutrients = 50 (>= 25 branch)
+        // Traits: nutrient-pump, nutrient-distributor
+        // Weights: 
+        //   rootNetwork: max(1, 1/2) = 1
+        //   nutrientPumpCount: 10 (new value)
+        //   nutrientDistributorCount: 8 (new value)
+        // Total = 1 + 10 + 8 = 19
+        Organism root1 = Organism.of("root-1", OrganismType.ROOT_NETWORK, 10, 1, "nutrient-pump", "nutrient-distributor");
+        // Environment: (50, 50, 50, 50, 50) - Nutrients >= 25
+        Garden garden = new Garden(1, 1, new Environment(50, 50, 50, 50, 50), List.of(root1), List.of());
+        
+        assertEquals(19, garden.rootContribution());
+    }
 }
