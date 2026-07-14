@@ -510,10 +510,11 @@ public class TraitRegistry {
         }
         if (childType == OrganismType.FOX && Math.random() < 0.3) {
             double r = Math.random();
-            if (r < 0.25) return "reproductive-efficiency";
-            else if (r < 0.50) return "nutrient-dependent-reproduction";
-            else if (r < 0.75) return "fox-energy-converter";
-            else return "mutualist-synergy";
+            if (r < 0.20) return "reproductive-efficiency";
+            else if (r < 0.40) return "nutrient-dependent-reproduction";
+            else if (r < 0.60) return "fox-energy-converter";
+            else if (r < 0.80) return "mutualist-synergy";
+            else return "fox-stamina";
         }
         if (childType == OrganismType.ROOT_NETWORK && Math.random() < 0.3) {
             double r = Math.random();
@@ -675,6 +676,9 @@ public class TraitRegistry {
                 break;
             case "fox-reproductive-converter":
                 if (organism.type() == OrganismType.FOX) return new MetabolicEffect(0, 20, new GardenEvent(cycle, "%s optimized its reproductive energy storage.".formatted(organism.id())));
+                break;
+            case "fox-stamina":
+                if (organism.type() == OrganismType.FOX) return new MetabolicEffect(-2, 2, new GardenEvent(cycle, "%s sustained itself with high fox-stamina.".formatted(organism.id())));
                 break;
             case "fox-metabolic-efficiency":
                 if (organism.type() == OrganismType.FOX) {
