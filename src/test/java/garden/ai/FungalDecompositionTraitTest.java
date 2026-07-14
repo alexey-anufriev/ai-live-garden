@@ -21,8 +21,8 @@ public class FungalDecompositionTraitTest {
         
         // Base contribution for 1 fungus (bufferBonus=2)
         // FungusCount(1) * 2 * bufferBonus(2) = 4
-        // DecomposerEfficiencyCount(1) * 120 = 120
-        // Total = 124
+        // DecomposerEfficiencyCount(1) * 200 = 200
+        // Total = 204
         
         List<Organism> organismsNoTrait = new ArrayList<>();
         organismsNoTrait.add(Organism.of("fungus-2", OrganismType.FUNGUS, 10, 1));
@@ -39,6 +39,6 @@ public class FungalDecompositionTraitTest {
         
         TraitRegistry.MetabolicEffect effect = TraitRegistry.getMetabolicEffect("fungal-decomposition-efficiency", 1, fungus, env, 0, 0);
         
-        assertEquals(12, effect.energyBonus(), "Fungal decomposition efficiency should provide an energy bonus of 12");
+        assertEquals(15, effect.energyBonus(), "Fungal decomposition efficiency should provide an energy bonus of 15");
     }
 }
