@@ -19,7 +19,7 @@ public class RootNetworkNutrientAmplifierTest {
         
         assertTrue(contributionWithTrait > contributionWithoutTrait, 
             "Contribution with trait should be higher: " + contributionWithTrait + " > " + contributionWithoutTrait);
-        assertEquals(20, contributionWithTrait - contributionWithoutTrait, 
-            "Difference should be exactly 20");
+        assertEquals(30, contributionWithTrait - contributionWithoutTrait, 
+            "Difference should be exactly 30");
     }
 }

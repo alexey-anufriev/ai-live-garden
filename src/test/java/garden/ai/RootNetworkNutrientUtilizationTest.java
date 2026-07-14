@@ -36,8 +36,8 @@ public class RootNetworkNutrientUtilizationTest {
         
         int contribution = TraitRegistry.calculateRootContribution(java.util.List.of(root), env, 0);
         
-        // Bonus for root-nutrient-utilizer is 15. Plus base contribution of 1 (rootNetworkCount(1)/2 = 0, + 1 = 1)
-        // Math.max(1, 1/2) + 15 = 1 + 15 = 16.
-        assertThat(contribution).isEqualTo(16);
+        // Bonus for root-nutrient-utilizer is 25. Plus base contribution of 1 (rootNetworkCount(1)/2 = 0, + 1 = 1)
+        // Math.max(1, 1/2) + 25 = 1 + 25 = 26.
+        assertThat(contribution).isEqualTo(26);
     }
 }

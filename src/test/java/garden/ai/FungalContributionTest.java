@@ -72,8 +72,8 @@ public class FungalContributionTest {
         // Environment: (50, 50, 50, 50, 50) - Nutrients >= 25
         Garden garden = new Garden(1, 1, new Environment(50, 50, 50, 50, 50), List.of(root1), List.of());
         
-        // Count: 1 ROOT_NETWORK (1/2 = 0, Math.max(1, 0) = 1), 1 root-soil-enricher (10 bonus) = 11
-        assertEquals(11, garden.rootContribution());
+        // Count: 1 ROOT_NETWORK (1/2 = 0, Math.max(1, 0) = 1), 1 root-soil-enricher (15 bonus) = 16
+        assertEquals(16, garden.rootContribution());
     }
 
     @Test
