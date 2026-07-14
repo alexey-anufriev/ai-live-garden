@@ -361,14 +361,16 @@ public class TraitRegistry {
         if (hunter.type() == OrganismType.FOX && hunter.traits().contains("beetle-predation-optimizer") && prey.type() == OrganismType.BEETLE) {
             long beetleCount = allOrganisms.stream().filter(o -> o.type() == OrganismType.BEETLE).count();
             int densityBonus = Math.min(10, (int) (beetleCount / 1000));
-            bite += 5 + densityBonus;
+            int stabilizationPenalty = (beetleCount < 2000) ? 3 : 0;
+            bite += Math.max(1, 5 + densityBonus - stabilizationPenalty);
 
             if (hunter.traits().contains("coordinated-predator")) {
                 bite += 5;
             }
 
             String synergyBonusText = hunter.traits().contains("coordinated-predator") ? " + synergy bonus: 5" : "";
-            events.add(new GardenEvent(cycle, "%s optimized beetle predation efficiency (base + density bonus: %d%s).".formatted(hunter.id(), densityBonus, synergyBonusText)));
+            String penaltyText = (stabilizationPenalty > 0) ? " - penalty: %d".formatted(stabilizationPenalty) : "";
+            events.add(new GardenEvent(cycle, "%s optimized beetle predation efficiency (base + density bonus: %d%s%s).".formatted(hunter.id(), densityBonus, synergyBonusText, penaltyText)));
         }
         if (hunter.traits().contains("predator-synergy") && hunter.type() == OrganismType.FOX) {
             long foxCount = allOrganisms.stream().filter(o -> o.type() == OrganismType.FOX && o.energy() > 0 && !o.id().equals(hunter.id())).count();
