@@ -14,8 +14,8 @@ public class FoxMetabolicEfficiencyTest {
         TraitRegistry.MetabolicEffect effect = TraitRegistry.getMetabolicEffect("fox-metabolic-efficiency", 1, fox, env, 0, 0);
         
         assertNotNull(effect);
-        assertEquals(-1, effect.metabolismChange());
-        assertEquals(5, effect.energyBonus());
+        assertEquals(-2, effect.metabolismChange());
+        assertEquals(8, effect.energyBonus());
         assertTrue(effect.event().description().contains("thrived with high metabolic efficiency"));
     }
 
@@ -27,8 +27,8 @@ public class FoxMetabolicEfficiencyTest {
         TraitRegistry.MetabolicEffect effect = TraitRegistry.getMetabolicEffect("fox-metabolic-efficiency", 1, fox, env, 0, 0);
         
         assertNotNull(effect);
-        assertEquals(0, effect.metabolismChange());
-        assertEquals(2, effect.energyBonus());
+        assertEquals(-1, effect.metabolismChange());
+        assertEquals(4, effect.energyBonus());
         assertTrue(effect.event().description().contains("maintained metabolic efficiency"));
     }
     
