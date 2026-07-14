@@ -139,5 +139,24 @@ class OrganismInteractionCalculatorTest {
         // Should have fed, energy increases
         assertThat(fedFox.energy()).isGreaterThan(20);
     }
+
+    @Test
+    void beetleReproductionRestrictedAtHighPopulation() {
+        Environment env = new Environment(50, 50, 50, 100, 100);
+        // Create 14000 total organisms, 3001 of them being beetles
+        List<Organism> organisms = IntStream.range(0, 14000)
+                .mapToObj(i -> {
+                    if (i < 3001) {
+                        return Organism.of("beetle-" + i, OrganismType.BEETLE, 10, 1);
+                    } else {
+                        return Organism.of("moss-" + i, OrganismType.MOSS, 10, 1);
+                    }
+                })
+                .collect(Collectors.toList());
+        
+        // Should be restricted
+        int budget = OrganismInteractionCalculator.typeBirthBudget(OrganismType.BEETLE, organisms, env);
+        assertThat(budget).isEqualTo(0);
+    }
 }
 
