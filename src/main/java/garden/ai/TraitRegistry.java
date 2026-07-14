@@ -670,6 +670,12 @@ public class TraitRegistry {
             case "fox-reproductive-converter":
                 if (organism.type() == OrganismType.FOX) return new MetabolicEffect(0, 20, new GardenEvent(cycle, "%s optimized its reproductive energy storage.".formatted(organism.id())));
                 break;
+            case "fox-metabolic-efficiency":
+                if (organism.type() == OrganismType.FOX) {
+                    if (environment.nutrientBuffer() > 50) return new MetabolicEffect(-1, 5, new GardenEvent(cycle, "%s thrived with high metabolic efficiency.".formatted(organism.id())));
+                    else return new MetabolicEffect(0, 2, new GardenEvent(cycle, "%s maintained metabolic efficiency.".formatted(organism.id())));
+                }
+                break;
             case "predator-scout":
                 if (environment.nutrients() < 25) return new MetabolicEffect(-1, 0, new GardenEvent(cycle, "%s scouted for prey in scarce conditions.".formatted(organism.id())));
                 break;
