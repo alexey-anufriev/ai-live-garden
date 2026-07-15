@@ -389,9 +389,12 @@ public class OrganismInteractionCalculator {
             int typeBirthBudget = typeBirthBudget(childType, context.organisms(), context.environment());
             int birthsForType = birthsByType.getOrDefault(childType, 0);
             boolean hasBirthCapacity = birthsThisCycle < totalBirthBudget && birthsForType < typeBirthBudget;
+            boolean isBeetleReproduction = (organism.type() == OrganismType.BEETLE);
+            long beetleCount = context.organisms().stream().filter(o -> o.type() == OrganismType.BEETLE).count();
             boolean canReproduce = hasBirthCapacity
                     && (organism.energy() >= reproductionThreshold(organism, context.environment(), context.fungalContribution(), context.organisms())
-                    || (isFungalSuccession && organism.energy() >= 4));
+                    || (isFungalSuccession && organism.energy() >= 4)
+                    || (isBeetleReproduction && beetleCount == 1 && organism.energy() >= 8));
 
             if (organism.traits().contains("stressed") && !organism.traits().contains("fungal-symbiote") && !isFungalSuccession && !isNutrientPioneer) {
                 canReproduce = false;
