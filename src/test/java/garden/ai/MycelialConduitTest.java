@@ -19,9 +19,9 @@ public class MycelialConduitTest {
         // Fungal network (to trigger conduit effect)
         Organism fungus = Organism.of("fungus-1", OrganismType.FUNGUS, 10, 1);
         
-        // Add 10 beetles so that beetle-recovery trait is not added
+        // Add 100 beetles so that beetle-recovery trait is not added
         List<Organism> beetles = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 100; i++) {
             beetles.add(Organism.of("beetle-" + i, OrganismType.BEETLE, 10, 2));
         }
         
