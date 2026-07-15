@@ -153,7 +153,8 @@ public class OrganismInteractionCalculator {
             }
             changed = changed.withEnergy(changed.energy() + growth);
         } else {
-            TraitRegistry.MetabolicEffect result = TraitRegistry.calculateMetabolism(context.cycle(), changed, context.environment(), context.contribution().mossContribution(), context.contribution().fungalContribution(), context.contribution().fungalAttractorContribution());
+            long beetleCount = context.allOrganisms().stream().filter(o -> o.type() == OrganismType.BEETLE).count();
+            TraitRegistry.MetabolicEffect result = TraitRegistry.calculateMetabolism(context.cycle(), changed, context.environment(), context.contribution().mossContribution(), context.contribution().fungalContribution(), context.contribution().fungalAttractorContribution(), beetleCount);
             if (result.event() != null) {
                 context.events().add(result.event());
             }

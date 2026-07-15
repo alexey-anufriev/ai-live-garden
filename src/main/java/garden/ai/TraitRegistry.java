@@ -159,13 +159,13 @@ public class TraitRegistry {
     return Optional.empty();
     }
 
-    public static MetabolicEffect calculateMetabolism(int cycle, Organism organism, Environment environment, int mossContribution, int fungalContribution, int fungalAttractorContribution) {
+    public static MetabolicEffect calculateMetabolism(int cycle, Organism organism, Environment environment, int mossContribution, int fungalContribution, int fungalAttractorContribution, long beetleCount) {
     int metabolism = organism.type().metabolism();
     int energyBonus = 0;
     List<GardenEvent> events = new ArrayList<>();
 
     for (String trait : organism.traits()) {
-        MetabolicEffect effect = getMetabolicEffect(trait, cycle, organism, environment, fungalContribution, mossContribution);
+        MetabolicEffect effect = getMetabolicEffect(trait, cycle, organism, environment, fungalContribution, mossContribution, beetleCount);
         if (effect != null) {
             metabolism = Math.max(0, metabolism + effect.metabolismChange());
             energyBonus += effect.energyBonus();
@@ -601,7 +601,7 @@ public class TraitRegistry {
         return null;
     }
 
-    public static MetabolicEffect getMetabolicEffect(String trait, int cycle, Organism organism, Environment environment, int fungalContribution, int mossContribution) {
+    public static MetabolicEffect getMetabolicEffect(String trait, int cycle, Organism organism, Environment environment, int fungalContribution, int mossContribution, long beetleCount) {
         switch (trait) {
             case "resilient":
                 return new MetabolicEffect(1, 0, null);
@@ -697,8 +697,21 @@ public class TraitRegistry {
                 break;
             case "fox-metabolic-efficiency":
                 if (organism.type() == OrganismType.FOX) {
-                    if (environment.nutrientBuffer() > 50) return new MetabolicEffect(-2, 8, new GardenEvent(cycle, "%s thrived with high metabolic efficiency.".formatted(organism.id())));
-                    else return new MetabolicEffect(-1, 4, new GardenEvent(cycle, "%s maintained metabolic efficiency.".formatted(organism.id())));
+                    int metaReduction = -1;
+                    int energyBonus = 4;
+                    String eventDesc = "%s maintained metabolic efficiency.".formatted(organism.id());
+                    
+                    if (environment.nutrientBuffer() > 50) {
+                        metaReduction = -2;
+                        energyBonus = 8;
+                        eventDesc = "%s thrived with high metabolic efficiency.".formatted(organism.id());
+                    }
+                    if (beetleCount >= 0 && beetleCount < 10) {
+                        metaReduction -= 1;
+                        energyBonus += 2;
+                        eventDesc = "%s thrived with high metabolic efficiency.".formatted(organism.id());
+                    }
+                    return new MetabolicEffect(metaReduction, energyBonus, new GardenEvent(cycle, eventDesc));
                 }
                 break;
             case "predator-scout":
@@ -708,6 +721,9 @@ public class TraitRegistry {
         return null;
     }
 
+    public static MetabolicEffect getMetabolicEffect(String trait, int cycle, Organism organism, Environment environment, int fungalContribution, int mossContribution) {
+        return getMetabolicEffect(trait, cycle, organism, environment, fungalContribution, mossContribution, -1);
+    }
     public static boolean canEat(OrganismType eater, OrganismType eaten) {
         return eater.prey().contains(eaten);
     }
