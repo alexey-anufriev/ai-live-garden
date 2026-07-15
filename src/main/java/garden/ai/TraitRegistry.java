@@ -313,6 +313,8 @@ public class TraitRegistry {
         int decayPressure = (int) Math.min((context.mossCount() + context.beetleCount()) / 50, 20);
 
         int beetlePressure = (int) Math.min(context.beetleCount() / 500, 20);
+        int absencePressure = (context.beetleCount() == 0) ? 10 : 0;
+        int decompositionPressure = Math.max(beetlePressure, absencePressure);
 
         return (int) (context.fungusCount() * 2 * bufferBonus +
                       context.decomposerCount() * (30 + decayPressure) * bufferBonus +
@@ -323,8 +325,8 @@ public class TraitRegistry {
                       context.fungalEnhancerCount() * 8 +
                       context.fungalBufferStabilizerCount() * 12 +
                       context.fungalDecomposerAcceleratorCount() * 45 +
-                      context.fungalDecompositionEfficiencyCount() * (200 + beetlePressure * 10) +
-                      context.fungalBeetleSpecialistCount() * (250 + beetlePressure * 12) +
+                      context.fungalDecompositionEfficiencyCount() * (200 + decompositionPressure * 10) +
+                      context.fungalBeetleSpecialistCount() * (250 + decompositionPressure * 12) +
                       context.fungalMetabolicAmplifierCount() * 200 +
                       context.fungalNutrientAmplifierCount() * 30 +
                       context.fungalEnergyConverterCount() * 100 * bufferBonus +
