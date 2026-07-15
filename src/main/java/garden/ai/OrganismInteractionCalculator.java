@@ -435,9 +435,9 @@ public class OrganismInteractionCalculator {
             identifier++;
         }
 
-        long currentAnimalCount = next.stream().filter(o -> o.type().isAnimal()).count();
+        long currentBeetleCount = next.stream().filter(o -> o.type() == OrganismType.BEETLE).count();
         long currentPlantCount = next.stream().filter(o -> o.type().isPlant()).count();
-        if (currentAnimalCount == 0 && currentPlantCount > 200 && !Boolean.getBoolean("disable.emergency.colonization") && random.nextInt(colonizationChance) == 0) {
+        if (currentBeetleCount == 0 && currentPlantCount > 200 && !Boolean.getBoolean("disable.emergency.colonization") && random.nextInt(colonizationChance) == 0) {
             OrganismType herbivore = OrganismType.BEETLE;
             String id = herbivore.name().toLowerCase(Locale.ROOT).replace('_', '-') + "-" + identifier;
             next.add(Organism.of(id, herbivore, 5, 2, "emergency-colonizer"));
