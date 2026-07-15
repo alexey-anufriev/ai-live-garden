@@ -360,6 +360,17 @@ public class TraitRegistry {
             bite += 2;
             events.add(new GardenEvent(cycle, "%s specialized in beetle hunting.".formatted(hunter.id())));
         }
+        if (hunter.type() == OrganismType.FOX && prey.type() == OrganismType.BEETLE) {
+            long beetleCount = allOrganisms.stream().filter(o -> o.type() == OrganismType.BEETLE).count();
+            if (beetleCount < 100) {
+                bite = Math.max(1, bite - 2);
+                events.add(new GardenEvent(cycle, "%s was significantly hindered by beetle scarcity.".formatted(hunter.id())));
+            } else if (beetleCount < 500) {
+                bite = Math.max(1, bite - 1);
+                events.add(new GardenEvent(cycle, "%s was slightly hindered by beetle scarcity.".formatted(hunter.id())));
+            }
+        }
+        
         if (hunter.type() == OrganismType.FOX && hunter.traits().contains("beetle-predation-optimizer") && prey.type() == OrganismType.BEETLE) {
             long beetleCount = allOrganisms.stream().filter(o -> o.type() == OrganismType.BEETLE).count();
             int densityBonus = Math.min(10, (int) (beetleCount / 1000));

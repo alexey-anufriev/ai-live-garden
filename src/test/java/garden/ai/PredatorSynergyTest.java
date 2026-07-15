@@ -15,8 +15,17 @@ public class PredatorSynergyTest {
         Organism beetle = Organism.of("beetle-1", OrganismType.BEETLE, 10, 4, "test");
         Environment env = new Environment(50, 50, 50, 50, 50);
         
+        java.util.List<Organism> allOrganisms = new java.util.ArrayList<>();
+        allOrganisms.add(fox1);
+        allOrganisms.add(fox2);
+        allOrganisms.add(fox3);
+        allOrganisms.add(beetle);
+        for(int i = 0; i < 500; i++) {
+            allOrganisms.add(Organism.of("beetle-" + i, OrganismType.BEETLE, 10, 4, "test"));
+        }
+        
         // FOX base = 3. Synergy with 2 other foxes = +2. Total = 5.
-        TraitRegistry.BiteEffect result = TraitRegistry.calculateBite(fox1, beetle, env, 0, 0, List.of(fox1, fox2, fox3, beetle));
+        TraitRegistry.BiteEffect result = TraitRegistry.calculateBite(fox1, beetle, env, 0, 0, allOrganisms);
         assertEquals(5, result.biteSize(), "Predator with synergy and 2 other foxes should have bite size 5");
         assertTrue(result.events().stream().anyMatch(e -> e.description().contains("synergy")), "Should have a synergy event");
     }
