@@ -154,8 +154,9 @@ public class OrganismInteractionCalculator {
             changed = changed.withEnergy(changed.energy() + growth);
         } else {
             long beetleCount = context.allOrganisms().stream().filter(o -> o.type() == OrganismType.BEETLE).count();
-            if (organism.type() == OrganismType.BEETLE && beetleCount < 10 && !changed.traits().contains("beetle-recovery")) {
+            if (organism.type() == OrganismType.BEETLE && beetleCount < 10) {
                 changed = changed.withTrait("beetle-recovery");
+                changed = changed.withTrait("prolific");
             }
             TraitRegistry.MetabolicEffect result = TraitRegistry.calculateMetabolism(context.cycle(), changed, context.environment(), context.contribution().mossContribution(), context.contribution().fungalContribution(), context.contribution().fungalAttractorContribution(), beetleCount);
             if (result.event() != null) {

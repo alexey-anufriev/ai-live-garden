@@ -20,5 +20,6 @@ public class BeetleRecoveryTraitAssignmentTest {
         List<Organism> changed = OrganismInteractionCalculator.calculatePassiveChanges(context);
         
         assertTrue(changed.get(0).traits().contains("beetle-recovery"), "Beetle should receive 'beetle-recovery' trait when population is 1");
+        assertTrue(changed.get(0).traits().contains("prolific"), "Beetle should receive 'prolific' trait when population is 1");
     }
 }
