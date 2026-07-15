@@ -2,6 +2,7 @@ package garden.ai;
 
 import org.junit.jupiter.api.Test;
 import java.util.List;
+import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -18,8 +19,18 @@ public class MycelialConduitTest {
         // Fungal network (to trigger conduit effect)
         Organism fungus = Organism.of("fungus-1", OrganismType.FUNGUS, 10, 1);
         
-        List<Organism> organisms = List.of(beetle, fungus);
-        Garden garden = new Garden(0, 2, env, organisms, List.of());
+        // Add 10 beetles so that beetle-recovery trait is not added
+        List<Organism> beetles = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            beetles.add(Organism.of("beetle-" + i, OrganismType.BEETLE, 10, 2));
+        }
+        
+        List<Organism> organisms = new ArrayList<>();
+        organisms.add(beetle);
+        organisms.add(fungus);
+        organisms.addAll(beetles);
+        
+        Garden garden = new Garden(0, 12, env, organisms, List.of());
         
         // Trigger nextCycle, which includes passiveChange
         Garden nextGarden = garden.nextCycle();

@@ -698,6 +698,11 @@ public class TraitRegistry {
             case "fox-reproductive-converter":
                 if (organism.type() == OrganismType.FOX) return new MetabolicEffect(0, 20, new GardenEvent(cycle, "%s optimized its reproductive energy storage.".formatted(organism.id())));
                 break;
+            case "beetle-recovery":
+                if (organism.type() == OrganismType.BEETLE && beetleCount < 10) {
+                    return new MetabolicEffect(0, 5, new GardenEvent(cycle, "%s gained energy for population recovery.".formatted(organism.id())));
+                }
+                break;
             case "fox-stamina":
                 if (organism.type() == OrganismType.FOX) return new MetabolicEffect(-2, 2, new GardenEvent(cycle, "%s sustained itself with high fox-stamina.".formatted(organism.id())));
                 break;
