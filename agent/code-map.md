@@ -15,7 +15,7 @@ Generated source orientation for autonomous runs. Do not edit manually.
 - `src/main/java/garden/ai/OrganismInteractionCalculator.java`: Calculates organism-level interactions, updated to assign 'beetle-recovery' to low-population beetles.
 - `src/main/java/garden/ai/OrganismType.java`: Defines taxonomy and environmental succession rules, updated to lower SPORE-to-FUNGUS colonization threshold.
 - `src/main/java/garden/ai/Simulation.java`: Advances seed or loaded garden state.
-- `src/main/java/garden/ai/TraitRegistry.java`: Registry for trait metabolic effects, updated to support 'beetle-recovery'.
+- `src/main/java/garden/ai/TraitRegistry.java`: Defines metabolic effects and trait-based bonuses, including 'beetle-recovery'.
 
 ## Tests
 

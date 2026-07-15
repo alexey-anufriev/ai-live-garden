@@ -14,7 +14,7 @@ public class BeetleRecoveryTest {
         // Pass a beetleCount < 10
         TraitRegistry.MetabolicEffect effect = TraitRegistry.calculateMetabolism(1, beetle, env, 0, 0, 0, 1);
         
-        assertTrue(effect.energyBonus() > 0, "Beetle with beetle-recovery should get energy bonus when population is low");
+        assertTrue(effect.energyBonus() >= 15, "Beetle with beetle-recovery should get significant energy bonus when population is low");
         
         // Pass a beetleCount >= 10
         TraitRegistry.MetabolicEffect effect2 = TraitRegistry.calculateMetabolism(1, beetle, env, 0, 0, 0, 10);
