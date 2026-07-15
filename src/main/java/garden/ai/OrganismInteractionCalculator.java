@@ -476,6 +476,13 @@ public class OrganismInteractionCalculator {
             threshold = 14;
         } else if (organism.type() == OrganismType.FOX) {
             threshold = 15;
+        } else if (organism.type() == OrganismType.BEETLE) {
+            long beetleCount = organisms.stream().filter(o -> o.type() == OrganismType.BEETLE).count();
+            if (beetleCount < 100) {
+                threshold = 13;
+            } else if (beetleCount < 500) {
+                threshold = 14;
+            }
         }
         
         if (environment.nutrients() < 25) {
