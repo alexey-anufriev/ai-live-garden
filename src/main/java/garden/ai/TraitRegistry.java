@@ -90,8 +90,14 @@ public class TraitRegistry {
     Predicate<Organism> isValidPrey = candidate -> {
         if (candidate.energy() <= 0 || !TraitRegistry.canEat(hunter.type(), candidate.type())) return false;
 
+        // Critical protection for beetle population
+        if (candidate.type() == OrganismType.BEETLE) {
+            long totalBeetles = organisms.stream().filter(o -> o.type() == OrganismType.BEETLE).count();
+            if (totalBeetles < 1 && !hunter.traits().contains("beetle-predation-optimizer")) return false;
+        }
+
         boolean bypassStealth = stealthHunter || isApexPredator || isPredatorScout ||
-            (hunter.traits().contains("coordinated-predator") && 
+            (hunter.traits().contains("coordinated-predator") &&
              organisms.stream().filter(o -> o.type() == OrganismType.FOX && o.energy() > 0 && !o.id().equals(hunter.id())).count() > 0);
 
         if (!bypassStealth) {
@@ -100,7 +106,6 @@ public class TraitRegistry {
         }
         return true;
     };
-
     if (nutrientScout || resourceTracker) {
         for (int i = 0; i < organisms.size(); i++) {
             if (i == hunterIndex) continue;
@@ -129,6 +134,7 @@ public class TraitRegistry {
         for (int i = 0; i < organisms.size(); i++) {
             if (i == hunterIndex) continue;
             Organism candidate = organisms.get(i);
+            
             if (isValidPrey.test(candidate) && candidate.energy() > maxEnergy) {
                 maxEnergy = candidate.energy();
                 bestIndex = i;

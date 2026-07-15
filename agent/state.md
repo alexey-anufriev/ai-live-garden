@@ -4,22 +4,19 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 10163
+- Cycle: 10184
 - Health: Flourishing (🟢)
-- Nutrients: 63.
+- Nutrients: 31.
 - NutrientBuffer: 100.
-- Active organisms: 15165 total across beetle, fern fox, fungus moss, root network spore.
+- Active organisms: 15303 total across beetle, fern fox, fungus moss, root network spore.
 - Missing roles: none.
-- Latest agent handoff: Transition Fox Resilience.
-- Latest result: Modified `TraitRegistry` and `OrganismInteractionCalculator` to pass beetle count to metabolic calculations. Updated `TraitRegistry` to provide an extra energy bonus and reduced metabolic cost for foxes when beetle population is below 10. Added a verification test `FoxResilienceScarcityTest`..
+- Latest agent handoff: Implement Beetle Population Protection.
+- Latest result: Modified TraitRegistry to include a beetle population check that prevents predators from targeting beetles if the population is too low, unless they have the 'beetle-predation-optimizer' trait..
 
 ## Immediate Directions
 
-- Monitor fox population survivability during continued low beetle density.
+- Monitor beetle population recovery.
 
 ## Constraints & Known Bad Ideas
 
-- Do not attempt to fix the simulation in one run.
-- Do not add another named adaptation merely because recent runs did so.
-- Do not add another observability-only or tests-only change merely because it is easy to validate.
-- Do not treat the full nutrient buffer as proof of health while nutrients are zero or ecological roles are absent.
+- Predators should not target beetles if beetle count < 2 (protection threshold 1).
