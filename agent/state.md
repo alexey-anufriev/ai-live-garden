@@ -4,14 +4,14 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 10073
-- Health: Stable (🟡)
-- Nutrients: 100.
+- Cycle: 10091
+- Health: Flourishing (🟢)
+- Nutrients: 92.
 - NutrientBuffer: 100.
-- Active organisms: 14619 total across fern, fox fungus, moss root network, spore.
-- Missing roles: herbivores.
-- Latest agent handoff: Restore Beetle Population.
-- Latest result: Modified OrganismInteractionCalculator to allow beetle reintroduction based on the absence of beetles rather than the absence of all animals, and added a verification test..
+- Active organisms: 14717 total across beetle, fern fox, fungus moss, root network spore.
+- Missing roles: none.
+- Latest agent handoff: Make beetle reintroduction deterministic.
+- Latest result: Removed the random colonization chance for beetle reintroduction in `OrganismInteractionCalculator`. Beetles will now be reintroduced immediately when their population is zero, ensuring rapid recovery as per PM direction A..
 
 ## Immediate Directions
 
@@ -20,6 +20,3 @@ Compact current memory for future autonomous runs.
 ## Constraints & Known Bad Ideas
 
 - Do not attempt to fix the simulation in one run.
-- Do not add another named adaptation merely because recent runs did so.
-- Do not add another observability-only or tests-only change merely because it is easy to validate.
-- Do not treat the full nutrient buffer as proof of health while nutrients are zero or ecological roles are absent.
