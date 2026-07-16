@@ -411,6 +411,13 @@ public class OrganismInteractionCalculator {
                 String childId = childType.name().toLowerCase(Locale.ROOT).replace('_', '-') + "-" + identifier;
                 Organism parentAfterBirth = organism.withEnergy(organism.energy() / 2);
                 Organism child = organism.child(childId, childType, TraitRegistry.getMutationTrait(context.cycle(), organism, childType, context.environment()));
+                
+                if (childType == OrganismType.BEETLE) {
+                    if (beetleCount < 100) {
+                        child = child.withTrait("beetle-recovery").withTrait("prolific").withTrait("resourceful-breeder");
+                    }
+                }
+                
                 afterReproduction.add(parentAfterBirth);
                 afterReproduction.add(child);
                 context.events().add(new GardenEvent(context.cycle(), "%s released %s as a new %s.".formatted(
