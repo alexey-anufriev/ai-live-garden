@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class FoxHuntingEfficiencyTest {
     @Test
     public void testFoxSpecialistTracksHighestEnergyPrey() {
-        Organism fox = Organism.of("fox-1", OrganismType.FOX, 10, 8, "fox-specialist");
+        Organism fox = Organism.of("fox-1", OrganismType.FOX, 10, 8, "fox-specialist", "beetle-predation-optimizer");
         Organism lowEnergyBeetle = Organism.of("beetle-1", OrganismType.BEETLE, 5, 4, "test");
         Organism highEnergyBeetle = Organism.of("beetle-2", OrganismType.BEETLE, 20, 4, "test");
         Environment env = new Environment(50, 50, 50, 50, 50);
@@ -26,7 +26,7 @@ public class FoxHuntingEfficiencyTest {
 
     @Test
     public void testApexPredatorTracksHighestEnergyPrey() {
-        Organism fox = Organism.of("fox-1", OrganismType.FOX, 10, 8, "apex-predator");
+        Organism fox = Organism.of("fox-1", OrganismType.FOX, 10, 8, "apex-predator", "beetle-predation-optimizer");
         Organism lowEnergyBeetle = Organism.of("beetle-1", OrganismType.BEETLE, 5, 4, "test");
         Organism highEnergyBeetle = Organism.of("beetle-2", OrganismType.BEETLE, 20, 4, "test");
         Environment env = new Environment(50, 50, 50, 50, 50);

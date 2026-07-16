@@ -93,7 +93,7 @@ public class TraitRegistry {
         // Critical protection for beetle population
         if (candidate.type() == OrganismType.BEETLE) {
             long totalBeetles = organisms.stream().filter(o -> o.type() == OrganismType.BEETLE).count();
-            if (totalBeetles < 2 && !hunter.traits().contains("beetle-predation-optimizer")) return false;
+            if (totalBeetles <= 2 && !hunter.traits().contains("beetle-predation-optimizer")) return false;
         }
 
         boolean bypassStealth = stealthHunter || isApexPredator || isPredatorScout ||

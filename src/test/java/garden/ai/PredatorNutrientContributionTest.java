@@ -11,7 +11,7 @@ public class PredatorNutrientContributionTest {
     public void testPredatorNutrientContribution() {
         // Create a garden with 1 FOX (needs to eat) and 2 BEETLES (prey)
         List<Organism> organisms = new ArrayList<>();
-        organisms.add(Organism.of("fox-1", OrganismType.FOX, 20, 8, "test"));
+        organisms.add(Organism.of("fox-1", OrganismType.FOX, 20, 8, "test", "beetle-predation-optimizer"));
         organisms.add(Organism.of("beetle-1", OrganismType.BEETLE, 20, 4, "test"));
         organisms.add(Organism.of("beetle-2", OrganismType.BEETLE, 20, 4, "test"));
         

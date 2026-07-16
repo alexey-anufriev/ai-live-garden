@@ -10,7 +10,7 @@ public class BeetleSpecialistHuntingTest {
 
     @Test
     void testBeetleSpecialistPrioritizesHighEnergyBeetle() {
-        Organism fox = Organism.of("fox-1", OrganismType.FOX, 10, 8, "beetle-specialist");
+        Organism fox = Organism.of("fox-1", OrganismType.FOX, 10, 8, "beetle-specialist", "beetle-predation-optimizer");
         Organism beetleLowEnergy = Organism.of("beetle-low", OrganismType.BEETLE, 2, 10);
         Organism beetleHighEnergy = Organism.of("beetle-high", OrganismType.BEETLE, 20, 10);
         Environment env = new Environment(50, 50, 50, 50, 50);

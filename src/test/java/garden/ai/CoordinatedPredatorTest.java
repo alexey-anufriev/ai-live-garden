@@ -8,8 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 public class CoordinatedPredatorTest {
     @Test
     public void testCoordinatedPredatorBypassesStealth() {
-        Organism fox1 = Organism.of("fox-1", OrganismType.FOX, 10, 8, "coordinated-predator");
-        Organism fox2 = Organism.of("fox-2", OrganismType.FOX, 10, 8, "coordinated-predator");
+        Organism fox1 = Organism.of("fox-1", OrganismType.FOX, 10, 8, "coordinated-predator", "beetle-predation-optimizer");
+        Organism fox2 = Organism.of("fox-2", OrganismType.FOX, 10, 8, "coordinated-predator", "beetle-predation-optimizer");
         // Beetle with camouflaged trait (should be ignored by normal hunters sometimes)
         Organism beetle1 = Organism.of("beetle-1", OrganismType.BEETLE, 10, 4, "camouflaged");
         Organism beetle2 = Organism.of("beetle-2", OrganismType.BEETLE, 10, 4, "camouflaged");
