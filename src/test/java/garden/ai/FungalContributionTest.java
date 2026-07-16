@@ -81,8 +81,8 @@ public class FungalContributionTest {
         Organism fungus1 = Organism.of("fungus-1", OrganismType.FUNGUS, 10, 1, "fungal-decomposer-accelerator");
         Garden garden = new Garden(1, 1, new Environment(50, 50, 50, 50, 50), List.of(fungus1), List.of());
         
-        // Count: 1 FUNGUS (2 * 2 = 4), 1 decomposer-accelerator (45 bonus) = 49
-        assertEquals(49, garden.fungalContribution());
+        // Count: 1 FUNGUS (2 * 2 = 4), 1 decomposer-accelerator (75 bonus) = 79
+        assertEquals(79, garden.fungalContribution());
     }
 
     @Test

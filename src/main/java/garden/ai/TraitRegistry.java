@@ -330,8 +330,8 @@ public class TraitRegistry {
                       context.fungalAcceleratorCount() * 15 +
                       context.fungalEnhancerCount() * 8 +
                       context.fungalBufferStabilizerCount() * 12 +
-                      context.fungalDecomposerAcceleratorCount() * 45 +
-                      context.fungalDecompositionEfficiencyCount() * (200 + decompositionPressure * 10) +
+                      context.fungalDecomposerAcceleratorCount() * 75 +
+                      context.fungalDecompositionEfficiencyCount() * (300 + decompositionPressure * 15) +
                       context.fungalBeetleSpecialistCount() * (250 + decompositionPressure * 12) +
                       context.fungalMetabolicAmplifierCount() * 200 +
                       context.fungalNutrientAmplifierCount() * 30 +
