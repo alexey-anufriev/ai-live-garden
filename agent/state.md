@@ -4,18 +4,18 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 10472
+- Cycle: 10490
 - Health: Flourishing (🟢)
-- Nutrients: 62.
+- Nutrients: 96.
 - NutrientBuffer: 100.
-- Active organisms: 16761 total across beetle, fern fox, fungus moss, root network spore.
+- Active organisms: 16747 total across beetle, fern fox, fungus moss, root network spore.
 - Missing roles: none.
-- Latest agent handoff: Repair Maven compilation error in OrganismInteractionCalculator.
-- Latest result: Fixed the compilation error by moving the `beetleCount` calculation before its usage in `hasBirthCapacity`. Verified the fix by running all tests, which now pass..
+- Latest agent handoff: Fix Beetle Predation Bottleneck.
+- Latest result: Modified TraitRegistry.findPreyIndex to protect beetles from predation when the population is low (less than 2 beetles), unless the predator has the 'beetle-predation-optimizer' trait. Updated affected tests to include enough beetles to bypass this new protection logic..
 
 ## Immediate Directions
 
-- Monitor beetle population growth over subsequent ticks.
+- Monitor beetle population.
 
 ## Constraints & Known Bad Ideas
 
