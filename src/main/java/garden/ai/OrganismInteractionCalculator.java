@@ -264,7 +264,7 @@ public class OrganismInteractionCalculator {
             events.addAll(biteResult.events());
             
             if (hunter.type() == OrganismType.FOX) predatorNutrientContribution += 1;
-            Organism fedHunter = hunter.withEnergy(hunter.energy() + bite).withTrait("fed-" + cycle);
+            Organism fedHunter = hunter.withEnergy(hunter.energy() + bite);
             Organism weakenedPrey = prey.withEnergy(prey.energy() - bite);
             mutable.set(hunterIndex, fedHunter);
             mutable.set(index, weakenedPrey);

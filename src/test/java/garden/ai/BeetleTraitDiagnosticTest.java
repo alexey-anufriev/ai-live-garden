@@ -12,17 +12,17 @@ public class BeetleTraitDiagnosticTest {
     public void diagnoseBeetleTraits() throws IOException {
         List<String> lines = Files.readAllLines(Paths.get("data/garden-state.txt"));
         List<Organism> organisms = lines.stream()
-                .filter(line -> line.contains("BEETLE"))
+                .filter(line -> line.startsWith("organism=") && line.contains("|BEETLE|"))
                 .map(line -> {
-                    // Very simple parser based on GardenStateStore.java
-                    String[] parts = line.split(" ");
+                    String data = line.substring("organism=".length());
+                    String[] parts = data.split("\\|");
                     String id = parts[0];
                     OrganismType type = OrganismType.valueOf(parts[1]);
-                    int energy = Integer.parseInt(parts[2].split("=")[1]);
-                    int curiosity = Integer.parseInt(parts[3].split("=")[1]);
-                    int generation = Integer.parseInt(parts[4].split("=")[1]);
-                    String traitText = parts[5].split("=")[1];
-                    List<String> traits = traitText.equals("[]") ? List.of() : List.of(traitText.split(","));
+                    int energy = Integer.parseInt(parts[2]);
+                    int curiosity = Integer.parseInt(parts[3]);
+                    int generation = Integer.parseInt(parts[4]);
+                    String traitText = parts[5];
+                    List<String> traits = traitText.isEmpty() ? List.of() : List.of(traitText.split(","));
                     return new Organism(id, type, energy, curiosity, generation, traits);
                 })
                 .collect(Collectors.toList());
