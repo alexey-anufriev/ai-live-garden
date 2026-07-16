@@ -676,7 +676,7 @@ public class TraitRegistry {
                 if (organism.type() == OrganismType.FUNGUS) return new MetabolicEffect(0, 20, new GardenEvent(cycle, "%s converted buffer nutrients directly into reproductive energy.".formatted(organism.id())));
                 break;
             case "fungal-decomposition-efficiency":
-                if (organism.type() == OrganismType.FUNGUS) return new MetabolicEffect(0, 15, new GardenEvent(cycle, "%s optimized its decomposition to gain energy.".formatted(organism.id())));
+                if (organism.type() == OrganismType.FUNGUS) return new MetabolicEffect(0, 25, new GardenEvent(cycle, "%s optimized its decomposition to gain energy.".formatted(organism.id())));
                 break;
             case "fungal-metabolic-amplifier":
                 if (organism.type() == OrganismType.FUNGUS) return new MetabolicEffect(0, 15, new GardenEvent(cycle, "%s amplified its metabolism to gain significant energy.".formatted(organism.id())));
