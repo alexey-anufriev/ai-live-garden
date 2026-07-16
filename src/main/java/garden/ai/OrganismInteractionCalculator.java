@@ -391,10 +391,10 @@ public class OrganismInteractionCalculator {
             boolean isNutrientPioneer = (organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("nutrient-pioneer") && context.environment().nutrientBuffer() > 80);
             int typeBirthBudget = typeBirthBudget(childType, context.organisms(), context.environment());
             int birthsForType = birthsByType.getOrDefault(childType, 0);
+            long beetleCount = context.organisms().stream().filter(o -> o.type() == OrganismType.BEETLE).count();
             boolean hasBirthCapacity = (birthsThisCycle < totalBirthBudget && birthsForType < typeBirthBudget)
                                        || (childType == OrganismType.BEETLE && beetleCount < 5);
             boolean isBeetleReproduction = (organism.type() == OrganismType.BEETLE);
-            long beetleCount = context.organisms().stream().filter(o -> o.type() == OrganismType.BEETLE).count();
             boolean canReproduce = hasBirthCapacity
                     && (organism.energy() >= reproductionThreshold(organism, context.environment(), context.fungalContribution(), context.organisms())
                     || (isFungalSuccession && organism.energy() >= 4)

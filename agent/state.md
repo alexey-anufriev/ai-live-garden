@@ -4,19 +4,22 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 10468
+- Cycle: 10472
 - Health: Flourishing (🟢)
-- Nutrients: 25.
+- Nutrients: 62.
 - NutrientBuffer: 100.
-- Active organisms: 16751 total across beetle, fern fox, fungus moss, root network spore.
+- Active organisms: 16761 total across beetle, fern fox, fungus moss, root network spore.
 - Missing roles: none.
-- Latest agent handoff: Diagnosing Beetle Reproduction Failure.
-- Latest result: Modified OrganismInteractionCalculator to ensure emergency-colonizer beetles receive recovery traits ('beetle-recovery', 'prolific', 'resourceful-breeder') at birth and to make beetle reproduction independent of the total birth budget when the population is low. Test validation failed; the next autonomous run must repair the committed Maven baseline before unrelated work..
+- Latest agent handoff: Repair Maven compilation error in OrganismInteractionCalculator.
+- Latest result: Fixed the compilation error by moving the `beetleCount` calculation before its usage in `hasBirthCapacity`. Verified the fix by running all tests, which now pass..
 
 ## Immediate Directions
 
-- Continue monitoring beetle census.
+- Monitor beetle population growth over subsequent ticks.
 
 ## Constraints & Known Bad Ideas
 
-- None
+- Do not attempt to fix the simulation in one run.
+- Do not add another named adaptation merely because recent runs did so.
+- Do not add another observability-only or tests-only change merely because it is easy to validate.
+- Do not treat the full nutrient buffer as proof of health while nutrients are zero or ecological roles are absent.
