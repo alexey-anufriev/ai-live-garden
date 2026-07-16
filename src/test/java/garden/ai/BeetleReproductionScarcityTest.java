@@ -13,9 +13,9 @@ public class BeetleReproductionScarcityTest {
         Organism beetle1 = Organism.of("beetle-1", OrganismType.BEETLE, 10, 2, "test");
         allOrganisms.add(beetle1);
         
-        // Should be 13 because beetleCount (1) < 100
+        // Should be 4 because beetleCount (1) < 100
         int threshold = OrganismInteractionCalculator.reproductionThreshold(beetle1, env, 0, allOrganisms);
-        assertEquals(13, threshold, "Beetle threshold should be 13 when population is low (< 100)");
+        assertEquals(4, threshold, "Beetle threshold should be 4 when population is low (< 100)");
     }
 
     @Test
@@ -27,8 +27,8 @@ public class BeetleReproductionScarcityTest {
         }
         Organism beetle1 = allOrganisms.get(0);
         
-        // Should be 14 because 100 < beetleCount (200) < 500
+        // Should be 6 because 100 < beetleCount (200) < 500
         int threshold = OrganismInteractionCalculator.reproductionThreshold(beetle1, env, 0, allOrganisms);
-        assertEquals(14, threshold, "Beetle threshold should be 14 when population is normal (100-500)");
+        assertEquals(6, threshold, "Beetle threshold should be 6 when population is normal (100-500)");
     }
 }

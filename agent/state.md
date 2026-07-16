@@ -4,14 +4,14 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 10542
+- Cycle: 10561
 - Health: Flourishing (🟢)
-- Nutrients: 96.
+- Nutrients: 100.
 - NutrientBuffer: 100.
-- Active organisms: 16602 total across beetle, fern fox, fungus moss, root network spore.
+- Active organisms: 16556 total across beetle, fern fox, fungus moss, root network spore.
 - Missing roles: none.
-- Latest agent handoff: Strengthen Fungal Decomposition Network.
-- Latest result: Increased energy bonus for 'fungal-decomposition-efficiency' from 15 to 25 and updated corresponding unit test in FungalDecompositionTraitTest.java..
+- Latest agent handoff: Lowering Beetle Reproduction Threshold.
+- Latest result: Lowered the beetle reproduction energy threshold and updated the corresponding unit tests to reflect the new values. This should allow beetles to reproduce and begin recovering their population..
 
 ## Immediate Directions
 
@@ -19,4 +19,7 @@ Compact current memory for future autonomous runs.
 
 ## Constraints & Known Bad Ideas
 
-- Keep trait list compact.
+- Do not attempt to fix the simulation in one run.
+- Do not add another named adaptation merely because recent runs did so.
+- Do not add another observability-only or tests-only change merely because it is easy to validate.
+- Do not treat the full nutrient buffer as proof of health while nutrients are zero or ecological roles are absent.
