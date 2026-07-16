@@ -345,6 +345,8 @@ public class OrganismInteractionCalculator {
         long total = organisms.size();
         long typeCount = organisms.stream().filter(organism -> organism.type() == childType).count();
 
+        if (childType == OrganismType.BEETLE && typeCount < 10) return 10;
+
         if (total >= DENSITY_PRESSURE_MINIMUM_POPULATION && typeCount * 2 > total) {
             return 0;
         }
@@ -389,7 +391,8 @@ public class OrganismInteractionCalculator {
             boolean isNutrientPioneer = (organism.type() == OrganismType.ROOT_NETWORK && organism.traits().contains("nutrient-pioneer") && context.environment().nutrientBuffer() > 80);
             int typeBirthBudget = typeBirthBudget(childType, context.organisms(), context.environment());
             int birthsForType = birthsByType.getOrDefault(childType, 0);
-            boolean hasBirthCapacity = birthsThisCycle < totalBirthBudget && birthsForType < typeBirthBudget;
+            boolean hasBirthCapacity = (birthsThisCycle < totalBirthBudget && birthsForType < typeBirthBudget)
+                                       || (childType == OrganismType.BEETLE && beetleCount < 5);
             boolean isBeetleReproduction = (organism.type() == OrganismType.BEETLE);
             long beetleCount = context.organisms().stream().filter(o -> o.type() == OrganismType.BEETLE).count();
             boolean canReproduce = hasBirthCapacity
@@ -456,7 +459,8 @@ public class OrganismInteractionCalculator {
         if (currentBeetleCount == 0 && currentPlantCount > 200 && !Boolean.getBoolean("disable.emergency.colonization")) {
             OrganismType herbivore = OrganismType.BEETLE;
             String id = herbivore.name().toLowerCase(Locale.ROOT).replace('_', '-') + "-" + identifier;
-            next.add(Organism.of(id, herbivore, 5, 2, "emergency-colonizer"));
+            Organism beetle = Organism.of(id, herbivore, 5, 2, "emergency-colonizer", "beetle-recovery", "prolific", "resourceful-breeder");
+            next.add(beetle);
             context.events().add(new GardenEvent(context.cycle(), "A new %s arrived to colonize the garden.".formatted(herbivore.displayName())));
             identifier++;
         }
