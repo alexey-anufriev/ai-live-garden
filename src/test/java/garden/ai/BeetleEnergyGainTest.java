@@ -26,7 +26,7 @@ public class BeetleEnergyGainTest {
         
         Organism changed = OrganismInteractionCalculator.calculatePassiveChanges(context).get(0);
         
-        // Base energy 5 + trait energy 15 = 20. Metabolism is 0 if not specified otherwise.
-        assertEquals(19, changed.energy(), "Beetle with beetle-recovery should gain 15 energy, minus 1 base metabolism");
+        // Base energy 5 + trait energy 30 = 35. Metabolism is 1.
+        assertEquals(34, changed.energy(), "Beetle with beetle-recovery should gain 30 energy, minus 1 base metabolism");
     }
 }

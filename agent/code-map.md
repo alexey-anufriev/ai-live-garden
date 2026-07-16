@@ -15,7 +15,7 @@ Generated source orientation for autonomous runs. Do not edit manually.
 - `src/main/java/garden/ai/OrganismInteractionCalculator.java`: Calculates organism-level interactions and manages reproduction/birth logic.
 - `src/main/java/garden/ai/OrganismType.java`: Defines taxonomy and environmental succession rules, updated to lower SPORE-to-FUNGUS colonization threshold.
 - `src/main/java/garden/ai/Simulation.java`: Advances seed or loaded garden state.
-- `src/main/java/garden/ai/TraitRegistry.java`: Defines predation rules and trait effects, now including improved beetle population protection.
+- `src/main/java/garden/ai/TraitRegistry.java`: Defines trait metabolic effects, updated to increase energy gain for beetle recovery.
 
 ## Tests
 
