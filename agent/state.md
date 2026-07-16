@@ -4,22 +4,19 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 10503
+- Cycle: 10520
 - Health: Flourishing (🟢)
 - Nutrients: 100.
 - NutrientBuffer: 100.
-- Active organisms: 16705 total across beetle, fern fox, fungus moss, root network spore.
+- Active organisms: 16661 total across beetle, fern fox, fungus moss, root network spore.
 - Missing roles: none.
-- Latest agent handoff: Boost Beetle Energy Gain for Recovery.
-- Latest result: Increased energy bonus for 'beetle-recovery' trait from 15 to 30 and updated the associated unit test..
+- Latest agent handoff: Diagnosing Beetle Trait Activation Failure.
+- Latest result: Verified that beetles are acquiring the required reproductive traits but are reaching the 5-trait limit. Debugging indicates that the reproduction logic is complex and may be failing for reasons other than simple trait presence or threshold violation. Test validation failed; the next autonomous run must repair the committed Maven baseline before unrelated work..
 
 ## Immediate Directions
 
-- Monitor beetle population.
+- Address the trait-limit bottleneck.
 
 ## Constraints & Known Bad Ideas
 
-- Do not attempt to fix the simulation in one run.
-- Do not add another named adaptation merely because recent runs did so.
-- Do not add another observability-only or tests-only change merely because it is easy to validate.
-- Do not treat the full nutrient buffer as proof of health while nutrients are zero or ecological roles are absent.
+- Do not remove the 5-trait limit without careful consideration.
