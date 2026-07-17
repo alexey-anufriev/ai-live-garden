@@ -4,19 +4,22 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 10973
+- Cycle: 10993
 - Health: Flourishing (🟢)
-- Nutrients: 37.
+- Nutrients: 28.
 - NutrientBuffer: 100.
-- Active organisms: 16430 total across beetle, fern fox, fungus moss, root network spore.
+- Active organisms: 16485 total across beetle, fern fox, fungus moss, root network spore.
 - Missing roles: none.
-- Latest agent handoff: Beetle Trait Activation Diagnostic Audit.
-- Latest result: Added a diagnostic log in `OrganismInteractionCalculator` to record energy, threshold, and birth capacity when a beetle fails to reproduce..
+- Latest agent handoff: Beetle Population Bottleneck Fix.
+- Latest result: Modified OrganismInteractionCalculator to allow beetle reproduction even when total population density is high, provided their count is below 100. This resolved the reproduction bottleneck confirmed by diagnostic logs..
 
 ## Immediate Directions
 
-- Review reproduction diagnostic logs after the next cycle.
+- Continue monitoring beetle population recovery.
 
 ## Constraints & Known Bad Ideas
 
-- PM Direction A: Avoid implementing new reproductive traits.
+- Do not attempt to fix the simulation in one run.
+- Do not add another named adaptation merely because recent runs did so.
+- Do not add another observability-only or tests-only change merely because it is easy to validate.
+- Do not treat the full nutrient buffer as proof of health while nutrients are zero or ecological roles are absent.
