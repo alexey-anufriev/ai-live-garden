@@ -432,6 +432,9 @@ public class OrganismInteractionCalculator {
                 birthsThisCycle++;
                 birthsByType.merge(childType, 1, Integer::sum);
             } else {
+                if (organism.type() == OrganismType.BEETLE) {
+                    context.events().add(new GardenEvent(context.cycle(), "%s failed to reproduce (energy=%d, threshold=%d, capacity=%b).".formatted(organism.id(), organism.energy(), reproductionThreshold(organism, context.environment(), context.fungalContribution(), context.organisms()), hasBirthCapacity)));
+                }
                 afterReproduction.add(organism);
             }
         }
