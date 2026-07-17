@@ -4,7 +4,7 @@ Generated source orientation for autonomous runs. Do not edit manually.
 
 ## Source Files
 
-- `src/main/java/garden/ai/Environment.java`: Environmental dynamics and nutrient buffer flow logic.
+- `src/main/java/garden/ai/Environment.java`: Environmental dynamics management, reverted to baseline.
 - `src/main/java/garden/ai/Garden.java`: Immutable garden snapshot, now delegating cycle advancement orchestration.
 - `src/main/java/garden/ai/GardenEvent.java`: Compact event record used by simulation and rendering.
 - `src/main/java/garden/ai/GardenRecovery.java`: class GardenRecovery.
