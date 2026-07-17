@@ -15,7 +15,7 @@ Generated source orientation for autonomous runs. Do not edit manually.
 - `src/main/java/garden/ai/OrganismInteractionCalculator.java`: Calculates organism-level interactions, now validated for beetle reproduction triggering.
 - `src/main/java/garden/ai/OrganismType.java`: Defines taxonomy and environmental succession rules, updated to lower SPORE-to-FUNGUS colonization threshold.
 - `src/main/java/garden/ai/Simulation.java`: Advances seed or loaded garden state.
-- `src/main/java/garden/ai/TraitRegistry.java`: Registry for organism traits and metabolic logic, now including abundance-based energy gain for foxes.
+- `src/main/java/garden/ai/TraitRegistry.java`: Registry for organism traits and metabolic logic, where the fox metabolic enhancement was implemented.
 
 ## Tests
 

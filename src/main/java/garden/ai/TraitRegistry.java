@@ -729,9 +729,9 @@ public class TraitRegistry {
                         eventDesc = "%s thrived with high metabolic efficiency.".formatted(organism.id());
                     }
                     if (beetleCount >= 0 && beetleCount < 10) {
-                        metaReduction -= 1;
-                        energyBonus += 2;
-                        eventDesc = "%s thrived with high metabolic efficiency.".formatted(organism.id());
+                        metaReduction -= 2;
+                        energyBonus += 4;
+                        eventDesc = "%s thrived with high metabolic efficiency in scarcity.".formatted(organism.id());
                     }
                     return new MetabolicEffect(metaReduction, energyBonus, new GardenEvent(cycle, eventDesc));
                 }

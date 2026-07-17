@@ -21,7 +21,7 @@ public class FoxResilienceScarcityTest {
         TraitRegistry.MetabolicEffect highBeetleResult = TraitRegistry.calculateMetabolism(1, fox, environment, 0, 0, 0, highBeetleCount);
 
         assertTrue(lowBeetleResult.energyBonus() > highBeetleResult.energyBonus(), "Fox should have higher energy bonus when beetle population is low.");
-        assertEquals(6, lowBeetleResult.energyBonus(), "Expected higher energy bonus for fox-metabolic-efficiency with low beetles.");
+        assertEquals(8, lowBeetleResult.energyBonus(), "Expected higher energy bonus for fox-metabolic-efficiency with low beetles.");
         assertEquals(4, highBeetleResult.energyBonus(), "Expected base energy bonus for fox-metabolic-efficiency with high beetles.");
     }
 }
