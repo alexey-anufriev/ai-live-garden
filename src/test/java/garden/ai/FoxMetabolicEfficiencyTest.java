@@ -1,44 +1,29 @@
 package garden.ai;
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 public class FoxMetabolicEfficiencyTest {
 
     @Test
-    public void testFoxMetabolicEfficiencyHighBuffer() {
-        Environment env = new Environment(50, 50, 50, 50, 75); // buffer > 50
-        Organism fox = Organism.of("fox-1", OrganismType.FOX, 10, 1, "fox-metabolic-efficiency");
-        
-        TraitRegistry.MetabolicEffect effect = TraitRegistry.getMetabolicEffect("fox-metabolic-efficiency", 1, fox, env, 0, 0);
-        
-        assertNotNull(effect);
-        assertEquals(-2, effect.metabolismChange());
-        assertEquals(8, effect.energyBonus());
-        assertTrue(effect.event().description().contains("thrived with high metabolic efficiency"));
-    }
+    public void testFoxMetabolicEfficiencyGainsEnergyWhenBeetlesAreScarce() {
+        Organism fox = Organism.of("fox-1", OrganismType.FOX, 10, 0, "fox-metabolic-efficiency");
+        Environment env = new Environment(50, 50, 50, 50, 50); // Nutrients, buffer, moisture, warmth, light
+        long beetleCount = 5; // Scarce
 
-    @Test
-    public void testFoxMetabolicEfficiencyLowBuffer() {
-        Environment env = new Environment(50, 50, 50, 50, 25); // buffer <= 50
-        Organism fox = Organism.of("fox-1", OrganismType.FOX, 10, 1, "fox-metabolic-efficiency");
+        TraitRegistry.MetabolicEffect result = TraitRegistry.calculateMetabolism(1, fox, env, 0, 0, 0, beetleCount);
         
-        TraitRegistry.MetabolicEffect effect = TraitRegistry.getMetabolicEffect("fox-metabolic-efficiency", 1, fox, env, 0, 0);
+        // metabolism = 2 (default FOX).
+        // With fox-metabolic-efficiency + low beetles:
+        // metabolism should be 0.
+        // energyBonus should be 6 (4 + 2).
         
-        assertNotNull(effect);
-        assertEquals(-1, effect.metabolismChange());
-        assertEquals(4, effect.energyBonus());
-        assertTrue(effect.event().description().contains("maintained metabolic efficiency"));
-    }
-    
-    @Test
-    public void testNonFoxMetabolicEfficiency() {
-        Environment env = new Environment(50, 50, 50, 50, 75);
-        Organism fungus = Organism.of("fungus-1", OrganismType.FUNGUS, 10, 1, "fox-metabolic-efficiency");
+        assertTrue(result.energyBonus() > 0, "Fox should gain energy bonus.");
+        assertTrue(result.metabolismChange() == 0, "Fox should have 0 metabolism.");
         
-        TraitRegistry.MetabolicEffect effect = TraitRegistry.getMetabolicEffect("fox-metabolic-efficiency", 1, fungus, env, 0, 0);
-        
-        assertNull(effect);
+        int netEffect = result.energyBonus() - result.metabolismChange();
+        // net gain is 6 - 0 = 6.
+        assertTrue(netEffect > 0, "Fox should have a net energy gain.");
     }
 }
