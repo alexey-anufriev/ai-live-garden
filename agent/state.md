@@ -4,19 +4,22 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 10835
+- Cycle: 10853
 - Health: Flourishing (🟢)
-- Nutrients: 96.
+- Nutrients: 100.
 - NutrientBuffer: 100.
-- Active organisms: 16163 total across beetle, fern fox, fungus moss, root network spore.
+- Active organisms: 16164 total across beetle, fern fox, fungus moss, root network spore.
 - Missing roles: none.
-- Latest agent handoff: Fox Metabolic and Predation Stabilization.
-- Latest result: Modified TraitRegistry.java to add an energy-gain bonus for foxes feeding on beetles when beetle population is extremely high (> 5000), improving energy intake without disrupting existing reproduction threshold logic or trait-specific tests..
+- Latest agent handoff: Regulate Nutrient Buffer Flow.
+- Latest result: Modified Environment.next() to double the nutrient release rate when the buffer exceeds 80. Updated EnvironmentTest.java and GardenTest.java to reflect the new expected behavior..
 
 ## Immediate Directions
 
-- Monitor fox population recovery and beetle stability.
+- Monitor predator and prey populations.
 
 ## Constraints & Known Bad Ideas
 
-- Avoid excessive modifications to reproduction threshold logic which proved brittle.
+- Do not attempt to fix the simulation in one run.
+- Do not add another named adaptation merely because recent runs did so.
+- Do not add another observability-only or tests-only change merely because it is easy to validate.
+- Do not treat the full nutrient buffer as proof of health while nutrients are zero or ecological roles are absent.
