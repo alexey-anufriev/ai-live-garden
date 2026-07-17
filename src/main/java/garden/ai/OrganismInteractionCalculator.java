@@ -526,6 +526,10 @@ public class OrganismInteractionCalculator {
                 threshold -= 8;
             } else if (beetleCount > 2000) {
                 threshold -= 5;
+            } else if (beetleCount > 500) {
+                threshold -= 3;
+            } else if (beetleCount > 250) {
+                threshold -= 2;
             }
         }
         if (organism.type() == OrganismType.ROOT_NETWORK && environment.nutrientBuffer() > 50 && organism.traits().contains("buffer-optimizer")) {

@@ -28,6 +28,22 @@ public class FoxPreyDensityReproductionTest {
         }
         assertEquals(7, OrganismInteractionCalculator.reproductionThreshold(fox, env, 0, organisms5000), "Reproduction threshold for FOX with 5000 beetles should be 7.");
         
+        // Setup: 600 beetles (should trigger -3 reduction)
+        List<Organism> organisms600 = new ArrayList<>();
+        organisms600.add(fox);
+        for (int i = 0; i < 600; i++) {
+            organisms600.add(Organism.of("beetle-" + i, OrganismType.BEETLE, 5, 1, "none"));
+        }
+        assertEquals(12, OrganismInteractionCalculator.reproductionThreshold(fox, env, 0, organisms600), "Reproduction threshold for FOX with 600 beetles should be 12.");
+
+        // Setup: 300 beetles (should trigger -2 reduction)
+        List<Organism> organisms300 = new ArrayList<>();
+        organisms300.add(fox);
+        for (int i = 0; i < 300; i++) {
+            organisms300.add(Organism.of("beetle-" + i, OrganismType.BEETLE, 5, 1, "none"));
+        }
+        assertEquals(13, OrganismInteractionCalculator.reproductionThreshold(fox, env, 0, organisms300), "Reproduction threshold for FOX with 300 beetles should be 13.");
+        
         // Setup: 7000 beetles (should trigger -10 reduction)
         List<Organism> organisms7000 = new ArrayList<>();
         organisms7000.add(fox);
