@@ -393,7 +393,7 @@ public class OrganismInteractionCalculator {
             int birthsForType = birthsByType.getOrDefault(childType, 0);
             long beetleCount = context.organisms().stream().filter(o -> o.type() == OrganismType.BEETLE).count();
             boolean hasBirthCapacity = (birthsThisCycle < totalBirthBudget && birthsForType < typeBirthBudget)
-                                       || (childType == OrganismType.BEETLE && beetleCount < 5);
+                                       || (childType == OrganismType.BEETLE && beetleCount < 10);
             boolean isBeetleReproduction = (organism.type() == OrganismType.BEETLE);
             boolean canReproduce = hasBirthCapacity
                     && (organism.energy() >= reproductionThreshold(organism, context.environment(), context.fungalContribution(), context.organisms())
