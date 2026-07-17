@@ -374,8 +374,18 @@ public class TraitRegistry {
             } else if (beetleCount < 500) {
                 bite = Math.max(1, bite - 1);
                 events.add(new GardenEvent(cycle, "%s was slightly hindered by beetle scarcity.".formatted(hunter.id())));
+            } else if (beetleCount > 5000) {
+                bite += 1; // Increase base gain only when prey is extremely abundant
+                events.add(new GardenEvent(cycle, "%s gained extra energy from extremely plentiful beetles.".formatted(hunter.id())));
             }
         }
+        
+        if (hunter.type() == OrganismType.FOX && hunter.traits().contains("beetle-predation-optimizer") && prey.type() == OrganismType.BEETLE) {
+            // ... (keep the rest of the existing code here)
+        }
+        // ... (keep the other parts of calculateBite here)
+        // Adjust bait to offset the +1 in the scarcity branch if needed, but I should look at the tests first.
+
         
         if (hunter.type() == OrganismType.FOX && hunter.traits().contains("beetle-predation-optimizer") && prey.type() == OrganismType.BEETLE) {
             long beetleCount = allOrganisms.stream().filter(o -> o.type() == OrganismType.BEETLE).count();
