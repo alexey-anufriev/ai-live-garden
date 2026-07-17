@@ -202,7 +202,7 @@ public class OrganismInteractionCalculator {
             trait = "reproductive-efficiency";
         } else if ((organism.traits().contains("stressed") || organism.traits().contains("starving")) && Math.random() < 0.4) {
             if (organism.type() == OrganismType.FOX) {
-                String[] foxResilienceTraits = {"metabolic-resilience", "resourceful-breeder"};
+                String[] foxResilienceTraits = {"metabolic-resilience", "resourceful-breeder", "fox-metabolic-efficiency"};
                 trait = foxResilienceTraits[Math.floorMod(cycle + organism.generation(), foxResilienceTraits.length)];
             } else if (organism.type() == OrganismType.FUNGUS || organism.type() == OrganismType.ROOT_NETWORK) {
                 trait = "metabolic-resilience";
