@@ -8,8 +8,12 @@ trap 'rm -rf "$fixture_root"' EXIT
 grep -Fq 'id: defer_shadow_rejection' "$repository_root/.github/workflows/evolve.yml"
 grep -Fq 'scripts/defer-shadow-rejection.sh' "$repository_root/.github/workflows/evolve.yml"
 grep -Fq 'id: commit_shadow_feedback' "$repository_root/.github/workflows/evolve.yml"
-if grep -Fq 'build-shadow-retry-prompt-output.sh' "$repository_root/.github/workflows/evolve.yml"; then
-  echo "The workflow reintroduced a same-run shadow corrective loop." >&2
+grep -Fq 'id: defer_agent_incomplete' "$repository_root/.github/workflows/evolve.yml"
+grep -Fq 'id: shadow_repair_evaluation' "$repository_root/.github/workflows/evolve.yml"
+grep -Fq "steps.harness_contracts.outcome == 'success'" "$repository_root/.github/workflows/evolve.yml"
+grep -Fq "steps.setup_java.outcome == 'success'" "$repository_root/.github/workflows/evolve.yml"
+if grep -Eq 'build-(agent|shadow)-retry-prompt-output\.sh|Run Gemini corrective retry' "$repository_root/.github/workflows/evolve.yml"; then
+  echo "The workflow reintroduced a same-run corrective agent loop." >&2
   exit 1
 fi
 
@@ -50,6 +54,7 @@ FEEDBACK
     AGENT_CONTEXT_METADATA_FILE="$prompt_metadata" \
     AGENT_CONTEXT_RECENT_JOURNAL_LIMIT=1 \
     AGENT_BASELINE_SHADOW_FILE="$baseline_shadow" \
+    AGENT_BASELINE_SHADOW_OUTCOME=success \
     AGENT_SHADOW_FEEDBACK_FILE="$shadow_feedback" \
     GARDEN_OUTCOME_HISTORY_LIMIT=1 \
     scripts/build-agent-context.sh "$prompt_context"
@@ -61,13 +66,31 @@ grep -Fq '# AI Live Garden Compact Agent Context' "$prompt_outputs"
 grep -Fq '## Baseline Shadow Simulation' "$prompt_outputs"
 grep -Fq '| 17 | 5 | completed | 10 | 20 | 9 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 2 | 9 |' "$prompt_outputs"
 grep -Fq 'scripts/evaluate-shadow-candidate.sh target/agent-baseline-shadow.json' "$prompt_outputs"
-grep -Fq '## Previous Rejected Shadow Hypothesis' "$prompt_outputs"
+grep -Fq '## Previous Autonomous Feedback' "$prompt_outputs"
 grep -Fq 'Previous candidate observed delta: 0.' "$prompt_outputs"
 grep -Fq 'AGENT_CONTEXT_BYTES=' "$prompt_metadata"
 grep -Fq "AGENT_CONTEXT_BASELINE_SHADOW_FILE=${baseline_shadow}" "$prompt_metadata"
+grep -Fq 'AGENT_CONTEXT_BASELINE_SHADOW_OUTCOME=success' "$prompt_metadata"
 grep -Fq "AGENT_CONTEXT_SHADOW_FEEDBACK_FILE=${shadow_feedback}" "$prompt_metadata"
 prompt_delimiter="$(sed -n '1s/^text<<//p' "$prompt_outputs")"
 [[ "$(tail -n 1 "$prompt_outputs")" == "$prompt_delimiter" ]]
+
+failed_shadow="$fixture_root/failed-baseline-shadow.json"
+failed_context="$fixture_root/failed-context.md"
+cat > "$failed_shadow" <<'JSON'
+[{"seed":17,"requestedSteps":5,"completedSteps":0,"status":"timed-out","exitCode":124}]
+JSON
+(
+  cd "$repository_root"
+  AGENT_CONTEXT_METADATA_FILE="$fixture_root/failed-context.metadata" \
+    AGENT_BASELINE_SHADOW_FILE="$failed_shadow" \
+    AGENT_BASELINE_SHADOW_OUTCOME=failure \
+    AGENT_SHADOW_FEEDBACK_FILE="$fixture_root/no-feedback.md" \
+    scripts/build-agent-context.sh "$failed_context"
+)
+grep -Fq 'repair bounded simulation operability' "$failed_context"
+grep -Fq '"status": "timed-out"' "$failed_context"
+grep -Fq 'tests/pass' "$failed_context"
 
 shadow_fixture="$fixture_root/shadow-capture"
 mkdir -p "$shadow_fixture/target/classes/garden/ai"
@@ -113,6 +136,8 @@ if (
   echo "A failed parallel shadow seed incorrectly passed." >&2
   exit 1
 fi
+jq -e '.[] | select(.seed == 99) | .status == "failed" and .exitCode == 7' \
+  "$shadow_fixture/failed.json" >/dev/null
 if (
   cd "$shadow_fixture"
   SHADOW_SIMULATION_RUNNER="$shadow_fixture/fake-java" \
@@ -123,8 +148,11 @@ if (
   echo "A timed-out parallel shadow seed incorrectly passed." >&2
   exit 1
 fi
+jq -e '.[] | select(.seed == 88) | .status == "timed-out" and .exitCode == 124' \
+  "$shadow_fixture/timed-out.json" >/dev/null
 mkdir -p "$shadow_fixture/scripts" "$shadow_fixture/agent/plans"
 cp "$repository_root/scripts/capture-shadow-simulation.sh" "$repository_root/scripts/evaluate-shadow-candidate.sh" \
+  "$repository_root/scripts/evaluate-shadow-repair.sh" \
   "$repository_root/scripts/validate-agent-handoff.sh" "$repository_root/scripts/find-active-agent-plan.sh" \
   "$shadow_fixture/scripts/"
 cat > "$shadow_fixture/.agent-run.json" <<'JSON'
@@ -149,6 +177,25 @@ if (
 fi
 jq -e '.passed == false and .reason == "candidate-shadow-capture-failed" and .observedDelta == null' \
   "$shadow_fixture/capture-failure-result.json" >/dev/null
+cat > "$shadow_fixture/repair-handoff.json" <<'JSON'
+{
+  "title":"Shadow repair fixture", "task":"Restore bounded shadow capture.", "why":"Regression coverage.",
+  "summary":"Fixture.", "observations":"Fixture.", "next":"Fixture.",
+  "expectedGardenEffect":"Future ticks complete within the bound.", "pmDirection":"none",
+  "evidence":{"bottleneck":"fixture","currentState":"fixture","verification":"fixture"},
+  "evaluation":{"metric":"tests","goal":"pass","requiredDelta":0},
+  "codeMap":[], "requests":[], "state":{"immediateDirections":[],"constraints":[]}
+}
+JSON
+(
+  cd "$shadow_fixture"
+  AGENT_BASELINE_SHADOW_OUTCOME=failure \
+    SHADOW_SIMULATION_RUNNER="$shadow_fixture/fake-java" SHADOW_SIMULATION_SEEDS=17 \
+    SHADOW_EVALUATION_RESULT_FILE="$shadow_fixture/repair-result.json" \
+    scripts/evaluate-shadow-repair.sh repair-handoff.json repair-candidate.json >/dev/null
+)
+jq -e '.passed == true and .metric == "shadowSimulation" and .goal == "pass"' \
+  "$shadow_fixture/repair-result.json" >/dev/null
 rm -rf "$shadow_fixture"
 
 mkdir -p "$fixture_root/scripts" "$fixture_root/agent/plans" "$fixture_root/artifacts"
@@ -198,6 +245,8 @@ AGENT_PM_REFERENCE_DATE=2026-07-09 scripts/validate-agent-handoff.sh handoff-sta
 handoff none tests pass 0 handoff-repair.json
 AGENT_PM_REFERENCE_DATE=2026-07-08 AGENT_BASELINE_TEST_OUTCOME=failure \
   scripts/validate-agent-handoff.sh handoff-repair.json >/dev/null
+AGENT_PM_REFERENCE_DATE=2026-07-08 AGENT_BASELINE_SHADOW_OUTCOME=failure \
+  scripts/validate-agent-handoff.sh handoff-repair.json >/dev/null
 
 if AGENT_PM_REFERENCE_DATE=2026-07-08 scripts/validate-agent-handoff.sh handoff-stale.json >/dev/null 2>&1; then
   echo "Active plan incorrectly accepted pmDirection=none." >&2
@@ -212,6 +261,25 @@ grep -Fxq 'valid_handoff=true' inspect.outputs
 grep -Fxq 'substantive_change=false' inspect.outputs
 grep -Fxq 'retry_required=true' inspect.outputs
 grep -Fxq 'noop_reason=handoff-without-substantive-change' inspect.outputs
+rm -rf artifacts inspect.outputs
+
+git config user.name fixture
+git config user.email fixture@example.invalid
+printf 'artifacts/\n' > .gitignore
+git add -A
+git commit -qm baseline
+mkdir -p artifacts
+printf '{}\n' > artifacts/stdout.log
+GITHUB_OUTPUT="$fixture_root/artifacts/inspect-empty.outputs" AGENT_PM_REFERENCE_DATE=2026-07-08 \
+  scripts/inspect-agent-gemini-output.sh artifacts >/dev/null
+grep -Fxq 'valid_handoff=false' artifacts/inspect-empty.outputs
+grep -Fxq 'retry_required=true' artifacts/inspect-empty.outputs
+if ! grep -Fxq 'noop_reason=agent-returned-no-valid-handoff-or-changes' artifacts/inspect-empty.outputs; then
+  echo "An empty agent response received the wrong deferral classification:" >&2
+  cat artifacts/inspect-empty.outputs >&2
+  git status --short -uall >&2
+  exit 1
+fi
 rm -rf artifacts
 
 if VALIDATE_AGENT_WORKTREE_SCOPE=changed scripts/validate-agent-worktree.sh >/dev/null 2>&1; then
@@ -262,6 +330,51 @@ JSON
   grep -Fq '## Baseline Shadow Runs' agent/shadow-feedback.md
   grep -Fq '## Candidate Shadow Runs' agent/shadow-feedback.md
   grep -Fq 'src/test/java/example/RejectedTest.java' agent/shadow-feedback.md
+)
+
+incomplete_fixture="$fixture_root/incomplete-fixture"
+mkdir -p "$incomplete_fixture/scripts" "$incomplete_fixture/src/main/java/example" \
+  "$incomplete_fixture/gemini-artifacts"
+cp "$repository_root/scripts/defer-agent-incomplete.sh" "$incomplete_fixture/scripts/"
+chmod +x "$incomplete_fixture/scripts/defer-agent-incomplete.sh"
+echo 'package example; class Change {}' > "$incomplete_fixture/src/main/java/example/Change.java"
+(
+  cd "$incomplete_fixture"
+  git init -q
+  git config user.name fixture
+  git config user.email fixture@example.invalid
+  git add scripts src/main/java/example/Change.java
+  git commit -qm baseline
+  echo 'package example; class Change { int partial; }' > src/main/java/example/Change.java
+  mkdir -p unrelated
+  echo 'partial scratch' > unrelated/scratch.txt
+  printf '{"response":"partial agent response","stats":{"tools":{"totalCalls":2}}}\n' \
+    > gemini-artifacts/stdout.log
+  scripts/defer-agent-incomplete.sh gemini-artifacts agent-returned-no-valid-handoff-or-changes \
+    agent/shadow-feedback.md >/dev/null
+  git diff --quiet -- src/main/java/example/Change.java
+  [[ ! -e unrelated/scratch.txt ]]
+  grep -Fq 'agent-returned-no-valid-handoff-or-changes' agent/shadow-feedback.md
+  grep -Fq 'src/main/java/example/Change.java' agent/shadow-feedback.md
+  grep -Fq 'unrelated/scratch.txt' agent/shadow-feedback.md
+  grep -Fq 'partial agent response' agent/shadow-feedback.md
+)
+
+observation_fixture="$fixture_root/observation-fixture"
+mkdir -p "$observation_fixture/scripts"
+cp "$repository_root/scripts/check-agent-observation-window.sh" "$observation_fixture/scripts/"
+chmod +x "$observation_fixture/scripts/check-agent-observation-window.sh"
+(
+  cd "$observation_fixture"
+  git init -q
+  git config user.name fixture
+  git config user.email fixture@example.invalid
+  touch state
+  git add scripts state
+  git commit -qm 'feat: autonomous garden evolution fixture'
+  GITHUB_OUTPUT="$observation_fixture/cooldown.outputs" AGENT_MIN_TICKS_BETWEEN_RUNS=3 \
+    scripts/check-agent-observation-window.sh >/dev/null
+  grep -Fxq 'ready=false' cooldown.outputs
 )
 
 echo "Agent harness regression tests passed."

@@ -13,7 +13,7 @@ stdout_file="${artifact_dir}/stdout.log"
 
 feedback_dir="$(dirname "$feedback_file")"
 mkdir -p "$feedback_dir"
-temporary_feedback="$(mktemp "${feedback_dir}/.agent-feedback.XXXXXX")"
+temporary_feedback="$(mktemp "${RUNNER_TEMP:-/tmp}/agent-feedback.XXXXXX")"
 trap 'rm -f "$temporary_feedback"' EXIT
 
 {
@@ -25,12 +25,12 @@ trap 'rm -f "$temporary_feedback"' EXIT
   echo
   echo "## Incomplete Change Paths"
   echo
-  git status --short -uall -- src/main src/test pom.xml data/garden-state.txt || true
+  git status --short -uall || true
   echo
   echo "## Incomplete Change Summary"
   echo
   echo '```text'
-  git diff --stat -- src/main src/test pom.xml data/garden-state.txt || true
+  git diff --stat || true
   echo '```'
   echo
   if [[ -f "$stdout_file" ]] && jq -e . "$stdout_file" >/dev/null 2>&1; then
@@ -50,13 +50,12 @@ trap 'rm -f "$temporary_feedback"' EXIT
   fi
 } > "$temporary_feedback"
 
-for candidate_path in src/main src/test pom.xml data/garden-state.txt; do
-  if [[ -n "$(git ls-files -- "$candidate_path")" ]]; then
-    git restore --worktree --staged -- "$candidate_path"
-  fi
-done
-git clean -fd -- src/main src/test >/dev/null
-rm -f .agent-run.json
+# An incomplete call has no validated scope. Restore the entire checkout so the
+# feedback-only commit cannot be blocked by an unrelated dirty path during its
+# pull --rebase, and so no partial implementation leaks into a later run.
+git restore --worktree --staged -- .
+git clean -fd >/dev/null
+mkdir -p "$feedback_dir"
 mv "$temporary_feedback" "$feedback_file"
 trap - EXIT
 

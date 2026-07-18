@@ -271,14 +271,14 @@ append_baseline_shadow_result() {
 }
 
 append_shadow_feedback() {
-  echo "## Previous Rejected Shadow Hypothesis"
+  echo "## Previous Autonomous Feedback"
   echo
   if [[ -f "$shadow_feedback_file" ]]; then
-    echo "This feedback is the highest-priority continuity evidence from the previous autonomous attempt. Diagnose its missed causal link before selecting work, and do not repeat the same hypothesis unchanged."
+    echo "This feedback is the highest-priority continuity evidence from the previous incomplete or rejected autonomous attempt. Diagnose the blocked or missed causal link before selecting work, and do not repeat the same approach unchanged."
     echo
     sed -n '1,$p' "$shadow_feedback_file"
   else
-    echo "No deferred shadow rejection is awaiting consumption."
+    echo "No deferred autonomous feedback is awaiting consumption."
   fi
   echo
 }

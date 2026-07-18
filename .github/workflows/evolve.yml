@@ -36,6 +36,7 @@ jobs:
         run: scripts/test-agent-harness.sh
 
       - name: Set up Java
+        id: setup_java
         uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -58,13 +59,13 @@ jobs:
 
       - name: Enforce observation window
         id: observation_window
-        if: ${{ !cancelled() && steps.baseline_test.outcome == 'success' && steps.baseline_policy.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.harness_contracts.outcome == 'success' && steps.setup_java.outcome == 'success' && steps.baseline_test.outcome == 'success' && steps.baseline_policy.outcome == 'success' }}
         shell: bash
         run: scripts/check-agent-observation-window.sh
 
       - name: Capture baseline shadow simulation
         id: baseline_shadow
-        if: ${{ !cancelled() && steps.baseline_test.outcome == 'success' && steps.observation_window.outputs.ready == 'true' }}
+        if: ${{ !cancelled() && steps.harness_contracts.outcome == 'success' && steps.setup_java.outcome == 'success' && steps.baseline_test.outcome == 'success' && steps.observation_window.outputs.ready == 'true' }}
         continue-on-error: true
         shell: bash
         run: |
@@ -75,7 +76,7 @@ jobs:
 
       - name: Build Gemini prompt
         id: gemini_prompt
-        if: ${{ !cancelled() && (steps.observation_window.outcome == 'skipped' || steps.observation_window.outputs.ready == 'true') }}
+        if: ${{ !cancelled() && steps.harness_contracts.outcome == 'success' && steps.setup_java.outcome == 'success' && (steps.observation_window.outcome == 'skipped' || steps.observation_window.outputs.ready == 'true') }}
         shell: bash
         env:
           AGENT_CONTEXT_METADATA_FILE: ${{ runner.temp }}/agent-context.metadata
