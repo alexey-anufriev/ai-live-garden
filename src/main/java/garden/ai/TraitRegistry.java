@@ -527,6 +527,12 @@ public class TraitRegistry {
                     modifier -= 3;
                 }
                 break;
+            case "fox-reproductive-resilience":
+                if (organism.type() == OrganismType.FOX) {
+                    if (environment.nutrients() < 25) modifier -= 8;
+                    else modifier -= 4;
+                }
+                break;
             case "mutualist-synergy":
                 if (organism.type() == OrganismType.FUNGUS && rootNetworkCount > 0) modifier -= 3;
                 if (organism.type() == OrganismType.ROOT_NETWORK && fungalContribution > 0) modifier -= 3;
@@ -543,12 +549,13 @@ public class TraitRegistry {
         }
         if (childType == OrganismType.FOX && Math.random() < 0.3) {
             double r = Math.random();
-            if (r < 0.13) return "reproductive-efficiency";
-            else if (r < 0.26) return "nutrient-dependent-reproduction";
-            else if (r < 0.39) return "fox-energy-converter";
-            else if (r < 0.52) return "mutualist-synergy";
-            else if (r < 0.65) return "fox-stamina";
-            else if (r < 0.78) return "fox-metabolic-efficiency";
+            if (r < 0.125) return "reproductive-efficiency";
+            else if (r < 0.25) return "nutrient-dependent-reproduction";
+            else if (r < 0.375) return "fox-energy-converter";
+            else if (r < 0.50) return "mutualist-synergy";
+            else if (r < 0.625) return "fox-stamina";
+            else if (r < 0.75) return "fox-metabolic-efficiency";
+            else if (r < 0.875) return "fox-reproductive-resilience";
             else return "fox-reproductive-converter";
         }
         if (childType == OrganismType.ROOT_NETWORK && Math.random() < 0.3) {
