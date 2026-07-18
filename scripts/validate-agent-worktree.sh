@@ -21,6 +21,10 @@ status_paths() {
     sort -u
 }
 
+has_substantive_agent_change() {
+  scripts/agent-substantive-changes.sh >/dev/null
+}
+
 test_paths() {
   case "$scope" in
     changed)
@@ -73,6 +77,15 @@ if git status --porcelain -uall | grep -Eq '^\?\? [^/]+\.(java|class|tmp|log|txt
     git status --porcelain -uall |
       sed -nE 's/^\?\? ([^/]+\.(java|class|tmp|log|txt))$/\1/p'
   )
+fi
+
+repair_required="false"
+if [[ "${AGENT_BASELINE_TEST_OUTCOME:-success}" != "success" || "${AGENT_BASELINE_POLICY_OUTCOME:-success}" != "success" ]]; then
+  repair_required="true"
+fi
+
+if [[ "$scope" == "changed" && "$repair_required" != "true" ]] && ! has_substantive_agent_change; then
+  add_hard_violation "Autonomous run must leave a substantive change under src/main/, src/test/, pom.xml, or data/garden-state.txt; a handoff or generated-memory-only diff is not a completed run."
 fi
 
 severity="clean"

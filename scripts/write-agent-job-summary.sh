@@ -45,7 +45,9 @@ metadata_value() {
   echo "| Phase | Outcome |"
   echo "| --- | --- |"
   echo "| Baseline test | $(value_or_dash "${BASELINE_TEST_OUTCOME:-}") |"
+  echo "| Baseline shadow simulation | $(value_or_dash "${BASELINE_SHADOW_OUTCOME:-}") |"
   echo "| Baseline worktree policy | $(value_or_dash "${BASELINE_POLICY_OUTCOME:-}") |"
+  echo "| Observation window | $(value_or_dash "${OBSERVATION_WINDOW_OUTCOME:-}") |"
   echo "| Gemini autonomous step | $(value_or_dash "${GEMINI_OUTCOME:-}") |"
   echo "| Protected file restore | $(value_or_dash "${RESTORE_PROTECTED_OUTCOME:-}") |"
   echo "| Gemini primary output inspection | $(value_or_dash "${GEMINI_PRIMARY_INSPECT_OUTCOME:-}") |"
@@ -56,6 +58,7 @@ metadata_value() {
   echo "| Agent handoff extraction | $(value_or_dash "${EXTRACT_AGENT_HANDOFF_OUTCOME:-}") |"
   echo "| Agent handoff validation | $(value_or_dash "${AGENT_HANDOFF_OUTCOME:-}") |"
   echo "| Post-Gemini test validation | $(value_or_dash "${POST_TEST_OUTCOME:-}") |"
+  echo "| Candidate shadow evaluation | $(value_or_dash "${SHADOW_EVALUATION_OUTCOME:-}") |"
   echo "| Garden state advance | $(value_or_dash "${ADVANCE_GARDEN_OUTCOME:-}") |"
   echo "| Automated memory generation | $(value_or_dash "${AUTO_MEMORY_OUTCOME:-}") |"
   echo "| Required memory validation | $(value_or_dash "${REQUIRED_MEMORY_OUTCOME:-}") |"
@@ -105,6 +108,8 @@ metadata_value() {
     echo "The run failed because Gemini did not leave a valid \`.agent-run.json\` file or marked handoff JSON in its output."
   elif [[ "${AGENT_HANDOFF_OUTCOME:-}" == "failure" ]]; then
     echo "The run failed because Gemini did not leave a valid \`.agent-run.json\` handoff."
+  elif [[ "${SHADOW_EVALUATION_OUTCOME:-}" == "failure" ]]; then
+    echo "The candidate was rejected because deterministic shadow simulation failed its ecological target or safety bounds. No garden tick or commit was allowed."
   elif [[ "${POST_TEST_OUTCOME:-}" == "failure" ]]; then
     echo "Post-Gemini Maven validation failed. The workflow intentionally commits the failed baseline and deterministic memory so the next autonomous run starts with repair."
   elif [[ "${AUTO_MEMORY_OUTCOME:-}" == "failure" ]]; then

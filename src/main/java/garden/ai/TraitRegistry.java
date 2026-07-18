@@ -381,14 +381,14 @@ public class TraitRegistry {
                 events.add(new GardenEvent(cycle, "%s gained extra energy from extremely plentiful beetles.".formatted(hunter.id())));
             }
         }
-        
+
         if (hunter.type() == OrganismType.FOX && hunter.traits().contains("beetle-predation-optimizer") && prey.type() == OrganismType.BEETLE) {
             // ... (keep the rest of the existing code here)
         }
         // ... (keep the other parts of calculateBite here)
         // Adjust bait to offset the +1 in the scarcity branch if needed, but I should look at the tests first.
 
-        
+
         if (hunter.type() == OrganismType.FOX && hunter.traits().contains("beetle-predation-optimizer") && prey.type() == OrganismType.BEETLE) {
             long beetleCount = allOrganisms.stream().filter(o -> o.type() == OrganismType.BEETLE).count();
             int densityBonus = Math.min(10, (int) (beetleCount / 1000));
@@ -543,12 +543,12 @@ public class TraitRegistry {
     }
 
     public static String getMutationTrait(int cycle, Organism organism, OrganismType childType, Environment environment) {
-        if (childType == OrganismType.FUNGUS && Math.random() < 0.5) {
+        if (childType == OrganismType.FUNGUS && SimulationRandom.current().nextDouble() < 0.5) {
             String[] fungalTraits = {"nutrient-decomposer", "fungus-soil-enricher", "fungal-network-connector", "fungal-accelerator", "fungal-enhancer", "fungal-buffer-stabilizer", "nutrient-synthesizer", "buffer-tapper", "fungal-nutrient-amplifier", "mass-decomposer", "reproductive-efficiency", "fungal-decomposition-efficiency", "nutrient-dependent-reproduction", "fungal-energy-converter", "mutualist-synergy", "fungal-beetle-specialist", "fungal-nutrient-cycler"};
             return fungalTraits[Math.floorMod(cycle + organism.generation(), fungalTraits.length)];
         }
-        if (childType == OrganismType.FOX && Math.random() < 0.3) {
-            double r = Math.random();
+        if (childType == OrganismType.FOX && SimulationRandom.current().nextDouble() < 0.3) {
+            double r = SimulationRandom.current().nextDouble();
             if (r < 0.125) return "reproductive-efficiency";
             else if (r < 0.25) return "nutrient-dependent-reproduction";
             else if (r < 0.375) return "fox-energy-converter";
@@ -558,15 +558,15 @@ public class TraitRegistry {
             else if (r < 0.875) return "fox-reproductive-resilience";
             else return "fox-reproductive-converter";
         }
-        if (childType == OrganismType.ROOT_NETWORK && Math.random() < 0.3) {
-            double r = Math.random();
+        if (childType == OrganismType.ROOT_NETWORK && SimulationRandom.current().nextDouble() < 0.3) {
+            double r = SimulationRandom.current().nextDouble();
             if (r < 0.20) return "reproductive-efficiency";
             else if (r < 0.40) return "nutrient-dependent-reproduction";
             else if (r < 0.60) return "nutrient-pioneer";
             else if (r < 0.80) return "mutualist-synergy";
             else return "root-nutrient-amplifier";
         }
-        if (environment.nutrients() < 40 && Math.random() < 0.3) {
+        if (environment.nutrients() < 40 && SimulationRandom.current().nextDouble() < 0.3) {
             if (childType.isPlant()) return "dormancy";
             if (childType.isAnimal()) return "metabolic-efficiency";
         }

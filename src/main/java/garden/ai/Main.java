@@ -14,6 +14,7 @@ import java.nio.file.Path;
  * tick --state data/garden-state.txt
  * tick --steps 10 --state data/garden-state.txt
  * recover --max-organisms 12000
+ * simulate --steps 20 --seed 42 --max-organisms 20000
  * }</pre>
  *
  * <p>When no arguments are provided, the command defaults to {@code tick --steps 3}.
@@ -45,19 +46,27 @@ public final class Main {
             return;
         }
 
+        if (command.mode() == Mode.SIMULATE) {
+            SimulationMetrics.Report report = SimulationMetrics.evaluate(
+                    garden, command.steps(), command.seed(), command.maxOrganisms());
+            System.out.println(report.toJson());
+            return;
+        }
+
         Garden advanced = Simulation.advance(garden, command.steps());
         GardenStateStore.save(command.statePath(), advanced);
         System.out.println(GardenRenderer.render(advanced));
         System.out.println("Saved persistent garden state to " + command.statePath());
     }
 
-    private record Command(Mode mode, int steps, Path statePath, int maxOrganisms) {
+    private record Command(Mode mode, int steps, Path statePath, int maxOrganisms, long seed) {
 
         static Command parse(String[] args) {
             Mode mode = Mode.TICK;
             int steps = 3;
             Path statePath = GardenStateStore.DEFAULT_PATH;
             int maxOrganisms = GardenRecovery.DEFAULT_MAX_ORGANISMS;
+            long seed = 1L;
 
             for (int i = 0; i < args.length; i++) {
                 String arg = args[i];
@@ -67,6 +76,8 @@ public final class Main {
                     mode = Mode.INSPECT;
                 } else if ("recover".equalsIgnoreCase(arg)) {
                     mode = Mode.RECOVER;
+                } else if ("simulate".equalsIgnoreCase(arg)) {
+                    mode = Mode.SIMULATE;
                 } else if ("--steps".equals(arg) && i + 1 < args.length) {
                     steps = parsePositiveInt(args[++i], 3);
                 } else if (arg.startsWith("--steps=")) {
@@ -80,11 +91,23 @@ public final class Main {
                 } else if (arg.startsWith("--max-organisms=")) {
                     maxOrganisms = parsePositiveInt(arg.substring("--max-organisms=".length()),
                             GardenRecovery.DEFAULT_MAX_ORGANISMS);
+                } else if ("--seed".equals(arg) && i + 1 < args.length) {
+                    seed = parseLong(args[++i], 1L);
+                } else if (arg.startsWith("--seed=")) {
+                    seed = parseLong(arg.substring("--seed=".length()), 1L);
                 } else {
                     steps = parsePositiveInt(arg, steps);
                 }
             }
-            return new Command(mode, steps, statePath, maxOrganisms);
+            return new Command(mode, steps, statePath, maxOrganisms, seed);
+        }
+
+        private static long parseLong(String value, long fallback) {
+            try {
+                return Long.parseLong(value);
+            } catch (NumberFormatException ignored) {
+                return fallback;
+            }
         }
 
         private static int parsePositiveInt(String value, int fallback) {
@@ -100,6 +123,7 @@ public final class Main {
     private enum Mode {
         TICK,
         INSPECT,
-        RECOVER
+        RECOVER,
+        SIMULATE
     }
 }

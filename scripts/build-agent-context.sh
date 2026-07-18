@@ -263,20 +263,24 @@ append_recent_implementation_pattern() {
 
 append_project_manager_direction() {
   local latest_plan
+  local active_plan
   latest_plan="$(find agent/plans -maxdepth 1 -type f -name '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].md' -print 2>/dev/null | sort -V | tail -n 1)"
+  active_plan="$(scripts/find-active-agent-plan.sh)"
 
   echo "## Project Manager Direction"
   echo
-  if [[ -n "$latest_plan" && -f "$latest_plan" ]]; then
-    echo "Highest product priority for normal autonomous runs. Baseline Maven or worktree-policy repair is the only higher priority. If repair is not required, choose exactly one listed PM direction, set \`pmDirection\` in \`.agent-run.json\` to its label, and do not invent unrelated work."
+  if [[ -n "$active_plan" ]]; then
+    echo "Active highest product priority for normal autonomous runs. Baseline Maven or worktree-policy repair is the only higher priority. If repair is not required, choose exactly one listed PM direction, set \`pmDirection\` in \`.agent-run.json\` to its label, and do not invent unrelated work."
     echo
-    echo "Source: \`${latest_plan}\`."
+    echo "Source: \`${active_plan}\`."
     echo
     echo '```markdown'
-    sed -n '1,220p' "$latest_plan"
+    sed -n '1,220p' "$active_plan"
     echo '```'
+  elif [[ -n "$latest_plan" ]]; then
+    echo "The newest PM plan, \`${latest_plan}\`, is outside the active same-day window (maximum age \`${AGENT_PM_PLAN_MAX_AGE_DAYS:-0}\` day(s)) and is continuity context only. It is not binding because its state signals may no longer describe the living garden. Choose one focused bottleneck-first improvement from current state and set \`pmDirection\` to \`none\`."
   else
-    echo "No Project Manager direction has been generated yet."
+    echo "No active Project Manager direction exists. Choose one focused bottleneck-first improvement from current state and set \`pmDirection\` to \`none\`."
   fi
   echo
 }
@@ -318,11 +322,12 @@ append_compact_journal_entry() {
   echo "- Treat a PM direction as an outcome target, not as proof of its suggested causal mechanism. Inspect the current state and relevant code before deciding how to achieve it."
   echo "- When Ecological Outcome History reports stagnation, use a bottleneck-first change: reproduce the blocker from the current persisted population, identify the active gate, and fix that gate with a focused behavior test. Do not add or tune another named trait unless current organisms carry it or the change includes a credible adoption path."
   echo "- A passing unit test proves the modeled rule, not impact on the living state. Report both current-state evidence and the behavioral verification in the handoff."
+  echo "- Declare one measurable shadow target in \`evaluation\`. CI replays baseline and candidate code from the same state and seeds; a missed target, role extinction, runaway population, or timeout rejects the candidate before the real tick."
   echo "- You have god-mode recovery authority when persisted state causes runaway growth, timeouts, corruption, or prevents autonomous recovery. You may deterministically rebalance, cull, reseed, migrate, or directly repair \`data/garden-state.txt\`; prefer the program's \`recover\` command, preserve ecological roles, add an explanatory event, and report before/after counts."
   echo "- Never wait indefinitely for a random event or population outcome. Tests and diagnostics must be bounded. Use \`scripts/run-maven-tests-with-timeout.sh\`; if it interrupts Maven, treat the timeout as the baseline defect and replace long loops with deterministic phase-level tests."
   echo "- If the Baseline Maven Test Result says \`failed\`, repairing the existing Java source or tests is the run's required first task. Do not add unrelated behavior until \`mvn test\` passes."
   echo "- If the Baseline Worktree Policy Result says \`deferred-repair\`, repairing those policy violations is the run's required first task. Do not add unrelated behavior until the policy violations are cleared."
-  echo "- If Project Manager Direction exists and no baseline repair is required, choose exactly one PM direction A-D as the run's highest product priority. Set \`pmDirection\` in \`.agent-run.json\` to the selected label."
+  echo "- If an active Project Manager Direction exists and no baseline repair is required, choose exactly one PM direction A-D as the run's highest product priority. Otherwise set \`pmDirection\` to \`none\`."
   echo "- The run is pre-approved. Do not enter planning mode, do not ask for confirmation, and do not stop after proposing a strategy."
   echo "- Choose a task for its garden value, and let implementation structure follow from that task."
   echo "- \`expectedGardenEffect\` should explain what future garden behavior or runtime state should change."
@@ -344,6 +349,7 @@ append_compact_journal_entry() {
   echo "- Do not edit generated memory or PM direction files: \`README.md\`, \`agent/state.md\`, \`agent/requests.md\`, \`agent/code-map.md\`, \`agent/journal/\`, \`agent/summaries/\`, \`agent/templates/\`, or \`agent/plans/\`."
   echo "- Do not run memory harness scripts. CI post-processing will generate README state, code map, summaries, journal, and current memory from the final diff and garden state."
   echo "- Write \`.agent-run.json\` as the machine-readable handoff described below. This file is required."
+  echo "- A handoff is not a completed run by itself. Before CI advances the garden, the worktree must contain a substantive agent-authored change under \`src/main/\`, \`src/test/\`, \`pom.xml\`, or an emergency change to \`data/garden-state.txt\`."
   echo "- Also include the same JSON object in your final response between \`AGENT_RUN_JSON_START\` and \`AGENT_RUN_JSON_END\` markers so the harness can recover the handoff if direct file creation fails."
   echo "- Before finishing, compare the final diff to the chosen task and remove accidental edits, scratch files, speculative comments, and unrelated assertion changes."
   echo "- Do not modify \`AGENTS.md\`, \`GEMINI.md\`, \`.github/\`, \`story/\`, license files, secrets, or prior journal entries."
@@ -352,6 +358,8 @@ append_compact_journal_entry() {
   echo
   append_context_manifest
   append_recent_implementation_pattern
+  scripts/report-complexity-budget.sh
+  echo
   scripts/write-garden-outcome-history.sh
   echo
   append_project_manager_direction
@@ -378,6 +386,11 @@ append_compact_journal_entry() {
     "bottleneck": "The concrete current-state gate or missing causal link this run addressed.",
     "currentState": "Evidence from data/garden-state.txt or a shadow copy showing why the change can affect living organisms.",
     "verification": "The focused test or command that proves the changed behavior, including the observed result."
+  },
+  "evaluation": {
+    "metric": "population.BEETLE, population.FOX, population.FUNGUS, population.ROOT_NETWORK, another population type, totalOrganisms, nutrients, nutrientBuffer, or tests for required repair only",
+    "goal": "increase, decrease, preserve, or pass for required repair only",
+    "requiredDelta": 1
   },
   "codeMap": [
     {
@@ -433,6 +446,7 @@ JSON
   echo
   echo "- \`scripts/run-maven-tests-with-timeout.sh\`"
   echo "- \`mvn -B -q exec:java -Dexec.args=\"inspect\"\`"
+  echo "- \`mvn -B -q exec:java -Dexec.args=\"simulate --steps 5 --seed 17 --max-organisms 25000\"\` (read-only shadow run)"
   echo "- \`mvn -B -q exec:java -Dexec.args=\"tick --steps 1\"\`"
   echo "- \`mvn -B -q exec:java -Dexec.args=\"recover --max-organisms 12000\"\` (emergency only)"
   echo

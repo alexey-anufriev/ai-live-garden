@@ -37,16 +37,16 @@ fi
 {
   echo "# AI Live Garden Corrective Agent Context"
   echo
-  echo "The previous Gemini call completed, but it did not leave a valid autonomous-run handoff."
+  echo "The previous Gemini call completed, but it did not leave both a valid autonomous-run handoff and a substantive repository change."
   echo
   echo "This retry is already authorized. Do not enter plan mode. Do not ask for confirmation. Do not stop after proposing a strategy."
   echo
   echo "Required retry behavior:"
   echo
-  if [[ -n "$(git status --porcelain -uall)" ]]; then
+  if scripts/agent-substantive-changes.sh >/dev/null; then
     echo "- The previous call already changed the worktree. Inspect and preserve the focused existing change, correct it if needed, and finish its handoff. Do not start a second task."
   else
-    echo "- Implement one focused bounded change now."
+    echo "- The previous response did not leave a substantive implementation. Implement one focused bounded change under \`src/main/\`, \`src/test/\`, \`pom.xml\`, or, only for a demonstrated emergency, \`data/garden-state.txt\`."
   fi
   echo "- Leave real repository changes unless a required baseline repair makes that impossible."
   echo "- Write \`.agent-run.json\` before finishing."

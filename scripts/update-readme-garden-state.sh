@@ -41,24 +41,6 @@ missing_roles_csv() {
   fi
 }
 
-health_status() {
-  local total="$1"
-  local nutrients="$2"
-  local missing="$3"
-
-  if (( total == 0 )); then
-    echo "🔴|Critical|no organisms remain in the persistent state."
-  elif [[ "$missing" != "none" && "${nutrients%.*}" -le 0 ]]; then
-    echo "🟠|Strained|available nutrients are exhausted while ecological roles are missing."
-  elif [[ "$missing" != "none" ]]; then
-    echo "🟡|Stable|the garden persists but ecological roles are still missing."
-  elif (( ${nutrients%.*} > 10 )); then
-    echo "🟢|Flourishing|diverse roles persist with usable nutrients."
-  else
-    echo "🟡|Stable|diverse roles persist under limited nutrients."
-  fi
-}
-
 readme_state_body() {
   local cycle="$1"
   local total="$2"
@@ -115,7 +97,7 @@ nutrients="$(state_value nutrients)"
 counts="$(organism_counts)"
 total="$(awk -F= '$1 == "total" { print $2 }' <<<"$counts")"
 missing="$(missing_roles_csv "$counts")"
-health_record="$(health_status "${total:-0}" "${nutrients:-0}" "$missing")"
+health_record="$(scripts/calculate-garden-health.sh data/garden-state.txt)"
 IFS='|' read -r health_symbol health_label health_reason <<<"$health_record"
 readme_narrative="$(readme_state_body "$cycle" "${total:-0}" "$missing")"
 

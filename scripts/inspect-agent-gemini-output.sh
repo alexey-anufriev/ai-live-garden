@@ -51,6 +51,7 @@ total_tool_calls="0"
 valid_handoff="false"
 artifact_handoff="false"
 worktree_changed="false"
+substantive_change="false"
 retry_required="false"
 noop_reason="none"
 
@@ -77,7 +78,25 @@ if [[ -n "$(git status --porcelain -uall)" ]]; then
   worktree_changed="true"
 fi
 
-if [[ "$valid_handoff" != "true" && ( "$worktree_changed" == "true" || "$plan_mode_count" != "0" || "$total_tool_calls" != "0" ) ]]; then
+if scripts/agent-substantive-changes.sh >/dev/null; then
+  substantive_change="true"
+fi
+
+repair_required="false"
+if [[ "${AGENT_BASELINE_TEST_OUTCOME:-success}" != "success" || "${AGENT_BASELINE_POLICY_OUTCOME:-success}" != "success" ]]; then
+  repair_required="true"
+fi
+if [[ "$repair_required" == "true" ]] && git status --porcelain -uall |
+    sed '/^$/d' | sed 's/^...//; s/.* -> //' |
+    grep -Ev '^(\.agent-run[.]json|README[.]md|agent/(state[.]md|requests[.]md|code-map[.]md|garden-trends[.]svg|organism-trends[.]svg|journal/|summaries/|templates/|plans/)|story/)' |
+    grep -q .; then
+  substantive_change="true"
+fi
+
+if [[ "$valid_handoff" == "true" && "$substantive_change" != "true" ]]; then
+  retry_required="true"
+  noop_reason="handoff-without-substantive-change"
+elif [[ "$valid_handoff" != "true" && ( "$worktree_changed" == "true" || "$plan_mode_count" != "0" || "$total_tool_calls" != "0" ) ]]; then
   retry_required="true"
   if [[ "$worktree_changed" == "true" ]]; then
     noop_reason="changes-without-valid-handoff"
@@ -95,6 +114,7 @@ if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
     echo "valid_handoff=${valid_handoff}"
     echo "artifact_handoff=${artifact_handoff}"
     echo "worktree_changed=${worktree_changed}"
+    echo "substantive_change=${substantive_change}"
     echo "retry_required=${retry_required}"
     echo "noop_reason=${noop_reason}"
   } >> "$GITHUB_OUTPUT"
@@ -108,12 +128,13 @@ fi
   echo "- Valid handoff available: ${valid_handoff}"
   echo "- Valid handoff recovered from artifacts: ${artifact_handoff}"
   echo "- Repository changes present: ${worktree_changed}"
+  echo "- Substantive agent change present: ${substantive_change}"
   echo "- Retry required: ${retry_required}"
   echo "- Reason: ${noop_reason}"
 }
 
 if [[ "$mode" == "fail-on-noop" && "$retry_required" == "true" ]]; then
-  echo "Gemini did not complete a valid autonomous-run handoff." >&2
+  echo "Gemini did not complete a valid autonomous run with both a handoff and a substantive change." >&2
   echo "Reason: ${noop_reason}." >&2
   exit 1
 fi

@@ -201,7 +201,7 @@ public class OrganismInteractionCalculator {
             trait = "fungal-symbiote";
         } else if (organism.type() == OrganismType.ROOT_NETWORK && (organism.id().hashCode() + cycle) % 7 == 0) {
             trait = "reproductive-efficiency";
-        } else if ((organism.traits().contains("stressed") || organism.traits().contains("starving")) && Math.random() < 0.4) {
+        } else if ((organism.traits().contains("stressed") || organism.traits().contains("starving")) && SimulationRandom.current().nextDouble() < 0.4) {
             if (organism.type() == OrganismType.FOX) {
                 String[] foxResilienceTraits = {"metabolic-resilience", "resourceful-breeder", "fox-metabolic-efficiency"};
                 trait = foxResilienceTraits[Math.floorMod(cycle + organism.generation(), foxResilienceTraits.length)];
@@ -570,7 +570,7 @@ public class OrganismInteractionCalculator {
                 feeding.nutrientBufferBoost());
         
         PopulationDynamicsResult population = calculatePopulationDynamics(new PopulationDynamicsContext(
-                garden.environment(), feeding.organisms(), nextCycle, garden.nextId(), nextEvents, contribution.fungalContribution(), new Random()));
+                garden.environment(), feeding.organisms(), nextCycle, garden.nextId(), nextEvents, contribution.fungalContribution(), SimulationRandom.current()));
         List<Organism> finalChanged = population.organisms();
         int nextIdentifier = population.nextId();
         

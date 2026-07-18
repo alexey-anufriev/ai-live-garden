@@ -144,25 +144,6 @@ missing_roles_csv() {
   fi
 }
 
-health_status() {
-  local counts="$1"
-  local total="$2"
-  local nutrients="$3"
-  local missing="$4"
-
-  if (( total == 0 )); then
-    echo "🔴|Critical|no organisms remain in the persistent state."
-  elif [[ "$missing" != "none" && "${nutrients%.*}" -le 0 ]]; then
-    echo "🟠|Strained|available nutrients are exhausted while ecological roles are missing."
-  elif [[ "$missing" != "none" ]]; then
-    echo "🟡|Stable|the garden persists but ecological roles are still missing."
-  elif (( ${nutrients%.*} > 10 )); then
-    echo "🟢|Flourishing|diverse roles persist with usable nutrients."
-  else
-    echo "🟡|Stable|diverse roles persist under limited nutrients."
-  fi
-}
-
 write_agent_state() {
   local cycle="$1"
   local nutrients="$2"
@@ -343,6 +324,9 @@ expected_effect="${expected_effect%.}"
 bottleneck_evidence="$(json_value '.evidence.bottleneck')"
 current_state_evidence="$(json_value '.evidence.currentState')"
 verification_evidence="$(json_value '.evidence.verification')"
+evaluation_metric="$(json_value '.evaluation.metric')"
+evaluation_goal="$(json_value '.evaluation.goal')"
+evaluation_delta="$(json_value '.evaluation.requiredDelta')"
 pm_direction="$(json_value '.pmDirection')"
 if [[ -z "$pm_direction" ]]; then
   pm_direction="none"
@@ -359,7 +343,7 @@ counts="$(organism_counts)"
 total="$(awk -F= '$1 == "total" { print $2 }' <<<"$counts")"
 active_types="$(types_csv)"
 missing="$(missing_roles_csv "$counts")"
-health_record="$(health_status "$counts" "${total:-0}" "${nutrients:-0}" "$missing")"
+health_record="$(scripts/calculate-garden-health.sh data/garden-state.txt)"
 IFS='|' read -r health_symbol health_label health_reason <<<"$health_record"
 
 if [[ "$test_outcome" == "success" ]]; then
@@ -386,7 +370,7 @@ else
   garden_result="The workflow skipped the garden tick because the garden advance step did not complete successfully; the committed garden state remains at cycle ${cycle} with nutrients ${nutrients}, nutrientBuffer ${buffer}, active types ${active_types:-none}, and missing roles ${missing}."
 fi
 
-summary_body="${summary_text}${pm_context} Expected future effect: ${expected_effect}. Changed files before memory generation: ${changed_list}. ${garden_result} Test validation outcome: ${test_outcome}. Worktree policy severity: ${worktree_policy_severity}."
+summary_body="${summary_text}${pm_context} Shadow target: ${evaluation_metric} ${evaluation_goal} ${evaluation_delta}. Expected future effect: ${expected_effect}. Changed files before memory generation: ${changed_list}. ${garden_result} Test validation outcome: ${test_outcome}. Worktree policy severity: ${worktree_policy_severity}."
 scripts/agent-append-summary.sh --cadence daily --timestamp "$timestamp" --title "$change_title" --body "$summary_body" >/dev/null
 append_rollups_if_due
 
@@ -403,7 +387,7 @@ scripts/agent-create-journal-entry.sh \
   --reason "$why_text" \
   --checks "$checks" \
   --test-result "$test_result" \
-  --observations "${observations_text}${pm_context} Bottleneck evidence: ${bottleneck_evidence}. Current-state evidence: ${current_state_evidence}. Behavioral verification: ${verification_evidence}. Expected future effect: ${expected_effect}. ${garden_result} Worktree policy severity: ${worktree_policy_severity}. Automated post-processing refreshed README/state memory from data/garden-state.txt." \
+  --observations "${observations_text}${pm_context} Shadow evaluation target: ${evaluation_metric} ${evaluation_goal} ${evaluation_delta}. Bottleneck evidence: ${bottleneck_evidence}. Current-state evidence: ${current_state_evidence}. Behavioral verification: ${verification_evidence}. Expected future effect: ${expected_effect}. ${garden_result} Worktree policy severity: ${worktree_policy_severity}. Automated post-processing refreshed README/state memory from data/garden-state.txt." \
   --next "$next_text" >/dev/null
 
 rm -f "$handoff_file"

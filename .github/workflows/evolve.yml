@@ -26,6 +26,14 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Freeze autonomous run policy date
+        shell: bash
+        run: echo "AGENT_PM_REFERENCE_DATE=$(date -u +%Y-%m-%d)" >> "$GITHUB_ENV"
+
+      - name: Validate autonomous harness contracts
+        shell: bash
+        run: scripts/test-agent-harness.sh
+
       - name: Set up Java
         uses: actions/setup-java@v5
         with:
@@ -46,6 +54,18 @@ jobs:
         env:
           VALIDATE_AGENT_WORKTREE_SCOPE: baseline
         run: scripts/capture-agent-worktree-policy-result.sh "${RUNNER_TEMP}/baseline-policy-result.md"
+
+      - name: Enforce observation window
+        id: observation_window
+        if: ${{ !cancelled() && steps.baseline_test.outcome == 'success' && steps.baseline_policy.outcome == 'success' }}
+        shell: bash
+        run: scripts/check-agent-observation-window.sh
+
+      - name: Capture baseline shadow simulation
+        id: baseline_shadow
+        if: ${{ !cancelled() && steps.baseline_test.outcome == 'success' && (steps.observation_window.outcome == 'success' || steps.observation_window.outcome == 'skipped') }}
+        shell: bash
+        run: scripts/capture-shadow-simulation.sh "${RUNNER_TEMP}/baseline-shadow.json"
 
       - name: Build Gemini prompt
         id: gemini_prompt
@@ -84,6 +104,9 @@ jobs:
         id: gemini_primary_inspect
         if: ${{ !cancelled() }}
         shell: bash
+        env:
+          AGENT_BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
+          AGENT_BASELINE_POLICY_OUTCOME: ${{ steps.baseline_policy.outcome }}
         run: scripts/inspect-agent-gemini-output.sh gemini-artifacts
 
       - name: Build Gemini corrective retry prompt
@@ -117,6 +140,9 @@ jobs:
         id: gemini_final_guard
         if: ${{ !cancelled() }}
         shell: bash
+        env:
+          AGENT_BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
+          AGENT_BASELINE_POLICY_OUTCOME: ${{ steps.baseline_policy.outcome }}
         run: scripts/inspect-agent-gemini-output.sh --fail-on-noop gemini-artifacts
 
       - name: Extract agent handoff from Gemini output
@@ -151,6 +177,8 @@ jobs:
         env:
           VALIDATE_AGENT_WORKTREE_SCOPE: changed
           VALIDATE_AGENT_WORKTREE_VIOLATIONS_FILE: ${{ runner.temp }}/agent-worktree-repair-input-violations.txt
+          AGENT_BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
+          AGENT_BASELINE_POLICY_OUTCOME: ${{ steps.baseline_policy.outcome }}
         run: scripts/validate-agent-worktree.sh
 
       - name: Fail on hard pre-memory worktree policy
@@ -161,15 +189,28 @@ jobs:
           cat "${RUNNER_TEMP}/agent-worktree-repair-input-violations.txt"
           exit 1
 
+      - name: Evaluate candidate shadow simulation
+        id: shadow_evaluation
+        if: ${{ !cancelled() && steps.post_test_final.outcome == 'success' && steps.agent_worktree_repair_input.outputs.severity == 'clean' && steps.baseline_shadow.outcome == 'success' }}
+        shell: bash
+        env:
+          AGENT_BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
+          AGENT_BASELINE_POLICY_OUTCOME: ${{ steps.baseline_policy.outcome }}
+          SHADOW_EVALUATION_RESULT_FILE: ${{ runner.temp }}/shadow-evaluation-result.json
+        run: scripts/evaluate-shadow-candidate.sh "${RUNNER_TEMP}/baseline-shadow.json" .agent-run.json "${RUNNER_TEMP}/candidate-shadow.json"
+
       - name: Advance persistent garden state
         id: advance_garden
-        if: ${{ !cancelled() && steps.post_test_final.outcome == 'success' && steps.agent_worktree_repair_input.outputs.severity == 'clean' }}
+        if: ${{ !cancelled() && steps.post_test_final.outcome == 'success' && steps.agent_worktree_repair_input.outputs.severity == 'clean' && (steps.shadow_evaluation.outcome == 'success' || steps.shadow_evaluation.outcome == 'skipped') }}
         run: mvn -B -q exec:java -Dexec.args="tick --steps 3"
 
       - name: Generate memory artifacts
         id: auto_memory
-        if: ${{ !cancelled() && (steps.post_test_final.outcome == 'success' || steps.post_test_final.outcome == 'failure') && (steps.agent_worktree_repair_input.outputs.severity == 'clean' || steps.agent_worktree_repair_input.outputs.severity == 'deferred') }}
+        if: ${{ !cancelled() && (steps.post_test_final.outcome == 'success' || steps.post_test_final.outcome == 'failure') && (steps.agent_worktree_repair_input.outputs.severity == 'clean' || steps.agent_worktree_repair_input.outputs.severity == 'deferred') && steps.shadow_evaluation.outcome != 'failure' }}
         shell: bash
+        env:
+          AGENT_BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
+          AGENT_BASELINE_POLICY_OUTCOME: ${{ steps.baseline_policy.outcome }}
         run: scripts/agent-auto-postprocess.sh --test-outcome "${{ steps.post_test_final.outcome }}" --garden-advance-outcome "${{ steps.advance_garden.outcome }}" --worktree-policy-severity "${{ steps.agent_worktree_repair_input.outputs.severity }}" --checks "mvn -B test"
 
       - name: Validate required memory updates
@@ -227,6 +268,8 @@ jobs:
         env:
           VALIDATE_AGENT_WORKTREE_SCOPE: changed
           VALIDATE_AGENT_WORKTREE_VIOLATIONS_FILE: ${{ runner.temp }}/agent-worktree-violations.txt
+          AGENT_BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
+          AGENT_BASELINE_POLICY_OUTCOME: ${{ steps.baseline_policy.outcome }}
         run: scripts/validate-agent-worktree.sh
 
       - name: Fail on hard final worktree policy
@@ -247,6 +290,9 @@ jobs:
           AGENT_BASELINE_TEST_RESULT_FILE: ${{ runner.temp }}/baseline-test-result.md
           AGENT_BASELINE_POLICY_RESULT_FILE: ${{ runner.temp }}/baseline-policy-result.md
           AGENT_PRIMARY_GEMINI_ARTIFACTS_DIR: ${{ runner.temp }}/gemini-artifacts-primary
+          AGENT_BASELINE_SHADOW_FILE: ${{ runner.temp }}/baseline-shadow.json
+          AGENT_CANDIDATE_SHADOW_FILE: ${{ runner.temp }}/candidate-shadow.json
+          AGENT_SHADOW_EVALUATION_RESULT_FILE: ${{ runner.temp }}/shadow-evaluation-result.json
         run: scripts/collect-agent-failure-diagnostics.sh "${{ runner.temp }}/agent-failure-diagnostics"
 
       - name: Upload failure diagnostics
@@ -265,6 +311,7 @@ jobs:
         env:
           BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
           BASELINE_POLICY_OUTCOME: ${{ steps.baseline_policy.outcome }}
+          OBSERVATION_WINDOW_OUTCOME: ${{ steps.observation_window.outcome }}
           GEMINI_OUTCOME: ${{ steps.gemini.outcome }}
           GEMINI_PRIMARY_INSPECT_OUTCOME: ${{ steps.gemini_primary_inspect.outcome }}
           GEMINI_RETRY_PROMPT_OUTCOME: ${{ steps.gemini_retry_prompt.outcome }}
@@ -274,6 +321,7 @@ jobs:
           EXTRACT_AGENT_HANDOFF_OUTCOME: ${{ steps.extract_agent_handoff.outcome }}
           AGENT_HANDOFF_OUTCOME: ${{ steps.agent_handoff.outcome }}
           POST_TEST_OUTCOME: ${{ steps.post_test_final.outcome }}
+          SHADOW_EVALUATION_OUTCOME: ${{ steps.shadow_evaluation.outcome }}
           ADVANCE_GARDEN_OUTCOME: ${{ steps.advance_garden.outcome }}
           AUTO_MEMORY_OUTCOME: ${{ steps.auto_memory.outcome }}
           REQUIRED_MEMORY_OUTCOME: ${{ steps.required_memory_final.outcome }}
@@ -306,6 +354,7 @@ jobs:
         env:
           BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
           BASELINE_POLICY_OUTCOME: ${{ steps.baseline_policy.outcome }}
+          OBSERVATION_WINDOW_OUTCOME: ${{ steps.observation_window.outcome }}
           GEMINI_OUTCOME: ${{ steps.gemini.outcome }}
           RESTORE_PROTECTED_OUTCOME: ${{ steps.restore_protected.outcome }}
           GEMINI_PRIMARY_INSPECT_OUTCOME: ${{ steps.gemini_primary_inspect.outcome }}
@@ -316,6 +365,8 @@ jobs:
           EXTRACT_AGENT_HANDOFF_OUTCOME: ${{ steps.extract_agent_handoff.outcome }}
           AGENT_HANDOFF_OUTCOME: ${{ steps.agent_handoff.outcome }}
           POST_TEST_OUTCOME: ${{ steps.post_test_final.outcome }}
+          BASELINE_SHADOW_OUTCOME: ${{ steps.baseline_shadow.outcome }}
+          SHADOW_EVALUATION_OUTCOME: ${{ steps.shadow_evaluation.outcome }}
           ADVANCE_GARDEN_OUTCOME: ${{ steps.advance_garden.outcome }}
           AUTO_MEMORY_OUTCOME: ${{ steps.auto_memory.outcome }}
           REQUIRED_MEMORY_OUTCOME: ${{ steps.required_memory_final.outcome }}

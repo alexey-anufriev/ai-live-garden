@@ -145,6 +145,7 @@ append_latest_plan() {
 }
 
 {
+  planning_date="${PROJECT_PLAN_EXPECTED_DATE:-$(date -u +%Y-%m-%d)}"
   echo "# AI Live Garden Project Manager Context"
   echo
   echo "Generated at: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
@@ -161,9 +162,12 @@ append_latest_plan() {
   echo "- Use state evidence only: garden counts, environment values, trait frequencies, agent state, summaries, requests, and the previous PM plan. Do not infer code causes."
   echo "- Recommend garden-facing outcomes rather than code-organization work."
   echo "- Each direction must describe an observable garden outcome for future ticks: population balance, nutrients, buffer pressure, survival, reproduction, predation, decay, succession, recovery, or environment response."
+  echo "- Every direction must be satisfiable through a future-behavior change. A diagnostic may be required as supporting work, but a report, log message, renderer phrase, counter, or test result alone is not an acceptable direction or acceptance signal."
+  echo "- Acceptance signals must be observable in bounded simulation behavior or persisted garden semantics, not merely in source structure, trait presence, instrumentation, or prose."
   echo "- Suggest directions, not implementation files. The autonomous agent will inspect code later if it chooses a direction."
   echo "- Baseline repair always takes precedence during agent runs. Once repair is clear, your directions are the highest product priority for autonomous agents that day."
   echo "- Produce exactly four directions labeled A, B, C, and D."
+  echo "- Set the top-level \`date\` field to exactly \`${planning_date}\`."
   echo "- Write \`.project-plan.json\` with the JSON shape below. Also include the same JSON in your final response between \`PROJECT_PLAN_JSON_START\` and \`PROJECT_PLAN_JSON_END\`."
   echo
   echo "## Required JSON Shape"

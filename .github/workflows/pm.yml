@@ -26,6 +26,10 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Freeze planning date
+        shell: bash
+        run: echo "PROJECT_PLAN_EXPECTED_DATE=$(date -u +%Y-%m-%d)" >> "$GITHUB_ENV"
+
       - name: Build Project Manager prompt
         id: pm_prompt
         shell: bash

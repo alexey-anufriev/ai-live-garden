@@ -46,4 +46,11 @@ if ! jq -e '
   exit 1
 fi
 
+expected_date="${PROJECT_PLAN_EXPECTED_DATE:-$(date -u +%Y-%m-%d)}"
+plan_date="$(jq -r '.date' "$plan_file")"
+if [[ "$plan_date" != "$expected_date" ]]; then
+  echo "Project plan date must be ${expected_date}, got ${plan_date}." >&2
+  exit 1
+fi
+
 echo "Project plan JSON is present and valid: ${plan_file}"
