@@ -34,6 +34,7 @@ public class TraitRegistry {
         long bufferOptimizerCount,
         long soilMasterCount,
         long nutrientRecyclerCount,
+        long nutrientRecyclingOptimizerCount,
         long nutrientTranslocatorCount,
         long nutrientSynthesizerCount,
         long nutrientReclaimerCount,
@@ -249,6 +250,7 @@ public class TraitRegistry {
             TraitRegistry.count(organisms, "buffer-optimizer", OrganismType.ROOT_NETWORK),
             TraitRegistry.count(organisms, "soil-master", OrganismType.ROOT_NETWORK),
             TraitRegistry.count(organisms, "nutrient-recycler", OrganismType.ROOT_NETWORK),
+            TraitRegistry.count(organisms, "nutrient-recycling-optimizer", OrganismType.ROOT_NETWORK),
             TraitRegistry.count(organisms, "nutrient-translocator", OrganismType.ROOT_NETWORK),
             TraitRegistry.count(organisms, "nutrient-synthesizer", OrganismType.ROOT_NETWORK),
             TraitRegistry.count(organisms, "nutrient-reclaimer", OrganismType.ROOT_NETWORK),
@@ -271,14 +273,14 @@ public class TraitRegistry {
 
     private static int calculateRoot(RootContributionContext context) {
     if (context.nutrients() < 5) {
-        return (int) (context.rootNetworkCount() * 10 + context.nutrientWeaverCount() * 10 + context.nutrientSharerCount() * 20 + context.bufferOptimizerCount() * 20 + context.soilMasterCount() * 30 + context.nutrientRecyclerCount() * 10 + context.nutrientTranslocatorCount() * 40 + context.nutrientSynthesizerCount() * 30 + context.nutrientReclaimerCount() * 25 + context.nutrientProducerCount() * 50 + context.nutrientPumpCount() * 60 + context.nutrientDistributorCount() * 40 + context.nutrientAcceleratorCount() * 50 + context.rootSoilEnricherCount() * 70 + context.fungalRootSymbiontCount() * 40 + context.mycelialRootMediatorCount() * 20 + context.mycelialSynergizerCount() * 10);
+        return (int) (context.rootNetworkCount() * 10 + context.nutrientWeaverCount() * 10 + context.nutrientSharerCount() * 20 + context.bufferOptimizerCount() * 20 + context.soilMasterCount() * 30 + context.nutrientRecyclerCount() * 10 + context.nutrientRecyclingOptimizerCount() * 15 + context.nutrientTranslocatorCount() * 40 + context.nutrientSynthesizerCount() * 30 + context.nutrientReclaimerCount() * 25 + context.nutrientProducerCount() * 50 + context.nutrientPumpCount() * 60 + context.nutrientDistributorCount() * 40 + context.nutrientAcceleratorCount() * 50 + context.rootSoilEnricherCount() * 70 + context.fungalRootSymbiontCount() * 40 + context.mycelialRootMediatorCount() * 20 + context.mycelialSynergizerCount() * 10);
     } else if (context.nutrients() < 10) {
-        return (int) (context.rootNetworkCount() * 8 + context.nutrientWeaverCount() * 8 + context.nutrientSharerCount() * 16 + context.bufferOptimizerCount() * 16 + context.soilMasterCount() * 24 + context.nutrientRecyclerCount() * 8 + context.nutrientTranslocatorCount() * 32 + context.nutrientSynthesizerCount() * 24 + context.nutrientReclaimerCount() * 20 + context.nutrientProducerCount() * 40 + context.nutrientPumpCount() * 48 + context.nutrientDistributorCount() * 32 + context.nutrientAcceleratorCount() * 40 + context.rootSoilEnricherCount() * 56 + context.fungalRootSymbiontCount() * 32 + context.mycelialRootMediatorCount() * 16 + context.mycelialSynergizerCount() * 8);
+        return (int) (context.rootNetworkCount() * 8 + context.nutrientWeaverCount() * 8 + context.nutrientSharerCount() * 16 + context.bufferOptimizerCount() * 16 + context.soilMasterCount() * 24 + context.nutrientRecyclerCount() * 8 + context.nutrientRecyclingOptimizerCount() * 12 + context.nutrientTranslocatorCount() * 32 + context.nutrientSynthesizerCount() * 24 + context.nutrientReclaimerCount() * 20 + context.nutrientProducerCount() * 40 + context.nutrientPumpCount() * 48 + context.nutrientDistributorCount() * 32 + context.nutrientAcceleratorCount() * 40 + context.rootSoilEnricherCount() * 56 + context.fungalRootSymbiontCount() * 32 + context.mycelialRootMediatorCount() * 16 + context.mycelialSynergizerCount() * 8);
     } else if (context.nutrients() < 25) {
-        return (int) (context.rootNetworkCount() * 4 + context.nutrientWeaverCount() * 4 + context.nutrientSharerCount() * 8 + context.bufferOptimizerCount() * 8 + context.soilMasterCount() * 12 + context.nutrientRecyclerCount() * 4 + context.nutrientTranslocatorCount() * 16 + context.nutrientSynthesizerCount() * 12 + context.nutrientReclaimerCount() * 10 + context.nutrientProducerCount() * 20 + context.nutrientPumpCount() * 24 + context.nutrientDistributorCount() * 16 + context.nutrientAcceleratorCount() * 20 + context.rootSoilEnricherCount() * 28 + context.fungalRootSymbiontCount() * 16 + context.mycelialRootMediatorCount() * 8 + context.mycelialSynergizerCount() * 4);
+        return (int) (context.rootNetworkCount() * 4 + context.nutrientWeaverCount() * 4 + context.nutrientSharerCount() * 8 + context.bufferOptimizerCount() * 8 + context.soilMasterCount() * 12 + context.nutrientRecyclerCount() * 4 + context.nutrientRecyclingOptimizerCount() * 6 + context.nutrientTranslocatorCount() * 16 + context.nutrientSynthesizerCount() * 12 + context.nutrientReclaimerCount() * 10 + context.nutrientProducerCount() * 20 + context.nutrientPumpCount() * 24 + context.nutrientDistributorCount() * 16 + context.nutrientAcceleratorCount() * 20 + context.rootSoilEnricherCount() * 28 + context.fungalRootSymbiontCount() * 16 + context.mycelialRootMediatorCount() * 8 + context.mycelialSynergizerCount() * 4);
     } else {
         int bufferBonus = (context.nutrientBuffer() > 50) ? 2 : 0;
-        int recyclerBonus = (context.nutrientBuffer() > 50 ? 5 : 2) + (int) Math.min(context.releaserCount(), 10);
+        int recyclerBonus = (context.nutrientBuffer() > 50 ? 5 : 2) + (int) Math.min(context.releaserCount(), 10) + (int) (context.nutrientRecyclingOptimizerCount() * 2);
         return (int) (Math.max(1, context.rootNetworkCount() / 2) + context.nutrientWeaverCount() + context.nutrientSharerCount() * 2 + context.bufferOptimizerCount() * (2 + bufferBonus) + context.soilMasterCount() * 4 + context.nutrientRecyclerCount() * recyclerBonus + context.nutrientTranslocatorCount() * 4 + context.nutrientSynthesizerCount() * 3 + context.nutrientReclaimerCount() * 3 + context.nutrientProducerCount() * 5 + context.nutrientPumpCount() * 10 + context.nutrientDistributorCount() * 8 + context.nutrientAcceleratorCount() * 5 + context.rootSoilEnricherCount() * (15 + bufferBonus) + context.fungalRootSymbiontCount() * 4 + context.mycelialRootMediatorCount() * 2 + context.mycelialSynergizerCount() * 5 + context.rootNutrientUtilizerCount() * 25 + context.rootNutrientAmplifierCount() * 30);
     }
     }
