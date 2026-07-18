@@ -543,12 +543,13 @@ public class TraitRegistry {
         }
         if (childType == OrganismType.FOX && Math.random() < 0.3) {
             double r = Math.random();
-            if (r < 0.16) return "reproductive-efficiency";
-            else if (r < 0.32) return "nutrient-dependent-reproduction";
-            else if (r < 0.48) return "fox-energy-converter";
-            else if (r < 0.64) return "mutualist-synergy";
-            else if (r < 0.80) return "fox-stamina";
-            else return "fox-metabolic-efficiency";
+            if (r < 0.13) return "reproductive-efficiency";
+            else if (r < 0.26) return "nutrient-dependent-reproduction";
+            else if (r < 0.39) return "fox-energy-converter";
+            else if (r < 0.52) return "mutualist-synergy";
+            else if (r < 0.65) return "fox-stamina";
+            else if (r < 0.78) return "fox-metabolic-efficiency";
+            else return "fox-reproductive-converter";
         }
         if (childType == OrganismType.ROOT_NETWORK && Math.random() < 0.3) {
             double r = Math.random();

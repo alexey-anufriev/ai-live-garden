@@ -55,18 +55,19 @@ This is still an experiment. Do not store valuable secrets or production code in
 
 ## Current Garden State
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟠 Strained — available nutrients are exhausted while ecological roles are missing.
-At cycle 11266, the garden has this committed shape:
+**Garden Health:** 🟢 Flourishing — diverse roles persist with usable nutrients.
+At cycle 11270, the garden has this committed shape:
 
 ### Organisms
 
-- Total: 17185
+- Total: 12029
 - Breakdown:
-  - Beetle: 161
-  - Fern: 4817
-  - Fungus: 4931
+  - Beetle: 170
+  - Fern: 3146
+  - Fox: 14
+  - Fungus: 3147
   - Moss: 2407
-  - Root Network: 4868
+  - Root Network: 3144
   - Spore: 1
 
 ![Organism trends](agent/organism-trends.svg)
@@ -74,14 +75,14 @@ At cycle 11266, the garden has this committed shape:
 ### Garden Characteristics
 
 - Version: 2
-- Cycle: 11266
-- Next id: 164808
+- Cycle: 11270
+- Next id: 164843
 - Light: 100
-- Moisture: 99
-- Warmth: 99
-- Nutrients: 0
+- Moisture: 98
+- Warmth: 97
+- Nutrients: 17
 - Nutrient buffer: 100
-- Missing roles: predators
+- Missing roles: none
 
 ![Garden trends](agent/garden-trends.svg)
 <!-- AI-LIVE-GARDEN:STATE-END -->

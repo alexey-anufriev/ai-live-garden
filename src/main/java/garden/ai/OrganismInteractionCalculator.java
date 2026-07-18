@@ -476,7 +476,7 @@ public class OrganismInteractionCalculator {
         if (herbivoreCount > 0 && predatorCount < 3 && !Boolean.getBoolean("disable.emergency.colonization") && random.nextInt(colonizationChance) == 0) {
             OrganismType predator = OrganismType.FOX;
             String id = predator.name().toLowerCase(Locale.ROOT).replace('_', '-') + "-" + identifier;
-            next.add(Organism.of(id, predator, 5, 8, "emergency-colonizer"));
+            next.add(Organism.of(id, predator, 5, 8, "emergency-colonizer", "fox-reproductive-converter"));
             context.events().add(new GardenEvent(context.cycle(), "A new %s arrived to colonize the garden.".formatted(predator.displayName())));
             identifier++;
         }
