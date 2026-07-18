@@ -59,6 +59,14 @@ metadata_value() {
   echo "| Agent handoff validation | $(value_or_dash "${AGENT_HANDOFF_OUTCOME:-}") |"
   echo "| Post-Gemini test validation | $(value_or_dash "${POST_TEST_OUTCOME:-}") |"
   echo "| Candidate shadow evaluation | $(value_or_dash "${SHADOW_EVALUATION_OUTCOME:-}") |"
+  echo "| Shadow corrective prompt | $(value_or_dash "${SHADOW_RETRY_PROMPT_OUTCOME:-}") |"
+  echo "| Shadow corrective Gemini retry | $(value_or_dash "${SHADOW_RETRY_OUTCOME:-}") |"
+  echo "| Shadow corrective protected restore | $(value_or_dash "${SHADOW_RETRY_RESTORE_OUTCOME:-}") |"
+  echo "| Shadow corrective output guard | $(value_or_dash "${SHADOW_RETRY_GUARD_OUTCOME:-}") |"
+  echo "| Shadow corrective handoff | $(value_or_dash "${SHADOW_RETRY_HANDOFF_OUTCOME:-}") |"
+  echo "| Shadow corrective tests | $(value_or_dash "${SHADOW_RETRY_POST_TEST_OUTCOME:-}") |"
+  echo "| Shadow corrective worktree | $(value_or_dash "${SHADOW_RETRY_WORKTREE_OUTCOME:-}") |"
+  echo "| Shadow corrective evaluation | $(value_or_dash "${SHADOW_RETRY_EVALUATION_OUTCOME:-}") |"
   echo "| Garden state advance | $(value_or_dash "${ADVANCE_GARDEN_OUTCOME:-}") |"
   echo "| Automated memory generation | $(value_or_dash "${AUTO_MEMORY_OUTCOME:-}") |"
   echo "| Required memory validation | $(value_or_dash "${REQUIRED_MEMORY_OUTCOME:-}") |"
@@ -108,7 +116,11 @@ metadata_value() {
     echo "The run failed because Gemini did not leave a valid \`.agent-run.json\` file or marked handoff JSON in its output."
   elif [[ "${AGENT_HANDOFF_OUTCOME:-}" == "failure" ]]; then
     echo "The run failed because Gemini did not leave a valid \`.agent-run.json\` handoff."
-  elif [[ "${SHADOW_EVALUATION_OUTCOME:-}" == "failure" ]]; then
+  elif [[ "${SHADOW_RETRY_OUTCOME:-}" == "failure" ]]; then
+    echo "The run failed during the one bounded shadow corrective Gemini retry."
+  elif [[ "${SHADOW_RETRY_EVALUATION_OUTCOME:-}" == "failure" ]]; then
+    echo "The corrected candidate still missed its deterministic ecological target or safety bounds. No garden tick or commit was allowed."
+  elif [[ "${SHADOW_EVALUATION_OUTCOME:-}" == "failure" && "${SHADOW_RETRY_EVALUATION_OUTCOME:-}" != "success" ]]; then
     echo "The candidate was rejected because deterministic shadow simulation failed its ecological target or safety bounds. No garden tick or commit was allowed."
   elif [[ "${POST_TEST_OUTCOME:-}" == "failure" ]]; then
     echo "Post-Gemini Maven validation failed. The workflow intentionally commits the failed baseline and deterministic memory so the next autonomous run starts with repair."

@@ -12,8 +12,10 @@ steps="${SHADOW_SIMULATION_STEPS:-5}"
 seeds="${SHADOW_SIMULATION_SEEDS:-17,43}"
 max_organisms="${SHADOW_MAX_ORGANISMS:-25000}"
 timeout_seconds="${SHADOW_SIMULATION_TIMEOUT_SECONDS:-90}"
+max_parallel_seeds="${SHADOW_SIMULATION_MAX_PARALLEL_SEEDS:-4}"
+simulation_runner="${SHADOW_SIMULATION_RUNNER:-java}"
 
-for value in "$steps" "$max_organisms" "$timeout_seconds"; do
+for value in "$steps" "$max_organisms" "$timeout_seconds" "$max_parallel_seeds"; do
   if ! [[ "$value" =~ ^[1-9][0-9]*$ ]]; then
     echo "Shadow simulation numeric settings must be positive integers." >&2
     exit 2
@@ -26,18 +28,56 @@ if [[ ! -f target/classes/garden/ai/Main.class ]]; then
 fi
 
 mkdir -p "$(dirname "$output_file")"
-json_lines="$(mktemp)"
-trap 'rm -f "$json_lines"' EXIT
+rm -f "$output_file"
+work_dir="$(mktemp -d)"
+pids=()
+result_files=()
+seed_values=()
 
-for seed in ${seeds//,/ }; do
+cleanup() {
+  local pid
+  for pid in "${pids[@]}"; do
+    if kill -0 "$pid" 2>/dev/null; then
+      kill "$pid" 2>/dev/null || true
+    fi
+  done
+  wait "${pids[@]}" 2>/dev/null || true
+  rm -rf "$work_dir"
+}
+trap cleanup EXIT
+
+IFS=',' read -r -a seed_values <<< "$seeds"
+if (( ${#seed_values[@]} == 0 || ${#seed_values[@]} > max_parallel_seeds )); then
+  echo "Shadow simulation requires between 1 and ${max_parallel_seeds} seeds." >&2
+  exit 2
+fi
+
+for index in "${!seed_values[@]}"; do
+  seed="${seed_values[$index]}"
   if ! [[ "$seed" =~ ^-?[0-9]+$ ]]; then
     echo "Invalid shadow simulation seed: ${seed}" >&2
     exit 2
   fi
-  timeout --signal=TERM --kill-after=10s "${timeout_seconds}s" \
-    java -cp target/classes garden.ai.Main simulate \
-      --state "$state_file" --steps "$steps" --seed "$seed" --max-organisms "$max_organisms" >> "$json_lines"
+  result_file="${work_dir}/${index}.json"
+  result_files+=("$result_file")
+  (
+    timeout --signal=TERM --kill-after=10s "${timeout_seconds}s" \
+      "$simulation_runner" -cp target/classes garden.ai.Main simulate \
+        --state "$state_file" --steps "$steps" --seed "$seed" --max-organisms "$max_organisms" > "$result_file"
+  ) &
+  pids+=("$!")
 done
 
-jq -s '.' "$json_lines" > "$output_file"
+failed="false"
+for index in "${!pids[@]}"; do
+  if ! wait "${pids[$index]}"; then
+    echo "Shadow simulation failed for seed ${seed_values[$index]}." >&2
+    failed="true"
+  fi
+done
+if [[ "$failed" == "true" ]]; then
+  exit 1
+fi
+
+jq -s '.' "${result_files[@]}" > "$output_file"
 echo "Captured shadow simulation metrics in ${output_file}."

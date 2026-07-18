@@ -51,9 +51,65 @@ grep -Fq "AGENT_CONTEXT_BASELINE_SHADOW_FILE=${baseline_shadow}" "$prompt_metada
 prompt_delimiter="$(sed -n '1s/^text<<//p' "$prompt_outputs")"
 [[ "$(tail -n 1 "$prompt_outputs")" == "$prompt_delimiter" ]]
 
+shadow_fixture="$fixture_root/shadow-capture"
+mkdir -p "$shadow_fixture/target/classes/garden/ai"
+touch "$shadow_fixture/target/classes/garden/ai/Main.class"
+cat > "$shadow_fixture/fake-java" <<'RUNNER'
+#!/usr/bin/env bash
+set -euo pipefail
+seed=""
+while (( $# > 0 )); do
+  if [[ "$1" == "--seed" ]]; then
+    seed="$2"
+    break
+  fi
+  shift
+done
+if [[ "$seed" == "99" ]]; then
+  exit 7
+fi
+if [[ "$seed" == "88" ]]; then
+  sleep 2
+fi
+if [[ "$seed" == "43" ]]; then
+  sleep 0.2
+else
+  sleep 0.05
+fi
+printf '{"seed":%s,"status":"completed","final":{"total":1,"nutrients":1,"nutrientBuffer":1,"counts":{}},"maximumTotal":1}\n' "$seed"
+RUNNER
+chmod +x "$shadow_fixture/fake-java"
+(
+  cd "$shadow_fixture"
+  SHADOW_SIMULATION_RUNNER="$shadow_fixture/fake-java" \
+    SHADOW_SIMULATION_SEEDS=43,17 \
+    "$repository_root/scripts/capture-shadow-simulation.sh" "$shadow_fixture/result.json" >/dev/null
+)
+[[ "$(jq -c '[.[].seed]' "$shadow_fixture/result.json")" == '[43,17]' ]]
+if (
+  cd "$shadow_fixture"
+  SHADOW_SIMULATION_RUNNER="$shadow_fixture/fake-java" \
+    SHADOW_SIMULATION_SEEDS=17,99 \
+    "$repository_root/scripts/capture-shadow-simulation.sh" "$shadow_fixture/failed.json" >/dev/null 2>&1
+); then
+  echo "A failed parallel shadow seed incorrectly passed." >&2
+  exit 1
+fi
+if (
+  cd "$shadow_fixture"
+  SHADOW_SIMULATION_RUNNER="$shadow_fixture/fake-java" \
+    SHADOW_SIMULATION_SEEDS=17,88 \
+    SHADOW_SIMULATION_TIMEOUT_SECONDS=1 \
+    "$repository_root/scripts/capture-shadow-simulation.sh" "$shadow_fixture/timed-out.json" >/dev/null 2>&1
+); then
+  echo "A timed-out parallel shadow seed incorrectly passed." >&2
+  exit 1
+fi
+rm -rf "$shadow_fixture"
+
 mkdir -p "$fixture_root/scripts" "$fixture_root/agent/plans" "$fixture_root/artifacts"
 for script in find-active-agent-plan.sh agent-substantive-changes.sh validate-agent-handoff.sh \
-  extract-agent-handoff.sh inspect-agent-gemini-output.sh validate-agent-worktree.sh; do
+  extract-agent-handoff.sh inspect-agent-gemini-output.sh validate-agent-worktree.sh write-output-file.sh; do
   cp "$repository_root/scripts/$script" "$fixture_root/scripts/$script"
 done
 chmod +x "$fixture_root/scripts/"*.sh
@@ -91,6 +147,17 @@ handoff() {
 
 handoff A population.BEETLE increase 1 handoff-active.json
 AGENT_PM_REFERENCE_DATE=2026-07-08 scripts/validate-agent-handoff.sh handoff-active.json >/dev/null
+
+cp handoff-active.json .agent-run.json
+cat > shadow-evaluation-result.json <<'JSON'
+{"passed":false,"safetyPassed":true,"targetPassed":false,"metric":"population.BEETLE","goal":"increase","requiredDelta":1,"baselineAverage":1,"candidateAverage":1,"observedDelta":0,"seeds":[17,43]}
+JSON
+GITHUB_OUTPUT="$fixture_root/shadow-retry.outputs" \
+  "$repository_root/scripts/build-shadow-retry-prompt-output.sh" \
+    "$prompt_context" shadow-evaluation-result.json "$fixture_root/shadow-retry-context.md"
+grep -Fq '# AI Live Garden Shadow Corrective Context' "$fixture_root/shadow-retry-context.md"
+grep -Fq '"observedDelta": 0' "$fixture_root/shadow-retry-context.md"
+rm .agent-run.json shadow-evaluation-result.json
 
 handoff none population.BEETLE increase 1 handoff-stale.json
 AGENT_PM_REFERENCE_DATE=2026-07-09 scripts/validate-agent-handoff.sh handoff-stale.json >/dev/null
