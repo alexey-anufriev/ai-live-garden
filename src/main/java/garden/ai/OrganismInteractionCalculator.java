@@ -289,6 +289,10 @@ public class OrganismInteractionCalculator {
                     if (organism.traits().contains("nutrient-recycler")) totalNutrientContribution += 5;
                 }
                 totalNutrientContribution += organism.nutrientValue();
+                if (organism.traits().contains("fungal-nutrient-cycler")) {
+                    long fungalCount = organisms.stream().filter(o -> o.type() == OrganismType.FUNGUS).count();
+                    if (fungalCount > 0) totalNutrientContribution += (int) (fungalCount / 100);
+                }
                 deadOrganisms++;
                 if (organism.traits().contains("moisture-retainer") && organism.type() == OrganismType.MOSS) {
                     totalMoistureContribution += 5;
