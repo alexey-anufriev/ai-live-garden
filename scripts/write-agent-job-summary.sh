@@ -51,14 +51,13 @@ metadata_value() {
   echo "| Gemini autonomous step | $(value_or_dash "${GEMINI_OUTCOME:-}") |"
   echo "| Protected file restore | $(value_or_dash "${RESTORE_PROTECTED_OUTCOME:-}") |"
   echo "| Gemini primary output inspection | $(value_or_dash "${GEMINI_PRIMARY_INSPECT_OUTCOME:-}") |"
-  echo "| Gemini corrective retry prompt | $(value_or_dash "${GEMINI_RETRY_PROMPT_OUTCOME:-}") |"
-  echo "| Gemini corrective retry | $(value_or_dash "${GEMINI_RETRY_OUTCOME:-}") |"
-  echo "| Retry protected file restore | $(value_or_dash "${RETRY_RESTORE_PROTECTED_OUTCOME:-}") |"
-  echo "| Gemini final no-op guard | $(value_or_dash "${GEMINI_FINAL_GUARD_OUTCOME:-}") |"
+  echo "| Incomplete agent feedback | $(value_or_dash "${AGENT_INCOMPLETE_FEEDBACK_OUTCOME:-}") |"
+  echo "| Incomplete feedback commit | $(value_or_dash "${AGENT_FEEDBACK_COMMIT_OUTCOME:-}") |"
   echo "| Agent handoff extraction | $(value_or_dash "${EXTRACT_AGENT_HANDOFF_OUTCOME:-}") |"
   echo "| Agent handoff validation | $(value_or_dash "${AGENT_HANDOFF_OUTCOME:-}") |"
   echo "| Post-Gemini test validation | $(value_or_dash "${POST_TEST_OUTCOME:-}") |"
   echo "| Candidate shadow evaluation | $(value_or_dash "${SHADOW_EVALUATION_OUTCOME:-}") |"
+  echo "| Shadow operability repair | $(value_or_dash "${SHADOW_REPAIR_EVALUATION_OUTCOME:-}") |"
   echo "| Deferred shadow feedback | $(value_or_dash "${SHADOW_FEEDBACK_OUTCOME:-}") |"
   echo "| Deferred feedback commit | $(value_or_dash "${SHADOW_FEEDBACK_COMMIT_OUTCOME:-}") |"
   echo "| Garden state advance | $(value_or_dash "${ADVANCE_GARDEN_OUTCOME:-}") |"
@@ -100,17 +99,13 @@ metadata_value() {
     echo "The run failed during the main Gemini call. This is usually provider quota, authentication, or model availability."
   elif [[ "${GEMINI_PRIMARY_INSPECT_OUTCOME:-}" == "failure" ]]; then
     echo "The run failed while inspecting Gemini output for plan-mode/no-op behavior."
-  elif [[ "${GEMINI_RETRY_PROMPT_OUTCOME:-}" == "failure" ]]; then
-    echo "The run failed while building the corrective retry prompt after Gemini produced a plan-mode/no-op result."
-  elif [[ "${GEMINI_RETRY_OUTCOME:-}" == "failure" ]]; then
-    echo "The run failed during the corrective Gemini retry. This is usually provider quota, authentication, model availability, or a retry-time CLI failure."
-  elif [[ "${GEMINI_FINAL_GUARD_OUTCOME:-}" == "failure" ]]; then
-    echo "The run failed because Gemini entered planning/no-op behavior and still did not leave a valid handoff or repository changes after the corrective retry path."
+  elif [[ "${AGENT_INCOMPLETE_FEEDBACK_OUTCOME:-}" == "success" ]]; then
+    echo "The agent call was incomplete. Its partial changes were discarded and its evidence was committed for the next run without a same-run retry."
   elif [[ "${EXTRACT_AGENT_HANDOFF_OUTCOME:-}" == "failure" ]]; then
     echo "The run failed because Gemini did not leave a valid \`.agent-run.json\` file or marked handoff JSON in its output."
   elif [[ "${AGENT_HANDOFF_OUTCOME:-}" == "failure" ]]; then
     echo "The run failed because Gemini did not leave a valid \`.agent-run.json\` handoff."
-  elif [[ "${SHADOW_EVALUATION_OUTCOME:-}" == "failure" && "${SHADOW_FEEDBACK_OUTCOME:-}" == "success" ]]; then
+  elif [[ ( "${SHADOW_EVALUATION_OUTCOME:-}" == "failure" || "${SHADOW_REPAIR_EVALUATION_OUTCOME:-}" == "failure" ) && "${SHADOW_FEEDBACK_OUTCOME:-}" == "success" ]]; then
     echo "The candidate missed its deterministic ecological target or safety bounds. Its source changes were discarded, the evidence was committed for the next autonomous run, and this workflow completed without a same-run retry."
   elif [[ "${POST_TEST_OUTCOME:-}" == "failure" ]]; then
     echo "Post-Gemini Maven validation failed. The workflow intentionally commits the failed baseline and deterministic memory so the next autonomous run starts with repair."

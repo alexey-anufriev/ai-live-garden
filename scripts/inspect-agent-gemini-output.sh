@@ -83,7 +83,7 @@ if scripts/agent-substantive-changes.sh >/dev/null; then
 fi
 
 repair_required="false"
-if [[ "${AGENT_BASELINE_TEST_OUTCOME:-success}" != "success" || "${AGENT_BASELINE_POLICY_OUTCOME:-success}" != "success" ]]; then
+if [[ "${AGENT_BASELINE_TEST_OUTCOME:-success}" != "success" || "${AGENT_BASELINE_POLICY_OUTCOME:-success}" != "success" || "${AGENT_BASELINE_SHADOW_OUTCOME:-success}" != "success" ]]; then
   repair_required="true"
 fi
 if [[ "$repair_required" == "true" ]] && git status --porcelain -uall |
@@ -105,6 +105,9 @@ elif [[ "$valid_handoff" != "true" && ( "$worktree_changed" == "true" || "$plan_
   else
     noop_reason="agent-activity-without-valid-handoff-or-changes"
   fi
+elif [[ "$valid_handoff" != "true" ]]; then
+  retry_required="true"
+  noop_reason="agent-returned-no-valid-handoff-or-changes"
 fi
 
 if [[ -n "${GITHUB_OUTPUT:-}" ]]; then

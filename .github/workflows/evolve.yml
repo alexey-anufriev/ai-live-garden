@@ -31,6 +31,7 @@ jobs:
         run: echo "AGENT_PM_REFERENCE_DATE=$(date -u +%Y-%m-%d)" >> "$GITHUB_ENV"
 
       - name: Validate autonomous harness contracts
+        id: harness_contracts
         shell: bash
         run: scripts/test-agent-harness.sh
 
@@ -63,20 +64,25 @@ jobs:
 
       - name: Capture baseline shadow simulation
         id: baseline_shadow
-        if: ${{ !cancelled() && steps.baseline_test.outcome == 'success' && (steps.observation_window.outcome == 'success' || steps.observation_window.outcome == 'skipped') }}
+        if: ${{ !cancelled() && steps.baseline_test.outcome == 'success' && steps.observation_window.outputs.ready == 'true' }}
+        continue-on-error: true
         shell: bash
         run: |
-          scripts/capture-shadow-simulation.sh "${RUNNER_TEMP}/baseline-shadow.json"
+          capture_status=0
+          scripts/capture-shadow-simulation.sh "${RUNNER_TEMP}/baseline-shadow.json" || capture_status=$?
           cp "${RUNNER_TEMP}/baseline-shadow.json" target/agent-baseline-shadow.json
+          exit "$capture_status"
 
       - name: Build Gemini prompt
         id: gemini_prompt
+        if: ${{ !cancelled() && (steps.observation_window.outcome == 'skipped' || steps.observation_window.outputs.ready == 'true') }}
         shell: bash
         env:
           AGENT_CONTEXT_METADATA_FILE: ${{ runner.temp }}/agent-context.metadata
           AGENT_BASELINE_TEST_RESULT_FILE: ${{ runner.temp }}/baseline-test-result.md
           AGENT_BASELINE_POLICY_RESULT_FILE: ${{ runner.temp }}/baseline-policy-result.md
           AGENT_BASELINE_SHADOW_FILE: target/agent-baseline-shadow.json
+          AGENT_BASELINE_SHADOW_OUTCOME: ${{ steps.baseline_shadow.outcome }}
         run: |
           scripts/build-agent-context.sh "${RUNNER_TEMP}/agent-context.md" || {
             status=$?
@@ -90,11 +96,13 @@ jobs:
           }
 
       - name: Record Gemini model diagnostics
+        if: ${{ !cancelled() && steps.gemini_prompt.outcome == 'success' }}
         shell: bash
         run: scripts/write-gemini-model-diagnostics.sh
 
       - name: Run Gemini autonomous step
         id: gemini
+        if: ${{ !cancelled() && steps.gemini_prompt.outcome == 'success' }}
         uses: google-github-actions/run-gemini-cli@v0.1.22
         env:
           GEMINI_CLI_TRUST_WORKSPACE: "true"
@@ -107,73 +115,58 @@ jobs:
 
       - name: Restore protected files
         id: restore_protected
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && steps.gemini.outcome == 'success' }}
         shell: bash
         run: scripts/restore-agent-protected-files.sh
 
       - name: Inspect Gemini autonomous result
         id: gemini_primary_inspect
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && steps.gemini.outcome == 'success' && steps.restore_protected.outcome == 'success' }}
         shell: bash
         env:
           AGENT_BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
           AGENT_BASELINE_POLICY_OUTCOME: ${{ steps.baseline_policy.outcome }}
+          AGENT_BASELINE_SHADOW_OUTCOME: ${{ steps.baseline_shadow.outcome }}
         run: scripts/inspect-agent-gemini-output.sh gemini-artifacts
 
-      - name: Build Gemini corrective retry prompt
-        id: gemini_retry_prompt
+      - name: Persist incomplete agent result for the next run
+        id: defer_agent_incomplete
         if: ${{ !cancelled() && steps.gemini_primary_inspect.outputs.retry_required == 'true' }}
         shell: bash
-        env:
-          AGENT_PRIMARY_GEMINI_ARTIFACTS_DIR: ${{ runner.temp }}/gemini-artifacts-primary
-        run: scripts/build-agent-retry-prompt-output.sh "${RUNNER_TEMP}/agent-context.md" gemini-artifacts "${RUNNER_TEMP}/agent-retry-context.md"
+        run: scripts/defer-agent-incomplete.sh gemini-artifacts "${{ steps.gemini_primary_inspect.outputs.noop_reason }}" agent/shadow-feedback.md
 
-      - name: Run Gemini corrective retry
-        id: gemini_retry
-        if: ${{ !cancelled() && steps.gemini_primary_inspect.outputs.retry_required == 'true' }}
-        uses: google-github-actions/run-gemini-cli@v0.1.22
-        env:
-          GEMINI_CLI_TRUST_WORKSPACE: "true"
-        with:
-          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
-          gemini_cli_version: ${{ env.GEMINI_CLI_VERSION }}
-          gemini_model: ${{ env.EXECUTION_MODEL }}
-          prompt: ${{ steps.gemini_retry_prompt.outputs.text }}
-          upload_artifacts: false
-
-      - name: Restore protected files after retry
-        id: retry_restore_protected
-        if: ${{ !cancelled() && steps.gemini_primary_inspect.outputs.retry_required == 'true' }}
-        shell: bash
-        run: scripts/restore-agent-protected-files.sh
-
-      - name: Fail on Gemini plan-mode no-op
-        id: gemini_final_guard
-        if: ${{ !cancelled() }}
+      - name: Commit incomplete agent feedback
+        id: commit_agent_feedback
+        if: ${{ !cancelled() && steps.defer_agent_incomplete.outcome == 'success' }}
         shell: bash
         env:
-          AGENT_BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
-          AGENT_BASELINE_POLICY_OUTCOME: ${{ steps.baseline_policy.outcome }}
-        run: scripts/inspect-agent-gemini-output.sh --fail-on-noop gemini-artifacts
+          COMMIT_MESSAGE_PREFIX: "chore: record incomplete autonomous run"
+          COMMIT_TIMESTAMP_FORMAT: "%Y-%m-%dT%H:%MZ"
+        run: scripts/commit-if-changed.sh agent/shadow-feedback.md
 
       - name: Extract agent handoff from Gemini output
         id: extract_agent_handoff
+        if: ${{ !cancelled() && steps.gemini_primary_inspect.outputs.valid_handoff == 'true' && steps.gemini_primary_inspect.outputs.substantive_change == 'true' }}
         shell: bash
         env:
           AGENT_BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
           AGENT_BASELINE_POLICY_OUTCOME: ${{ steps.baseline_policy.outcome }}
+          AGENT_BASELINE_SHADOW_OUTCOME: ${{ steps.baseline_shadow.outcome }}
         run: scripts/extract-agent-handoff.sh --output .agent-run.json gemini-artifacts
 
       - name: Validate agent handoff
         id: agent_handoff
+        if: ${{ !cancelled() && steps.extract_agent_handoff.outcome == 'success' }}
         shell: bash
         env:
           AGENT_BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
           AGENT_BASELINE_POLICY_OUTCOME: ${{ steps.baseline_policy.outcome }}
+          AGENT_BASELINE_SHADOW_OUTCOME: ${{ steps.baseline_shadow.outcome }}
         run: scripts/validate-agent-handoff.sh .agent-run.json
 
       - name: Validate tests after Gemini changes
         id: post_test_final
+        if: ${{ !cancelled() && steps.agent_handoff.outcome == 'success' }}
         continue-on-error: true
         timeout-minutes: 4
         shell: bash
@@ -183,6 +176,7 @@ jobs:
 
       - name: Validate agent worktree before memory
         id: agent_worktree_repair_input
+        if: ${{ !cancelled() && steps.agent_handoff.outcome == 'success' }}
         continue-on-error: true
         shell: bash
         env:
@@ -190,6 +184,7 @@ jobs:
           VALIDATE_AGENT_WORKTREE_VIOLATIONS_FILE: ${{ runner.temp }}/agent-worktree-repair-input-violations.txt
           AGENT_BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
           AGENT_BASELINE_POLICY_OUTCOME: ${{ steps.baseline_policy.outcome }}
+          AGENT_BASELINE_SHADOW_OUTCOME: ${{ steps.baseline_shadow.outcome }}
         run: scripts/validate-agent-worktree.sh
 
       - name: Fail on hard pre-memory worktree policy
@@ -211,14 +206,37 @@ jobs:
           SHADOW_EVALUATION_RESULT_FILE: ${{ runner.temp }}/shadow-evaluation-result.json
         run: scripts/evaluate-shadow-candidate.sh "${RUNNER_TEMP}/baseline-shadow.json" .agent-run.json "${RUNNER_TEMP}/candidate-shadow.json"
 
-      - name: Persist rejected shadow evaluation for the next run
-        id: defer_shadow_rejection
-        if: ${{ !cancelled() && steps.shadow_evaluation.outcome == 'failure' }}
+      - name: Validate shadow operability repair
+        id: shadow_repair_evaluation
+        if: ${{ !cancelled() && steps.post_test_final.outcome == 'success' && steps.agent_worktree_repair_input.outputs.severity == 'clean' && steps.baseline_shadow.outcome != 'success' }}
+        continue-on-error: true
         shell: bash
         env:
-          SHADOW_BASELINE_FILE: ${{ runner.temp }}/baseline-shadow.json
-          SHADOW_CANDIDATE_FILE: ${{ runner.temp }}/candidate-shadow.json
-        run: scripts/defer-shadow-rejection.sh "${RUNNER_TEMP}/shadow-evaluation-result.json" .agent-run.json agent/shadow-feedback.md
+          AGENT_BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
+          AGENT_BASELINE_POLICY_OUTCOME: ${{ steps.baseline_policy.outcome }}
+          AGENT_BASELINE_SHADOW_OUTCOME: ${{ steps.baseline_shadow.outcome }}
+          SHADOW_EVALUATION_RESULT_FILE: ${{ runner.temp }}/shadow-repair-evaluation-result.json
+        run: scripts/evaluate-shadow-repair.sh .agent-run.json "${RUNNER_TEMP}/candidate-shadow-repair.json"
+
+      - name: Persist rejected shadow evaluation for the next run
+        id: defer_shadow_rejection
+        if: ${{ !cancelled() && (steps.shadow_evaluation.outcome == 'failure' || steps.shadow_repair_evaluation.outcome == 'failure') }}
+        shell: bash
+        env:
+          AGENT_BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
+          AGENT_BASELINE_POLICY_OUTCOME: ${{ steps.baseline_policy.outcome }}
+          AGENT_BASELINE_SHADOW_OUTCOME: ${{ steps.baseline_shadow.outcome }}
+        run: |
+          if [[ "${{ steps.shadow_evaluation.outcome }}" == "failure" ]]; then
+            export SHADOW_BASELINE_FILE="${RUNNER_TEMP}/baseline-shadow.json"
+            export SHADOW_CANDIDATE_FILE="${RUNNER_TEMP}/candidate-shadow.json"
+            result_file="${RUNNER_TEMP}/shadow-evaluation-result.json"
+          else
+            export SHADOW_BASELINE_FILE="${RUNNER_TEMP}/baseline-shadow.json"
+            export SHADOW_CANDIDATE_FILE="${RUNNER_TEMP}/candidate-shadow-repair.json"
+            result_file="${RUNNER_TEMP}/shadow-repair-evaluation-result.json"
+          fi
+          scripts/defer-shadow-rejection.sh "$result_file" .agent-run.json agent/shadow-feedback.md
 
       - name: Commit deferred shadow feedback
         id: commit_shadow_feedback
@@ -230,18 +248,18 @@ jobs:
         run: scripts/commit-if-changed.sh agent/shadow-feedback.md
 
       - name: Clear consumed shadow feedback
-        if: ${{ !cancelled() && steps.shadow_evaluation.outcome == 'success' }}
+        if: ${{ !cancelled() && (steps.shadow_evaluation.outcome == 'success' || steps.shadow_repair_evaluation.outcome == 'success') }}
         shell: bash
         run: rm -f agent/shadow-feedback.md
 
       - name: Advance persistent garden state
         id: advance_garden
-        if: ${{ !cancelled() && steps.post_test_final.outcome == 'success' && steps.agent_worktree_repair_input.outputs.severity == 'clean' && (steps.shadow_evaluation.outcome == 'success' || steps.shadow_evaluation.outcome == 'skipped') }}
+        if: ${{ !cancelled() && steps.post_test_final.outcome == 'success' && steps.agent_worktree_repair_input.outputs.severity == 'clean' && (steps.shadow_evaluation.outcome == 'success' || steps.shadow_repair_evaluation.outcome == 'success') }}
         run: mvn -B -q exec:java -Dexec.args="tick --steps 3"
 
       - name: Generate memory artifacts
         id: auto_memory
-        if: ${{ !cancelled() && (steps.post_test_final.outcome == 'success' || steps.post_test_final.outcome == 'failure') && (steps.agent_worktree_repair_input.outputs.severity == 'clean' || steps.agent_worktree_repair_input.outputs.severity == 'deferred') && steps.shadow_evaluation.outcome != 'failure' }}
+        if: ${{ !cancelled() && (steps.agent_worktree_repair_input.outputs.severity == 'clean' || steps.agent_worktree_repair_input.outputs.severity == 'deferred') && (steps.post_test_final.outcome == 'failure' || steps.shadow_evaluation.outcome == 'success' || steps.shadow_repair_evaluation.outcome == 'success') }}
         shell: bash
         env:
           AGENT_BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
@@ -349,14 +367,12 @@ jobs:
           OBSERVATION_WINDOW_OUTCOME: ${{ steps.observation_window.outcome }}
           GEMINI_OUTCOME: ${{ steps.gemini.outcome }}
           GEMINI_PRIMARY_INSPECT_OUTCOME: ${{ steps.gemini_primary_inspect.outcome }}
-          GEMINI_RETRY_PROMPT_OUTCOME: ${{ steps.gemini_retry_prompt.outcome }}
-          GEMINI_RETRY_OUTCOME: ${{ steps.gemini_retry.outcome }}
-          RETRY_RESTORE_PROTECTED_OUTCOME: ${{ steps.retry_restore_protected.outcome }}
-          GEMINI_FINAL_GUARD_OUTCOME: ${{ steps.gemini_final_guard.outcome }}
+          AGENT_INCOMPLETE_FEEDBACK_OUTCOME: ${{ steps.defer_agent_incomplete.outcome }}
           EXTRACT_AGENT_HANDOFF_OUTCOME: ${{ steps.extract_agent_handoff.outcome }}
           AGENT_HANDOFF_OUTCOME: ${{ steps.agent_handoff.outcome }}
           POST_TEST_OUTCOME: ${{ steps.post_test_final.outcome }}
           SHADOW_EVALUATION_OUTCOME: ${{ steps.shadow_evaluation.outcome }}
+          SHADOW_REPAIR_EVALUATION_OUTCOME: ${{ steps.shadow_repair_evaluation.outcome }}
           SHADOW_FEEDBACK_OUTCOME: ${{ steps.defer_shadow_rejection.outcome }}
           ADVANCE_GARDEN_OUTCOME: ${{ steps.advance_garden.outcome }}
           AUTO_MEMORY_OUTCOME: ${{ steps.auto_memory.outcome }}
@@ -394,15 +410,13 @@ jobs:
           GEMINI_OUTCOME: ${{ steps.gemini.outcome }}
           RESTORE_PROTECTED_OUTCOME: ${{ steps.restore_protected.outcome }}
           GEMINI_PRIMARY_INSPECT_OUTCOME: ${{ steps.gemini_primary_inspect.outcome }}
-          GEMINI_RETRY_PROMPT_OUTCOME: ${{ steps.gemini_retry_prompt.outcome }}
-          GEMINI_RETRY_OUTCOME: ${{ steps.gemini_retry.outcome }}
-          RETRY_RESTORE_PROTECTED_OUTCOME: ${{ steps.retry_restore_protected.outcome }}
-          GEMINI_FINAL_GUARD_OUTCOME: ${{ steps.gemini_final_guard.outcome }}
+          AGENT_INCOMPLETE_FEEDBACK_OUTCOME: ${{ steps.defer_agent_incomplete.outcome }}
           EXTRACT_AGENT_HANDOFF_OUTCOME: ${{ steps.extract_agent_handoff.outcome }}
           AGENT_HANDOFF_OUTCOME: ${{ steps.agent_handoff.outcome }}
           POST_TEST_OUTCOME: ${{ steps.post_test_final.outcome }}
           BASELINE_SHADOW_OUTCOME: ${{ steps.baseline_shadow.outcome }}
           SHADOW_EVALUATION_OUTCOME: ${{ steps.shadow_evaluation.outcome }}
+          SHADOW_REPAIR_EVALUATION_OUTCOME: ${{ steps.shadow_repair_evaluation.outcome }}
           SHADOW_FEEDBACK_OUTCOME: ${{ steps.defer_shadow_rejection.outcome }}
           ADVANCE_GARDEN_OUTCOME: ${{ steps.advance_garden.outcome }}
           AUTO_MEMORY_OUTCOME: ${{ steps.auto_memory.outcome }}
@@ -421,6 +435,7 @@ jobs:
           COLLECT_CHANGE_DIAGNOSTICS_OUTCOME: ${{ steps.collect_change_diagnostics.outcome }}
           COMMIT_OUTCOME: ${{ steps.commit_changes.outcome }}
           SHADOW_FEEDBACK_COMMIT_OUTCOME: ${{ steps.commit_shadow_feedback.outcome }}
+          AGENT_FEEDBACK_COMMIT_OUTCOME: ${{ steps.commit_agent_feedback.outcome }}
           AGENT_CONTEXT_METADATA_FILE: ${{ runner.temp }}/agent-context.metadata
           AGENT_CHANGE_DIAGNOSTICS_FILE: ${{ runner.temp }}/agent-change-diagnostics.md
         run: scripts/write-agent-job-summary.sh

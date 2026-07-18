@@ -51,7 +51,7 @@ if [[ -z "$pm_plan_file" ]]; then
 fi
 pm_direction="$(jq -r '.pmDirection // empty' "$handoff_file")"
 repair_required="false"
-if [[ "${AGENT_BASELINE_TEST_OUTCOME:-success}" != "success" || "${AGENT_BASELINE_POLICY_OUTCOME:-success}" != "success" ]]; then
+if [[ "${AGENT_BASELINE_TEST_OUTCOME:-success}" != "success" || "${AGENT_BASELINE_POLICY_OUTCOME:-success}" != "success" || "${AGENT_BASELINE_SHADOW_OUTCOME:-success}" != "success" ]]; then
   repair_required="true"
 fi
 

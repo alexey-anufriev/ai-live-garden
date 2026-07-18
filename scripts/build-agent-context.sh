@@ -23,6 +23,7 @@ metadata_file="${AGENT_CONTEXT_METADATA_FILE:-${output_file}.metadata}"
 baseline_test_result_file="${AGENT_BASELINE_TEST_RESULT_FILE:-}"
 baseline_policy_result_file="${AGENT_BASELINE_POLICY_RESULT_FILE:-}"
 baseline_shadow_file="${AGENT_BASELINE_SHADOW_FILE:-}"
+baseline_shadow_outcome="${AGENT_BASELINE_SHADOW_OUTCOME:-unknown}"
 shadow_feedback_file="${AGENT_SHADOW_FEEDBACK_FILE:-agent/shadow-feedback.md}"
 mkdir -p "$(dirname "$metadata_file")"
 
@@ -216,7 +217,7 @@ append_baseline_shadow_result() {
   echo "## Baseline Shadow Simulation"
   echo
   if [[ -z "$baseline_shadow_file" || ! -f "$baseline_shadow_file" ]]; then
-    echo "No baseline shadow simulation was provided."
+    echo "No baseline shadow simulation was provided. Treat this as a required operability repair when the baseline shadow outcome is not success."
     echo
     return
   fi
@@ -225,12 +226,20 @@ append_baseline_shadow_result() {
     type == "array" and length > 0 and
     all(.[];
       (.seed | type == "number") and
-      (.status | type == "string") and
-      (.final | type == "object") and
-      (.final.counts | type == "object")
+      (.status | type == "string")
     )
   ' "$baseline_shadow_file" >/dev/null; then
     echo "The baseline shadow simulation file is malformed; do not claim a shadow-verified ecological target."
+    echo
+    return
+  fi
+
+  if [[ "$baseline_shadow_outcome" != "success" ]] || ! jq -e 'all(.[]; .status == "completed")' "$baseline_shadow_file" >/dev/null; then
+    echo "Baseline shadow simulation did not complete. This run must repair bounded simulation operability, set \`pmDirection\` to \`none\`, and use the required-repair \`tests/pass\` handoff. CI will require the post-change shadow capture to complete before advancing the garden."
+    echo
+    echo '```json'
+    jq . "$baseline_shadow_file"
+    echo '```'
     echo
     return
   fi
@@ -399,6 +408,7 @@ append_compact_journal_entry() {
   echo "- You have god-mode recovery authority when persisted state causes runaway growth, timeouts, corruption, or prevents autonomous recovery. You may deterministically rebalance, cull, reseed, migrate, or directly repair \`data/garden-state.txt\`; prefer the program's \`recover\` command, preserve ecological roles, add an explanatory event, and report before/after counts."
   echo "- Never wait indefinitely for a random event or population outcome. Tests and diagnostics must be bounded. Use \`scripts/run-maven-tests-with-timeout.sh\`; if it interrupts Maven, treat the timeout as the baseline defect and replace long loops with deterministic phase-level tests."
   echo "- If the Baseline Maven Test Result says \`failed\`, repairing the existing Java source or tests is the run's required first task. Do not add unrelated behavior until \`mvn test\` passes."
+  echo "- If the Baseline Shadow Simulation did not complete, repairing bounded simulation operability is the required task. Set \`pmDirection\` to \`none\`; CI will rerun the bounded shadow capture after the change and will not tick until it completes."
   echo "- If the Baseline Worktree Policy Result says \`deferred-repair\`, repairing those policy violations is the run's required first task. Do not add unrelated behavior until the policy violations are cleared."
   echo "- If an active Project Manager Direction exists and no baseline repair is required, choose exactly one PM direction A-D as the run's highest product priority. Otherwise set \`pmDirection\` to \`none\`."
   echo "- The run is pre-approved. Do not enter planning mode, do not ask for confirmation, and do not stop after proposing a strategy."
@@ -556,5 +566,6 @@ fi
   echo "AGENT_CONTEXT_BASELINE_TEST_RESULT_FILE=${baseline_test_result_file}"
   echo "AGENT_CONTEXT_BASELINE_POLICY_RESULT_FILE=${baseline_policy_result_file}"
   echo "AGENT_CONTEXT_BASELINE_SHADOW_FILE=${baseline_shadow_file}"
+  echo "AGENT_CONTEXT_BASELINE_SHADOW_OUTCOME=${baseline_shadow_outcome}"
   echo "AGENT_CONTEXT_SHADOW_FEEDBACK_FILE=${shadow_feedback_file}"
 } > "$metadata_file"

@@ -11,7 +11,7 @@ state_file="${SHADOW_STATE_FILE:-data/garden-state.txt}"
 steps="${SHADOW_SIMULATION_STEPS:-5}"
 seeds="${SHADOW_SIMULATION_SEEDS:-17,43}"
 max_organisms="${SHADOW_MAX_ORGANISMS:-25000}"
-timeout_seconds="${SHADOW_SIMULATION_TIMEOUT_SECONDS:-90}"
+timeout_seconds="${SHADOW_SIMULATION_TIMEOUT_SECONDS:-120}"
 max_parallel_seeds="${SHADOW_SIMULATION_MAX_PARALLEL_SEEDS:-4}"
 simulation_runner="${SHADOW_SIMULATION_RUNNER:-java}"
 
@@ -70,14 +70,37 @@ done
 
 failed="false"
 for index in "${!pids[@]}"; do
-  if ! wait "${pids[$index]}"; then
-    echo "Shadow simulation failed for seed ${seed_values[$index]}." >&2
+  exit_code=0
+  wait "${pids[$index]}" || exit_code=$?
+  if (( exit_code != 0 )); then
+    if (( exit_code == 124 || exit_code == 137 )); then
+      failure_status="timed-out"
+    else
+      failure_status="failed"
+    fi
+    jq -n \
+      --argjson seed "${seed_values[$index]}" \
+      --argjson requestedSteps "$steps" \
+      --arg status "$failure_status" \
+      --argjson exitCode "$exit_code" \
+      '{seed:$seed,requestedSteps:$requestedSteps,completedSteps:0,status:$status,exitCode:$exitCode}' \
+      > "${result_files[$index]}"
+    echo "Shadow simulation ${failure_status} for seed ${seed_values[$index]} (exit ${exit_code})." >&2
+    failed="true"
+  elif ! jq -e 'type == "object" and (.seed | type == "number") and (.status | type == "string")' "${result_files[$index]}" >/dev/null 2>&1; then
+    jq -n \
+      --argjson seed "${seed_values[$index]}" \
+      --argjson requestedSteps "$steps" \
+      '{seed:$seed,requestedSteps:$requestedSteps,completedSteps:0,status:"invalid-output",exitCode:0}' \
+      > "${result_files[$index]}"
+    echo "Shadow simulation returned invalid output for seed ${seed_values[$index]}." >&2
     failed="true"
   fi
 done
-if [[ "$failed" == "true" ]]; then
-  exit 1
-fi
 
 jq -s '.' "${result_files[@]}" > "$output_file"
+if [[ "$failed" == "true" ]]; then
+  echo "Captured failed shadow simulation diagnostics in ${output_file}." >&2
+  exit 1
+fi
 echo "Captured shadow simulation metrics in ${output_file}."
