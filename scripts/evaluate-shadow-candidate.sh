@@ -13,7 +13,28 @@ if [[ -z "$baseline_file" || ! -f "$baseline_file" ]]; then
 fi
 
 scripts/validate-agent-handoff.sh "$handoff_file" >/dev/null
-scripts/capture-shadow-simulation.sh "$candidate_file" >/dev/null
+if ! scripts/capture-shadow-simulation.sh "$candidate_file" >/dev/null; then
+  jq -n \
+    --slurpfile handoff "$handoff_file" '
+    $handoff[0].evaluation as $evaluation |
+    {
+      passed: false,
+      safetyPassed: false,
+      targetPassed: false,
+      metric: $evaluation.metric,
+      goal: $evaluation.goal,
+      requiredDelta: $evaluation.requiredDelta,
+      baselineAverage: null,
+      candidateAverage: null,
+      observedDelta: null,
+      seeds: [],
+      reason: "candidate-shadow-capture-failed"
+    }
+  ' > "$result_file"
+  cat "$result_file"
+  echo "Candidate shadow capture failed; the autonomous change was rejected." >&2
+  exit 1
+fi
 
 jq -n \
   --slurpfile baseline "$baseline_file" \

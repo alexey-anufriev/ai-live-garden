@@ -60,8 +60,7 @@ if [[ -n "${AGENT_BASELINE_POLICY_RESULT_FILE:-}" && -f "$AGENT_BASELINE_POLICY_
   cp "$AGENT_BASELINE_POLICY_RESULT_FILE" "$output_dir/baseline-policy-result.md"
 fi
 
-for shadow_variable in AGENT_BASELINE_SHADOW_FILE AGENT_CANDIDATE_SHADOW_FILE AGENT_SHADOW_EVALUATION_RESULT_FILE \
-  AGENT_SHADOW_RETRY_CANDIDATE_FILE AGENT_SHADOW_RETRY_EVALUATION_RESULT_FILE; do
+for shadow_variable in AGENT_BASELINE_SHADOW_FILE AGENT_CANDIDATE_SHADOW_FILE AGENT_SHADOW_EVALUATION_RESULT_FILE; do
   shadow_file="${!shadow_variable:-}"
   if [[ -n "$shadow_file" && -f "$shadow_file" ]]; then
     cp "$shadow_file" "$output_dir/$(basename "$shadow_file")"

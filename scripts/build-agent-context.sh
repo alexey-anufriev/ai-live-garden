@@ -23,6 +23,7 @@ metadata_file="${AGENT_CONTEXT_METADATA_FILE:-${output_file}.metadata}"
 baseline_test_result_file="${AGENT_BASELINE_TEST_RESULT_FILE:-}"
 baseline_policy_result_file="${AGENT_BASELINE_POLICY_RESULT_FILE:-}"
 baseline_shadow_file="${AGENT_BASELINE_SHADOW_FILE:-}"
+shadow_feedback_file="${AGENT_SHADOW_FEEDBACK_FILE:-agent/shadow-feedback.md}"
 mkdir -p "$(dirname "$metadata_file")"
 
 latest_files() {
@@ -260,6 +261,19 @@ append_baseline_shadow_result() {
   echo
 }
 
+append_shadow_feedback() {
+  echo "## Previous Rejected Shadow Hypothesis"
+  echo
+  if [[ -f "$shadow_feedback_file" ]]; then
+    echo "This feedback is the highest-priority continuity evidence from the previous autonomous attempt. Diagnose its missed causal link before selecting work, and do not repeat the same hypothesis unchanged."
+    echo
+    sed -n '1,$p' "$shadow_feedback_file"
+  else
+    echo "No deferred shadow rejection is awaiting consumption."
+  fi
+  echo
+}
+
 autonomous_commits() {
   git log --grep='^feat: autonomous garden evolution' --format='%H' -n "${1:-3}" 2>/dev/null || true
 }
@@ -380,7 +394,7 @@ append_compact_journal_entry() {
   echo "- Treat a PM direction as an outcome target, not as proof of its suggested causal mechanism. Inspect the current state and relevant code before deciding how to achieve it."
   echo "- When Ecological Outcome History reports stagnation, use a bottleneck-first change: reproduce the blocker from the current persisted population, identify the active gate, and fix that gate with a focused behavior test. Do not add or tune another named trait unless current organisms carry it or the change includes a credible adoption path."
   echo "- A passing unit test proves the modeled rule, not impact on the living state. Report both current-state evidence and the behavioral verification in the handoff."
-  echo "- Declare one measurable shadow target in \`evaluation\`. CI replays baseline and candidate code from the same state and seeds; a missed target, role extinction, runaway population, or timeout rejects the candidate before the real tick."
+  echo "- Declare one measurable shadow target in \`evaluation\`. CI replays baseline and candidate code from the same state and seeds; a missed target, role extinction, runaway population, or timeout discards the candidate before the real tick and records the evidence for the next run."
   echo "- Use the Baseline Shadow Simulation section as the acceptance baseline. Before finalizing, run the exact candidate preflight command shown there and report its observed delta in \`evidence.verification\`."
   echo "- You have god-mode recovery authority when persisted state causes runaway growth, timeouts, corruption, or prevents autonomous recovery. You may deterministically rebalance, cull, reseed, migrate, or directly repair \`data/garden-state.txt\`; prefer the program's \`recover\` command, preserve ecological roles, add an explanatory event, and report before/after counts."
   echo "- Never wait indefinitely for a random event or population outcome. Tests and diagnostics must be bounded. Use \`scripts/run-maven-tests-with-timeout.sh\`; if it interrupts Maven, treat the timeout as the baseline defect and replace long loops with deterministic phase-level tests."
@@ -405,7 +419,7 @@ append_compact_journal_entry() {
   echo "- Do not weaken assertions to make tests pass or leave uncertainty comments in tests such as \"maybe\", \"wait\", \"not sure\", or \"does not distinguish\"."
   echo "- Run \`scripts/run-maven-tests-with-timeout.sh\` if possible and leave the code in a testable state."
   echo "- Normal evolution happens by simulation. During a demonstrated operability emergency, use the smallest deterministic god-mode state intervention needed and pair it with a recurrence guard."
-  echo "- Do not edit generated memory or PM direction files: \`README.md\`, \`agent/state.md\`, \`agent/requests.md\`, \`agent/code-map.md\`, \`agent/journal/\`, \`agent/summaries/\`, \`agent/templates/\`, or \`agent/plans/\`."
+  echo "- Do not edit generated memory, deferred feedback, or PM direction files: \`README.md\`, \`agent/state.md\`, \`agent/requests.md\`, \`agent/code-map.md\`, \`agent/shadow-feedback.md\`, \`agent/journal/\`, \`agent/summaries/\`, \`agent/templates/\`, or \`agent/plans/\`."
   echo "- Do not run memory harness scripts. CI post-processing will generate README state, code map, summaries, journal, and current memory from the final diff and garden state."
   echo "- Write \`.agent-run.json\` as the machine-readable handoff described below. This file is required."
   echo "- A handoff is not a completed run by itself. Before CI advances the garden, the worktree must contain a substantive agent-authored change under \`src/main/\`, \`src/test/\`, \`pom.xml\`, or an emergency change to \`data/garden-state.txt\`."
@@ -422,6 +436,7 @@ append_compact_journal_entry() {
   scripts/write-garden-outcome-history.sh
   echo
   append_project_manager_direction
+  append_shadow_feedback
   echo "## Automatic Post-Processing"
   echo
   echo "After this step, CI runs \`scripts/agent-auto-postprocess.sh\`. It parses \`.agent-run.json\`, restores generated memory files, refreshes \`agent/code-map.md\`, advances documentation from \`data/garden-state.txt\`, appends summaries, creates the journal entry, applies any request entries, removes \`.agent-run.json\`, and leaves those artifacts for validation."
@@ -541,4 +556,5 @@ fi
   echo "AGENT_CONTEXT_BASELINE_TEST_RESULT_FILE=${baseline_test_result_file}"
   echo "AGENT_CONTEXT_BASELINE_POLICY_RESULT_FILE=${baseline_policy_result_file}"
   echo "AGENT_CONTEXT_BASELINE_SHADOW_FILE=${baseline_shadow_file}"
+  echo "AGENT_CONTEXT_SHADOW_FEEDBACK_FILE=${shadow_feedback_file}"
 } > "$metadata_file"
