@@ -13,7 +13,7 @@ public class BufferSiphonTest {
         Organism siphoner = Organism.of("root-siphon", OrganismType.ROOT_NETWORK, 10, 5, "buffer-siphon");
         
         // Advance cycle: siphonCount = 1
-        Environment nextEnv = env.next(1, 0, 0, 0, 0, 0, 0, 0, 0, 1);
+        Environment nextEnv = env.next(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1);
         
         // Siphon moves 5 nutrients from buffer (100 -> 95) to pool (0 -> 5)
         assertTrue(nextEnv.nutrientBuffer() <= 95, "Buffer should decrease by at least 5 due to siphon");

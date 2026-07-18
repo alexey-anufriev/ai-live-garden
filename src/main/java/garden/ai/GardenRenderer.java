@@ -46,6 +46,7 @@ public final class GardenRenderer {
         int rootConsumptionReduction = (int) (demandRegulatorCount / 2);
         int mobilizerCount = (int) TraitRegistry.count(garden.organisms(), "nutrient-mobilizer");
         int releaserCount = (int) TraitRegistry.count(garden.organisms(), "buffer-releaser");
+        int acceleratorCount = (int) TraitRegistry.count(garden.organisms(), "buffer-release-accelerator");
 
         Map<String, Long> traitCounts = garden.organisms().stream()
                 .flatMap(o -> o.traits().stream())
@@ -87,7 +88,7 @@ public final class GardenRenderer {
                 garden.environment().nutrientBuffer(),
                 garden.rootContribution(),
                 garden.fungalContribution(),
-                garden.environment().mood() + (garden.environment().mood().equals("hungry") ? " (" + garden.environment().diagnostic(moss, ferns, mossConsumptionReduction, fernConsumptionReduction, rootConsumptionReduction, mobilizerCount, releaserCount, garden.blockedPlantCount(), culledPlantCount, stressResilientPlantCount) + ")" : ""),
+                garden.environment().mood() + (garden.environment().mood().equals("hungry") ? " (" + garden.environment().diagnostic(moss, ferns, mossConsumptionReduction, fernConsumptionReduction, rootConsumptionReduction, mobilizerCount, releaserCount, acceleratorCount, garden.blockedPlantCount(), culledPlantCount, stressResilientPlantCount) + ")" : ""),
                 garden.plantCount(),
                 moss, roots, spores, ferns,
                 garden.animalCount(),

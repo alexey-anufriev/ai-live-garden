@@ -53,6 +53,7 @@ public class OrganismInteractionCalculator {
         long mobilizerCount = TraitRegistry.count(context.organisms(), "nutrient-mobilizer");
         long fungalNutrientMobilizerCount = TraitRegistry.count(context.organisms(), "fungal-nutrient-mobilizer", OrganismType.FUNGUS);
         long releaserCount = TraitRegistry.count(context.organisms(), "buffer-releaser");
+        long acceleratorCount = TraitRegistry.count(context.organisms(), "buffer-release-accelerator");
         long recyclerCount = TraitRegistry.count(context.organisms(), "nutrient-recycler");
         long distributorCount = TraitRegistry.count(context.organisms(), "nutrient-distributor");
         long demandRegulatorCount = TraitRegistry.count(context.organisms(), "nutrient-demand-regulator");
@@ -60,7 +61,7 @@ public class OrganismInteractionCalculator {
         
         int reductionFactor = context.environment().nutrients() < 10 ? 1 : 5;
         int plantConsumptionReduction = (int) ((mossConserverCount + mossScavengerCount + fernConserverCount) / reductionFactor);
-        Environment nextEnvironment = context.environment().next(context.nextCycle(), (int) plantCount, (int) animalCount, contribution.rootContribution(), contribution.fungalContribution(), plantConsumptionReduction, (int) demandRegulatorCount / 2, (int) (mobilizerCount + fungalNutrientMobilizerCount), (int) releaserCount, (int) siphonCount);
+        Environment nextEnvironment = context.environment().next(context.nextCycle(), (int) plantCount, (int) animalCount, contribution.rootContribution(), contribution.fungalContribution(), plantConsumptionReduction, (int) demandRegulatorCount / 2, (int) (mobilizerCount + fungalNutrientMobilizerCount), (int) releaserCount, (int) acceleratorCount, (int) siphonCount);
         
         int production = 2 + (int)animalCount / 2;
         int mossConsumption = (int)Math.max(0, mossCount / 5 - (mossConserverCount + mossScavengerCount) / reductionFactor);
@@ -79,9 +80,9 @@ public class OrganismInteractionCalculator {
             nextEvents.add(new GardenEvent(context.nextCycle(), "The nutrient buffer is accumulating."));
         }
         int baseReleaseRate = context.environment().nutrients() < 5 ? 2 : (context.environment().nutrients() < 10 ? 5 : 10);
-        int effectiveReleaseRate = Math.max(1, baseReleaseRate - (int)(mobilizerCount + fungalNutrientMobilizerCount) - (int)releaserCount - (int)recyclerCount - (int)distributorCount);
+        int effectiveReleaseRate = Math.max(1, baseReleaseRate - (int)(mobilizerCount + fungalNutrientMobilizerCount) - (int)releaserCount - (int)acceleratorCount - (int)recyclerCount - (int)distributorCount);
         int releasedFromBuffer = context.environment().nutrientBuffer() / effectiveReleaseRate;
-        nextEvents.add(new GardenEvent(context.nextCycle(), "Buffer release stats: baseRate=%d, mobilizers=%d, releasers=%d, recyclers=%d, distributors=%d, effectiveRate=%d, released=%d".formatted(baseReleaseRate, mobilizerCount + fungalNutrientMobilizerCount, releaserCount, recyclerCount, distributorCount, effectiveReleaseRate, releasedFromBuffer)));
+        nextEvents.add(new GardenEvent(context.nextCycle(), "Buffer release stats: baseRate=%d, mobilizers=%d, releasers=%d, accelerators=%d, recyclers=%d, distributors=%d, effectiveRate=%d, released=%d".formatted(baseReleaseRate, mobilizerCount + fungalNutrientMobilizerCount, releaserCount, acceleratorCount, recyclerCount, distributorCount, effectiveReleaseRate, releasedFromBuffer)));
         
         int availableNutrients = context.environment().nutrients() + releasedFromBuffer;
         if (consumption > availableNutrients) {

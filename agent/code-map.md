@@ -4,15 +4,15 @@ Generated source orientation for autonomous runs. Do not edit manually.
 
 ## Source Files
 
-- `src/main/java/garden/ai/Environment.java`: Environmental dynamics management, reverted to baseline.
+- `src/main/java/garden/ai/Environment.java`: Environment drift and nutrient buffer release logic updated to support buffer-release-accelerator.
 - `src/main/java/garden/ai/Garden.java`: Immutable garden snapshot, now delegating cycle advancement orchestration.
 - `src/main/java/garden/ai/GardenEvent.java`: Compact event record used by simulation and rendering.
 - `src/main/java/garden/ai/GardenRecovery.java`: class GardenRecovery.
-- `src/main/java/garden/ai/GardenRenderer.java`: CLI renderer, now utilizing TraitRegistry for trait counting.
+- `src/main/java/garden/ai/GardenRenderer.java`: Diagnostic output updated to include acceleratorCount.
 - `src/main/java/garden/ai/GardenStateStore.java`: Persistence for `data/garden-state.txt`.
 - `src/main/java/garden/ai/Main.java`: CLI entry point for `inspect` and `tick`.
 - `src/main/java/garden/ai/Organism.java`: Represents a single living element in the garden, now utilizing TraitRegistry for nutrient value calculation.
-- `src/main/java/garden/ai/OrganismInteractionCalculator.java`: Calculates reproduction thresholds for all organism types.
+- `src/main/java/garden/ai/OrganismInteractionCalculator.java`: Counting logic for buffer-release-accelerator added to environmental dynamics calculation.
 - `src/main/java/garden/ai/OrganismType.java`: Defines taxonomy and environmental succession rules, updated to lower SPORE-to-FUNGUS colonization threshold.
 - `src/main/java/garden/ai/Simulation.java`: Advances seed or loaded garden state.
 - `src/main/java/garden/ai/TraitRegistry.java`: Registry for metabolic and interaction traits.
@@ -20,6 +20,6 @@ Generated source orientation for autonomous runs. Do not edit manually.
 ## Tests
 
 - Tests live under `src/test/java/garden/ai/`.
-- Current Java test files: 134.
+- Current Java test files: 135.
 - Prefer focused behavior tests for changed simulation rules.
 - Add or inspect exact test files only when the chosen task needs them.
