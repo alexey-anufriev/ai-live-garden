@@ -53,7 +53,7 @@ public class OrganismInteractionCalculator {
         long mobilizerCount = TraitRegistry.count(context.organisms(), "nutrient-mobilizer");
         long fungalNutrientMobilizerCount = TraitRegistry.count(context.organisms(), "fungal-nutrient-mobilizer", OrganismType.FUNGUS);
         long releaserCount = TraitRegistry.count(context.organisms(), "buffer-releaser");
-        long acceleratorCount = TraitRegistry.count(context.organisms(), "buffer-release-accelerator");
+        long acceleratorCount = TraitRegistry.count(context.organisms(), "buffer-release-accelerator") + TraitRegistry.count(context.organisms(), "buffer-release-optimizer");
         long recyclerCount = TraitRegistry.count(context.organisms(), "nutrient-recycler");
         long distributorCount = TraitRegistry.count(context.organisms(), "nutrient-distributor");
         long demandRegulatorCount = TraitRegistry.count(context.organisms(), "nutrient-demand-regulator");
