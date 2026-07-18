@@ -5,23 +5,37 @@ repository_root="$(cd "$(dirname "$0")/.." && pwd)"
 fixture_root="$(mktemp -d)"
 trap 'rm -rf "$fixture_root"' EXIT
 
-for executable_script in \
-  scripts/defer-agent-incomplete.sh \
-  scripts/evaluate-shadow-repair.sh; do
-  if [[ ! -x "$repository_root/$executable_script" ]]; then
-    echo "Workflow helper must be executable: ${executable_script}" >&2
+workflow_file="$repository_root/.github/workflows/evolve.yml"
+while IFS= read -r workflow_script; do
+  if [[ ! -f "$repository_root/$workflow_script" ]]; then
+    echo "Workflow references a missing shell script: ${workflow_script}" >&2
     exit 1
   fi
-done
+  bash -n "$repository_root/$workflow_script"
+done < <(grep -oE 'scripts/[a-zA-Z0-9._-]+[.]sh' "$workflow_file" | sort -u)
 
-grep -Fq 'id: defer_shadow_rejection' "$repository_root/.github/workflows/evolve.yml"
-grep -Fq 'scripts/defer-shadow-rejection.sh' "$repository_root/.github/workflows/evolve.yml"
-grep -Fq 'id: commit_shadow_feedback' "$repository_root/.github/workflows/evolve.yml"
-grep -Fq 'id: defer_agent_incomplete' "$repository_root/.github/workflows/evolve.yml"
-grep -Fq 'id: shadow_repair_evaluation' "$repository_root/.github/workflows/evolve.yml"
-grep -Fq "steps.harness_contracts.outcome == 'success'" "$repository_root/.github/workflows/evolve.yml"
-grep -Fq "steps.setup_java.outcome == 'success'" "$repository_root/.github/workflows/evolve.yml"
-if grep -Eq 'build-(agent|shadow)-retry-prompt-output\.sh|Run Gemini corrective retry' "$repository_root/.github/workflows/evolve.yml"; then
+while IFS= read -r directly_invoked_script; do
+  if [[ ! -x "$repository_root/$directly_invoked_script" ]]; then
+    echo "Directly invoked workflow helper must be executable or called with bash: ${directly_invoked_script}" >&2
+    exit 1
+  fi
+done < <(
+  sed -nE \
+    -e 's/^[[:space:]]*run:[[:space:]]+(scripts\/[a-zA-Z0-9._-]+[.]sh).*/\1/p' \
+    -e 's/^[[:space:]]+(scripts\/[a-zA-Z0-9._-]+[.]sh).*/\1/p' \
+    "$workflow_file" | sort -u
+)
+
+grep -Fq 'id: defer_shadow_rejection' "$workflow_file"
+grep -Fq 'scripts/defer-shadow-rejection.sh' "$workflow_file"
+grep -Fq 'id: commit_shadow_feedback' "$workflow_file"
+grep -Fq 'id: defer_agent_incomplete' "$workflow_file"
+grep -Fq 'id: shadow_repair_evaluation' "$workflow_file"
+grep -Fq 'bash scripts/defer-agent-incomplete.sh' "$workflow_file"
+grep -Fq 'bash scripts/evaluate-shadow-repair.sh' "$workflow_file"
+grep -Fq "steps.harness_contracts.outcome == 'success'" "$workflow_file"
+grep -Fq "steps.setup_java.outcome == 'success'" "$workflow_file"
+if grep -Eq 'build-(agent|shadow)-retry-prompt-output\.sh|Run Gemini corrective retry' "$workflow_file"; then
   echo "The workflow reintroduced a same-run corrective agent loop." >&2
   exit 1
 fi
@@ -201,7 +215,7 @@ JSON
   AGENT_BASELINE_SHADOW_OUTCOME=failure \
     SHADOW_SIMULATION_RUNNER="$shadow_fixture/fake-java" SHADOW_SIMULATION_SEEDS=17 \
     SHADOW_EVALUATION_RESULT_FILE="$shadow_fixture/repair-result.json" \
-    scripts/evaluate-shadow-repair.sh repair-handoff.json repair-candidate.json >/dev/null
+    bash scripts/evaluate-shadow-repair.sh repair-handoff.json repair-candidate.json >/dev/null
 )
 jq -e '.passed == true and .metric == "shadowSimulation" and .goal == "pass"' \
   "$shadow_fixture/repair-result.json" >/dev/null
@@ -359,7 +373,7 @@ echo 'package example; class Change {}' > "$incomplete_fixture/src/main/java/exa
   echo 'partial scratch' > unrelated/scratch.txt
   printf '{"response":"partial agent response","stats":{"tools":{"totalCalls":2}}}\n' \
     > gemini-artifacts/stdout.log
-  scripts/defer-agent-incomplete.sh gemini-artifacts agent-returned-no-valid-handoff-or-changes \
+  bash scripts/defer-agent-incomplete.sh gemini-artifacts agent-returned-no-valid-handoff-or-changes \
     agent/shadow-feedback.md >/dev/null
   git diff --quiet -- src/main/java/example/Change.java
   [[ ! -e unrelated/scratch.txt ]]

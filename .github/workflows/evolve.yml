@@ -134,7 +134,7 @@ jobs:
         id: defer_agent_incomplete
         if: ${{ !cancelled() && steps.gemini_primary_inspect.outputs.retry_required == 'true' }}
         shell: bash
-        run: scripts/defer-agent-incomplete.sh gemini-artifacts "${{ steps.gemini_primary_inspect.outputs.noop_reason }}" agent/shadow-feedback.md
+        run: bash scripts/defer-agent-incomplete.sh gemini-artifacts "${{ steps.gemini_primary_inspect.outputs.noop_reason }}" agent/shadow-feedback.md
 
       - name: Commit incomplete agent feedback
         id: commit_agent_feedback
@@ -217,7 +217,7 @@ jobs:
           AGENT_BASELINE_POLICY_OUTCOME: ${{ steps.baseline_policy.outcome }}
           AGENT_BASELINE_SHADOW_OUTCOME: ${{ steps.baseline_shadow.outcome }}
           SHADOW_EVALUATION_RESULT_FILE: ${{ runner.temp }}/shadow-repair-evaluation-result.json
-        run: scripts/evaluate-shadow-repair.sh .agent-run.json "${RUNNER_TEMP}/candidate-shadow-repair.json"
+        run: bash scripts/evaluate-shadow-repair.sh .agent-run.json "${RUNNER_TEMP}/candidate-shadow-repair.json"
 
       - name: Persist rejected shadow evaluation for the next run
         id: defer_shadow_rejection
