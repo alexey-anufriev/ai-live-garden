@@ -5,6 +5,15 @@ repository_root="$(cd "$(dirname "$0")/.." && pwd)"
 fixture_root="$(mktemp -d)"
 trap 'rm -rf "$fixture_root"' EXIT
 
+for executable_script in \
+  scripts/defer-agent-incomplete.sh \
+  scripts/evaluate-shadow-repair.sh; do
+  if [[ ! -x "$repository_root/$executable_script" ]]; then
+    echo "Workflow helper must be executable: ${executable_script}" >&2
+    exit 1
+  fi
+done
+
 grep -Fq 'id: defer_shadow_rejection' "$repository_root/.github/workflows/evolve.yml"
 grep -Fq 'scripts/defer-shadow-rejection.sh' "$repository_root/.github/workflows/evolve.yml"
 grep -Fq 'id: commit_shadow_feedback' "$repository_root/.github/workflows/evolve.yml"
