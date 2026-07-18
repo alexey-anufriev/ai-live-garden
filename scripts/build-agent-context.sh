@@ -6,7 +6,7 @@ if (( $# != 1 )); then
   exit 2
 fi
 
-required_commands=(awk cat date find git grep mkdir paste sed sort tail tr wc xargs)
+required_commands=(awk cat date find git grep jq mkdir paste sed sort tail tr wc xargs)
 for required_command in "${required_commands[@]}"; do
   if ! command -v "$required_command" >/dev/null 2>&1; then
     echo "Agent context generation requires command: ${required_command}" >&2
@@ -22,6 +22,7 @@ context_warn_lines="${AGENT_CONTEXT_WARN_LINES:-1200}"
 metadata_file="${AGENT_CONTEXT_METADATA_FILE:-${output_file}.metadata}"
 baseline_test_result_file="${AGENT_BASELINE_TEST_RESULT_FILE:-}"
 baseline_policy_result_file="${AGENT_BASELINE_POLICY_RESULT_FILE:-}"
+baseline_shadow_file="${AGENT_BASELINE_SHADOW_FILE:-}"
 mkdir -p "$(dirname "$metadata_file")"
 
 latest_files() {
@@ -210,6 +211,55 @@ append_baseline_policy_result() {
   echo
 }
 
+append_baseline_shadow_result() {
+  echo "## Baseline Shadow Simulation"
+  echo
+  if [[ -z "$baseline_shadow_file" || ! -f "$baseline_shadow_file" ]]; then
+    echo "No baseline shadow simulation was provided."
+    echo
+    return
+  fi
+
+  if ! jq -e '
+    type == "array" and length > 0 and
+    all(.[];
+      (.seed | type == "number") and
+      (.status | type == "string") and
+      (.final | type == "object") and
+      (.final.counts | type == "object")
+    )
+  ' "$baseline_shadow_file" >/dev/null; then
+    echo "The baseline shadow simulation file is malformed; do not claim a shadow-verified ecological target."
+    echo
+    return
+  fi
+
+  echo "CI will compare candidate code with these exact same-state, same-seed results. An isolated unit test is not evidence that the declared metric changes in this window."
+  echo
+  echo "| Seed | Steps | Status | Nutrients | Buffer | Total | Moss | Root | Spore | Fern | Fungus | Beetle | Hare | Fox | Maximum total |"
+  echo "| ---: | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"
+  jq -r '.[] | [
+    .seed,
+    .completedSteps,
+    .status,
+    .final.nutrients,
+    .final.nutrientBuffer,
+    .final.total,
+    (.final.counts.MOSS // 0),
+    (.final.counts.ROOT_NETWORK // 0),
+    (.final.counts.SPORE // 0),
+    (.final.counts.FERN // 0),
+    (.final.counts.FUNGUS // 0),
+    (.final.counts.BEETLE // 0),
+    (.final.counts.HARE // 0),
+    (.final.counts.FOX // 0),
+    .maximumTotal
+  ] | "| " + (map(tostring) | join(" | ")) + " |"' "$baseline_shadow_file"
+  echo
+  echo "Before finalizing a normal run: write the proposed evaluation into \`.agent-run.json\`, run \`scripts/run-maven-tests-with-timeout.sh\`, then run \`SHADOW_EVALUATION_RESULT_FILE=target/agent-preflight-result.json scripts/evaluate-shadow-candidate.sh target/agent-baseline-shadow.json .agent-run.json target/agent-candidate-shadow.json\`. Finish only when that exact preflight passes. If it fails, revise the implementation or choose a truthful metric supported by the intended behavior; do not weaken the target merely to pass."
+  echo
+}
+
 autonomous_commits() {
   git log --grep='^feat: autonomous garden evolution' --format='%H' -n "${1:-3}" 2>/dev/null || true
 }
@@ -331,6 +381,7 @@ append_compact_journal_entry() {
   echo "- When Ecological Outcome History reports stagnation, use a bottleneck-first change: reproduce the blocker from the current persisted population, identify the active gate, and fix that gate with a focused behavior test. Do not add or tune another named trait unless current organisms carry it or the change includes a credible adoption path."
   echo "- A passing unit test proves the modeled rule, not impact on the living state. Report both current-state evidence and the behavioral verification in the handoff."
   echo "- Declare one measurable shadow target in \`evaluation\`. CI replays baseline and candidate code from the same state and seeds; a missed target, role extinction, runaway population, or timeout rejects the candidate before the real tick."
+  echo "- Use the Baseline Shadow Simulation section as the acceptance baseline. Before finalizing, run the exact candidate preflight command shown there and report its observed delta in \`evidence.verification\`."
   echo "- You have god-mode recovery authority when persisted state causes runaway growth, timeouts, corruption, or prevents autonomous recovery. You may deterministically rebalance, cull, reseed, migrate, or directly repair \`data/garden-state.txt\`; prefer the program's \`recover\` command, preserve ecological roles, add an explanatory event, and report before/after counts."
   echo "- Never wait indefinitely for a random event or population outcome. Tests and diagnostics must be bounded. Use \`scripts/run-maven-tests-with-timeout.sh\`; if it interrupts Maven, treat the timeout as the baseline defect and replace long loops with deterministic phase-level tests."
   echo "- If the Baseline Maven Test Result says \`failed\`, repairing the existing Java source or tests is the run's required first task. Do not add unrelated behavior until \`mvn test\` passes."
@@ -444,6 +495,7 @@ JSON
   append_summary_entries "Latest Monthly Summary Entry" "agent/summaries/monthly" 1
   append_baseline_test_result
   append_baseline_policy_result
+  append_baseline_shadow_result
   append_garden_digest
   echo "## Recent Active Journal Entries"
   echo
@@ -488,4 +540,5 @@ fi
   echo "AGENT_CONTEXT_LATEST_YEARLY_SUMMARY=$(latest_files 1 "agent/summaries/yearly" || true)"
   echo "AGENT_CONTEXT_BASELINE_TEST_RESULT_FILE=${baseline_test_result_file}"
   echo "AGENT_CONTEXT_BASELINE_POLICY_RESULT_FILE=${baseline_policy_result_file}"
+  echo "AGENT_CONTEXT_BASELINE_SHADOW_FILE=${baseline_shadow_file}"
 } > "$metadata_file"

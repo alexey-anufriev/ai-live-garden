@@ -65,7 +65,9 @@ jobs:
         id: baseline_shadow
         if: ${{ !cancelled() && steps.baseline_test.outcome == 'success' && (steps.observation_window.outcome == 'success' || steps.observation_window.outcome == 'skipped') }}
         shell: bash
-        run: scripts/capture-shadow-simulation.sh "${RUNNER_TEMP}/baseline-shadow.json"
+        run: |
+          scripts/capture-shadow-simulation.sh "${RUNNER_TEMP}/baseline-shadow.json"
+          cp "${RUNNER_TEMP}/baseline-shadow.json" target/agent-baseline-shadow.json
 
       - name: Build Gemini prompt
         id: gemini_prompt
@@ -74,6 +76,7 @@ jobs:
           AGENT_CONTEXT_METADATA_FILE: ${{ runner.temp }}/agent-context.metadata
           AGENT_BASELINE_TEST_RESULT_FILE: ${{ runner.temp }}/baseline-test-result.md
           AGENT_BASELINE_POLICY_RESULT_FILE: ${{ runner.temp }}/baseline-policy-result.md
+          AGENT_BASELINE_SHADOW_FILE: target/agent-baseline-shadow.json
         run: |
           scripts/build-agent-context.sh "${RUNNER_TEMP}/agent-context.md" || {
             status=$?
