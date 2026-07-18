@@ -739,6 +739,11 @@ public class TraitRegistry {
             case "predator-scout":
                 if (environment.nutrients() < 25) return new MetabolicEffect(-1, 0, new GardenEvent(cycle, "%s scouted for prey in scarce conditions.".formatted(organism.id())));
                 break;
+            case "fungal-beetle-synergizer":
+                if (organism.type() == OrganismType.BEETLE && fungalContribution > 0) {
+                    return new MetabolicEffect(0, 2, new GardenEvent(cycle, "%s benefited from fungal-beetle synergy.".formatted(organism.id())));
+                }
+                break;
         }
         return null;
     }

@@ -15,11 +15,11 @@ Generated source orientation for autonomous runs. Do not edit manually.
 - `src/main/java/garden/ai/OrganismInteractionCalculator.java`: Calculates reproduction thresholds for all organism types, now updated for fox-prey synergy.
 - `src/main/java/garden/ai/OrganismType.java`: Defines taxonomy and environmental succession rules, updated to lower SPORE-to-FUNGUS colonization threshold.
 - `src/main/java/garden/ai/Simulation.java`: Advances seed or loaded garden state.
-- `src/main/java/garden/ai/TraitRegistry.java`: Registry for metabolic logic; updated scarcity threshold for metabolic efficiency.
+- `src/main/java/garden/ai/TraitRegistry.java`: Registry for metabolic logic, now supporting fungal-beetle synergy.
 
 ## Tests
 
 - Tests live under `src/test/java/garden/ai/`.
-- Current Java test files: 132.
+- Current Java test files: 133.
 - Prefer focused behavior tests for changed simulation rules.
 - Add or inspect exact test files only when the chosen task needs them.
