@@ -14,10 +14,20 @@ stdout_file="${artifact_dir}/stdout.log"
 feedback_dir="$(dirname "$feedback_file")"
 mkdir -p "$feedback_dir"
 temporary_feedback="$(mktemp "${RUNNER_TEMP:-/tmp}/agent-feedback.XXXXXX")"
-trap 'rm -f "$temporary_feedback"' EXIT
+prior_feedback="$(mktemp "${RUNNER_TEMP:-/tmp}/prior-agent-feedback.XXXXXX")"
+if [[ -f "$feedback_file" ]]; then
+  cp "$feedback_file" "$prior_feedback"
+fi
+trap 'rm -f "$temporary_feedback" "$prior_feedback"' EXIT
 
 {
-  echo "# Deferred Autonomous Run Feedback"
+  if [[ -s "$prior_feedback" ]]; then
+    sed '/^## Subsequent Incomplete Attempt$/,$d' "$prior_feedback"
+    echo
+    echo "## Subsequent Incomplete Attempt"
+  else
+    echo "# Deferred Autonomous Run Feedback"
+  fi
   echo
   echo "The previous agent call completed but did not leave both a valid handoff and a substantive implementation. No same-run agent retry was attempted. The incomplete source changes were discarded; use this evidence on the next autonomous run."
   echo
@@ -58,5 +68,6 @@ git clean -fd >/dev/null
 mkdir -p "$feedback_dir"
 mv "$temporary_feedback" "$feedback_file"
 trap - EXIT
+rm -f "$prior_feedback"
 
 echo "Deferred incomplete autonomous run to ${feedback_file}."

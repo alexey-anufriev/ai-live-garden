@@ -31,8 +31,13 @@ grep -Fq 'scripts/defer-shadow-rejection.sh' "$workflow_file"
 grep -Fq 'id: commit_shadow_feedback' "$workflow_file"
 grep -Fq 'id: defer_agent_incomplete' "$workflow_file"
 grep -Fq 'id: shadow_repair_evaluation' "$workflow_file"
+grep -Fq 'id: publish_rejected_candidate' "$workflow_file"
+grep -Fq 'id: cleanup_rejected_candidates' "$workflow_file"
+grep -Fq 'id: cleanup_consumed_rejected_candidates' "$workflow_file"
 grep -Fq 'bash scripts/defer-agent-incomplete.sh' "$workflow_file"
 grep -Fq 'bash scripts/evaluate-shadow-repair.sh' "$workflow_file"
+grep -Fq 'bash scripts/publish-rejected-candidate.sh' "$workflow_file"
+grep -Fq 'bash scripts/cleanup-rejected-candidate-branches.sh' "$workflow_file"
 grep -Fq "steps.harness_contracts.outcome == 'success'" "$workflow_file"
 grep -Fq "steps.setup_java.outcome == 'success'" "$workflow_file"
 if grep -Eq 'build-(agent|shadow)-retry-prompt-output\.sh|Run Gemini corrective retry' "$workflow_file"; then
@@ -316,9 +321,12 @@ scripts/agent-substantive-changes.sh | grep -Fxq 'src/main/java/example/Change.j
 VALIDATE_AGENT_WORKTREE_SCOPE=changed scripts/validate-agent-worktree.sh >/dev/null
 
 defer_fixture="$fixture_root/defer-fixture"
+defer_remote="$fixture_root/defer-remote.git"
+git init --bare -q "$defer_remote"
 mkdir -p "$defer_fixture/scripts" "$defer_fixture/src/main/java/example" "$defer_fixture/src/test/java/example"
 cp "$repository_root/scripts/defer-shadow-rejection.sh" "$repository_root/scripts/validate-agent-handoff.sh" \
-  "$repository_root/scripts/find-active-agent-plan.sh" "$defer_fixture/scripts/"
+  "$repository_root/scripts/find-active-agent-plan.sh" "$repository_root/scripts/publish-rejected-candidate.sh" \
+  "$repository_root/scripts/cleanup-rejected-candidate-branches.sh" "$defer_fixture/scripts/"
 chmod +x "$defer_fixture/scripts/"*.sh
 echo 'package example; class Change {}' > "$defer_fixture/src/main/java/example/Change.java"
 (
@@ -328,6 +336,8 @@ echo 'package example; class Change {}' > "$defer_fixture/src/main/java/example/
   git config user.email fixture@example.invalid
   git add scripts src/main/java/example/Change.java
   git commit -qm baseline
+  git remote add origin "$defer_remote"
+  git push -q -u origin HEAD:main
   echo 'package example; class Change { int rejected; }' > src/main/java/example/Change.java
   echo 'package example; class RejectedTest {}' > src/test/java/example/RejectedTest.java
   cat > .agent-run.json <<'JSON'
@@ -341,32 +351,64 @@ echo 'package example; class Change {}' > "$defer_fixture/src/main/java/example/
   "requests":[], "state":{"immediateDirections":[],"constraints":[]}
 }
 JSON
+  cat > shadow-runs.json <<'JSON'
+[{"seed":17,"requestedSteps":5,"completedSteps":5,"status":"completed","initial":{"total":1,"counts":{"BEETLE":1}},"final":{"total":1,"counts":{"BEETLE":1}},"minimumTotal":1,"maximumTotal":1}]
+JSON
+  GITHUB_OUTPUT=publish.outputs GITHUB_RUN_ID=12345 GITHUB_RUN_ATTEMPT=2 \
+    bash scripts/publish-rejected-candidate.sh >/dev/null
+  rejected_branch="$(sed -n 's/^branch=//p' publish.outputs)"
+  rejected_commit="$(sed -n 's/^commit=//p' publish.outputs)"
+  [[ "$rejected_branch" == "agent-rejected/12345-2" ]]
+  [[ "$rejected_commit" =~ ^[0-9a-f]{40}$ ]]
+  git --git-dir="$defer_remote" show "${rejected_commit}:src/main/java/example/Change.java" | \
+    grep -Fq 'int rejected'
+  git --git-dir="$defer_remote" show "${rejected_commit}:src/test/java/example/RejectedTest.java" | \
+    grep -Fq 'RejectedTest'
+  if git --git-dir="$defer_remote" cat-file -e "${rejected_commit}:.agent-run.json" 2>/dev/null; then
+    echo "Rejected candidate branch incorrectly included the machine handoff." >&2
+    exit 1
+  fi
   cat > shadow-result.json <<'JSON'
 {"passed":false,"safetyPassed":true,"targetPassed":false,"metric":"population.BEETLE","goal":"increase","requiredDelta":1,"baselineAverage":1,"candidateAverage":1,"observedDelta":0,"seeds":[17,43]}
 JSON
-  SHADOW_BASELINE_FILE=shadow-result.json SHADOW_CANDIDATE_FILE=shadow-result.json \
+  REJECTED_CANDIDATE_BRANCH="$rejected_branch" REJECTED_CANDIDATE_COMMIT="$rejected_commit" \
+    SHADOW_BASELINE_FILE=shadow-runs.json SHADOW_CANDIDATE_FILE=shadow-runs.json \
     scripts/defer-shadow-rejection.sh shadow-result.json .agent-run.json agent/shadow-feedback.md >/dev/null
   git diff --quiet -- src/main/java/example/Change.java
   [[ ! -e src/test/java/example/RejectedTest.java ]]
   [[ ! -e .agent-run.json ]]
   grep -Fq '"observedDelta": 0' agent/shadow-feedback.md
+  grep -Fq "Branch: \`${rejected_branch}\`" agent/shadow-feedback.md
+  grep -Fq "Commit: \`${rejected_commit}\`" agent/shadow-feedback.md
   grep -Fq '## Baseline Shadow Runs' agent/shadow-feedback.md
   grep -Fq '## Candidate Shadow Runs' agent/shadow-feedback.md
-  grep -Fq 'src/test/java/example/RejectedTest.java' agent/shadow-feedback.md
+  if grep -Eq 'codeMap|## Rejected Change Paths|## Rejected Change Summary' agent/shadow-feedback.md; then
+    echo "Compact rejection feedback duplicated source details preserved on the branch." >&2
+    exit 1
+  fi
+  bash scripts/cleanup-rejected-candidate-branches.sh "$rejected_branch" >/dev/null
+  git ls-remote --exit-code --heads origin "refs/heads/${rejected_branch}" >/dev/null
+  bash scripts/cleanup-rejected-candidate-branches.sh >/dev/null
+  if git ls-remote --exit-code --heads origin "refs/heads/${rejected_branch}" >/dev/null 2>&1; then
+    echo "Consumed rejected candidate branch was not removed." >&2
+    exit 1
+  fi
 )
 
 incomplete_fixture="$fixture_root/incomplete-fixture"
 mkdir -p "$incomplete_fixture/scripts" "$incomplete_fixture/src/main/java/example" \
-  "$incomplete_fixture/gemini-artifacts"
+  "$incomplete_fixture/gemini-artifacts" "$incomplete_fixture/agent"
 cp "$repository_root/scripts/defer-agent-incomplete.sh" "$incomplete_fixture/scripts/"
 chmod +x "$incomplete_fixture/scripts/defer-agent-incomplete.sh"
 echo 'package example; class Change {}' > "$incomplete_fixture/src/main/java/example/Change.java"
+printf '# Deferred Shadow Evaluation Feedback\n\n- Branch: `agent-rejected/prior-1`\n' \
+  > "$incomplete_fixture/agent/shadow-feedback.md"
 (
   cd "$incomplete_fixture"
   git init -q
   git config user.name fixture
   git config user.email fixture@example.invalid
-  git add scripts src/main/java/example/Change.java
+  git add scripts src/main/java/example/Change.java agent/shadow-feedback.md
   git commit -qm baseline
   echo 'package example; class Change { int partial; }' > src/main/java/example/Change.java
   mkdir -p unrelated
@@ -378,6 +420,8 @@ echo 'package example; class Change {}' > "$incomplete_fixture/src/main/java/exa
   git diff --quiet -- src/main/java/example/Change.java
   [[ ! -e unrelated/scratch.txt ]]
   grep -Fq 'agent-returned-no-valid-handoff-or-changes' agent/shadow-feedback.md
+  grep -Fq 'Branch: `agent-rejected/prior-1`' agent/shadow-feedback.md
+  grep -Fq '## Subsequent Incomplete Attempt' agent/shadow-feedback.md
   grep -Fq 'src/main/java/example/Change.java' agent/shadow-feedback.md
   grep -Fq 'unrelated/scratch.txt' agent/shadow-feedback.md
   grep -Fq 'partial agent response' agent/shadow-feedback.md

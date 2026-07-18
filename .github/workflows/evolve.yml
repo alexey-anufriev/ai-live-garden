@@ -219,14 +219,22 @@ jobs:
           SHADOW_EVALUATION_RESULT_FILE: ${{ runner.temp }}/shadow-repair-evaluation-result.json
         run: bash scripts/evaluate-shadow-repair.sh .agent-run.json "${RUNNER_TEMP}/candidate-shadow-repair.json"
 
+      - name: Publish rejected candidate branch
+        id: publish_rejected_candidate
+        if: ${{ !cancelled() && (steps.shadow_evaluation.outcome == 'failure' || steps.shadow_repair_evaluation.outcome == 'failure') }}
+        shell: bash
+        run: bash scripts/publish-rejected-candidate.sh
+
       - name: Persist rejected shadow evaluation for the next run
         id: defer_shadow_rejection
-        if: ${{ !cancelled() && (steps.shadow_evaluation.outcome == 'failure' || steps.shadow_repair_evaluation.outcome == 'failure') }}
+        if: ${{ !cancelled() && steps.publish_rejected_candidate.outcome == 'success' }}
         shell: bash
         env:
           AGENT_BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
           AGENT_BASELINE_POLICY_OUTCOME: ${{ steps.baseline_policy.outcome }}
           AGENT_BASELINE_SHADOW_OUTCOME: ${{ steps.baseline_shadow.outcome }}
+          REJECTED_CANDIDATE_BRANCH: ${{ steps.publish_rejected_candidate.outputs.branch }}
+          REJECTED_CANDIDATE_COMMIT: ${{ steps.publish_rejected_candidate.outputs.commit }}
         run: |
           if [[ "${{ steps.shadow_evaluation.outcome }}" == "failure" ]]; then
             export SHADOW_BASELINE_FILE="${RUNNER_TEMP}/baseline-shadow.json"
@@ -247,6 +255,12 @@ jobs:
           COMMIT_MESSAGE_PREFIX: "chore: record rejected autonomous hypothesis"
           COMMIT_TIMESTAMP_FORMAT: "%Y-%m-%dT%H:%MZ"
         run: scripts/commit-if-changed.sh agent/shadow-feedback.md
+
+      - name: Clean obsolete rejected candidate branches
+        id: cleanup_rejected_candidates
+        if: ${{ !cancelled() && steps.commit_shadow_feedback.outcome == 'success' }}
+        shell: bash
+        run: bash scripts/cleanup-rejected-candidate-branches.sh "${{ steps.publish_rejected_candidate.outputs.branch }}" || echo "::warning::Rejected candidate branch cleanup will be retried by a later run."
 
       - name: Clear consumed shadow feedback
         if: ${{ !cancelled() && (steps.shadow_evaluation.outcome == 'success' || steps.shadow_repair_evaluation.outcome == 'success') }}
@@ -374,7 +388,9 @@ jobs:
           POST_TEST_OUTCOME: ${{ steps.post_test_final.outcome }}
           SHADOW_EVALUATION_OUTCOME: ${{ steps.shadow_evaluation.outcome }}
           SHADOW_REPAIR_EVALUATION_OUTCOME: ${{ steps.shadow_repair_evaluation.outcome }}
+          REJECTED_CANDIDATE_PUBLISH_OUTCOME: ${{ steps.publish_rejected_candidate.outcome }}
           SHADOW_FEEDBACK_OUTCOME: ${{ steps.defer_shadow_rejection.outcome }}
+          REJECTED_CANDIDATE_CLEANUP_OUTCOME: ${{ steps.cleanup_rejected_candidates.outcome }}
           ADVANCE_GARDEN_OUTCOME: ${{ steps.advance_garden.outcome }}
           AUTO_MEMORY_OUTCOME: ${{ steps.auto_memory.outcome }}
           REQUIRED_MEMORY_OUTCOME: ${{ steps.required_memory_final.outcome }}
@@ -401,6 +417,12 @@ jobs:
           COMMIT_TIMESTAMP_FORMAT: "%Y-%m-%dT%H:%MZ"
         run: scripts/commit-if-changed.sh .
 
+      - name: Clean consumed rejected candidate branches
+        id: cleanup_consumed_rejected_candidates
+        if: ${{ !cancelled() && steps.commit_changes.outcome == 'success' }}
+        shell: bash
+        run: bash scripts/cleanup-rejected-candidate-branches.sh || echo "::warning::Rejected candidate branch cleanup will be retried by a later run."
+
       - name: Write workflow summary
         if: ${{ always() }}
         shell: bash
@@ -418,7 +440,10 @@ jobs:
           BASELINE_SHADOW_OUTCOME: ${{ steps.baseline_shadow.outcome }}
           SHADOW_EVALUATION_OUTCOME: ${{ steps.shadow_evaluation.outcome }}
           SHADOW_REPAIR_EVALUATION_OUTCOME: ${{ steps.shadow_repair_evaluation.outcome }}
+          REJECTED_CANDIDATE_PUBLISH_OUTCOME: ${{ steps.publish_rejected_candidate.outcome }}
           SHADOW_FEEDBACK_OUTCOME: ${{ steps.defer_shadow_rejection.outcome }}
+          REJECTED_CANDIDATE_CLEANUP_OUTCOME: ${{ steps.cleanup_rejected_candidates.outcome }}
+          CONSUMED_REJECTED_CANDIDATE_CLEANUP_OUTCOME: ${{ steps.cleanup_consumed_rejected_candidates.outcome }}
           ADVANCE_GARDEN_OUTCOME: ${{ steps.advance_garden.outcome }}
           AUTO_MEMORY_OUTCOME: ${{ steps.auto_memory.outcome }}
           REQUIRED_MEMORY_OUTCOME: ${{ steps.required_memory_final.outcome }}

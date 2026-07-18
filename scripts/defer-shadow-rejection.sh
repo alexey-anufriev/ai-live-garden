@@ -11,6 +11,17 @@ handoff_file="$2"
 feedback_file="${3:-agent/shadow-feedback.md}"
 baseline_shadow_file="${SHADOW_BASELINE_FILE:-}"
 candidate_shadow_file="${SHADOW_CANDIDATE_FILE:-}"
+rejected_branch="${REJECTED_CANDIDATE_BRANCH:-}"
+rejected_commit="${REJECTED_CANDIDATE_COMMIT:-}"
+
+if [[ ! "$rejected_branch" =~ ^agent-rejected/[a-zA-Z0-9._-]+$ ]]; then
+  echo "REJECTED_CANDIDATE_BRANCH must identify a published agent-rejected branch." >&2
+  exit 2
+fi
+if [[ ! "$rejected_commit" =~ ^[0-9a-f]{40}$ ]] || ! git cat-file -e "${rejected_commit}^{commit}" 2>/dev/null; then
+  echo "REJECTED_CANDIDATE_COMMIT must identify the preserved candidate commit." >&2
+  exit 2
+fi
 
 for required_file in "$evaluation_file" "$handoff_file"; do
   if [[ ! -f "$required_file" ]]; then
@@ -41,12 +52,19 @@ trap 'rm -f "$temporary_feedback"' EXIT
 {
   echo "# Deferred Shadow Evaluation Feedback"
   echo
-  echo "This is machine-generated evidence from the previous autonomous run. The rejected source changes were discarded, the garden was not advanced, and no same-run agent retry was attempted. Treat this evidence as input: do not repeat the rejected hypothesis without addressing why its declared effect was absent."
+  echo "This is machine-generated evidence from the previous autonomous run. The rejected source changes were preserved on a dedicated branch, removed from main, and the garden was not advanced. Treat this evidence as input: inspect the preserved candidate before deciding what to reuse, revise, or abandon."
+  echo
+  echo "## Rejected Candidate"
+  echo
+  echo "- Branch: \`${rejected_branch}\`"
+  echo "- Commit: \`${rejected_commit}\`"
+  echo "- Inspect: \`git show --stat ${rejected_commit}\`"
+  echo "- Compare: \`git diff ${rejected_commit}^ ${rejected_commit}\`"
   echo
   echo "## Rejected Handoff"
   echo
   echo '```json'
-  jq . "$handoff_file"
+  jq 'del(.codeMap)' "$handoff_file"
   echo '```'
   echo
   echo "## Deterministic Evaluation"
@@ -59,7 +77,7 @@ trap 'rm -f "$temporary_feedback"' EXIT
     echo "## Baseline Shadow Runs"
     echo
     echo '```json'
-    jq . "$baseline_shadow_file"
+    jq '[.[] | {seed, requestedSteps, completedSteps, status, initial, final, minimumTotal, maximumTotal}]' "$baseline_shadow_file"
     echo '```'
     echo
   fi
@@ -67,19 +85,10 @@ trap 'rm -f "$temporary_feedback"' EXIT
     echo "## Candidate Shadow Runs"
     echo
     echo '```json'
-    jq . "$candidate_shadow_file"
+    jq '[.[] | {seed, requestedSteps, completedSteps, status, initial, final, minimumTotal, maximumTotal}]' "$candidate_shadow_file"
     echo '```'
     echo
   fi
-  echo "## Rejected Change Paths"
-  echo
-  git status --short -uall -- src/main src/test pom.xml data/garden-state.txt || true
-  echo
-  echo "## Rejected Change Summary"
-  echo
-  echo '```text'
-  git diff --stat -- src/main src/test pom.xml data/garden-state.txt || true
-  echo '```'
 } > "$temporary_feedback"
 
 # A rejected ecological hypothesis is evidence, not source history. Keep the
