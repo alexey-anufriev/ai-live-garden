@@ -7,7 +7,20 @@ trait_literal_budget="${AGENT_TRAIT_LITERAL_BUDGET:-150}"
 
 source_count="$(find src/main/java -type f -name '*.java' | wc -l | tr -d '[:space:]')"
 test_count="$(find src/test/java -type f -name '*.java' | wc -l | tr -d '[:space:]')"
-trait_literals="$(rg -o '"[a-z][a-z0-9-]+"' src/main/java 2>/dev/null | sed 's/.*://; s/"//g' | sort -u | wc -l | tr -d '[:space:]')"
+trait_literals="$(
+  find src/main/java -type f -name '*.java' -exec awk '
+    {
+      remainder = $0
+      while (match(remainder, /"[a-z][a-z0-9-]+"/)) {
+        print substr(remainder, RSTART + 1, RLENGTH - 2)
+        remainder = substr(remainder, RSTART + RLENGTH)
+      }
+    }
+  ' {} + |
+    sort -u |
+    wc -l |
+    tr -d '[:space:]'
+)"
 over_budget_files="$(find src/main/java -type f -name '*.java' -print0 | xargs -0 wc -l | awk -v budget="$source_line_budget" '$2 != "total" && $1 > budget { print $1 " " $2 }')"
 
 echo "## Architecture Budget"

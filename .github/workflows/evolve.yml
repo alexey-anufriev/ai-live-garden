@@ -75,8 +75,16 @@ jobs:
           AGENT_BASELINE_TEST_RESULT_FILE: ${{ runner.temp }}/baseline-test-result.md
           AGENT_BASELINE_POLICY_RESULT_FILE: ${{ runner.temp }}/baseline-policy-result.md
         run: |
-          scripts/build-agent-context.sh "${RUNNER_TEMP}/agent-context.md"
-          scripts/write-output-file.sh text "${RUNNER_TEMP}/agent-context.md"
+          scripts/build-agent-context.sh "${RUNNER_TEMP}/agent-context.md" || {
+            status=$?
+            echo "::error::Agent context generation failed with exit code ${status}."
+            exit "$status"
+          }
+          scripts/write-output-file.sh text "${RUNNER_TEMP}/agent-context.md" || {
+            status=$?
+            echo "::error::Publishing the agent context to GITHUB_OUTPUT failed with exit code ${status}."
+            exit "$status"
+          }
 
       - name: Record Gemini model diagnostics
         shell: bash

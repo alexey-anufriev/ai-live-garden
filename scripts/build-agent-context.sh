@@ -6,6 +6,14 @@ if (( $# != 1 )); then
   exit 2
 fi
 
+required_commands=(awk cat date find git grep mkdir paste sed sort tail tr wc xargs)
+for required_command in "${required_commands[@]}"; do
+  if ! command -v "$required_command" >/dev/null 2>&1; then
+    echo "Agent context generation requires command: ${required_command}" >&2
+    exit 127
+  fi
+done
+
 output_file="$1"
 mkdir -p "$(dirname "$output_file")"
 

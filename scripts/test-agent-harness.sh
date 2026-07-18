@@ -5,6 +5,30 @@ repository_root="$(cd "$(dirname "$0")/.." && pwd)"
 fixture_root="$(mktemp -d)"
 trap 'rm -rf "$fixture_root"' EXIT
 
+prompt_context="$fixture_root/agent-context.md"
+prompt_metadata="$fixture_root/agent-context.metadata"
+prompt_outputs="$fixture_root/prompt.outputs"
+(
+  cd "$repository_root"
+  rg() {
+    echo "Prompt construction must not depend on ripgrep." >&2
+    return 127
+  }
+  export -f rg
+  PATH=/usr/bin:/bin \
+    AGENT_CONTEXT_METADATA_FILE="$prompt_metadata" \
+    AGENT_CONTEXT_RECENT_JOURNAL_LIMIT=1 \
+    GARDEN_OUTCOME_HISTORY_LIMIT=1 \
+    scripts/build-agent-context.sh "$prompt_context"
+  PATH=/usr/bin:/bin GITHUB_OUTPUT="$prompt_outputs" \
+    scripts/write-output-file.sh text "$prompt_context"
+)
+grep -Eq '^text<<agent_output_[0-9]+_[0-9]+_[0-9]+$' "$prompt_outputs"
+grep -Fq '# AI Live Garden Compact Agent Context' "$prompt_outputs"
+grep -Fq 'AGENT_CONTEXT_BYTES=' "$prompt_metadata"
+prompt_delimiter="$(sed -n '1s/^text<<//p' "$prompt_outputs")"
+[[ "$(tail -n 1 "$prompt_outputs")" == "$prompt_delimiter" ]]
+
 mkdir -p "$fixture_root/scripts" "$fixture_root/agent/plans" "$fixture_root/artifacts"
 for script in find-active-agent-plan.sh agent-substantive-changes.sh validate-agent-handoff.sh \
   extract-agent-handoff.sh inspect-agent-gemini-output.sh validate-agent-worktree.sh; do
