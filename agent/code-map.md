@@ -15,7 +15,7 @@ Generated source orientation for autonomous runs. Do not edit manually.
 - `src/main/java/garden/ai/OrganismInteractionCalculator.java`: Calculates reproduction thresholds for all organism types, now updated for fox-prey synergy.
 - `src/main/java/garden/ai/OrganismType.java`: Defines taxonomy and environmental succession rules, updated to lower SPORE-to-FUNGUS colonization threshold.
 - `src/main/java/garden/ai/Simulation.java`: Advances seed or loaded garden state.
-- `src/main/java/garden/ai/TraitRegistry.java`: Registry for metabolic logic, now supporting fungal-beetle synergy.
+- `src/main/java/garden/ai/TraitRegistry.java`: Registry for metabolic and interaction logic, now with an increased beetle protection threshold.
 
 ## Tests
 

@@ -1,12 +1,12 @@
 package garden.ai;
 
-import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
-
+import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.ArrayList;
 
 public class BeetleProtectionTest {
+
     @Test
     public void testLoneBeetleIsProtectedFromFox() {
         Organism beetle = Organism.of("beetle-1", OrganismType.BEETLE, 10, 1, "test-beetle");
@@ -24,11 +24,6 @@ public class BeetleProtectionTest {
         
         // Check if the beetle is still alive
         boolean beetleAlive = nextGarden.organisms().stream().anyMatch(o -> o.type() == OrganismType.BEETLE);
-        
-        System.out.println("Events:");
-        for (GardenEvent event : nextGarden.events()) {
-            System.out.println(event.description());
-        }
         
         assertTrue(beetleAlive, "The lone beetle should be protected from the fox, but it was eaten.");
     }
