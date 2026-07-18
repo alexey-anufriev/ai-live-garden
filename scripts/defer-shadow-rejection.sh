@@ -73,7 +73,7 @@ trap 'rm -f "$temporary_feedback"' EXIT
   fi
   echo "## Rejected Change Paths"
   echo
-  git status --short -- src/main src/test pom.xml data/garden-state.txt || true
+  git status --short -uall -- src/main src/test pom.xml data/garden-state.txt || true
   echo
   echo "## Rejected Change Summary"
   echo

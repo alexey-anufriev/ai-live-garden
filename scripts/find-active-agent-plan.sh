@@ -15,6 +15,10 @@ if ! [[ "$reference_date" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
   exit 2
 fi
 
+if [[ ! -d "$plans_dir" ]]; then
+  exit 0
+fi
+
 latest_plan="$(find "$plans_dir" -maxdepth 1 -type f -name '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].md' -print 2>/dev/null | sort -V | tail -n 1)"
 if [[ -z "$latest_plan" ]]; then
   exit 0
