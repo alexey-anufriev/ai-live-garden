@@ -17,7 +17,11 @@ public class BeetleSpecialistHuntingTest {
         List<Organism> organisms = new ArrayList<>(List.of(fox, beetleLowEnergy, beetleHighEnergy));
         int hunterIndex = 0; // fox index
 
-        Optional<Integer> targetIndex = TraitRegistry.findPreyIndex(organisms, fox, hunterIndex, 1, env, new ArrayList<>());
+        long totalBeetles = organisms.stream().filter(o -> o.type() == OrganismType.BEETLE).count();
+        long totalFoxes = organisms.stream().filter(o -> o.type() == OrganismType.FOX).count();
+        long fungusCount = organisms.stream().filter(o -> o.type() == OrganismType.FUNGUS).count();
+
+        Optional<Integer> targetIndex = TraitRegistry.findPreyIndex(organisms, fox, hunterIndex, 1, env, new ArrayList<>(), totalBeetles, totalFoxes, fungusCount);
 
         assertThat(targetIndex).isPresent();
         assertThat(organisms.get(targetIndex.get()).id()).isEqualTo("beetle-high");

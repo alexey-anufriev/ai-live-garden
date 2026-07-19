@@ -79,7 +79,7 @@ public class TraitRegistry {
         int nutrientBuffer
     ) {}
 
-    public static Optional<Integer> findPreyIndex(List<Organism> organisms, Organism hunter, int hunterIndex, int cycle, Environment environment, List<GardenEvent> events) {
+    public static Optional<Integer> findPreyIndex(List<Organism> organisms, Organism hunter, int hunterIndex, int cycle, Environment environment, List<GardenEvent> events, long totalBeetles, long totalFoxes, long fungusCount) {
     boolean nutrientScout = hunter.traits().contains("nutrient-scout");
     boolean preyTracker = hunter.traits().contains("prey-tracker");
     boolean resourceTracker = hunter.traits().contains("resource-tracker");
@@ -93,13 +93,11 @@ public class TraitRegistry {
 
         // Critical protection for beetle population
         if (candidate.type() == OrganismType.BEETLE) {
-            long totalBeetles = organisms.stream().filter(o -> o.type() == OrganismType.BEETLE).count();
             if (totalBeetles <= 200 && !hunter.traits().contains("beetle-predation-optimizer")) return false;
         }
 
         boolean bypassStealth = stealthHunter || isApexPredator || isPredatorScout ||
-            (hunter.traits().contains("coordinated-predator") &&
-             organisms.stream().filter(o -> o.type() == OrganismType.FOX && o.energy() > 0 && !o.id().equals(hunter.id())).count() > 0);
+            (hunter.traits().contains("coordinated-predator") && totalFoxes > 0);
 
         if (!bypassStealth) {
             if (candidate.traits().contains("shadow-stepper") && (candidate.id().hashCode() + cycle) % 2 == 0) return false;
@@ -116,7 +114,6 @@ public class TraitRegistry {
     }
 
     if (mycelialNetworkScout) {
-        long fungusCount = organisms.stream().filter(o -> o.type() == OrganismType.FUNGUS).count();
         if (fungusCount > 0) {
             for (int i = 0; i < organisms.size(); i++) {
                 if (i == hunterIndex) continue;

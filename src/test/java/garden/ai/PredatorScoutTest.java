@@ -22,8 +22,12 @@ public class PredatorScoutTest {
             organisms.add(Organism.of("beetle-" + i, OrganismType.BEETLE, 10, 4, "test"));
         }
         
+        long totalBeetles = organisms.stream().filter(o -> o.type() == OrganismType.BEETLE).count();
+        long totalFoxes = organisms.stream().filter(o -> o.type() == OrganismType.FOX).count();
+        long fungusCount = organisms.stream().filter(o -> o.type() == OrganismType.FUNGUS).count();
+        
         // Cycle 0: id().hashCode() % 2 == 0 for beetle-1 (stealthyBeetle)
-        Optional<Integer> preyIndex = TraitRegistry.findPreyIndex(organisms, fox, 0, 0, env, new java.util.ArrayList<>());
+        Optional<Integer> preyIndex = TraitRegistry.findPreyIndex(organisms, fox, 0, 0, env, new java.util.ArrayList<>(), totalBeetles, totalFoxes, fungusCount);
         
         assertTrue(preyIndex.isPresent(), "Predator scout should find stealthy prey");
     }

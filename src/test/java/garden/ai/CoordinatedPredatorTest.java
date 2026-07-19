@@ -16,7 +16,11 @@ public class CoordinatedPredatorTest {
         Environment env = new Environment(50, 50, 50, 50, 50);
 
         // Test coordinated-predator with nearby fox
-        Optional<Integer> result = TraitRegistry.findPreyIndex(List.of(fox1, fox2, beetle1, beetle2), fox1, 0, 0, env, List.of());
+        List<Organism> organisms = List.of(fox1, fox2, beetle1, beetle2);
+        long totalBeetles = organisms.stream().filter(o -> o.type() == OrganismType.BEETLE).count();
+        long totalFoxes = organisms.stream().filter(o -> o.type() == OrganismType.FOX).count();
+        long fungusCount = organisms.stream().filter(o -> o.type() == OrganismType.FUNGUS).count();
+        Optional<Integer> result = TraitRegistry.findPreyIndex(organisms, fox1, 0, 0, env, List.of(), totalBeetles, totalFoxes, fungusCount);
 
         assertTrue(result.isPresent(), "Coordinated predator should find camouflaged beetle when another fox is present");
         }
@@ -29,7 +33,12 @@ public class CoordinatedPredatorTest {
         Organism beetle2 = Organism.of("beetle-2", OrganismType.BEETLE, 10, 4, "camouflaged");
         Environment env = new Environment(50, 50, 50, 50, 50);
 
-        Optional<Integer> result = TraitRegistry.findPreyIndex(List.of(fox1, beetle1, beetle2), fox1, 0, 0, env, List.of());
+        List<Organism> organisms2 = List.of(fox1, beetle1, beetle2);
+        long totalBeetles2 = organisms2.stream().filter(o -> o.type() == OrganismType.BEETLE).count();
+        long totalFoxes2 = organisms2.stream().filter(o -> o.type() == OrganismType.FOX).count();
+        long fungusCount2 = organisms2.stream().filter(o -> o.type() == OrganismType.FUNGUS).count();
+
+        Optional<Integer> result = TraitRegistry.findPreyIndex(organisms2, fox1, 0, 0, env, List.of(), totalBeetles2, totalFoxes2, fungusCount2);
         
         // This test relies on the beetle being camouflaged and thus ignored without the second fox.
         // Whether it's empty or not depends on hashcodes, let's keep it simple.

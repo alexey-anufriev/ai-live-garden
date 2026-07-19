@@ -36,8 +36,12 @@ public class ApexPredatorTest {
         for(int i = 0; i < 500; i++) {
             organisms.add(Organism.of("beetle-" + i, OrganismType.BEETLE, 10, 4, "test"));
         }
+        long totalBeetles = organisms.stream().filter(o -> o.type() == OrganismType.BEETLE).count();
+        long totalFoxes = organisms.stream().filter(o -> o.type() == OrganismType.FOX).count();
+        long fungusCount = organisms.stream().filter(o -> o.type() == OrganismType.FUNGUS).count();
+
         // Fox should find beetle despite camouflage.
-        java.util.Optional<Integer> preyIndex = TraitRegistry.findPreyIndex(organisms, fox, 0, 0, env, new java.util.ArrayList<>());
+        java.util.Optional<Integer> preyIndex = TraitRegistry.findPreyIndex(organisms, fox, 0, 0, env, new java.util.ArrayList<>(), totalBeetles, totalFoxes, fungusCount);
         assertTrue(preyIndex.isPresent(), "Apex predator fox should find camouflaged prey");
         assertEquals(1, preyIndex.get(), "Should find the beetle");
     }

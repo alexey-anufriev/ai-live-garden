@@ -18,7 +18,11 @@ public class FoxHuntingEfficiencyTest {
         // Organisms: fox, lowEnergyBeetle, highEnergyBeetle
         List<Organism> organisms = List.of(fox, lowEnergyBeetle, highEnergyBeetle);
         
-        Optional<Integer> preyIndex = TraitRegistry.findPreyIndex(organisms, fox, 0, 0, env, new ArrayList<>());
+        long totalBeetles = organisms.stream().filter(o -> o.type() == OrganismType.BEETLE).count();
+        long totalFoxes = organisms.stream().filter(o -> o.type() == OrganismType.FOX).count();
+        long fungusCount = organisms.stream().filter(o -> o.type() == OrganismType.FUNGUS).count();
+        
+        Optional<Integer> preyIndex = TraitRegistry.findPreyIndex(organisms, fox, 0, 0, env, new ArrayList<>(), totalBeetles, totalFoxes, fungusCount);
         
         assertTrue(preyIndex.isPresent(), "Fox specialist should find prey");
         assertEquals(2, preyIndex.get(), "Fox specialist should track the high energy beetle (index 2)");
@@ -34,7 +38,11 @@ public class FoxHuntingEfficiencyTest {
         // Organisms: fox, lowEnergyBeetle, highEnergyBeetle
         List<Organism> organisms = List.of(fox, lowEnergyBeetle, highEnergyBeetle);
         
-        Optional<Integer> preyIndex = TraitRegistry.findPreyIndex(organisms, fox, 0, 0, env, new ArrayList<>());
+        long totalBeetles = organisms.stream().filter(o -> o.type() == OrganismType.BEETLE).count();
+        long totalFoxes = organisms.stream().filter(o -> o.type() == OrganismType.FOX).count();
+        long fungusCount = organisms.stream().filter(o -> o.type() == OrganismType.FUNGUS).count();
+        
+        Optional<Integer> preyIndex = TraitRegistry.findPreyIndex(organisms, fox, 0, 0, env, new ArrayList<>(), totalBeetles, totalFoxes, fungusCount);
         
         assertTrue(preyIndex.isPresent(), "Apex predator should find prey");
         assertEquals(2, preyIndex.get(), "Apex predator should track the high energy beetle (index 2)");

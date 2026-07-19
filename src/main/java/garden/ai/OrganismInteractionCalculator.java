@@ -243,6 +243,8 @@ public class OrganismInteractionCalculator {
         int predatorNutrientContribution = 0;
         long rootNetworkCount = organisms.stream().filter(o -> o.type() == OrganismType.ROOT_NETWORK).count();
         long beetleCount = mutable.stream().filter(o -> o.type() == OrganismType.BEETLE).count();
+        long foxCount = mutable.stream().filter(o -> o.type() == OrganismType.FOX && o.energy() > 0).count();
+        long fungusCount = organisms.stream().filter(o -> o.type() == OrganismType.FUNGUS).count();
         
         for (int hunterIndex = 0; hunterIndex < mutable.size(); hunterIndex++) {
             Organism hunter = mutable.get(hunterIndex);
@@ -251,7 +253,7 @@ public class OrganismInteractionCalculator {
                 events.add(new GardenEvent(cycle, "%s skipped feeding to conserve energy.".formatted(hunter.id())));
                 continue;
             }
-            Optional<Integer> preyIndex = TraitRegistry.findPreyIndex(mutable, hunter, hunterIndex, cycle, environment, events);
+            Optional<Integer> preyIndex = TraitRegistry.findPreyIndex(mutable, hunter, hunterIndex, cycle, environment, events, beetleCount, foxCount, fungusCount);
             if (preyIndex.isEmpty()) {
                 if (hunter.traits().contains("starving")) {
                     events.add(new GardenEvent(cycle, "%s is desperately searching for prey in the scarce garden.".formatted(hunter.id())));
@@ -311,11 +313,9 @@ public class OrganismInteractionCalculator {
         int bufferBoost = 0;
         for (Organism organism : mutable) {
             if (organism.energy() <= 0 && organism.traits().contains("mycelial-distributor")) {
-                long fungusCount = organisms.stream().filter(o -> o.type() == OrganismType.FUNGUS).count();
                 if (fungusCount > 0) bufferBoost += 5;
             }
             if (organism.energy() > 0 && organism.traits().contains("buffer-stabilizer")) {
-                long fungusCount = organisms.stream().filter(o -> o.type() == OrganismType.FUNGUS).count();
                 if (fungusCount > 0) bufferBoost += 2;
             }
         }
