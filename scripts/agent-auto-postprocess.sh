@@ -328,6 +328,8 @@ evaluation_metric="$(json_value '.evaluation.metric')"
 evaluation_goal="$(json_value '.evaluation.goal')"
 evaluation_delta="$(json_value '.evaluation.requiredDelta')"
 pm_direction="$(json_value '.pmDirection')"
+run_mode="$(json_value '.runMode')"
+acceptance_source="$(json_value '.acceptanceSource')"
 if [[ -z "$pm_direction" ]]; then
   pm_direction="none"
 fi
@@ -370,7 +372,7 @@ else
   garden_result="The workflow skipped the garden tick because the garden advance step did not complete successfully; the committed garden state remains at cycle ${cycle} with nutrients ${nutrients}, nutrientBuffer ${buffer}, active types ${active_types:-none}, and missing roles ${missing}."
 fi
 
-summary_body="${summary_text}${pm_context} Shadow target: ${evaluation_metric} ${evaluation_goal} ${evaluation_delta}. Expected future effect: ${expected_effect}. Changed files before memory generation: ${changed_list}. ${garden_result} Test validation outcome: ${test_outcome}. Worktree policy severity: ${worktree_policy_severity}."
+summary_body="${summary_text}${pm_context} Run mode: ${run_mode}; acceptance source: ${acceptance_source}; validation target: ${evaluation_metric} ${evaluation_goal} ${evaluation_delta}. Expected future effect: ${expected_effect}. Changed files before memory generation: ${changed_list}. ${garden_result} Test validation outcome: ${test_outcome}. Worktree policy severity: ${worktree_policy_severity}."
 scripts/agent-append-summary.sh --cadence daily --timestamp "$timestamp" --title "$change_title" --body "$summary_body" >/dev/null
 append_rollups_if_due
 
@@ -387,7 +389,7 @@ scripts/agent-create-journal-entry.sh \
   --reason "$why_text" \
   --checks "$checks" \
   --test-result "$test_result" \
-  --observations "${observations_text}${pm_context} Shadow evaluation target: ${evaluation_metric} ${evaluation_goal} ${evaluation_delta}. Bottleneck evidence: ${bottleneck_evidence}. Current-state evidence: ${current_state_evidence}. Behavioral verification: ${verification_evidence}. Expected future effect: ${expected_effect}. ${garden_result} Worktree policy severity: ${worktree_policy_severity}. Automated post-processing refreshed README/state memory from data/garden-state.txt." \
+  --observations "${observations_text}${pm_context} Run mode: ${run_mode}; acceptance source: ${acceptance_source}; validation target: ${evaluation_metric} ${evaluation_goal} ${evaluation_delta}. Bottleneck evidence: ${bottleneck_evidence}. Current-state evidence: ${current_state_evidence}. Behavioral verification: ${verification_evidence}. Expected future effect: ${expected_effect}. ${garden_result} Worktree policy severity: ${worktree_policy_severity}. Automated post-processing refreshed README/state memory from data/garden-state.txt." \
   --next "$next_text" >/dev/null
 
 rm -f "$handoff_file"

@@ -235,7 +235,7 @@ append_baseline_shadow_result() {
   fi
 
   if [[ "$baseline_shadow_outcome" != "success" ]] || ! jq -e 'all(.[]; .status == "completed")' "$baseline_shadow_file" >/dev/null; then
-    echo "Baseline shadow simulation did not complete. This run must repair bounded simulation operability, set \`pmDirection\` to \`none\`, and use the required-repair \`tests/pass\` handoff. CI will require the post-change shadow capture to complete before advancing the garden."
+    echo "Baseline shadow simulation did not complete. This run must use \`runMode=recovery\`, \`acceptanceSource=mode\`, \`pmDirection=none\`, and \`tests/pass/0\`. CI will require the post-change shadow capture to complete safely before advancing the garden."
     echo
     echo '```json'
     jq . "$baseline_shadow_file"
@@ -266,7 +266,7 @@ append_baseline_shadow_result() {
     .maximumTotal
   ] | "| " + (map(tostring) | join(" | ")) + " |"' "$baseline_shadow_file"
   echo
-  echo "Before finalizing a normal run: write the proposed evaluation into \`.agent-run.json\`, run \`scripts/run-maven-tests-with-timeout.sh\`, then run \`SHADOW_EVALUATION_RESULT_FILE=target/agent-preflight-result.json scripts/evaluate-shadow-candidate.sh target/agent-baseline-shadow.json .agent-run.json target/agent-candidate-shadow.json\`. Finish only when that exact preflight passes. If it fails, revise the implementation or choose a truthful metric supported by the intended behavior; do not weaken the target merely to pass."
+  echo "Before finalizing an evolution run: write the proposed evaluation into \`.agent-run.json\`, run \`scripts/run-maven-tests-with-timeout.sh\`, then run \`SHADOW_EVALUATION_RESULT_FILE=target/agent-preflight-result.json scripts/evaluate-shadow-candidate.sh target/agent-baseline-shadow.json .agent-run.json target/agent-candidate-shadow.json\`. For safety-only modes add \`SHADOW_EVALUATION_POLICY=safety\`; skip this preflight for test-only repair and diagnostic modes."
   echo
 }
 
@@ -351,7 +351,7 @@ append_project_manager_direction() {
   echo "## Project Manager Direction"
   echo
   if [[ -n "$active_plan" ]]; then
-    echo "Active highest product priority for normal autonomous runs. Baseline Maven or worktree-policy repair is the only higher priority. If repair is not required, choose exactly one listed PM direction, set \`pmDirection\` in \`.agent-run.json\` to its label, and do not invent unrelated work."
+    echo "Active highest product priority for \`evolution\` runs. Required repair/recovery and objectively eligible maintenance or diagnostic runs may bypass it with \`pmDirection=none\`. An evolution run must choose exactly one listed PM direction. Its own task-specific acceptance target is preferred; set \`acceptanceSource=pm\` only when using the plan's default shadow acceptance exactly."
     echo
     echo "Source: \`${active_plan}\`."
     echo
@@ -392,6 +392,7 @@ append_compact_journal_entry() {
   echo
   echo "## Non-Negotiable Run Contract"
   echo
+  echo "- Classify the run explicitly: \`evolution\` changes future garden behavior; \`repair\` fixes a failing baseline; \`recovery\` resolves an operability emergency; \`maintenance\` performs one bounded behavior-preserving consolidation only when the architecture budget is exceeded; \`diagnostic\` adds focused test-only evidence for an important uncertainty."
   echo "- Choose exactly one focused bounded improvement with a visible expected future effect."
   echo "- Unless this run is repairing a failing baseline, the task must change future simulation behavior, rendered garden state, or persisted state semantics in a way that can be observed in future ticks."
   echo "- Prefer continuity over novelty and ecological depth over disconnected additions."
@@ -403,14 +404,15 @@ append_compact_journal_entry() {
   echo "- Treat a PM direction as an outcome target, not as proof of its suggested causal mechanism. Inspect the current state and relevant code before deciding how to achieve it."
   echo "- When Ecological Outcome History reports stagnation, use a bottleneck-first change: reproduce the blocker from the current persisted population, identify the active gate, and fix that gate with a focused behavior test. Do not add or tune another named trait unless current organisms carry it or the change includes a credible adoption path."
   echo "- A passing unit test proves the modeled rule, not impact on the living state. Report both current-state evidence and the behavioral verification in the handoff."
-  echo "- Declare one measurable shadow target in \`evaluation\`. CI replays baseline and candidate code from the same state and seeds; a missed target, role extinction, runaway population, or timeout discards the candidate before the real tick and records the evidence for the next run."
-  echo "- Use the Baseline Shadow Simulation section as the acceptance baseline. Before finalizing, run the exact candidate preflight command shown there and report its observed delta in \`evidence.verification\`."
+  echo "- Evolution runs declare one measurable ecological shadow target in \`evaluation\`; prefer a truthful task-specific target with \`acceptanceSource=agent\`, or use the selected PM direction's exact fallback with \`acceptanceSource=pm\`."
+  echo "- CI derives validation from \`runMode\`: evolution uses target plus safety; production repair, recovery, and eligible maintenance use safety only; test-only repair and diagnostic work skip shadow simulation. Only evolution and recovery advance the persistent garden."
+  echo "- For an evolution run, use the Baseline Shadow Simulation section as the acceptance baseline, run the exact candidate preflight command shown there, and report its observed delta in \`evidence.verification\`."
   echo "- You have god-mode recovery authority when persisted state causes runaway growth, timeouts, corruption, or prevents autonomous recovery. You may deterministically rebalance, cull, reseed, migrate, or directly repair \`data/garden-state.txt\`; prefer the program's \`recover\` command, preserve ecological roles, add an explanatory event, and report before/after counts."
   echo "- Never wait indefinitely for a random event or population outcome. Tests and diagnostics must be bounded. Use \`scripts/run-maven-tests-with-timeout.sh\`; if it interrupts Maven, treat the timeout as the baseline defect and replace long loops with deterministic phase-level tests."
-  echo "- If the Baseline Maven Test Result says \`failed\`, repairing the existing Java source or tests is the run's required first task. Do not add unrelated behavior until \`mvn test\` passes."
-  echo "- If the Baseline Shadow Simulation did not complete, repairing bounded simulation operability is the required task. Set \`pmDirection\` to \`none\`; CI will rerun the bounded shadow capture after the change and will not tick until it completes."
+  echo "- If the Baseline Maven Test Result says \`failed\`, use \`runMode=repair\`, \`acceptanceSource=mode\`, and \`tests/pass/0\`; repairing the existing Java source or tests is the required task."
+  echo "- If the Baseline Shadow Simulation did not complete, use \`runMode=recovery\`, \`acceptanceSource=mode\`, \`pmDirection=none\`, and \`tests/pass/0\`; CI will require bounded shadow capture to complete before advancing."
   echo "- If the Baseline Worktree Policy Result says \`deferred-repair\`, repairing those policy violations is the run's required first task. Do not add unrelated behavior until the policy violations are cleared."
-  echo "- If an active Project Manager Direction exists and no baseline repair is required, choose exactly one PM direction A-D as the run's highest product priority. Otherwise set \`pmDirection\` to \`none\`."
+  echo "- If an active Project Manager Direction exists and \`runMode=evolution\`, choose exactly one PM direction A-D. Non-evolution modes set \`pmDirection=none\` and must satisfy their objective eligibility rules."
   echo "- The run is pre-approved. Do not enter planning mode, do not ask for confirmation, and do not stop after proposing a strategy."
   echo "- Choose a task for its garden value, and let implementation structure follow from that task."
   echo "- \`expectedGardenEffect\` should explain what future garden behavior or runtime state should change."
@@ -458,6 +460,8 @@ append_compact_journal_entry() {
   cat <<'JSON'
 ```json
 {
+  "runMode": "evolution, repair, maintenance, recovery, or diagnostic",
+  "acceptanceSource": "agent or pm for evolution; mode for every non-evolution mode",
   "title": "Short title for this run",
   "task": "One sentence describing the chosen implementation task.",
   "why": "One short paragraph explaining why this was the right next step.",
@@ -465,7 +469,7 @@ append_compact_journal_entry() {
   "observations": "One short paragraph describing what was learned or any limitations.",
   "next": "One concrete possible next direction.",
   "expectedGardenEffect": "What future ticks should do differently because of this change.",
-  "pmDirection": "A, B, C, D, or none when no PM plan exists or this run is required repair.",
+  "pmDirection": "A, B, C, or D for evolution with an active PM plan; otherwise none.",
   "evidence": {
     "bottleneck": "The concrete current-state gate or missing causal link this run addressed.",
     "currentState": "Evidence from data/garden-state.txt or a shadow copy showing why the change can affect living organisms.",

@@ -38,6 +38,12 @@ if ! jq -e '
     (.why | type == "string" and length > 0) and
     (.expectedGardenEffect | type == "string" and length > 0) and
     (.acceptanceSignal | type == "string" and length > 0) and
+    (.shadowAcceptance | type == "object") and
+    ((.shadowAcceptance.metric // "") | type == "string" and
+      test("^(population[.](MOSS|ROOT_NETWORK|SPORE|FERN|FUNGUS|BEETLE|HARE|FOX)|totalOrganisms|nutrients|nutrientBuffer)$")) and
+    ((.shadowAcceptance.goal // "") | type == "string" and test("^(increase|decrease|preserve)$")) and
+    ((.shadowAcceptance.requiredDelta // -1) | type == "number" and . >= 0) and
+    ((.shadowAcceptance.goal == "preserve") or (.shadowAcceptance.requiredDelta > 0)) and
     (.avoid | type == "string" and length > 0)
   )) and
   (.antiPatterns | type == "array" and length >= 1 and all(.[]; type == "string" and length > 0))

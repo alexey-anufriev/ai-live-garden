@@ -6,6 +6,12 @@ handoff_file="${2:-.agent-run.json}"
 candidate_file="${3:-${RUNNER_TEMP:-/tmp}/candidate-shadow.json}"
 result_file="${SHADOW_EVALUATION_RESULT_FILE:-${RUNNER_TEMP:-/tmp}/shadow-evaluation-result.json}"
 max_organisms="${SHADOW_MAX_ORGANISMS:-25000}"
+evaluation_policy="${SHADOW_EVALUATION_POLICY:-target}"
+
+if [[ "$evaluation_policy" != "target" && "$evaluation_policy" != "safety" ]]; then
+  echo "SHADOW_EVALUATION_POLICY must be target or safety." >&2
+  exit 2
+fi
 
 if [[ -z "$baseline_file" || ! -f "$baseline_file" ]]; then
   echo "Usage: $0 BASELINE_FILE [HANDOFF_FILE] [CANDIDATE_FILE]" >&2
@@ -15,10 +21,12 @@ fi
 scripts/validate-agent-handoff.sh "$handoff_file" >/dev/null
 if ! scripts/capture-shadow-simulation.sh "$candidate_file" >/dev/null; then
   jq -n \
-    --slurpfile handoff "$handoff_file" '
+    --slurpfile handoff "$handoff_file" \
+    --arg policy "$evaluation_policy" '
     $handoff[0].evaluation as $evaluation |
     {
       passed: false,
+      policy: $policy,
       safetyPassed: false,
       targetPassed: false,
       metric: $evaluation.metric,
@@ -40,6 +48,7 @@ jq -n \
   --slurpfile baseline "$baseline_file" \
   --slurpfile candidate "$candidate_file" \
   --slurpfile handoff "$handoff_file" \
+  --arg policy "$evaluation_policy" \
   --argjson maximum "$max_organisms" '
   def metric_value($report; $metric):
     if ($metric | startswith("population.")) then
@@ -67,13 +76,15 @@ jq -n \
       (($candidateRuns[$index].final.counts[$type] // 0) > 0)
     ))
   )) as $safe |
-  (if $evaluation.goal == "increase" then $delta >= $evaluation.requiredDelta
+  (if $policy == "safety" then true
+   elif $evaluation.goal == "increase" then $delta >= $evaluation.requiredDelta
    elif $evaluation.goal == "decrease" then $delta <= -$evaluation.requiredDelta
    elif $evaluation.goal == "preserve" then ($delta | fabs) <= $evaluation.requiredDelta
    elif $evaluation.goal == "pass" then true
    else false end) as $targetMet |
   {
     passed: ($safe and $targetMet),
+    policy: $policy,
     safetyPassed: $safe,
     targetPassed: $targetMet,
     metric: $evaluation.metric,

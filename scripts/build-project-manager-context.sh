@@ -164,8 +164,9 @@ append_latest_plan() {
   echo "- Each direction must describe an observable garden outcome for future ticks: population balance, nutrients, buffer pressure, survival, reproduction, predation, decay, succession, recovery, or environment response."
   echo "- Every direction must be satisfiable through a future-behavior change. A diagnostic may be required as supporting work, but a report, log message, renderer phrase, counter, or test result alone is not an acceptable direction or acceptance signal."
   echo "- Acceptance signals must be observable in bounded simulation behavior or persisted garden semantics, not merely in source structure, trait presence, instrumentation, or prose."
+  echo "- For each direction, provide a conservative machine-readable shadowAcceptance. It is a fallback default: an evolution agent may instead declare its own truthful ecological target and set acceptanceSource=agent."
   echo "- Suggest directions, not implementation files. The autonomous agent will inspect code later if it chooses a direction."
-  echo "- Baseline repair always takes precedence during agent runs. Once repair is clear, your directions are the highest product priority for autonomous agents that day."
+  echo "- Baseline repair/recovery takes precedence. Once operability is clear, your directions are the highest product priority for evolution runs; objectively eligible maintenance or diagnostic work may use an explicit non-evolution mode."
   echo "- Produce exactly four directions labeled A, B, C, and D."
   echo "- Set the top-level \`date\` field to exactly \`${planning_date}\`."
   echo "- Write \`.project-plan.json\` with the JSON shape below. Also include the same JSON in your final response between \`PROJECT_PLAN_JSON_START\` and \`PROJECT_PLAN_JSON_END\`."
@@ -199,6 +200,11 @@ append_latest_plan() {
       "why": "Why this direction matters now based on garden state.",
       "expectedGardenEffect": "Observable future tick effect.",
       "acceptanceSignal": "What would show that the direction was successfully implemented.",
+      "shadowAcceptance": {
+        "metric": "population.BEETLE, another population type, totalOrganisms, nutrients, or nutrientBuffer",
+        "goal": "increase, decrease, or preserve",
+        "requiredDelta": 1
+      },
       "avoid": "What the agent should not do while pursuing this direction."
     }
   ],

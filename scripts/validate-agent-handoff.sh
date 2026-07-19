@@ -17,6 +17,8 @@ fi
 if ! jq -e '
   . as $root |
   type == "object" and
+  (($root.runMode // "") | type == "string" and test("^(evolution|repair|maintenance|recovery|diagnostic)$")) and
+  (($root.acceptanceSource // "") | type == "string" and test("^(agent|pm|mode)$")) and
   (["title", "task", "why", "summary", "observations", "next", "expectedGardenEffect"] |
     all(.[]; ($root[.] | type == "string" and length > 0))) and
   (($root.requests // []) | type == "array") and
@@ -50,12 +52,18 @@ if [[ -z "$pm_plan_file" ]]; then
   pm_plan_file="$(scripts/find-active-agent-plan.sh)"
 fi
 pm_direction="$(jq -r '.pmDirection // empty' "$handoff_file")"
+run_mode="$(jq -r '.runMode' "$handoff_file")"
+acceptance_source="$(jq -r '.acceptanceSource' "$handoff_file")"
 repair_required="false"
 if [[ "${AGENT_BASELINE_TEST_OUTCOME:-success}" != "success" || "${AGENT_BASELINE_POLICY_OUTCOME:-success}" != "success" || "${AGENT_BASELINE_SHADOW_OUTCOME:-success}" != "success" ]]; then
   repair_required="true"
 fi
 
 if [[ "$repair_required" == "true" ]]; then
+  if [[ "$run_mode" != "repair" && "$run_mode" != "recovery" ]]; then
+    echo "A failing baseline requires runMode=repair or runMode=recovery." >&2
+    exit 1
+  fi
   if [[ "$pm_direction" != "none" ]]; then
     echo "Agent handoff must set pmDirection to none for a required baseline repair." >&2
     exit 1
@@ -64,10 +72,10 @@ if [[ "$repair_required" == "true" ]]; then
     echo "A baseline repair handoff must evaluate metric=tests with goal=pass." >&2
     exit 1
   fi
-elif [[ -f "$pm_plan_file" ]]; then
+elif [[ "$run_mode" == "evolution" && -f "$pm_plan_file" ]]; then
   if ! grep -Eq '^[A-D]$' <<<"$pm_direction"; then
     echo "Agent handoff must set pmDirection to A, B, C, or D when active plan ${pm_plan_file} exists." >&2
-    echo "The active PM plan is the highest product priority for normal runs." >&2
+    echo "The active PM plan is the highest product priority for evolution runs." >&2
     exit 1
   fi
 
@@ -75,23 +83,93 @@ elif [[ -f "$pm_plan_file" ]]; then
     echo "Agent handoff selected pmDirection=${pm_direction}, but that direction was not found in ${pm_plan_file}." >&2
     exit 1
   fi
-elif [[ "$pm_direction" != "none" ]]; then
+elif [[ "$run_mode" == "evolution" && "$pm_direction" != "none" ]]; then
   echo "Agent handoff must set pmDirection to none when no active PM plan exists." >&2
+  exit 1
+elif [[ "$run_mode" != "evolution" && "$pm_direction" != "none" ]]; then
+  echo "Non-evolution run modes must set pmDirection to none." >&2
   exit 1
 fi
 
-if [[ "$repair_required" != "true" ]]; then
-  evaluation_metric="$(jq -r '.evaluation.metric' "$handoff_file")"
-  evaluation_goal="$(jq -r '.evaluation.goal' "$handoff_file")"
-  evaluation_delta="$(jq -r '.evaluation.requiredDelta' "$handoff_file")"
-  if [[ "$evaluation_metric" == "tests" || "$evaluation_goal" == "pass" ]]; then
-    echo "A normal evolution handoff must declare an ecological shadow-evaluation target." >&2
-    exit 1
-  fi
-  if [[ "$evaluation_goal" != "preserve" ]] && awk -v delta="$evaluation_delta" 'BEGIN { exit !(delta <= 0) }'; then
-    echo "Increase/decrease shadow targets must require a positive delta." >&2
-    exit 1
-  fi
-fi
+evaluation_metric="$(jq -r '.evaluation.metric' "$handoff_file")"
+evaluation_goal="$(jq -r '.evaluation.goal' "$handoff_file")"
+evaluation_delta="$(jq -r '.evaluation.requiredDelta' "$handoff_file")"
+
+case "$run_mode" in
+  evolution)
+    if [[ "$repair_required" == "true" ]]; then
+      echo "runMode=evolution cannot override a failing baseline." >&2
+      exit 1
+    fi
+    if [[ "$acceptance_source" != "agent" && "$acceptance_source" != "pm" ]]; then
+      echo "Evolution runs must use acceptanceSource=agent or acceptanceSource=pm." >&2
+      exit 1
+    fi
+    if [[ "$evaluation_metric" == "tests" || "$evaluation_goal" == "pass" ]]; then
+      echo "A normal evolution handoff must declare an ecological shadow-evaluation target." >&2
+      exit 1
+    fi
+    if [[ "$evaluation_goal" != "preserve" ]] && awk -v delta="$evaluation_delta" 'BEGIN { exit !(delta <= 0) }'; then
+      echo "Increase/decrease shadow targets must require a positive delta." >&2
+      exit 1
+    fi
+    if [[ "$acceptance_source" == "pm" ]]; then
+      pm_json_file="${pm_plan_file%.md}.json"
+      if [[ ! -f "$pm_json_file" ]]; then
+        echo "acceptanceSource=pm requires a machine-readable active PM plan sidecar: ${pm_json_file}" >&2
+        exit 1
+      fi
+      if ! jq -e --arg label "$pm_direction" --slurpfile handoff "$handoff_file" '
+        first(.directions[] | select(.label == $label) | .shadowAcceptance) == $handoff[0].evaluation
+      ' "$pm_json_file" >/dev/null; then
+        echo "Agent evaluation must exactly match the selected PM shadowAcceptance when acceptanceSource=pm." >&2
+        exit 1
+      fi
+    fi
+    ;;
+  repair)
+    if [[ "$repair_required" != "true" || "$acceptance_source" != "mode" || "$evaluation_metric" != "tests" || "$evaluation_goal" != "pass" || "$evaluation_delta" != "0" ]]; then
+      echo "runMode=repair requires a failing baseline, acceptanceSource=mode, and tests/pass/0." >&2
+      exit 1
+    fi
+    ;;
+  recovery)
+    data_changed="$(git status --porcelain -uall -- data/garden-state.txt)"
+    if [[ "$acceptance_source" != "mode" || "$evaluation_metric" != "tests" || "$evaluation_goal" != "pass" || "$evaluation_delta" != "0" ]]; then
+      echo "runMode=recovery requires acceptanceSource=mode and tests/pass/0." >&2
+      exit 1
+    fi
+    if [[ "${AGENT_BASELINE_SHADOW_OUTCOME:-success}" == "success" && -z "$data_changed" ]]; then
+      echo "runMode=recovery requires a failed shadow baseline or a deliberate persisted-state change." >&2
+      exit 1
+    fi
+    ;;
+  maintenance)
+    maintenance_change="$(git status --porcelain -uall -- src/main pom.xml)"
+    if [[ "$repair_required" == "true" || "$acceptance_source" != "mode" || "$pm_direction" != "none" || "$evaluation_metric" == "tests" || "$evaluation_goal" != "preserve" ]]; then
+      echo "runMode=maintenance requires a passing baseline, acceptanceSource=mode, pmDirection=none, and an ecological preserve target." >&2
+      exit 1
+    fi
+    if [[ -z "$maintenance_change" || -n "$(git status --porcelain -uall -- data/garden-state.txt)" ]]; then
+      echo "runMode=maintenance requires a production/project change and cannot modify persisted garden state." >&2
+      exit 1
+    fi
+    complexity_report="$(scripts/report-complexity-budget.sh)"
+    if ! grep -Fq 'Budget status: exceeded' <<<"$complexity_report"; then
+      echo "runMode=maintenance requires an objectively exceeded architecture budget." >&2
+      exit 1
+    fi
+    ;;
+  diagnostic)
+    if [[ "$repair_required" == "true" || "$acceptance_source" != "mode" || "$pm_direction" != "none" || "$evaluation_metric" != "tests" || "$evaluation_goal" != "pass" || "$evaluation_delta" != "0" ]]; then
+      echo "runMode=diagnostic requires a passing baseline, acceptanceSource=mode, pmDirection=none, and tests/pass/0." >&2
+      exit 1
+    fi
+    if [[ -n "$(git status --porcelain -uall -- src/main pom.xml data/garden-state.txt)" || -z "$(git status --porcelain -uall -- src/test)" ]]; then
+      echo "runMode=diagnostic is limited to focused test-only changes." >&2
+      exit 1
+    fi
+    ;;
+esac
 
 echo "Agent handoff JSON is present and valid: ${handoff_file}"

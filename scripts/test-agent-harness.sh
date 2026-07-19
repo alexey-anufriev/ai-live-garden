@@ -31,13 +31,16 @@ grep -Fq 'scripts/defer-shadow-rejection.sh' "$workflow_file"
 grep -Fq 'id: commit_shadow_feedback' "$workflow_file"
 grep -Fq 'id: defer_agent_incomplete' "$workflow_file"
 grep -Fq 'id: shadow_repair_evaluation' "$workflow_file"
+grep -Fq 'id: validation_policy' "$workflow_file"
+grep -Fq 'id: shadow_safety_evaluation' "$workflow_file"
+grep -Fq 'id: candidate_validation' "$workflow_file"
 grep -Fq 'id: publish_rejected_candidate' "$workflow_file"
 grep -Fq 'id: cleanup_rejected_candidates' "$workflow_file"
 grep -Fq 'id: cleanup_consumed_rejected_candidates' "$workflow_file"
-grep -Fq 'bash scripts/defer-agent-incomplete.sh' "$workflow_file"
-grep -Fq 'bash scripts/evaluate-shadow-repair.sh' "$workflow_file"
-grep -Fq 'bash scripts/publish-rejected-candidate.sh' "$workflow_file"
-grep -Fq 'bash scripts/cleanup-rejected-candidate-branches.sh' "$workflow_file"
+grep -Fq 'run: scripts/defer-agent-incomplete.sh' "$workflow_file"
+grep -Fq 'run: scripts/evaluate-shadow-repair.sh' "$workflow_file"
+grep -Fq 'run: scripts/publish-rejected-candidate.sh' "$workflow_file"
+grep -Fq 'run: scripts/cleanup-rejected-candidate-branches.sh' "$workflow_file"
 grep -Fq "steps.harness_contracts.outcome == 'success'" "$workflow_file"
 grep -Fq "steps.setup_java.outcome == 'success'" "$workflow_file"
 if grep -Eq 'build-(agent|shadow)-retry-prompt-output\.sh|Run Gemini corrective retry' "$workflow_file"; then
@@ -116,9 +119,9 @@ JSON
     AGENT_SHADOW_FEEDBACK_FILE="$fixture_root/no-feedback.md" \
     scripts/build-agent-context.sh "$failed_context"
 )
-grep -Fq 'repair bounded simulation operability' "$failed_context"
+grep -Fq 'runMode=recovery' "$failed_context"
 grep -Fq '"status": "timed-out"' "$failed_context"
-grep -Fq 'tests/pass' "$failed_context"
+grep -Fq 'tests/pass/0' "$failed_context"
 
 shadow_fixture="$fixture_root/shadow-capture"
 mkdir -p "$shadow_fixture/target/classes/garden/ai"
@@ -185,6 +188,7 @@ cp "$repository_root/scripts/capture-shadow-simulation.sh" "$repository_root/scr
   "$shadow_fixture/scripts/"
 cat > "$shadow_fixture/.agent-run.json" <<'JSON'
 {
+  "runMode":"evolution", "acceptanceSource":"agent",
   "title":"Capture failure fixture", "task":"Exercise structured rejection.", "why":"Regression coverage.",
   "summary":"Fixture.", "observations":"Fixture.", "next":"Fixture.",
   "expectedGardenEffect":"Increase beetles.", "pmDirection":"none",
@@ -193,6 +197,15 @@ cat > "$shadow_fixture/.agent-run.json" <<'JSON'
   "codeMap":[], "requests":[], "state":{"immediateDirections":[],"constraints":[]}
 }
 JSON
+(
+  cd "$shadow_fixture"
+  SHADOW_SIMULATION_RUNNER="$shadow_fixture/fake-java" SHADOW_SIMULATION_SEEDS=17 \
+    SHADOW_EVALUATION_POLICY=safety \
+    SHADOW_EVALUATION_RESULT_FILE="$shadow_fixture/safety-result.json" \
+    scripts/evaluate-shadow-candidate.sh "$shadow_fixture/result.json" .agent-run.json "$shadow_fixture/safety-candidate.json" >/dev/null
+)
+jq -e '.passed == true and .policy == "safety" and .targetPassed == true' \
+  "$shadow_fixture/safety-result.json" >/dev/null
 if (
   cd "$shadow_fixture"
   SHADOW_SIMULATION_RUNNER="$shadow_fixture/fake-java" \
@@ -207,6 +220,7 @@ jq -e '.passed == false and .reason == "candidate-shadow-capture-failed" and .ob
   "$shadow_fixture/capture-failure-result.json" >/dev/null
 cat > "$shadow_fixture/repair-handoff.json" <<'JSON'
 {
+  "runMode":"repair", "acceptanceSource":"mode",
   "title":"Shadow repair fixture", "task":"Restore bounded shadow capture.", "why":"Regression coverage.",
   "summary":"Fixture.", "observations":"Fixture.", "next":"Fixture.",
   "expectedGardenEffect":"Future ticks complete within the bound.", "pmDirection":"none",
@@ -228,7 +242,8 @@ rm -rf "$shadow_fixture"
 
 mkdir -p "$fixture_root/scripts" "$fixture_root/agent/plans" "$fixture_root/artifacts"
 for script in find-active-agent-plan.sh agent-substantive-changes.sh validate-agent-handoff.sh \
-  extract-agent-handoff.sh inspect-agent-gemini-output.sh validate-agent-worktree.sh write-output-file.sh; do
+  derive-agent-validation-policy.sh report-complexity-budget.sh extract-agent-handoff.sh \
+  inspect-agent-gemini-output.sh validate-agent-worktree.sh write-output-file.sh; do
   cp "$repository_root/scripts/$script" "$fixture_root/scripts/$script"
 done
 chmod +x "$fixture_root/scripts/"*.sh
@@ -241,6 +256,14 @@ cat > "$fixture_root/agent/plans/2026-07-08.md" <<'PLAN'
 ### C. Direction C
 ### D. Direction D
 PLAN
+cat > "$fixture_root/agent/plans/2026-07-08.json" <<'JSON'
+{"directions":[
+  {"label":"A","shadowAcceptance":{"metric":"population.BEETLE","goal":"increase","requiredDelta":1}},
+  {"label":"B","shadowAcceptance":{"metric":"nutrients","goal":"preserve","requiredDelta":1}},
+  {"label":"C","shadowAcceptance":{"metric":"population.FOX","goal":"increase","requiredDelta":1}},
+  {"label":"D","shadowAcceptance":{"metric":"nutrientBuffer","goal":"decrease","requiredDelta":1}}
+]}
+JSON
 
 cd "$fixture_root"
 git init -q
@@ -251,7 +274,10 @@ handoff() {
   local goal="$3"
   local delta="$4"
   local output="$5"
-  jq -n --arg direction "$direction" --arg metric "$metric" --arg goal "$goal" --argjson delta "$delta" '{
+  local mode="${6:-evolution}"
+  local source="${7:-agent}"
+  jq -n --arg direction "$direction" --arg metric "$metric" --arg goal "$goal" --argjson delta "$delta" --arg mode "$mode" --arg source "$source" '{
+    runMode:$mode, acceptanceSource:$source,
     title:"Harness fixture", task:"Exercise the autonomous contract.", why:"Regression coverage.",
     summary:"Fixture.", observations:"Fixture.", next:"Fixture.", expectedGardenEffect:"Fixture effect.",
     pmDirection:$direction,
@@ -266,11 +292,18 @@ handoff() {
 
 handoff A population.BEETLE increase 1 handoff-active.json
 AGENT_PM_REFERENCE_DATE=2026-07-08 scripts/validate-agent-handoff.sh handoff-active.json >/dev/null
+handoff A population.BEETLE increase 1 handoff-pm.json evolution pm
+AGENT_PM_REFERENCE_DATE=2026-07-08 scripts/validate-agent-handoff.sh handoff-pm.json >/dev/null
+handoff A population.BEETLE increase 2 handoff-pm-mismatch.json evolution pm
+if AGENT_PM_REFERENCE_DATE=2026-07-08 scripts/validate-agent-handoff.sh handoff-pm-mismatch.json >/dev/null 2>&1; then
+  echo "PM acceptance source incorrectly accepted a target that differed from the plan sidecar." >&2
+  exit 1
+fi
 
 handoff none population.BEETLE increase 1 handoff-stale.json
 AGENT_PM_REFERENCE_DATE=2026-07-09 scripts/validate-agent-handoff.sh handoff-stale.json >/dev/null
 
-handoff none tests pass 0 handoff-repair.json
+handoff none tests pass 0 handoff-repair.json repair mode
 AGENT_PM_REFERENCE_DATE=2026-07-08 AGENT_BASELINE_TEST_OUTCOME=failure \
   scripts/validate-agent-handoff.sh handoff-repair.json >/dev/null
 AGENT_PM_REFERENCE_DATE=2026-07-08 AGENT_BASELINE_SHADOW_OUTCOME=failure \
@@ -319,6 +352,37 @@ mkdir -p src/main/java/example
 echo 'package example;' > src/main/java/example/Change.java
 scripts/agent-substantive-changes.sh | grep -Fxq 'src/main/java/example/Change.java'
 VALIDATE_AGENT_WORKTREE_SCOPE=changed scripts/validate-agent-worktree.sh >/dev/null
+GITHUB_OUTPUT=policy-evolution.outputs AGENT_PM_REFERENCE_DATE=2026-07-08 \
+  scripts/derive-agent-validation-policy.sh handoff-active.json >/dev/null
+grep -Fxq 'run_mode=evolution' policy-evolution.outputs
+grep -Fxq 'shadow_policy=target' policy-evolution.outputs
+grep -Fxq 'advance_garden=true' policy-evolution.outputs
+
+GITHUB_OUTPUT=policy-repair-production.outputs AGENT_PM_REFERENCE_DATE=2026-07-08 \
+  AGENT_BASELINE_TEST_OUTCOME=failure scripts/derive-agent-validation-policy.sh handoff-repair.json >/dev/null
+grep -Fxq 'shadow_policy=safety' policy-repair-production.outputs
+grep -Fxq 'advance_garden=false' policy-repair-production.outputs
+
+rm src/main/java/example/Change.java
+mkdir -p src/test/java/example
+echo 'package example;' > src/test/java/example/DiagnosticTest.java
+GITHUB_OUTPUT=policy-repair-tests.outputs AGENT_PM_REFERENCE_DATE=2026-07-08 \
+  AGENT_BASELINE_TEST_OUTCOME=failure scripts/derive-agent-validation-policy.sh handoff-repair.json >/dev/null
+grep -Fxq 'shadow_policy=skip' policy-repair-tests.outputs
+
+handoff none tests pass 0 handoff-diagnostic.json diagnostic mode
+GITHUB_OUTPUT=policy-diagnostic.outputs AGENT_PM_REFERENCE_DATE=2026-07-08 \
+  scripts/derive-agent-validation-policy.sh handoff-diagnostic.json >/dev/null
+grep -Fxq 'shadow_policy=skip' policy-diagnostic.outputs
+grep -Fxq 'advance_garden=false' policy-diagnostic.outputs
+
+rm src/test/java/example/DiagnosticTest.java
+echo 'package example; class Change {}' > src/main/java/example/Change.java
+handoff none totalOrganisms preserve 0 handoff-maintenance.json maintenance mode
+GITHUB_OUTPUT=policy-maintenance.outputs AGENT_PM_REFERENCE_DATE=2026-07-08 \
+  AGENT_SOURCE_FILE_LINE_BUDGET=0 scripts/derive-agent-validation-policy.sh handoff-maintenance.json >/dev/null
+grep -Fxq 'shadow_policy=safety' policy-maintenance.outputs
+grep -Fxq 'advance_garden=false' policy-maintenance.outputs
 
 defer_fixture="$fixture_root/defer-fixture"
 defer_remote="$fixture_root/defer-remote.git"
@@ -342,6 +406,7 @@ echo 'package example; class Change {}' > "$defer_fixture/src/main/java/example/
   echo 'package example; class RejectedTest {}' > src/test/java/example/RejectedTest.java
   cat > .agent-run.json <<'JSON'
 {
+  "runMode":"evolution", "acceptanceSource":"agent",
   "title":"Rejected fixture", "task":"Exercise deferral.", "why":"Regression coverage.",
   "summary":"Rejected source.", "observations":"No delta.", "next":"Use the evidence.",
   "expectedGardenEffect":"Increase beetles.", "pmDirection":"none",
@@ -442,6 +507,41 @@ chmod +x "$observation_fixture/scripts/check-agent-observation-window.sh"
   GITHUB_OUTPUT="$observation_fixture/cooldown.outputs" AGENT_MIN_TICKS_BETWEEN_RUNS=3 \
     scripts/check-agent-observation-window.sh >/dev/null
   grep -Fxq 'ready=false' cooldown.outputs
+)
+
+plan_fixture="$fixture_root/plan-fixture"
+mkdir -p "$plan_fixture/scripts" "$plan_fixture/agent/plans"
+cp "$repository_root/scripts/validate-project-plan.sh" "$repository_root/scripts/render-project-plan.sh" \
+  "$repository_root/scripts/validate-project-plan-worktree.sh" "$plan_fixture/scripts/"
+chmod +x "$plan_fixture/scripts/"*.sh
+(
+  cd "$plan_fixture"
+  git init -q
+  git config user.name fixture
+  git config user.email fixture@example.invalid
+  touch agent/plans/.gitkeep
+  git add .
+  git commit -qm baseline
+  jq -n '{
+    date:"2026-07-19",
+    review:{previousPlanDate:"none",overallMark:"unclear",summary:"No prior evidence.",results:[]},
+    thesis:"Four bounded ecological outcomes provide useful autonomous directions today.",
+    stateSignals:["Fixture state signal."],
+    directions:["A","B","C","D"] | map({
+      label:., title:(. + " direction"), why:"Fixture evidence.",
+      expectedGardenEffect:"A future bounded tick changes observably.",
+      acceptanceSignal:"The bounded simulation exposes the expected outcome.",
+      shadowAcceptance:{metric:"totalOrganisms",goal:"preserve",requiredDelta:1},
+      avoid:"Avoid unrelated work."
+    }),
+    antiPatterns:["Unbounded work."]
+  }' > .project-plan.json
+  PROJECT_PLAN_EXPECTED_DATE=2026-07-19 scripts/validate-project-plan.sh .project-plan.json >/dev/null
+  PROJECT_PLAN_EXPECTED_DATE=2026-07-19 scripts/render-project-plan.sh .project-plan.json >/dev/null
+  [[ -f agent/plans/2026-07-19.md ]]
+  [[ -f agent/plans/2026-07-19.json ]]
+  jq -e '.directions[0].shadowAcceptance.goal == "preserve"' agent/plans/2026-07-19.json >/dev/null
+  scripts/validate-project-plan-worktree.sh >/dev/null
 )
 
 echo "Agent harness regression tests passed."

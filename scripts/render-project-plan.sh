@@ -51,6 +51,7 @@ render_plan() {
       "- Why now: " + .why,
       "- Expected garden effect: " + .expectedGardenEffect,
       "- Acceptance signal: " + .acceptanceSignal,
+      "- Default shadow acceptance: `" + .shadowAcceptance.metric + " " + .shadowAcceptance.goal + " " + (.shadowAcceptance.requiredDelta | tostring) + "` (fallback; the agent may declare a better task-specific target)",
       "- Avoid: " + .avoid,
       ""
     ),
@@ -62,6 +63,7 @@ render_plan() {
 }
 
 render_plan > "$dated_plan"
-rm -f "$plan_file" "$dated_json_sidecar"
+jq -S . "$plan_file" > "$dated_json_sidecar"
+rm -f "$plan_file"
 
-echo "Rendered project plan to ${dated_plan}."
+echo "Rendered project plan to ${dated_plan} with machine-readable sidecar ${dated_json_sidecar}."
