@@ -345,13 +345,19 @@ append_recent_implementation_pattern() {
 append_project_manager_direction() {
   local latest_plan
   local active_plan
+  local active_plan_sidecar
   latest_plan="$(find agent/plans -maxdepth 1 -type f -name '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].md' -print 2>/dev/null | sort -V | tail -n 1)"
   active_plan="$(scripts/find-active-agent-plan.sh)"
 
   echo "## Project Manager Direction"
   echo
   if [[ -n "$active_plan" ]]; then
-    echo "Active highest product priority for \`evolution\` runs. Required repair/recovery and objectively eligible maintenance or diagnostic runs may bypass it with \`pmDirection=none\`. An evolution run must choose exactly one listed PM direction. Its own task-specific acceptance target is preferred; set \`acceptanceSource=pm\` only when using the plan's default shadow acceptance exactly."
+    active_plan_sidecar="${active_plan%.md}.json"
+    if [[ -f "$active_plan_sidecar" ]]; then
+      echo "Active highest product priority for \`evolution\` runs. Required repair/recovery and objectively eligible maintenance or diagnostic runs may bypass it with \`pmDirection=none\`. An evolution run must choose exactly one listed PM direction. Its own task-specific acceptance target is preferred; set \`acceptanceSource=pm\` only when using the plan sidecar's default shadow acceptance exactly."
+    else
+      echo "Active highest product priority for \`evolution\` runs. This legacy plan has no machine-readable acceptance sidecar, so choose one direction but set \`acceptanceSource=agent\` and declare a truthful task-specific ecological target. Do not use \`acceptanceSource=pm\` for this plan."
+    fi
     echo
     echo "Source: \`${active_plan}\`."
     echo

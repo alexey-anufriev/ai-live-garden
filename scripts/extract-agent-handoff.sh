@@ -77,7 +77,7 @@ candidate_files() {
 
 valid_handoff() {
   local path="$1"
-  scripts/validate-agent-handoff.sh "$path" >/dev/null 2>&1
+  scripts/validate-agent-handoff.sh "$path" >/dev/null
 }
 
 try_candidate() {
@@ -88,10 +88,17 @@ try_candidate() {
   jq '.' "$candidate_file" > "${candidate_file}.normalized" 2>/dev/null || return 1
   mv "${candidate_file}.normalized" "$candidate_file"
 
-  if valid_handoff "$candidate_file"; then
+  candidate_error="${tmp_dir}/candidate-error.txt"
+  if valid_handoff "$candidate_file" 2> "$candidate_error"; then
     mv "$candidate_file" "$output_file"
     echo "Extracted agent handoff from ${source_file} into ${output_file}."
     return 0
+  fi
+
+  first_error="$(sed -n '/[^[:space:]]/ { p; q; }' "$candidate_error")"
+  if [[ -n "$first_error" ]]; then
+    printf 'Invalid agent handoff candidate: %s\n' "$source_file" >> "$validation_log"
+    printf 'Handoff validation error: %s\n' "$first_error" >> "$validation_log"
   fi
 
   return 1
@@ -163,6 +170,7 @@ extract_json_fence() {
 
 tmp_dir="$(mktemp -d)"
 trap 'rm -rf "$tmp_dir"' EXIT
+validation_log="${tmp_dir}/validation-errors.txt"
 
 while IFS= read -r source_file; do
   [[ -n "$source_file" && -f "$source_file" ]] || continue
@@ -181,6 +189,9 @@ while IFS= read -r source_file; do
   done
 done < <(candidate_files | sort -u)
 
+if [[ -s "$validation_log" ]]; then
+  awk '!seen[$0]++' "$validation_log" >&2
+fi
 echo "Could not create ${output_file}: no valid agent handoff JSON was found in Gemini output." >&2
 echo "Expected either ${output_file}, a JSON block between AGENT_RUN_JSON_START and AGENT_RUN_JSON_END, or a valid handoff inside a known JSON output field such as .response." >&2
 exit 1

@@ -30,6 +30,8 @@ grep -Fq 'id: defer_shadow_rejection' "$workflow_file"
 grep -Fq 'scripts/defer-shadow-rejection.sh' "$workflow_file"
 grep -Fq 'id: commit_shadow_feedback' "$workflow_file"
 grep -Fq 'id: defer_agent_incomplete' "$workflow_file"
+grep -Fq 'id: publish_incomplete_candidate' "$workflow_file"
+grep -Fq 'id: cleanup_incomplete_candidates' "$workflow_file"
 grep -Fq 'id: shadow_repair_evaluation' "$workflow_file"
 grep -Fq 'id: validation_policy' "$workflow_file"
 grep -Fq 'id: shadow_safety_evaluation' "$workflow_file"
@@ -99,6 +101,7 @@ grep -Fq '| 17 | 5 | completed | 10 | 20 | 9 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 2 | 9
 grep -Fq 'scripts/evaluate-shadow-candidate.sh target/agent-baseline-shadow.json' "$prompt_outputs"
 grep -Fq '## Previous Autonomous Feedback' "$prompt_outputs"
 grep -Fq 'Previous candidate observed delta: 0.' "$prompt_outputs"
+grep -Fq 'legacy plan has no machine-readable acceptance sidecar' "$prompt_outputs"
 grep -Fq 'AGENT_CONTEXT_BYTES=' "$prompt_metadata"
 grep -Fq "AGENT_CONTEXT_BASELINE_SHADOW_FILE=${baseline_shadow}" "$prompt_metadata"
 grep -Fq 'AGENT_CONTEXT_BASELINE_SHADOW_OUTCOME=success' "$prompt_metadata"
@@ -299,6 +302,9 @@ if AGENT_PM_REFERENCE_DATE=2026-07-08 scripts/validate-agent-handoff.sh handoff-
   echo "PM acceptance source incorrectly accepted a target that differed from the plan sidecar." >&2
   exit 1
 fi
+mv agent/plans/2026-07-08.json legacy-plan-sidecar.json
+AGENT_PM_REFERENCE_DATE=2026-07-08 scripts/validate-agent-handoff.sh handoff-pm-mismatch.json >/dev/null
+mv legacy-plan-sidecar.json agent/plans/2026-07-08.json
 
 handoff none population.BEETLE increase 1 handoff-stale.json
 AGENT_PM_REFERENCE_DATE=2026-07-09 scripts/validate-agent-handoff.sh handoff-stale.json >/dev/null
@@ -343,6 +349,13 @@ if ! grep -Fxq 'noop_reason=agent-returned-no-valid-handoff-or-changes' artifact
 fi
 rm -rf artifacts
 
+echo 'temporary helper' > scratch.py
+if VALIDATE_AGENT_WORKTREE_SCOPE=changed scripts/validate-agent-worktree.sh >/dev/null 2>&1; then
+  echo "Root Python scratch file incorrectly passed worktree policy." >&2
+  exit 1
+fi
+rm scratch.py
+
 if VALIDATE_AGENT_WORKTREE_SCOPE=changed scripts/validate-agent-worktree.sh >/dev/null 2>&1; then
   echo "Generated-only fixture incorrectly passed substantive-change policy." >&2
   exit 1
@@ -352,6 +365,20 @@ mkdir -p src/main/java/example
 echo 'package example;' > src/main/java/example/Change.java
 scripts/agent-substantive-changes.sh | grep -Fxq 'src/main/java/example/Change.java'
 VALIDATE_AGENT_WORKTREE_SCOPE=changed scripts/validate-agent-worktree.sh >/dev/null
+mkdir -p artifacts
+jq -n --rawfile response handoff-pm-mismatch.json \
+  '{response:("AGENT_RUN_JSON_START\n" + $response + "AGENT_RUN_JSON_END")}' > artifacts/stdout.log
+GITHUB_OUTPUT=inspect-invalid.outputs AGENT_PM_REFERENCE_DATE=2026-07-08 \
+  scripts/inspect-agent-gemini-output.sh artifacts >/dev/null
+grep -Fxq 'valid_handoff=false' inspect-invalid.outputs
+grep -Fxq 'handoff_candidate=true' inspect-invalid.outputs
+grep -Fxq 'noop_reason=changes-with-invalid-handoff' inspect-invalid.outputs
+if ! grep -Fq 'handoff_validation_reason=Agent evaluation must exactly match' inspect-invalid.outputs; then
+  echo "Invalid handoff diagnostics did not expose the semantic validator reason:" >&2
+  cat inspect-invalid.outputs >&2
+  exit 1
+fi
+rm -rf artifacts inspect-invalid.outputs
 GITHUB_OUTPUT=policy-evolution.outputs AGENT_PM_REFERENCE_DATE=2026-07-08 \
   scripts/derive-agent-validation-policy.sh handoff-active.json >/dev/null
 grep -Fxq 'run_mode=evolution' policy-evolution.outputs
@@ -461,10 +488,13 @@ JSON
 )
 
 incomplete_fixture="$fixture_root/incomplete-fixture"
+incomplete_remote="$fixture_root/incomplete-remote.git"
+git init --bare -q "$incomplete_remote"
 mkdir -p "$incomplete_fixture/scripts" "$incomplete_fixture/src/main/java/example" \
   "$incomplete_fixture/gemini-artifacts" "$incomplete_fixture/agent"
-cp "$repository_root/scripts/defer-agent-incomplete.sh" "$incomplete_fixture/scripts/"
-chmod +x "$incomplete_fixture/scripts/defer-agent-incomplete.sh"
+cp "$repository_root/scripts/defer-agent-incomplete.sh" "$repository_root/scripts/publish-rejected-candidate.sh" \
+  "$repository_root/scripts/cleanup-rejected-candidate-branches.sh" "$incomplete_fixture/scripts/"
+chmod +x "$incomplete_fixture/scripts/"*.sh
 echo 'package example; class Change {}' > "$incomplete_fixture/src/main/java/example/Change.java"
 printf '# Deferred Shadow Evaluation Feedback\n\n- Branch: `agent-rejected/prior-1`\n' \
   > "$incomplete_fixture/agent/shadow-feedback.md"
@@ -475,21 +505,39 @@ printf '# Deferred Shadow Evaluation Feedback\n\n- Branch: `agent-rejected/prior
   git config user.email fixture@example.invalid
   git add scripts src/main/java/example/Change.java agent/shadow-feedback.md
   git commit -qm baseline
+  git remote add origin "$incomplete_remote"
+  git push -q -u origin HEAD:main
   echo 'package example; class Change { int partial; }' > src/main/java/example/Change.java
   mkdir -p unrelated
   echo 'partial scratch' > unrelated/scratch.txt
   printf '{"response":"partial agent response","stats":{"tools":{"totalCalls":2}}}\n' \
     > gemini-artifacts/stdout.log
-  bash scripts/defer-agent-incomplete.sh gemini-artifacts agent-returned-no-valid-handoff-or-changes \
-    agent/shadow-feedback.md >/dev/null
+  GITHUB_OUTPUT=publish-incomplete.outputs GITHUB_RUN_ID=67890 GITHUB_RUN_ATTEMPT=1 \
+    scripts/publish-rejected-candidate.sh >/dev/null
+  incomplete_branch="$(sed -n 's/^branch=//p' publish-incomplete.outputs)"
+  incomplete_commit="$(sed -n 's/^commit=//p' publish-incomplete.outputs)"
+  INCOMPLETE_CANDIDATE_BRANCH="$incomplete_branch" INCOMPLETE_CANDIDATE_COMMIT="$incomplete_commit" \
+    HANDOFF_VALIDATION_REASON='Fixture handoff validation failed.' \
+    scripts/defer-agent-incomplete.sh gemini-artifacts changes-with-invalid-handoff \
+      agent/shadow-feedback.md >/dev/null
   git diff --quiet -- src/main/java/example/Change.java
   [[ ! -e unrelated/scratch.txt ]]
-  grep -Fq 'agent-returned-no-valid-handoff-or-changes' agent/shadow-feedback.md
+  git --git-dir="$incomplete_remote" show "${incomplete_commit}:src/main/java/example/Change.java" | grep -Fq 'int partial'
+  grep -Fq 'changes-with-invalid-handoff' agent/shadow-feedback.md
+  grep -Fq 'Fixture handoff validation failed.' agent/shadow-feedback.md
+  grep -Fq "Branch: \`${incomplete_branch}\`" agent/shadow-feedback.md
   grep -Fq 'Branch: `agent-rejected/prior-1`' agent/shadow-feedback.md
-  grep -Fq '## Subsequent Incomplete Attempt' agent/shadow-feedback.md
+  grep -Fq '## Latest Incomplete Attempt' agent/shadow-feedback.md
+  grep -Fq '## Prior Feedback' agent/shadow-feedback.md
+  if grep -Fq '## Subsequent Incomplete Attempt' agent/shadow-feedback.md; then
+    echo "Incomplete feedback retained the obsolete append marker." >&2
+    exit 1
+  fi
   grep -Fq 'src/main/java/example/Change.java' agent/shadow-feedback.md
   grep -Fq 'unrelated/scratch.txt' agent/shadow-feedback.md
   grep -Fq 'partial agent response' agent/shadow-feedback.md
+  scripts/cleanup-rejected-candidate-branches.sh "$incomplete_branch" agent-rejected/prior-1 >/dev/null
+  git ls-remote --exit-code --heads origin "refs/heads/${incomplete_branch}" >/dev/null
 )
 
 observation_fixture="$fixture_root/observation-fixture"

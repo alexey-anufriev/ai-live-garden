@@ -130,10 +130,21 @@ jobs:
           AGENT_BASELINE_SHADOW_OUTCOME: ${{ steps.baseline_shadow.outcome }}
         run: scripts/inspect-agent-gemini-output.sh gemini-artifacts
 
+      - name: Publish substantive incomplete candidate
+        id: publish_incomplete_candidate
+        if: ${{ !cancelled() && steps.gemini_primary_inspect.outputs.retry_required == 'true' && steps.gemini_primary_inspect.outputs.substantive_change == 'true' }}
+        continue-on-error: true
+        shell: bash
+        run: scripts/publish-rejected-candidate.sh
+
       - name: Persist incomplete agent result for the next run
         id: defer_agent_incomplete
         if: ${{ !cancelled() && steps.gemini_primary_inspect.outputs.retry_required == 'true' }}
         shell: bash
+        env:
+          INCOMPLETE_CANDIDATE_BRANCH: ${{ steps.publish_incomplete_candidate.outputs.branch }}
+          INCOMPLETE_CANDIDATE_COMMIT: ${{ steps.publish_incomplete_candidate.outputs.commit }}
+          HANDOFF_VALIDATION_REASON: ${{ steps.gemini_primary_inspect.outputs.handoff_validation_reason }}
         run: scripts/defer-agent-incomplete.sh gemini-artifacts "${{ steps.gemini_primary_inspect.outputs.noop_reason }}" agent/shadow-feedback.md
 
       - name: Commit incomplete agent feedback
@@ -144,6 +155,14 @@ jobs:
           COMMIT_MESSAGE_PREFIX: "chore: record incomplete autonomous run"
           COMMIT_TIMESTAMP_FORMAT: "%Y-%m-%dT%H:%MZ"
         run: scripts/commit-if-changed.sh agent/shadow-feedback.md
+
+      - name: Clean unreferenced incomplete candidate branches
+        id: cleanup_incomplete_candidates
+        if: ${{ !cancelled() && steps.commit_agent_feedback.outcome == 'success' }}
+        shell: bash
+        run: |
+          mapfile -t referenced_branches < <(sed -n 's/^- Branch: `\(agent-rejected\/[a-zA-Z0-9._-]*\)`$/\1/p' agent/shadow-feedback.md)
+          scripts/cleanup-rejected-candidate-branches.sh "${referenced_branches[@]}" || echo "::warning::Incomplete candidate branch cleanup will be retried by a later run."
 
       - name: Extract agent handoff from Gemini output
         id: extract_agent_handoff
@@ -297,6 +316,7 @@ jobs:
         run: scripts/cleanup-rejected-candidate-branches.sh "${{ steps.publish_rejected_candidate.outputs.branch }}" || echo "::warning::Rejected candidate branch cleanup will be retried by a later run."
 
       - name: Clear consumed shadow feedback
+        id: clear_shadow_feedback
         if: ${{ !cancelled() && steps.candidate_validation.outcome == 'success' && steps.validation_policy.outputs.run_mode == 'evolution' }}
         shell: bash
         run: rm -f agent/shadow-feedback.md
@@ -457,7 +477,7 @@ jobs:
 
       - name: Clean consumed rejected candidate branches
         id: cleanup_consumed_rejected_candidates
-        if: ${{ !cancelled() && steps.commit_changes.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.commit_changes.outcome == 'success' && steps.clear_shadow_feedback.outcome == 'success' }}
         shell: bash
         run: scripts/cleanup-rejected-candidate-branches.sh || echo "::warning::Rejected candidate branch cleanup will be retried by a later run."
 
@@ -472,6 +492,8 @@ jobs:
           RESTORE_PROTECTED_OUTCOME: ${{ steps.restore_protected.outcome }}
           GEMINI_PRIMARY_INSPECT_OUTCOME: ${{ steps.gemini_primary_inspect.outcome }}
           AGENT_INCOMPLETE_FEEDBACK_OUTCOME: ${{ steps.defer_agent_incomplete.outcome }}
+          INCOMPLETE_CANDIDATE_PUBLISH_OUTCOME: ${{ steps.publish_incomplete_candidate.outcome }}
+          INCOMPLETE_CANDIDATE_CLEANUP_OUTCOME: ${{ steps.cleanup_incomplete_candidates.outcome }}
           EXTRACT_AGENT_HANDOFF_OUTCOME: ${{ steps.extract_agent_handoff.outcome }}
           AGENT_HANDOFF_OUTCOME: ${{ steps.agent_handoff.outcome }}
           POST_TEST_OUTCOME: ${{ steps.post_test_final.outcome }}

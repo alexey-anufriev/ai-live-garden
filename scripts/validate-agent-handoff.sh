@@ -116,10 +116,8 @@ case "$run_mode" in
     if [[ "$acceptance_source" == "pm" ]]; then
       pm_json_file="${pm_plan_file%.md}.json"
       if [[ ! -f "$pm_json_file" ]]; then
-        echo "acceptanceSource=pm requires a machine-readable active PM plan sidecar: ${pm_json_file}" >&2
-        exit 1
-      fi
-      if ! jq -e --arg label "$pm_direction" --slurpfile handoff "$handoff_file" '
+        echo "Warning: legacy PM plan ${pm_plan_file} has no machine-readable sidecar; treating its ecological evaluation as agent-selected." >&2
+      elif ! jq -e --arg label "$pm_direction" --slurpfile handoff "$handoff_file" '
         first(.directions[] | select(.label == $label) | .shadowAcceptance) == $handoff[0].evaluation
       ' "$pm_json_file" >/dev/null; then
         echo "Agent evaluation must exactly match the selected PM shadowAcceptance when acceptanceSource=pm." >&2

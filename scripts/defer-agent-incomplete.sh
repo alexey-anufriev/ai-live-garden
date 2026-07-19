@@ -10,28 +10,58 @@ artifact_dir="$1"
 reason="$2"
 feedback_file="${3:-agent/shadow-feedback.md}"
 stdout_file="${artifact_dir}/stdout.log"
+candidate_branch="${INCOMPLETE_CANDIDATE_BRANCH:-}"
+candidate_commit="${INCOMPLETE_CANDIDATE_COMMIT:-}"
+handoff_validation_reason="${HANDOFF_VALIDATION_REASON:-}"
+
+if [[ -n "$candidate_branch" && ! "$candidate_branch" =~ ^agent-rejected/[a-zA-Z0-9._-]+$ ]]; then
+  echo "INCOMPLETE_CANDIDATE_BRANCH must identify an agent-rejected branch." >&2
+  exit 2
+fi
+if [[ -n "$candidate_commit" && ! "$candidate_commit" =~ ^[0-9a-f]{40}$ ]]; then
+  echo "INCOMPLETE_CANDIDATE_COMMIT must identify a candidate commit." >&2
+  exit 2
+fi
 
 feedback_dir="$(dirname "$feedback_file")"
 mkdir -p "$feedback_dir"
 temporary_feedback="$(mktemp "${RUNNER_TEMP:-/tmp}/agent-feedback.XXXXXX")"
 prior_feedback="$(mktemp "${RUNNER_TEMP:-/tmp}/prior-agent-feedback.XXXXXX")"
 if [[ -f "$feedback_file" ]]; then
-  cp "$feedback_file" "$prior_feedback"
+  if grep -Fq '## Prior Feedback' "$feedback_file"; then
+    sed -n '/^## Prior Feedback$/,$p' "$feedback_file" | sed '1d' > "$prior_feedback"
+  elif grep -Fq '## Subsequent Incomplete Attempt' "$feedback_file"; then
+    sed '/^## Subsequent Incomplete Attempt$/,$d' "$feedback_file" > "$prior_feedback"
+  else
+    cp "$feedback_file" "$prior_feedback"
+  fi
 fi
 trap 'rm -f "$temporary_feedback" "$prior_feedback"' EXIT
 
 {
-  if [[ -s "$prior_feedback" ]]; then
-    sed '/^## Subsequent Incomplete Attempt$/,$d' "$prior_feedback"
-    echo
-    echo "## Subsequent Incomplete Attempt"
+  echo "# Deferred Autonomous Run Feedback"
+  echo
+  echo "## Latest Incomplete Attempt"
+  echo
+  if [[ -n "$candidate_branch" && -n "$candidate_commit" ]]; then
+    echo "The agent call left a substantive candidate but not a valid handoff. Its exact source was preserved for assessment on the next run; it was removed from main and no garden tick occurred."
   else
-    echo "# Deferred Autonomous Run Feedback"
+    echo "The agent call did not leave both a valid handoff and a publishable substantive candidate. No same-run retry was attempted, no garden tick occurred, and unvalidated worktree changes were removed from main."
   fi
   echo
-  echo "The previous agent call completed but did not leave both a valid handoff and a substantive implementation. No same-run agent retry was attempted. The incomplete source changes were discarded; use this evidence on the next autonomous run."
-  echo
   echo "- Reason: ${reason}"
+  if [[ -n "$handoff_validation_reason" && "$handoff_validation_reason" != "none" ]]; then
+    echo "- Handoff validation: ${handoff_validation_reason}"
+  fi
+  if [[ -n "$candidate_branch" && -n "$candidate_commit" ]]; then
+    echo
+    echo "## Preserved Incomplete Candidate"
+    echo
+    echo "- Branch: \`${candidate_branch}\`"
+    echo "- Commit: \`${candidate_commit}\`"
+    echo "- Inspect: \`git show --stat ${candidate_commit}\`"
+    echo "- Compare: \`git diff ${candidate_commit}^ ${candidate_commit}\`"
+  fi
   echo
   echo "## Incomplete Change Paths"
   echo
@@ -58,11 +88,24 @@ trap 'rm -f "$temporary_feedback" "$prior_feedback"' EXIT
     fi
     rm -f "$response_file"
   fi
+  if [[ -s "$prior_feedback" ]]; then
+    echo
+    echo "## Prior Feedback"
+    echo
+    awk '
+      { lines[NR] = $0 }
+      END {
+        last = NR
+        while (last > 0 && lines[last] ~ /^[[:space:]]*$/) last--
+        for (line = 1; line <= last; line++) print lines[line]
+      }
+    ' "$prior_feedback"
+  fi
 } > "$temporary_feedback"
 
-# An incomplete call has no validated scope. Restore the entire checkout so the
-# feedback-only commit cannot be blocked by an unrelated dirty path during its
-# pull --rebase, and so no partial implementation leaks into a later run.
+# The publish step preserves any substantive candidate before this point.
+# Restore the checkout so only deterministic feedback reaches main and no
+# unvalidated partial implementation leaks into the next run's worktree.
 git restore --worktree --staged -- .
 git clean -fd >/dev/null
 mkdir -p "$feedback_dir"

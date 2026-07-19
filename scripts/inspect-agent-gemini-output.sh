@@ -50,6 +50,8 @@ plan_mode_count="0"
 total_tool_calls="0"
 valid_handoff="false"
 artifact_handoff="false"
+handoff_candidate="false"
+handoff_validation_reason="none"
 worktree_changed="false"
 substantive_change="false"
 retry_required="false"
@@ -66,12 +68,23 @@ fi
 
 if [[ "$valid_handoff" != "true" && -d "$artifact_dir" ]]; then
   artifact_candidate="$(mktemp)"
+  artifact_diagnostics="$(mktemp)"
   rm -f "$artifact_candidate"
-  if scripts/extract-agent-handoff.sh --output "$artifact_candidate" "$artifact_dir" >/dev/null 2>&1; then
+  if scripts/extract-agent-handoff.sh --output "$artifact_candidate" "$artifact_dir" >/dev/null 2> "$artifact_diagnostics"; then
     valid_handoff="true"
     artifact_handoff="true"
+  elif grep -Fq 'Invalid agent handoff candidate: ' "$artifact_diagnostics"; then
+    handoff_candidate="true"
+    handoff_validation_reason="$(
+      sed -n 's/^Handoff validation error: //p' "$artifact_diagnostics" |
+        awk '$0 !~ /^Agent handoff JSON is malformed:/ { print; exit }'
+    )"
+    if [[ -z "$handoff_validation_reason" ]]; then
+      handoff_validation_reason="$(sed -n 's/^Handoff validation error: //p' "$artifact_diagnostics" | sed -n '1p')"
+    fi
+    handoff_validation_reason="$(cut -c 1-500 <<<"$handoff_validation_reason")"
   fi
-  rm -f "$artifact_candidate"
+  rm -f "$artifact_candidate" "$artifact_diagnostics"
 fi
 
 if [[ -n "$(git status --porcelain -uall)" ]]; then
@@ -98,7 +111,9 @@ if [[ "$valid_handoff" == "true" && "$substantive_change" != "true" ]]; then
   noop_reason="handoff-without-substantive-change"
 elif [[ "$valid_handoff" != "true" && ( "$worktree_changed" == "true" || "$plan_mode_count" != "0" || "$total_tool_calls" != "0" ) ]]; then
   retry_required="true"
-  if [[ "$worktree_changed" == "true" ]]; then
+  if [[ "$handoff_candidate" == "true" ]]; then
+    noop_reason="changes-with-invalid-handoff"
+  elif [[ "$worktree_changed" == "true" ]]; then
     noop_reason="changes-without-valid-handoff"
   elif [[ "$plan_mode_count" != "0" ]]; then
     noop_reason="plan-mode-without-handoff-or-changes"
@@ -116,6 +131,8 @@ if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
     echo "total_tool_calls=${total_tool_calls}"
     echo "valid_handoff=${valid_handoff}"
     echo "artifact_handoff=${artifact_handoff}"
+    echo "handoff_candidate=${handoff_candidate}"
+    echo "handoff_validation_reason=${handoff_validation_reason}"
     echo "worktree_changed=${worktree_changed}"
     echo "substantive_change=${substantive_change}"
     echo "retry_required=${retry_required}"
@@ -130,6 +147,8 @@ fi
   echo "- Total tool calls: ${total_tool_calls}"
   echo "- Valid handoff available: ${valid_handoff}"
   echo "- Valid handoff recovered from artifacts: ${artifact_handoff}"
+  echo "- Invalid handoff candidate found: ${handoff_candidate}"
+  echo "- Handoff validation reason: ${handoff_validation_reason}"
   echo "- Repository changes present: ${worktree_changed}"
   echo "- Substantive agent change present: ${substantive_change}"
   echo "- Retry required: ${retry_required}"

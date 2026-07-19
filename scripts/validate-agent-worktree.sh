@@ -70,12 +70,12 @@ while IFS= read -r path; do
   esac
 done < <(git ls-files '*.class')
 
-if git status --porcelain -uall | grep -Eq '^\?\? [^/]+\.(java|class|tmp|log|txt)$'; then
+if git status --porcelain -uall | grep -Eq '^\?\? [^/]+\.(java|class|tmp|log|txt|py|sh|patch|diff)$'; then
   while IFS= read -r path; do
     add_hard_violation "Root scratch file must not be left in the worktree: ${path}"
   done < <(
     git status --porcelain -uall |
-      sed -nE 's/^\?\? ([^/]+\.(java|class|tmp|log|txt))$/\1/p'
+      sed -nE 's/^\?\? ([^/]+\.(java|class|tmp|log|txt|py|sh|patch|diff))$/\1/p'
   )
 fi
 

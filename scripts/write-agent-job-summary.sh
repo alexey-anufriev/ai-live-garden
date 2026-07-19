@@ -52,6 +52,8 @@ metadata_value() {
   echo "| Protected file restore | $(value_or_dash "${RESTORE_PROTECTED_OUTCOME:-}") |"
   echo "| Gemini primary output inspection | $(value_or_dash "${GEMINI_PRIMARY_INSPECT_OUTCOME:-}") |"
   echo "| Incomplete agent feedback | $(value_or_dash "${AGENT_INCOMPLETE_FEEDBACK_OUTCOME:-}") |"
+  echo "| Incomplete candidate publication | $(value_or_dash "${INCOMPLETE_CANDIDATE_PUBLISH_OUTCOME:-}") |"
+  echo "| Incomplete candidate cleanup | $(value_or_dash "${INCOMPLETE_CANDIDATE_CLEANUP_OUTCOME:-}") |"
   echo "| Incomplete feedback commit | $(value_or_dash "${AGENT_FEEDBACK_COMMIT_OUTCOME:-}") |"
   echo "| Agent handoff extraction | $(value_or_dash "${EXTRACT_AGENT_HANDOFF_OUTCOME:-}") |"
   echo "| Agent handoff validation | $(value_or_dash "${AGENT_HANDOFF_OUTCOME:-}") |"
@@ -106,7 +108,11 @@ metadata_value() {
   elif [[ "${GEMINI_PRIMARY_INSPECT_OUTCOME:-}" == "failure" ]]; then
     echo "The run failed while inspecting Gemini output for plan-mode/no-op behavior."
   elif [[ "${AGENT_INCOMPLETE_FEEDBACK_OUTCOME:-}" == "success" ]]; then
-    echo "The agent call was incomplete. Its partial changes were discarded and its evidence was committed for the next run without a same-run retry."
+    if [[ "${INCOMPLETE_CANDIDATE_PUBLISH_OUTCOME:-}" == "success" ]]; then
+      echo "The agent call had an invalid or missing handoff. Its substantive source was preserved on a rejected-candidate branch, the validation reason was committed for the next run, and no same-run retry occurred."
+    else
+      echo "The agent call was incomplete without a publishable candidate. Its evidence was committed for the next run, unvalidated worktree residue was removed, and no same-run retry occurred."
+    fi
   elif [[ "${EXTRACT_AGENT_HANDOFF_OUTCOME:-}" == "failure" ]]; then
     echo "The run failed because Gemini did not leave a valid \`.agent-run.json\` file or marked handoff JSON in its output."
   elif [[ "${AGENT_HANDOFF_OUTCOME:-}" == "failure" ]]; then
