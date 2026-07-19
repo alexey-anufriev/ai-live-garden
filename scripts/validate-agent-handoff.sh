@@ -38,6 +38,7 @@ if ! jq -e '
     test("^(population[.](MOSS|ROOT_NETWORK|SPORE|FERN|FUNGUS|BEETLE|HARE|FOX)|totalOrganisms|nutrients|nutrientBuffer|tests)$")) and
   (($root.evaluation.goal // "") | type == "string" and test("^(increase|decrease|preserve|pass)$")) and
   (($root.evaluation.requiredDelta // -1) | type == "number" and . >= 0) and
+  (($root.causalReach // {}) | type == "object") and
   (($root.state // {}) | type == "object") and
   (($root.state.immediateDirections // []) | type == "array") and
   (($root.state.constraints // []) | type == "array")
@@ -112,6 +113,97 @@ case "$run_mode" in
     if [[ "$evaluation_goal" != "preserve" ]] && awk -v delta="$evaluation_delta" 'BEGIN { exit !(delta <= 0) }'; then
       echo "Increase/decrease shadow targets must require a positive delta." >&2
       exit 1
+    fi
+    if ! jq -e '
+      (.causalReach | type == "object") and
+      ((.causalReach.mechanism // "") | type == "string" and length > 0) and
+      ((.causalReach.traits // []) | type == "array") and
+      (all((.causalReach.traits // [])[]; type == "string" and test("^[a-z0-9-]+$"))) and
+      ((.causalReach.carrierBasis // "") | type == "string" and test("^(existing|adoption|not-applicable)$")) and
+      ((.causalReach.activeCarrierCount // -1) | type == "number" and . >= 0 and floor == .) and
+      ((.causalReach.adoptionPath // "") | type == "string" and length > 0) and
+      ((.causalReach.estimatedPhaseImpact // "") | type == "string" and length > 0) and
+      ((.causalReach.clampRisk // "") | type == "string" and test("^(none|lower|upper|unknown)$")) and
+      ((.causalReach.previousFeedbackDecision // "") | type == "string" and test("^(none|reuse|revise|abandon)$")) and
+      (.causalReach.preflight | type == "object") and
+      (.causalReach.preflight.passed | type == "boolean") and
+      ((.causalReach.preflight.observedDelta | type == "number") or .causalReach.preflight.observedDelta == null)
+    ' "$handoff_file" >/dev/null; then
+      echo "Evolution handoff requires structured causalReach evidence, including traits, carrier basis, phase impact, clamp risk, prior-feedback decision, and preflight result." >&2
+      exit 1
+    fi
+
+    carrier_basis="$(jq -r '.causalReach.carrierBasis' "$handoff_file")"
+    declared_carriers="$(jq -r '.causalReach.activeCarrierCount' "$handoff_file")"
+    mapfile -t causal_traits < <(jq -r '.causalReach.traits[]' "$handoff_file")
+    causal_state_file="${AGENT_GARDEN_STATE_FILE:-data/garden-state.txt}"
+    actual_carriers=0
+    for causal_trait in "${causal_traits[@]}"; do
+      trait_carriers="$(scripts/count-garden-trait-carriers.sh "$causal_trait" "$causal_state_file")"
+      actual_carriers=$((actual_carriers + trait_carriers))
+    done
+    case "$carrier_basis" in
+      existing)
+        if (( ${#causal_traits[@]} == 0 || actual_carriers == 0 || declared_carriers != actual_carriers )); then
+          echo "carrierBasis=existing requires listed traits with a nonzero carrier count matching data/garden-state.txt (declared=${declared_carriers}, actual=${actual_carriers})." >&2
+          exit 1
+        fi
+        ;;
+      adoption)
+        if (( ${#causal_traits[@]} == 0 || declared_carriers != actual_carriers )) || [[ "$(jq -r '.causalReach.adoptionPath' "$handoff_file")" == "none" ]]; then
+          echo "carrierBasis=adoption requires listed traits, their current count matching data/garden-state.txt, and a concrete adoption path in the same change (declared=${declared_carriers}, actual=${actual_carriers})." >&2
+          exit 1
+        fi
+        ;;
+      not-applicable)
+        if (( ${#causal_traits[@]} != 0 || declared_carriers != 0 )); then
+          echo "carrierBasis=not-applicable requires an empty traits array and activeCarrierCount=0." >&2
+          exit 1
+        fi
+        ;;
+    esac
+
+    feedback_decision="$(jq -r '.causalReach.previousFeedbackDecision' "$handoff_file")"
+    if [[ -f "agent/shadow-feedback.md" && "$feedback_decision" == "none" ]]; then
+      echo "A supplied previous rejection requires causalReach.previousFeedbackDecision to be reuse, revise, or abandon." >&2
+      exit 1
+    fi
+    if [[ ! -f "agent/shadow-feedback.md" && "$feedback_decision" != "none" ]]; then
+      echo "causalReach.previousFeedbackDecision must be none when no previous feedback is supplied." >&2
+      exit 1
+    fi
+
+    if [[ "${AGENT_HANDOFF_ALLOW_UNVERIFIED_PREFLIGHT:-false}" != "true" ]]; then
+      preflight_passed="$(jq -r '.causalReach.preflight.passed' "$handoff_file")"
+      preflight_delta="$(jq -r '.causalReach.preflight.observedDelta // "null"' "$handoff_file")"
+      if [[ "$preflight_passed" != "true" || "$preflight_delta" == "null" ]]; then
+        echo "Evolution handoff requires a passing causalReach.preflight with a numeric baseline-to-candidate observedDelta." >&2
+        exit 1
+      fi
+      case "$evaluation_goal" in
+        increase)
+          if awk -v observed="$preflight_delta" -v required="$evaluation_delta" 'BEGIN { exit !(observed < required) }'; then
+            echo "Evolution preflight observedDelta does not meet the declared increase target." >&2
+            exit 1
+          fi
+          ;;
+        decrease)
+          if awk -v observed="$preflight_delta" -v required="$evaluation_delta" 'BEGIN { exit !(observed > -required) }'; then
+            echo "Evolution preflight observedDelta does not meet the declared decrease target." >&2
+            exit 1
+          fi
+          ;;
+        preserve)
+          if awk -v observed="$preflight_delta" -v required="$evaluation_delta" 'BEGIN { absolute = observed < 0 ? -observed : observed; exit !(absolute > required) }'; then
+            echo "Evolution preflight observedDelta does not meet the declared preserve tolerance." >&2
+            exit 1
+          fi
+          ;;
+      esac
+      if ! jq -e '.evidence.verification | test("observed[ -]?delta"; "i")' "$handoff_file" >/dev/null; then
+        echo "Evolution evidence.verification must report the baseline-to-candidate observedDelta, not only unit tests." >&2
+        exit 1
+      fi
     fi
     if [[ "$acceptance_source" == "pm" ]]; then
       pm_json_file="${pm_plan_file%.md}.json"

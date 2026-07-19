@@ -117,12 +117,26 @@ Before finishing, agents must write `.agent-run.json`:
   "evidence": {
     "bottleneck": "The concrete current-state gate or missing causal link addressed.",
     "currentState": "Evidence that the change can affect the committed living state.",
-    "verification": "The focused test or bounded command and its observed result."
+    "verification": "Focused tests plus the shadow preflight baseline average, candidate average, and observedDelta."
   },
   "evaluation": {
     "metric": "population.BEETLE, another population type, totalOrganisms, nutrients, nutrientBuffer, or tests for repair only",
     "goal": "increase, decrease, preserve, or pass for repair only",
     "requiredDelta": 1
+  },
+  "causalReach": {
+    "mechanism": "The concrete production mechanism changed.",
+    "traits": ["exact-trait-name"],
+    "carrierBasis": "existing, adoption, or not-applicable",
+    "activeCarrierCount": 1,
+    "adoptionPath": "Where carriers exist or how organisms acquire the trait.",
+    "estimatedPhaseImpact": "Numeric current-state impact versus the dominant competing term.",
+    "clampRisk": "none, lower, upper, or unknown",
+    "previousFeedbackDecision": "reuse, revise, abandon, or none",
+    "preflight": {
+      "passed": true,
+      "observedDelta": 1
+    }
   },
   "codeMap": [
     {
@@ -141,6 +155,8 @@ Before finishing, agents must write `.agent-run.json`:
 `codeMap` should include new or meaningfully changed Java source files from the run, with one short stable responsibility description each. Describe what the file is for, not what changed in the current run. Avoid change-specific phrasing such as "updated", "added", "implemented", "now supports", or "new logic".
 
 `evaluation` declares the validation target. Evolution runs use an ecological metric and a positive delta for increase/decrease goals. Prefer a task-specific target with `acceptanceSource: agent`; a PM plan's structured default is fallback and must match exactly when `acceptanceSource: pm`. Repair, recovery, and diagnostic modes use `tests`, `pass`, and `0`; maintenance uses an ecological `preserve` target. CI derives target, safety-only, or skipped shadow validation from the mode. Evolution acceptance is a same-state, same-seed differential: CI averages the final declared metric across candidate seeds and baseline seeds, then calculates `observedDelta = candidateAverage - baselineAverage`. Initial-to-final movement that also occurs in the baseline is not candidate impact.
+
+Evolution runs also require `causalReach`. When the mechanism depends on traits, list their exact names and declare whether the current committed state already has carriers or the same change provides an adoption path. `scripts/count-garden-trait-carriers.sh` is the authoritative carrier count. Global mechanisms use `not-applicable` with no traits. Estimate the mechanism's numeric phase impact against the dominant competing term and record clamp risk. When previous feedback exists, explicitly choose `reuse`, `revise`, or `abandon`. Before final handoff, run the differential shadow preflight and copy its passing `observedDelta`; unit tests alone do not validate evolution.
 
 `requests` may contain objects with `title`, `what`, `why`, `affected`, `benefit`, and `fallback`. Use an empty array when no human help is needed.
 

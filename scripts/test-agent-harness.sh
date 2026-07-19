@@ -105,6 +105,8 @@ grep -Fq '## Previous Autonomous Feedback' "$prompt_outputs"
 grep -Fq 'Previous candidate observed delta: 0.' "$prompt_outputs"
 grep -Fq 'observedDelta = candidateAverage - baselineAverage' "$prompt_outputs"
 grep -Fq 'mandatory decision input, not optional history' "$prompt_outputs"
+grep -Fq '## Current Causal Reach Diagnostics' "$prompt_outputs"
+grep -Fq 'causalReach' "$prompt_outputs"
 grep -Fq 'legacy plan has no machine-readable acceptance sidecar' "$prompt_outputs"
 grep -Fq 'AGENT_CONTEXT_BYTES=' "$prompt_metadata"
 grep -Fq "AGENT_CONTEXT_BASELINE_SHADOW_FILE=${baseline_shadow}" "$prompt_metadata"
@@ -112,6 +114,19 @@ grep -Fq 'AGENT_CONTEXT_BASELINE_SHADOW_OUTCOME=success' "$prompt_metadata"
 grep -Fq "AGENT_CONTEXT_SHADOW_FEEDBACK_FILE=${shadow_feedback}" "$prompt_metadata"
 prompt_delimiter="$(sed -n '1s/^text<<//p' "$prompt_outputs")"
 [[ "$(tail -n 1 "$prompt_outputs")" == "$prompt_delimiter" ]]
+
+causal_state="$fixture_root/causal-state.txt"
+cat > "$causal_state" <<'STATE'
+nutrients=6
+nutrientBuffer=100
+organism=moss-1|MOSS|1|1|1|nutrient-conserver\,quiet-hunger
+organism=fox-1|FOX|1|1|1|quiet-hunger
+STATE
+[[ "$(scripts/count-garden-trait-carriers.sh nutrient-conserver "$causal_state")" == "1" ]]
+[[ "$(scripts/count-garden-trait-carriers.sh nutrient-demand-regulator "$causal_state")" == "0" ]]
+scripts/report-garden-causal-reach.sh "$causal_state" > "$fixture_root/causal-report.md"
+grep -Fq 'nutrient-conserver: 1' "$fixture_root/causal-report.md"
+grep -Fq 'clamp risk:' "$fixture_root/causal-report.md"
 
 failed_shadow="$fixture_root/failed-baseline-shadow.json"
 failed_context="$fixture_root/failed-context.md"
@@ -199,8 +214,9 @@ cat > "$shadow_fixture/.agent-run.json" <<'JSON'
   "title":"Capture failure fixture", "task":"Exercise structured rejection.", "why":"Regression coverage.",
   "summary":"Fixture.", "observations":"Fixture.", "next":"Fixture.",
   "expectedGardenEffect":"Increase beetles.", "pmDirection":"none",
-  "evidence":{"bottleneck":"fixture","currentState":"fixture","verification":"fixture"},
+  "evidence":{"bottleneck":"fixture","currentState":"fixture","verification":"preflight observedDelta pending"},
   "evaluation":{"metric":"population.BEETLE","goal":"increase","requiredDelta":1},
+  "causalReach":{"mechanism":"global fixture","traits":[],"carrierBasis":"not-applicable","activeCarrierCount":0,"adoptionPath":"not-applicable","estimatedPhaseImpact":"fixture impact 1","clampRisk":"none","previousFeedbackDecision":"none","preflight":{"passed":false,"observedDelta":null}},
   "codeMap":[], "requests":[], "state":{"immediateDirections":[],"constraints":[]}
 }
 JSON
@@ -248,7 +264,7 @@ jq -e '.passed == true and .metric == "shadowSimulation" and .goal == "pass"' \
 rm -rf "$shadow_fixture"
 
 mkdir -p "$fixture_root/scripts" "$fixture_root/agent/plans" "$fixture_root/artifacts"
-for script in find-active-agent-plan.sh agent-substantive-changes.sh validate-agent-handoff.sh \
+for script in find-active-agent-plan.sh agent-substantive-changes.sh validate-agent-handoff.sh count-garden-trait-carriers.sh \
   derive-agent-validation-policy.sh report-complexity-budget.sh extract-agent-handoff.sh \
   inspect-agent-gemini-output.sh validate-agent-worktree.sh write-output-file.sh; do
   cp "$repository_root/scripts/$script" "$fixture_root/scripts/$script"
@@ -288,8 +304,9 @@ handoff() {
     title:"Harness fixture", task:"Exercise the autonomous contract.", why:"Regression coverage.",
     summary:"Fixture.", observations:"Fixture.", next:"Fixture.", expectedGardenEffect:"Fixture effect.",
     pmDirection:$direction,
-    evidence:{bottleneck:"fixture",currentState:"fixture",verification:"fixture"},
+    evidence:{bottleneck:"fixture",currentState:"fixture",verification:"preflight observedDelta meets target"},
     evaluation:{metric:$metric,goal:$goal,requiredDelta:$delta},
+    causalReach:(if $mode == "evolution" then {mechanism:"global fixture",traits:[],carrierBasis:"not-applicable",activeCarrierCount:0,adoptionPath:"not-applicable",estimatedPhaseImpact:"fixture impact 1",clampRisk:"none",previousFeedbackDecision:"none",preflight:{passed:true,observedDelta:(if $goal == "decrease" then -$delta elif $goal == "preserve" then 0 else $delta end)}} else null end),
     codeMap:[],requests:[],state:{immediateDirections:[],constraints:[]}
   }' > "$output"
 }
@@ -299,6 +316,33 @@ handoff() {
 
 handoff A population.BEETLE increase 1 handoff-active.json
 AGENT_PM_REFERENCE_DATE=2026-07-08 scripts/validate-agent-handoff.sh handoff-active.json >/dev/null
+jq '.causalReach = {mechanism:"live trait fixture",traits:["nutrient-conserver"],carrierBasis:"existing",activeCarrierCount:1,adoptionPath:"one committed carrier",estimatedPhaseImpact:"1 versus demand 1",clampRisk:"none",previousFeedbackDecision:"none",preflight:{passed:true,observedDelta:1}}' \
+  handoff-active.json > handoff-existing-carrier.json
+AGENT_PM_REFERENCE_DATE=2026-07-08 AGENT_GARDEN_STATE_FILE="$causal_state" \
+  scripts/validate-agent-handoff.sh handoff-existing-carrier.json >/dev/null
+jq '.causalReach.traits = ["nutrient-demand-regulator"] | .causalReach.activeCarrierCount = 0' \
+  handoff-existing-carrier.json > handoff-zero-carrier.json
+if AGENT_PM_REFERENCE_DATE=2026-07-08 AGENT_GARDEN_STATE_FILE="$causal_state" \
+    scripts/validate-agent-handoff.sh handoff-zero-carrier.json >/dev/null 2>&1; then
+  echo "Evolution handoff incorrectly accepted a zero-carrier existing mechanism." >&2
+  exit 1
+fi
+jq '.causalReach.preflight = {passed:false,observedDelta:0}' handoff-active.json > handoff-failed-preflight.json
+if AGENT_PM_REFERENCE_DATE=2026-07-08 scripts/validate-agent-handoff.sh handoff-failed-preflight.json >/dev/null 2>&1; then
+  echo "Evolution handoff incorrectly accepted a failed differential preflight." >&2
+  exit 1
+fi
+AGENT_HANDOFF_ALLOW_UNVERIFIED_PREFLIGHT=true AGENT_PM_REFERENCE_DATE=2026-07-08 \
+  scripts/validate-agent-handoff.sh handoff-failed-preflight.json >/dev/null
+mkdir -p agent
+printf '# Deferred Shadow Evaluation Feedback\n' > agent/shadow-feedback.md
+if AGENT_PM_REFERENCE_DATE=2026-07-08 scripts/validate-agent-handoff.sh handoff-active.json >/dev/null 2>&1; then
+  echo "Evolution handoff ignored supplied previous feedback." >&2
+  exit 1
+fi
+jq '.causalReach.previousFeedbackDecision = "revise"' handoff-active.json > handoff-feedback-decision.json
+AGENT_PM_REFERENCE_DATE=2026-07-08 scripts/validate-agent-handoff.sh handoff-feedback-decision.json >/dev/null
+rm agent/shadow-feedback.md
 handoff A population.BEETLE increase 1 handoff-pm.json evolution pm
 AGENT_PM_REFERENCE_DATE=2026-07-08 scripts/validate-agent-handoff.sh handoff-pm.json >/dev/null
 handoff A population.BEETLE increase 2 handoff-pm-mismatch.json evolution pm
@@ -442,8 +486,9 @@ echo 'package example; class Change {}' > "$defer_fixture/src/main/java/example/
   "title":"Rejected fixture", "task":"Exercise deferral.", "why":"Regression coverage.",
   "summary":"Rejected source.", "observations":"No delta.", "next":"Use the evidence.",
   "expectedGardenEffect":"Increase beetles.", "pmDirection":"none",
-  "evidence":{"bottleneck":"fixture","currentState":"fixture","verification":"fixture"},
+  "evidence":{"bottleneck":"fixture","currentState":"fixture","verification":"preflight observedDelta 1"},
   "evaluation":{"metric":"population.BEETLE","goal":"increase","requiredDelta":1},
+  "causalReach":{"mechanism":"global fixture","traits":[],"carrierBasis":"not-applicable","activeCarrierCount":0,"adoptionPath":"not-applicable","estimatedPhaseImpact":"fixture impact 1","clampRisk":"none","previousFeedbackDecision":"none","preflight":{"passed":true,"observedDelta":1}},
   "codeMap":[{"path":"src/main/java/example/Change.java","description":"Fixture behavior."}],
   "requests":[], "state":{"immediateDirections":[],"constraints":[]}
 }

@@ -419,9 +419,10 @@ append_compact_journal_entry() {
   echo "- Treat a PM direction as an outcome target, not as proof of its suggested causal mechanism. Inspect the current state and relevant code before deciding how to achieve it."
   echo "- When Ecological Outcome History reports stagnation, use a bottleneck-first change: reproduce the blocker from the current persisted population, identify the active gate, and fix that gate with a focused behavior test. Do not add or tune another named trait unless current organisms carry it or the change includes a credible adoption path."
   echo "- A passing unit test proves the modeled rule, not impact on the living state. Report both current-state evidence and the behavioral verification in the handoff."
+  echo "- Evolution handoffs must include \`causalReach\`. Declare exact trait names and their actual committed carrier count, or use \`carrierBasis=adoption\` with a concrete acquisition path, or \`not-applicable\` for a global non-trait mechanism. Estimate the phase impact against the dominant competing term and identify clamp risk."
   echo "- Evolution runs declare one measurable ecological shadow target in \`evaluation\`; prefer a truthful task-specific target with \`acceptanceSource=agent\`, or use the selected PM direction's exact fallback with \`acceptanceSource=pm\`."
   echo "- CI derives validation from \`runMode\`: evolution uses target plus safety; production repair, recovery, and eligible maintenance use safety only; test-only repair and diagnostic work skip shadow simulation. Only evolution and recovery advance the persistent garden."
-  echo "- For an evolution run, use the Baseline Shadow Simulation section as the acceptance baseline, run the exact candidate preflight command shown there, and report its observed delta in \`evidence.verification\`."
+  echo "- For an evolution run, use the Baseline Shadow Simulation section as the acceptance baseline, run the exact candidate preflight command shown there, and record a passing baseline-to-candidate delta in both \`causalReach.preflight\` and \`evidence.verification\`. Unit tests alone are not a valid evolution handoff."
   echo "- You have god-mode recovery authority when persisted state causes runaway growth, timeouts, corruption, or prevents autonomous recovery. You may deterministically rebalance, cull, reseed, migrate, or directly repair \`data/garden-state.txt\`; prefer the program's \`recover\` command, preserve ecological roles, add an explanatory event, and report before/after counts."
   echo "- Never wait indefinitely for a random event or population outcome. Tests and diagnostics must be bounded. Use \`scripts/run-maven-tests-with-timeout.sh\`; if it interrupts Maven, treat the timeout as the baseline defect and replace long loops with deterministic phase-level tests."
   echo "- If the Baseline Maven Test Result says \`failed\`, use \`runMode=repair\`, \`acceptanceSource=mode\`, and \`tests/pass/0\`; repairing the existing Java source or tests is the required task."
@@ -462,6 +463,8 @@ append_compact_journal_entry() {
   echo
   scripts/write-garden-outcome-history.sh
   echo
+  scripts/report-garden-causal-reach.sh
+  echo
   append_project_manager_direction
   append_shadow_feedback
   echo "## Automatic Post-Processing"
@@ -488,12 +491,26 @@ append_compact_journal_entry() {
   "evidence": {
     "bottleneck": "The concrete current-state gate or missing causal link this run addressed.",
     "currentState": "Evidence from data/garden-state.txt or a shadow copy showing why the change can affect living organisms.",
-    "verification": "The focused test or command that proves the changed behavior, including the observed result."
+    "verification": "Focused tests plus the shadow preflight baseline average, candidate average, and observedDelta."
   },
   "evaluation": {
     "metric": "population.BEETLE, population.FOX, population.FUNGUS, population.ROOT_NETWORK, another population type, totalOrganisms, nutrients, nutrientBuffer, or tests for required repair only",
     "goal": "increase, decrease, preserve, or pass for required repair only",
     "requiredDelta": 1
+  },
+  "causalReach": {
+    "mechanism": "The concrete production mechanism changed by this run.",
+    "traits": [],
+    "carrierBasis": "existing, adoption, or not-applicable",
+    "activeCarrierCount": 0,
+    "adoptionPath": "Where carriers were counted, how organisms acquire the trait, or not-applicable.",
+    "estimatedPhaseImpact": "Numeric estimate at the committed population, including the dominant competing term.",
+    "clampRisk": "none, lower, upper, or unknown",
+    "previousFeedbackDecision": "reuse, revise, or abandon when feedback exists; otherwise none",
+    "preflight": {
+      "passed": true,
+      "observedDelta": 1
+    }
   },
   "codeMap": [
     {
@@ -524,6 +541,7 @@ append_compact_journal_entry() {
 JSON
   echo
   echo "Do not wrap the actual \`.agent-run.json\` file in Markdown fences. Do not wrap the final marked JSON block in Markdown fences either."
+  echo "For evolution, populate \`causalReach\` truthfully. Use \`scripts/count-garden-trait-carriers.sh TRAIT\`; a zero-carrier trait requires \`carrierBasis=adoption\` and a concrete acquisition path in the same change. Set preflight to \`passed=false\` and \`observedDelta=null\` while developing, run the exact shadow preflight command, then copy its \`passed\` and \`observedDelta\` into the final handoff. CI rejects an evolution handoff that reports only unit tests or a preflight miss."
   echo
   echo "## Current Agent Memory"
   echo
