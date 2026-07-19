@@ -225,9 +225,18 @@ jobs:
           AGENT_BASELINE_SHADOW_OUTCOME: ${{ steps.baseline_shadow.outcome }}
         run: scripts/derive-agent-validation-policy.sh .agent-run.json
 
+      - name: Detect unchanged previous rejection
+        id: repeated_candidate
+        if: ${{ !cancelled() && (steps.validation_policy.outputs.shadow_policy == 'target' || steps.validation_policy.outputs.shadow_policy == 'safety') }}
+        continue-on-error: true
+        shell: bash
+        env:
+          REPEATED_CANDIDATE_RESULT_FILE: ${{ runner.temp }}/repeated-candidate-result.json
+        run: scripts/detect-repeated-rejected-candidate.sh agent/shadow-feedback.md "${RUNNER_TEMP}/baseline-shadow.json"
+
       - name: Evaluate candidate shadow simulation
         id: shadow_evaluation
-        if: ${{ !cancelled() && steps.validation_policy.outputs.shadow_policy == 'target' && steps.baseline_shadow.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.repeated_candidate.outcome == 'success' && steps.validation_policy.outputs.shadow_policy == 'target' && steps.baseline_shadow.outcome == 'success' }}
         continue-on-error: true
         shell: bash
         env:
@@ -239,7 +248,7 @@ jobs:
 
       - name: Validate candidate shadow safety
         id: shadow_safety_evaluation
-        if: ${{ !cancelled() && steps.validation_policy.outputs.shadow_policy == 'safety' && steps.baseline_shadow.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.repeated_candidate.outcome == 'success' && steps.validation_policy.outputs.shadow_policy == 'safety' && steps.baseline_shadow.outcome == 'success' }}
         continue-on-error: true
         shell: bash
         env:
@@ -252,7 +261,7 @@ jobs:
 
       - name: Validate shadow operability repair
         id: shadow_repair_evaluation
-        if: ${{ !cancelled() && steps.validation_policy.outputs.shadow_policy == 'safety' && steps.baseline_shadow.outcome != 'success' }}
+        if: ${{ !cancelled() && steps.repeated_candidate.outcome == 'success' && steps.validation_policy.outputs.shadow_policy == 'safety' && steps.baseline_shadow.outcome != 'success' }}
         continue-on-error: true
         shell: bash
         env:
@@ -270,7 +279,7 @@ jobs:
 
       - name: Publish rejected candidate branch
         id: publish_rejected_candidate
-        if: ${{ !cancelled() && (steps.shadow_evaluation.outcome == 'failure' || steps.shadow_safety_evaluation.outcome == 'failure' || steps.shadow_repair_evaluation.outcome == 'failure') }}
+        if: ${{ !cancelled() && (steps.repeated_candidate.outcome == 'failure' || steps.shadow_evaluation.outcome == 'failure' || steps.shadow_safety_evaluation.outcome == 'failure' || steps.shadow_repair_evaluation.outcome == 'failure') }}
         shell: bash
         run: scripts/publish-rejected-candidate.sh
 
@@ -285,7 +294,10 @@ jobs:
           REJECTED_CANDIDATE_BRANCH: ${{ steps.publish_rejected_candidate.outputs.branch }}
           REJECTED_CANDIDATE_COMMIT: ${{ steps.publish_rejected_candidate.outputs.commit }}
         run: |
-          if [[ "${{ steps.shadow_evaluation.outcome }}" == "failure" ]]; then
+          if [[ "${{ steps.repeated_candidate.outcome }}" == "failure" ]]; then
+            export SHADOW_BASELINE_FILE="${RUNNER_TEMP}/baseline-shadow.json"
+            result_file="${RUNNER_TEMP}/repeated-candidate-result.json"
+          elif [[ "${{ steps.shadow_evaluation.outcome }}" == "failure" ]]; then
             export SHADOW_BASELINE_FILE="${RUNNER_TEMP}/baseline-shadow.json"
             export SHADOW_CANDIDATE_FILE="${RUNNER_TEMP}/candidate-shadow.json"
             result_file="${RUNNER_TEMP}/shadow-evaluation-result.json"

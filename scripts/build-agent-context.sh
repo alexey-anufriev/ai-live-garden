@@ -244,7 +244,7 @@ append_baseline_shadow_result() {
     return
   fi
 
-  echo "CI will compare candidate code with these exact same-state, same-seed results. An isolated unit test is not evidence that the declared metric changes in this window."
+  echo "CI will compare candidate code with these exact same-state, same-seed results. Acceptance is differential: movement inside the candidate run is not evidence by itself. For example, if nutrients move from 3 to 6 in both baseline and candidate runs, the candidate delta is 0, not +3. An isolated unit test is not evidence that the declared metric changes in this window."
   echo
   echo "| Seed | Steps | Status | Nutrients | Buffer | Total | Moss | Root | Spore | Fern | Fungus | Beetle | Hare | Fox | Maximum total |"
   echo "| ---: | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"
@@ -266,6 +266,15 @@ append_baseline_shadow_result() {
     .maximumTotal
   ] | "| " + (map(tostring) | join(" | ")) + " |"' "$baseline_shadow_file"
   echo
+  echo "### Shadow Acceptance Contract"
+  echo
+  echo "- Baseline and candidate start from the same committed state, use the same seeds, and run the same bounded number of ticks."
+  echo "- CI averages the declared final metric across seeds for each side, then calculates \`observedDelta = candidateAverage - baselineAverage\`."
+  echo "- \`increase\` passes only when \`observedDelta >= requiredDelta\`; \`decrease\` passes only when \`observedDelta <= -requiredDelta\`; \`preserve\` passes only when \`abs(observedDelta) <= requiredDelta\`."
+  echo "- Target validation also requires safety: every candidate run must complete, remain within the population bounds, and preserve every critical population that existed at the baseline final state."
+  echo "- The candidate is rejected when shadow capture fails, safety fails, the target delta is missed, or both its source diff and baseline context are identical to the previous preserved rejection. Rejection does not fail the workflow: CI preserves the exact candidate on an \`agent-rejected/\` branch, restores main, skips the real tick, and supplies the evidence to the next run."
+  echo "- Do not claim that the harness accepted or measured the candidate unless you actually ran the preflight command and read its result. Report baseline-to-candidate delta, never only initial-to-final movement within one simulation."
+  echo
   echo "Before finalizing an evolution run: write the proposed evaluation into \`.agent-run.json\`, run \`scripts/run-maven-tests-with-timeout.sh\`, then run \`SHADOW_EVALUATION_RESULT_FILE=target/agent-preflight-result.json scripts/evaluate-shadow-candidate.sh target/agent-baseline-shadow.json .agent-run.json target/agent-candidate-shadow.json\`. For safety-only modes add \`SHADOW_EVALUATION_POLICY=safety\`; skip this preflight for test-only repair and diagnostic modes."
   echo
 }
@@ -274,7 +283,7 @@ append_shadow_feedback() {
   echo "## Previous Autonomous Feedback"
   echo
   if [[ -f "$shadow_feedback_file" ]]; then
-    echo "This feedback is the highest-priority continuity evidence from the previous incomplete or rejected autonomous attempt. Diagnose the blocked or missed causal link before selecting work, and do not repeat the same approach unchanged."
+    echo "A previous attempt exists and is supplied in full below. This is mandatory decision input, not optional history. Before selecting work, inspect the preserved commit when one is listed and decide explicitly to reuse, revise, or abandon its hypothesis. State that decision and its evidence in \`evidence.bottleneck\` or \`observations\`. Do not repeat the same diff or causal approach unchanged. The same diff against the same baseline context is deterministically rejected before shadow simulation."
     echo
     sed -n '1,$p' "$shadow_feedback_file"
   else

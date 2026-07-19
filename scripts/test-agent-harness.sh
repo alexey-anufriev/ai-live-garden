@@ -34,6 +34,7 @@ grep -Fq 'id: publish_incomplete_candidate' "$workflow_file"
 grep -Fq 'id: cleanup_incomplete_candidates' "$workflow_file"
 grep -Fq 'id: shadow_repair_evaluation' "$workflow_file"
 grep -Fq 'id: validation_policy' "$workflow_file"
+grep -Fq 'id: repeated_candidate' "$workflow_file"
 grep -Fq 'id: shadow_safety_evaluation' "$workflow_file"
 grep -Fq 'id: candidate_validation' "$workflow_file"
 grep -Fq 'id: publish_rejected_candidate' "$workflow_file"
@@ -42,6 +43,7 @@ grep -Fq 'id: cleanup_consumed_rejected_candidates' "$workflow_file"
 grep -Fq 'run: scripts/defer-agent-incomplete.sh' "$workflow_file"
 grep -Fq 'run: scripts/evaluate-shadow-repair.sh' "$workflow_file"
 grep -Fq 'run: scripts/publish-rejected-candidate.sh' "$workflow_file"
+grep -Fq 'run: scripts/detect-repeated-rejected-candidate.sh agent/shadow-feedback.md "${RUNNER_TEMP}/baseline-shadow.json"' "$workflow_file"
 grep -Fq 'run: scripts/cleanup-rejected-candidate-branches.sh' "$workflow_file"
 grep -Fq "steps.harness_contracts.outcome == 'success'" "$workflow_file"
 grep -Fq "steps.setup_java.outcome == 'success'" "$workflow_file"
@@ -101,6 +103,8 @@ grep -Fq '| 17 | 5 | completed | 10 | 20 | 9 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 2 | 9
 grep -Fq 'scripts/evaluate-shadow-candidate.sh target/agent-baseline-shadow.json' "$prompt_outputs"
 grep -Fq '## Previous Autonomous Feedback' "$prompt_outputs"
 grep -Fq 'Previous candidate observed delta: 0.' "$prompt_outputs"
+grep -Fq 'observedDelta = candidateAverage - baselineAverage' "$prompt_outputs"
+grep -Fq 'mandatory decision input, not optional history' "$prompt_outputs"
 grep -Fq 'legacy plan has no machine-readable acceptance sidecar' "$prompt_outputs"
 grep -Fq 'AGENT_CONTEXT_BYTES=' "$prompt_metadata"
 grep -Fq "AGENT_CONTEXT_BASELINE_SHADOW_FILE=${baseline_shadow}" "$prompt_metadata"
@@ -417,7 +421,8 @@ git init --bare -q "$defer_remote"
 mkdir -p "$defer_fixture/scripts" "$defer_fixture/src/main/java/example" "$defer_fixture/src/test/java/example"
 cp "$repository_root/scripts/defer-shadow-rejection.sh" "$repository_root/scripts/validate-agent-handoff.sh" \
   "$repository_root/scripts/find-active-agent-plan.sh" "$repository_root/scripts/publish-rejected-candidate.sh" \
-  "$repository_root/scripts/cleanup-rejected-candidate-branches.sh" "$defer_fixture/scripts/"
+  "$repository_root/scripts/cleanup-rejected-candidate-branches.sh" \
+  "$repository_root/scripts/detect-repeated-rejected-candidate.sh" "$defer_fixture/scripts/"
 chmod +x "$defer_fixture/scripts/"*.sh
 echo 'package example; class Change {}' > "$defer_fixture/src/main/java/example/Change.java"
 (
@@ -474,10 +479,28 @@ JSON
   grep -Fq "Commit: \`${rejected_commit}\`" agent/shadow-feedback.md
   grep -Fq '## Baseline Shadow Runs' agent/shadow-feedback.md
   grep -Fq '## Candidate Shadow Runs' agent/shadow-feedback.md
+  grep -Fq '## What Acceptance Required' agent/shadow-feedback.md
+  grep -Fq 'The declared ecological target was missed' agent/shadow-feedback.md
   if grep -Eq 'codeMap|## Rejected Change Paths|## Rejected Change Summary' agent/shadow-feedback.md; then
     echo "Compact rejection feedback duplicated source details preserved on the branch." >&2
     exit 1
   fi
+  echo 'package example; class Change { int rejected; }' > src/main/java/example/Change.java
+  mkdir -p src/test/java/example
+  echo 'package example; class RejectedTest {}' > src/test/java/example/RejectedTest.java
+  if REPEATED_CANDIDATE_RESULT_FILE=repeated-result.json \
+      scripts/detect-repeated-rejected-candidate.sh agent/shadow-feedback.md shadow-runs.json >/dev/null 2>&1; then
+    echo "An identical previous rejection was not detected." >&2
+    exit 1
+  fi
+  jq -e '.reason == "repeated-previous-rejection" and .previousRejectedCommit == $commit' \
+    --arg commit "$rejected_commit" repeated-result.json >/dev/null
+  jq '.[0].initial.total = 2' shadow-runs.json > changed-shadow-runs.json
+  scripts/detect-repeated-rejected-candidate.sh agent/shadow-feedback.md changed-shadow-runs.json >/dev/null
+  echo 'package example; class Change { int revised; }' > src/main/java/example/Change.java
+  scripts/detect-repeated-rejected-candidate.sh agent/shadow-feedback.md shadow-runs.json >/dev/null
+  git restore src/main/java/example/Change.java
+  rm -f src/test/java/example/RejectedTest.java repeated-result.json changed-shadow-runs.json
   bash scripts/cleanup-rejected-candidate-branches.sh "$rejected_branch" >/dev/null
   git ls-remote --exit-code --heads origin "refs/heads/${rejected_branch}" >/dev/null
   bash scripts/cleanup-rejected-candidate-branches.sh >/dev/null

@@ -52,7 +52,25 @@ trap 'rm -f "$temporary_feedback"' EXIT
 {
   echo "# Deferred Shadow Evaluation Feedback"
   echo
-  echo "This is machine-generated evidence from the previous autonomous run. The rejected source changes were preserved on a dedicated branch, removed from main, and the garden was not advanced. Treat this evidence as input: inspect the preserved candidate before deciding what to reuse, revise, or abandon."
+  echo "This is machine-generated evidence from the immediately preceding rejected autonomous run. The rejected source changes were preserved on a dedicated branch, removed from main, and the garden was not advanced. The next agent must inspect this exact candidate and explicitly decide what to reuse, revise, or abandon before choosing its task. Repeating the same diff is not progress and will be rejected automatically."
+  echo
+  echo "## What Acceptance Required"
+  echo
+  echo "Baseline and candidate used the same committed garden state, seeds, and tick count. Acceptance compares their final metrics, not initial-to-final movement inside the candidate: \`observedDelta = candidateAverage - baselineAverage\`. An increase requires that delta to be at least \`requiredDelta\`; a decrease requires it to be at most negative \`requiredDelta\`; preserve requires its absolute value to remain within \`requiredDelta\`. Every run must also complete safely and stay within population bounds."
+  echo
+  echo "## Why This Candidate Was Rejected"
+  echo
+  jq -r '
+    if .reason == "repeated-previous-rejection" then
+      "The source diff and baseline context are identical to the supplied previous rejected candidate. No shadow run was needed because the ecological hypothesis was already disproved for this state and acceptance window."
+    elif .safetyPassed == false then
+      "Safety failed: the candidate shadow run did not complete safely, exceeded an operability bound, or removed a critical population present in the baseline."
+    elif .targetPassed == false then
+      "The declared ecological target was missed: baseline average \((.baselineAverage // "unavailable")), candidate average \((.candidateAverage // "unavailable")), observed delta \((.observedDelta // "unavailable")), required delta \(.requiredDelta) for goal \(.goal). Absolute movement within either simulation does not count as candidate impact."
+    else
+      "The deterministic shadow policy rejected the candidate; inspect the evaluation object below for the exact flags and reason."
+    end
+  ' "$evaluation_file"
   echo
   echo "## Rejected Candidate"
   echo
