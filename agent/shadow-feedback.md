@@ -8,14 +8,14 @@ Baseline and candidate used the same committed garden state, seeds, and tick cou
 
 ## Why This Candidate Was Rejected
 
-The declared ecological target was missed: baseline average 6, candidate average 6, observed delta 0, required delta 1 for goal increase. Absolute movement within either simulation does not count as candidate impact.
+The declared ecological target was missed: baseline average 0, candidate average 0, observed delta 0, required delta 1 for goal increase. Absolute movement within either simulation does not count as candidate impact.
 
 ## Rejected Candidate
 
-- Branch: `agent-rejected/29702150855-1`
-- Commit: `06259be0fc7be2d8a652cacf415fc76eeaa33b1d`
-- Inspect: `git show --stat 06259be0fc7be2d8a652cacf415fc76eeaa33b1d`
-- Compare: `git diff 06259be0fc7be2d8a652cacf415fc76eeaa33b1d^ 06259be0fc7be2d8a652cacf415fc76eeaa33b1d`
+- Branch: `agent-rejected/29703120682-1`
+- Commit: `d7d6aa5ef3b9561673e21961a14f5d68b53882ce`
+- Inspect: `git show --stat d7d6aa5ef3b9561673e21961a14f5d68b53882ce`
+- Compare: `git diff d7d6aa5ef3b9561673e21961a14f5d68b53882ce^ d7d6aa5ef3b9561673e21961a14f5d68b53882ce`
 
 ## Rejected Handoff
 
@@ -23,18 +23,18 @@ The declared ecological target was missed: baseline average 6, candidate average
 {
   "runMode": "evolution",
   "acceptanceSource": "agent",
-  "title": "Increase Nutrient Conservation Efficiency",
-  "task": "Increase the impact of the 'nutrient-conserver' trait by doubling the reduction factor for plant nutrient consumption.",
-  "why": "Nutrients are critically low (6) while the nutrient buffer is high (100). Reducing plant nutrient consumption directly conserves active nutrients, addressing the bottleneck of consumption outpacing replenishment.",
-  "summary": "Modified OrganismInteractionCalculator to multiply plantConsumptionReduction by 2, doubling the nutrient conservation effect of conservers and scavengers. Also adjusted maybeMutate to force a 'buffer-siphon' mutation in low-nutrient environments for root networks and fungi, albeit with a 20% chance to ensure stability.",
-  "observations": "The nutrient conservation change was verified to increase soil nutrient levels in tests. The mutation logic now forces the adoption of 'buffer-siphon' under severe nutrient scarcity. The shadow simulation rejection is noted, but this is a substantial behavioral change towards the PM direction.",
-  "next": "Continue monitoring soil nutrient levels in future ticks to ensure they stabilize.",
-  "expectedGardenEffect": "Higher soil nutrient retention due to reduced plant consumption, stabilizing the nutrient pool.",
+  "title": "Optimize Nutrient Utilization via Demand Regulator Strengthening",
+  "task": "Strengthen the effect of the 'nutrient-demand-regulator' trait by doubling its plant consumption reduction factor.",
+  "why": "Nutrients are critically low (6) while the nutrient buffer is high (100). Reducing plant consumption at the source using existing traits is a sustainable way to rebalance the nutrient cycle without triggering runaway population growth.",
+  "summary": "Modified OrganismInteractionCalculator and GardenRenderer to use the full demandRegulatorCount for plant consumption reduction, instead of half. Updated NutrientDemandRegulatorTest to reflect the stronger trait effect.",
+  "observations": "Doubling the consumption reduction factor of demand regulators significantly improves nutrient retention and allows the ecosystem to manage high consumer populations more effectively.",
+  "next": "Monitor nutrient recovery in future ticks.",
+  "expectedGardenEffect": "Higher soil nutrient availability due to reduced plant consumption, stabilizing the nutrient pool.",
   "pmDirection": "A",
   "evidence": {
-    "bottleneck": "Nutrient consumption by plants outpaces production/buffer release.",
-    "currentState": "Nutrients=6, Buffer=100. High plant population consumption.",
-    "verification": "Increased nutrient conservation efficiency in tests and added mutation logic for 'buffer-siphon'."
+    "bottleneck": "High plant consumption rates deplete soil nutrients faster than the buffer can replenish them.",
+    "currentState": "Nutrients=6, Buffer=100.",
+    "verification": "All tests, including updated NutrientDemandRegulatorTest, pass."
   },
   "evaluation": {
     "metric": "nutrients",
@@ -62,8 +62,8 @@ The declared ecological target was missed: baseline average 6, candidate average
   "metric": "nutrients",
   "goal": "increase",
   "requiredDelta": 1,
-  "baselineAverage": 6,
-  "candidateAverage": 6,
+  "baselineAverage": 0,
+  "candidateAverage": 0,
   "observedDelta": 0,
   "seeds": [
     17,
@@ -82,22 +82,6 @@ The declared ecological target was missed: baseline average 6, candidate average
     "completedSteps": 5,
     "status": "completed",
     "initial": {
-      "cycle": 11728,
-      "total": 15759,
-      "nutrients": 6,
-      "nutrientBuffer": 100,
-      "counts": {
-        "MOSS": 2407,
-        "ROOT_NETWORK": 3190,
-        "SPORE": 1,
-        "FERN": 3787,
-        "FUNGUS": 3462,
-        "BEETLE": 200,
-        "HARE": 0,
-        "FOX": 2712
-      }
-    },
-    "final": {
       "cycle": 11733,
       "total": 15620,
       "nutrients": 6,
@@ -113,8 +97,24 @@ The declared ecological target was missed: baseline average 6, candidate average
         "FOX": 2742
       }
     },
-    "minimumTotal": 15578,
-    "maximumTotal": 15770
+    "final": {
+      "cycle": 11738,
+      "total": 15751,
+      "nutrients": 0,
+      "nutrientBuffer": 100,
+      "counts": {
+        "MOSS": 2407,
+        "ROOT_NETWORK": 3192,
+        "SPORE": 1,
+        "FERN": 3796,
+        "FUNGUS": 3474,
+        "BEETLE": 131,
+        "HARE": 0,
+        "FOX": 2750
+      }
+    },
+    "minimumTotal": 15620,
+    "maximumTotal": 15751
   },
   {
     "seed": 43,
@@ -122,22 +122,6 @@ The declared ecological target was missed: baseline average 6, candidate average
     "completedSteps": 5,
     "status": "completed",
     "initial": {
-      "cycle": 11728,
-      "total": 15759,
-      "nutrients": 6,
-      "nutrientBuffer": 100,
-      "counts": {
-        "MOSS": 2407,
-        "ROOT_NETWORK": 3190,
-        "SPORE": 1,
-        "FERN": 3787,
-        "FUNGUS": 3462,
-        "BEETLE": 200,
-        "HARE": 0,
-        "FOX": 2712
-      }
-    },
-    "final": {
       "cycle": 11733,
       "total": 15620,
       "nutrients": 6,
@@ -153,8 +137,24 @@ The declared ecological target was missed: baseline average 6, candidate average
         "FOX": 2742
       }
     },
-    "minimumTotal": 15578,
-    "maximumTotal": 15770
+    "final": {
+      "cycle": 11738,
+      "total": 15751,
+      "nutrients": 0,
+      "nutrientBuffer": 100,
+      "counts": {
+        "MOSS": 2407,
+        "ROOT_NETWORK": 3192,
+        "SPORE": 1,
+        "FERN": 3796,
+        "FUNGUS": 3474,
+        "BEETLE": 131,
+        "HARE": 0,
+        "FOX": 2750
+      }
+    },
+    "minimumTotal": 15620,
+    "maximumTotal": 15751
   }
 ]
 ```
@@ -169,22 +169,6 @@ The declared ecological target was missed: baseline average 6, candidate average
     "completedSteps": 5,
     "status": "completed",
     "initial": {
-      "cycle": 11728,
-      "total": 15759,
-      "nutrients": 6,
-      "nutrientBuffer": 100,
-      "counts": {
-        "MOSS": 2407,
-        "ROOT_NETWORK": 3190,
-        "SPORE": 1,
-        "FERN": 3787,
-        "FUNGUS": 3462,
-        "BEETLE": 200,
-        "HARE": 0,
-        "FOX": 2712
-      }
-    },
-    "final": {
       "cycle": 11733,
       "total": 15620,
       "nutrients": 6,
@@ -200,8 +184,24 @@ The declared ecological target was missed: baseline average 6, candidate average
         "FOX": 2742
       }
     },
-    "minimumTotal": 15578,
-    "maximumTotal": 15770
+    "final": {
+      "cycle": 11738,
+      "total": 15751,
+      "nutrients": 0,
+      "nutrientBuffer": 100,
+      "counts": {
+        "MOSS": 2407,
+        "ROOT_NETWORK": 3192,
+        "SPORE": 1,
+        "FERN": 3796,
+        "FUNGUS": 3474,
+        "BEETLE": 131,
+        "HARE": 0,
+        "FOX": 2750
+      }
+    },
+    "minimumTotal": 15620,
+    "maximumTotal": 15751
   },
   {
     "seed": 43,
@@ -209,22 +209,6 @@ The declared ecological target was missed: baseline average 6, candidate average
     "completedSteps": 5,
     "status": "completed",
     "initial": {
-      "cycle": 11728,
-      "total": 15759,
-      "nutrients": 6,
-      "nutrientBuffer": 100,
-      "counts": {
-        "MOSS": 2407,
-        "ROOT_NETWORK": 3190,
-        "SPORE": 1,
-        "FERN": 3787,
-        "FUNGUS": 3462,
-        "BEETLE": 200,
-        "HARE": 0,
-        "FOX": 2712
-      }
-    },
-    "final": {
       "cycle": 11733,
       "total": 15620,
       "nutrients": 6,
@@ -240,8 +224,24 @@ The declared ecological target was missed: baseline average 6, candidate average
         "FOX": 2742
       }
     },
-    "minimumTotal": 15578,
-    "maximumTotal": 15770
+    "final": {
+      "cycle": 11738,
+      "total": 15751,
+      "nutrients": 0,
+      "nutrientBuffer": 100,
+      "counts": {
+        "MOSS": 2407,
+        "ROOT_NETWORK": 3192,
+        "SPORE": 1,
+        "FERN": 3796,
+        "FUNGUS": 3474,
+        "BEETLE": 131,
+        "HARE": 0,
+        "FOX": 2750
+      }
+    },
+    "minimumTotal": 15620,
+    "maximumTotal": 15751
   }
 ]
 ```
