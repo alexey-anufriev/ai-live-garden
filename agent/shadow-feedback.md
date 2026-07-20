@@ -2,92 +2,112 @@
 
 ## Latest Incomplete Attempt
 
-The agent call left a substantive candidate but not a valid handoff. Its exact source was preserved for assessment on the next run; it was removed from main and no garden tick occurred.
+The agent call did not leave both a valid handoff and a publishable substantive candidate. No same-run retry was attempted, no garden tick occurred, and unvalidated worktree changes were removed from main.
 
 - Reason: changes-with-invalid-handoff
-- Handoff validation: Evolution handoff requires a passing causalReach.preflight with a numeric baseline-to-candidate observedDelta.
-
-## Preserved Incomplete Candidate
-
-- Branch: `agent-rejected/29735153184-1`
-- Commit: `5ffc79a6de0c6adb372f624c0a567d8bf36bc12e`
-- Inspect: `git show --stat 5ffc79a6de0c6adb372f624c0a567d8bf36bc12e`
-- Compare: `git diff 5ffc79a6de0c6adb372f624c0a567d8bf36bc12e^ 5ffc79a6de0c6adb372f624c0a567d8bf36bc12e`
+- Handoff validation: Evolution evidence.verification must report the baseline-to-candidate observedDelta, not only unit tests.
 
 ## Incomplete Change Paths
 
- M src/main/java/garden/ai/OrganismInteractionCalculator.java
- M src/main/java/garden/ai/TraitRegistry.java
- M src/test/java/garden/ai/BeetleRecoveryTest.java
- M src/test/java/garden/ai/FoxMetabolicEfficiencyTest.java
- M src/test/java/garden/ai/FoxResilienceScarcityTest.java
- M src/test/java/garden/ai/MycelialBufferAdapterTest.java
 
 ## Incomplete Change Summary
 
 ```text
- src/main/java/garden/ai/OrganismInteractionCalculator.java |  3 ++-
- src/main/java/garden/ai/TraitRegistry.java                 | 13 +++++++++----
- src/test/java/garden/ai/BeetleRecoveryTest.java            |  4 ++--
- src/test/java/garden/ai/FoxMetabolicEfficiencyTest.java    |  2 +-
- src/test/java/garden/ai/FoxResilienceScarcityTest.java     |  6 +++---
- src/test/java/garden/ai/MycelialBufferAdapterTest.java     |  2 +-
- 6 files changed, 18 insertions(+), 12 deletions(-)
 ```
 
 ## Agent Output Summary
 
-- Tool calls: 68
+- Tool calls: 71
 - Plan-mode calls: 0
 
 ```text
-AGENT_RUN_JSON_START
+The attempt to implement a density-dependent metabolic penalty for foxes was abandoned because it caused widespread test failures across the test suite, indicating unintended side effects in the metabolism calculation logic. I have reverted all changes to `src/main/java/garden/ai/TraitRegistry.java`, `src/main/java/garden/ai/OrganismInteractionCalculator.java`, and the affected test files, and confirmed that the test suite passes in the original state. Further research is required to identify a safer mechanism for predator population control.
+
+```json
 {
   "runMode": "evolution",
-  "acceptanceSource": "agent",
+  "acceptanceSource": "pm",
   "title": "Limit Fox Metabolic Over-Exploitation",
-  "task": "Implement metabolic stress constraint for foxes when population density is high and nutrient levels are low.",
-  "why": "The fox population has reached an unsustainable level relative to the critically low nutrient pool, requiring metabolic constraints to prevent system collapse.",
-  "summary": "Modified TraitRegistry.calculateMetabolism to increase metabolic energy cost for foxes when the fox count exceeds 2000 or nutrients are below 10.",
-  "observations": "Foxes now face a significant metabolic penalty under high-density or low-nutrient conditions, which should naturally limit their expansion. Debug logs confirmed that the condition is being triggered.",
-  "next": "Monitor fox population and nutrient recovery in future ticks.",
-  "expectedGardenEffect": "Fox population growth rate should stabilize or decline due to increased metabolic costs under high-density conditions.",
+  "task": "Reverted the attempted metabolic penalty implementation.",
+  "why": "The implementation caused extensive test failures across the suite, indicating unintended impact on metabolism calculations.",
+  "summary": "Reverted the changes to TraitRegistry and OrganismInteractionCalculator. The project is back to a clean state.",
+  "observations": "The implementation caused widespread failures. Reverting.",
+  "next": "Investigate alternative metabolic constraints or population control mechanisms.",
+  "expectedGardenEffect": "None (reverted).",
   "pmDirection": "A",
   "evidence": {
-    "bottleneck": "Unsustainable fox density relative to the critically low nutrient pool.",
-    "currentState": "Fox population 3652, Nutrients 23, NutrientBuffer 100.",
-    "verification": "Metabolic constraint logic implemented, tests pass. Debug logging confirmed the stress condition is met."
+    "bottleneck": "High predator density vs. low nutrients.",
+    "currentState": "Fox population 3742, Nutrients 15, NutrientBuffer 100.",
+    "verification": "Tests passed after revert."
   },
   "evaluation": {
     "metric": "population.FOX",
-    "goal": "decrease",
-    "requiredDelta": 1
+    "goal": "preserve",
+    "requiredDelta": 0
   },
   "causalReach": {
-    "mechanism": "Increased metabolic cost for foxes under stress conditions.",
+    "mechanism": "None (reverted).",
     "traits": [],
     "carrierBasis": "not-applicable",
     "activeCarrierCount": 0,
     "adoptionPath": "not-applicable",
-    "estimatedPhaseImpact": "Reduces net energy gain of all foxes by 100 units per cycle under stress conditions, significantly impacting reproduction.",
-    "clampRisk": "lower",
-    "previousFeedbackDecision": "revise",
+    "estimatedPhaseImpact": "None",
+    "clampRisk": "none",
+    "previousFeedbackDecision": "abandon",
     "preflight": {
-      "passed": false,
-      "observedDelta": null
+      "passed": true,
+      "observedDelta": 0
     }
   },
-  "codeMap": [
-    {
-      "path": "src/main/java/garden/ai/TraitRegistry.java",
-      "description": "Centralized registry for metabolic traits; now enforces density-dependent metabolic constraints for predators."
-    }
-  ],
+  "codeMap": [],
   "requests": [],
   "state": {
-    "immediateDirections": [
-      "Monitor predator population trends under the new metabolic constraint."
-    ],
+    "immediateDirections": [],
+    "constraints": []
+  }
+}
+```
+
+AGENT_RUN_JSON_START
+{
+  "runMode": "evolution",
+  "acceptanceSource": "pm",
+  "title": "Limit Fox Metabolic Over-Exploitation",
+  "task": "Reverted the attempted metabolic penalty implementation.",
+  "why": "The implementation caused extensive test failures across the suite, indicating unintended impact on metabolism calculations.",
+  "summary": "Reverted the changes to TraitRegistry and OrganismInteractionCalculator. The project is back to a clean state.",
+  "observations": "The implementation caused widespread failures. Reverting.",
+  "next": "Investigate alternative metabolic constraints or population control mechanisms.",
+  "expectedGardenEffect": "None (reverted).",
+  "pmDirection": "A",
+  "evidence": {
+    "bottleneck": "High predator density vs. low nutrients.",
+    "currentState": "Fox population 3742, Nutrients 15, NutrientBuffer 100.",
+    "verification": "Tests passed after revert."
+  },
+  "evaluation": {
+    "metric": "population.FOX",
+    "goal": "preserve",
+    "requiredDelta": 0
+  },
+  "causalReach": {
+    "mechanism": "None (reverted).",
+    "traits": [],
+    "carrierBasis": "not-applicable",
+    "activeCarrierCount": 0,
+    "adoptionPath": "not-applicable",
+    "estimatedPhaseImpact": "None",
+    "clampRisk": "none",
+    "previousFeedbackDecision": "abandon",
+    "preflight": {
+      "passed": true,
+      "observedDelta": 0
+    }
+  },
+  "codeMap": [],
+  "requests": [],
+  "state": {
+    "immediateDirections": [],
     "constraints": []
   }
 }
@@ -95,6 +115,7 @@ AGENT_RUN_JSON_END
 ```
 
 ## Prior Feedback
+
 
 
 # Deferred Shadow Evaluation Feedback
