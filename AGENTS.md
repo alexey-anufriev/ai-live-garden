@@ -193,7 +193,7 @@ The workflow archives old summaries unchanged: 100 daily, 50 weekly, 12 monthly,
 
 ## Workflow And Test Recovery
 
-The Agent workflow calls Gemini through `GEMINI_API_KEY` and passes `EXECUTION_MODEL`. Evolution defaults to `gemini-3.1-pro-preview`; repository variable `AGENT_EXECUTION_MODEL` can override it without editing the workflow.
+The Agent workflow calls Gemini through `GEMINI_API_KEY` and passes `EXECUTION_MODEL`. Evolution defaults to the known-working `gemini-3.1-flash-lite`; repository variable `AGENT_EXECUTION_MODEL` can opt into a stronger model after its API access, billing, and quota are confirmed without editing the workflow.
 
 If Gemini fails because of quota, billing, authentication, or provider availability, the run must fail without committing. Do not work around capacity failures by committing partial changes, suppressing errors, or adding unbounded retries.
 
