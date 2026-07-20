@@ -18,7 +18,7 @@ env:
 jobs:
   agent:
     runs-on: ubuntu-latest
-    timeout-minutes: 42
+    timeout-minutes: 90
 
     steps:
       - name: Checkout repository
@@ -115,38 +115,126 @@ jobs:
           prompt: ${{ steps.gemini_prompt.outputs.text }}
           upload_artifacts: true
 
-      - name: Restore protected files
-        id: restore_protected
+      - name: Restore protected files after attempt 1
+        id: restore_protected_attempt_1
         if: ${{ !cancelled() && steps.gemini.outcome == 'success' }}
         shell: bash
         run: scripts/restore-agent-protected-files.sh
 
-      - name: Inspect Gemini autonomous result
-        id: gemini_primary_inspect
-        if: ${{ !cancelled() && steps.gemini.outcome == 'success' && steps.restore_protected.outcome == 'success' }}
+      - name: Assess autonomous attempt 1
+        id: attempt_1_assessment
+        if: ${{ !cancelled() && steps.gemini.outcome == 'success' && steps.restore_protected_attempt_1.outcome == 'success' }}
         shell: bash
         env:
           AGENT_BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
           AGENT_BASELINE_POLICY_OUTCOME: ${{ steps.baseline_policy.outcome }}
           AGENT_BASELINE_SHADOW_OUTCOME: ${{ steps.baseline_shadow.outcome }}
-        run: scripts/inspect-agent-gemini-output.sh gemini-artifacts
+        run: scripts/assess-agent-attempt.sh 1 gemini-artifacts "${RUNNER_TEMP}/baseline-shadow.json" "${RUNNER_TEMP}/agent-attempt-1.json"
+
+      - name: Build bounded repair prompt for attempt 2
+        id: repair_prompt_2
+        if: ${{ !cancelled() && steps.attempt_1_assessment.outputs.retry_required == 'true' }}
+        shell: bash
+        run: scripts/build-agent-repair-prompt.sh 2 "${RUNNER_TEMP}/agent-context.md" gemini-artifacts "${RUNNER_TEMP}/agent-attempt-1.json" "${RUNNER_TEMP}/agent-repair-2.md"
+
+      - name: Run Gemini bounded repair attempt 2
+        id: gemini_repair_2
+        if: ${{ !cancelled() && steps.repair_prompt_2.outcome == 'success' }}
+        uses: google-github-actions/run-gemini-cli@v0.1.22
+        env:
+          GEMINI_CLI_TRUST_WORKSPACE: "true"
+        with:
+          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+          gemini_cli_version: ${{ env.GEMINI_CLI_VERSION }}
+          gemini_model: ${{ env.EXECUTION_MODEL }}
+          prompt: ${{ steps.repair_prompt_2.outputs.text }}
+          upload_artifacts: false
+
+      - name: Restore protected files after attempt 2
+        id: restore_protected_attempt_2
+        if: ${{ !cancelled() && steps.gemini_repair_2.outcome == 'success' }}
+        shell: bash
+        run: scripts/restore-agent-protected-files.sh
+
+      - name: Assess autonomous attempt 2
+        id: attempt_2_assessment
+        if: ${{ !cancelled() && steps.restore_protected_attempt_2.outcome == 'success' }}
+        shell: bash
+        env:
+          AGENT_BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
+          AGENT_BASELINE_POLICY_OUTCOME: ${{ steps.baseline_policy.outcome }}
+          AGENT_BASELINE_SHADOW_OUTCOME: ${{ steps.baseline_shadow.outcome }}
+        run: scripts/assess-agent-attempt.sh 2 gemini-artifacts "${RUNNER_TEMP}/baseline-shadow.json" "${RUNNER_TEMP}/agent-attempt-2.json"
+
+      - name: Build bounded repair prompt for attempt 3
+        id: repair_prompt_3
+        if: ${{ !cancelled() && steps.attempt_2_assessment.outputs.retry_required == 'true' }}
+        shell: bash
+        run: scripts/build-agent-repair-prompt.sh 3 "${RUNNER_TEMP}/agent-context.md" gemini-artifacts "${RUNNER_TEMP}/agent-attempt-2.json" "${RUNNER_TEMP}/agent-repair-3.md"
+
+      - name: Run Gemini bounded repair attempt 3
+        id: gemini_repair_3
+        if: ${{ !cancelled() && steps.repair_prompt_3.outcome == 'success' }}
+        uses: google-github-actions/run-gemini-cli@v0.1.22
+        env:
+          GEMINI_CLI_TRUST_WORKSPACE: "true"
+        with:
+          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+          gemini_cli_version: ${{ env.GEMINI_CLI_VERSION }}
+          gemini_model: ${{ env.EXECUTION_MODEL }}
+          prompt: ${{ steps.repair_prompt_3.outputs.text }}
+          upload_artifacts: false
+
+      - name: Restore protected files after attempt 3
+        id: restore_protected_attempt_3
+        if: ${{ !cancelled() && steps.gemini_repair_3.outcome == 'success' }}
+        shell: bash
+        run: scripts/restore-agent-protected-files.sh
+
+      - name: Assess autonomous attempt 3
+        id: attempt_3_assessment
+        if: ${{ !cancelled() && steps.restore_protected_attempt_3.outcome == 'success' }}
+        shell: bash
+        env:
+          AGENT_BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
+          AGENT_BASELINE_POLICY_OUTCOME: ${{ steps.baseline_policy.outcome }}
+          AGENT_BASELINE_SHADOW_OUTCOME: ${{ steps.baseline_shadow.outcome }}
+        run: scripts/assess-agent-attempt.sh 3 gemini-artifacts "${RUNNER_TEMP}/baseline-shadow.json" "${RUNNER_TEMP}/agent-attempt-3.json"
+
+      - name: Resolve bounded autonomous attempts
+        id: attempt_resolution
+        if: ${{ !cancelled() && steps.attempt_1_assessment.outcome == 'success' }}
+        shell: bash
+        run: scripts/resolve-agent-attempts.sh "${RUNNER_TEMP}/agent-attempt-ledger.json" "${RUNNER_TEMP}/agent-attempt-1.json" "${RUNNER_TEMP}/agent-attempt-2.json" "${RUNNER_TEMP}/agent-attempt-3.json"
+
+      - name: Inspect accepted Gemini autonomous result
+        id: gemini_primary_inspect
+        if: ${{ !cancelled() && steps.attempt_resolution.outputs.accepted == 'true' }}
+        shell: bash
+        env:
+          AGENT_BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
+          AGENT_BASELINE_POLICY_OUTCOME: ${{ steps.baseline_policy.outcome }}
+          AGENT_BASELINE_SHADOW_OUTCOME: ${{ steps.baseline_shadow.outcome }}
+        run: scripts/inspect-agent-gemini-output.sh --fail-on-noop gemini-artifacts
 
       - name: Publish substantive incomplete candidate
         id: publish_incomplete_candidate
-        if: ${{ !cancelled() && steps.gemini_primary_inspect.outputs.retry_required == 'true' && steps.gemini_primary_inspect.outputs.substantive_change == 'true' }}
-        continue-on-error: true
+        if: ${{ !cancelled() && steps.attempt_resolution.outputs.exhausted == 'true' && steps.attempt_resolution.outputs.best_candidate_commit != '' }}
         shell: bash
+        env:
+          REJECTED_CANDIDATE_SOURCE_COMMIT: ${{ steps.attempt_resolution.outputs.best_candidate_commit }}
         run: scripts/publish-rejected-candidate.sh
 
       - name: Persist incomplete agent result for the next run
         id: defer_agent_incomplete
-        if: ${{ !cancelled() && steps.gemini_primary_inspect.outputs.retry_required == 'true' }}
+        if: ${{ !cancelled() && steps.attempt_resolution.outputs.exhausted == 'true' }}
         shell: bash
         env:
           INCOMPLETE_CANDIDATE_BRANCH: ${{ steps.publish_incomplete_candidate.outputs.branch }}
           INCOMPLETE_CANDIDATE_COMMIT: ${{ steps.publish_incomplete_candidate.outputs.commit }}
-          HANDOFF_VALIDATION_REASON: ${{ steps.gemini_primary_inspect.outputs.handoff_validation_reason }}
-        run: scripts/defer-agent-incomplete.sh gemini-artifacts "${{ steps.gemini_primary_inspect.outputs.noop_reason }}" agent/shadow-feedback.md
+          HANDOFF_VALIDATION_REASON: "Attempt ${{ steps.attempt_resolution.outputs.attempts_completed }} stopped at ${{ steps.attempt_resolution.outputs.stage }}: ${{ steps.attempt_resolution.outputs.reason }}"
+          AGENT_ATTEMPT_LEDGER_FILE: ${{ steps.attempt_resolution.outputs.ledger_file }}
+        run: scripts/defer-agent-incomplete.sh gemini-artifacts "attempts-exhausted" agent/shadow-feedback.md
 
       - name: Commit incomplete agent feedback
         id: commit_agent_feedback
@@ -167,7 +255,7 @@ jobs:
 
       - name: Extract agent handoff from Gemini output
         id: extract_agent_handoff
-        if: ${{ !cancelled() && steps.gemini_primary_inspect.outputs.valid_handoff == 'true' && steps.gemini_primary_inspect.outputs.substantive_change == 'true' }}
+        if: ${{ !cancelled() && steps.attempt_resolution.outputs.accepted == 'true' && steps.gemini_primary_inspect.outputs.valid_handoff == 'true' && steps.gemini_primary_inspect.outputs.substantive_change == 'true' }}
         shell: bash
         env:
           AGENT_BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
@@ -424,7 +512,9 @@ jobs:
           AGENT_CONTEXT_METADATA_FILE: ${{ runner.temp }}/agent-context.metadata
           AGENT_BASELINE_TEST_RESULT_FILE: ${{ runner.temp }}/baseline-test-result.md
           AGENT_BASELINE_POLICY_RESULT_FILE: ${{ runner.temp }}/baseline-policy-result.md
-          AGENT_PRIMARY_GEMINI_ARTIFACTS_DIR: ${{ runner.temp }}/gemini-artifacts-primary
+          AGENT_PRIMARY_GEMINI_ARTIFACTS_DIR: ${{ runner.temp }}/gemini-artifacts-attempt-1
+          AGENT_ATTEMPT_ARTIFACTS_ROOT: ${{ runner.temp }}
+          AGENT_ATTEMPT_LEDGER_FILE: ${{ runner.temp }}/agent-attempt-ledger.json
           AGENT_BASELINE_SHADOW_FILE: ${{ runner.temp }}/baseline-shadow.json
           AGENT_CANDIDATE_SHADOW_FILE: ${{ runner.temp }}/candidate-shadow.json
           AGENT_SHADOW_EVALUATION_RESULT_FILE: ${{ runner.temp }}/shadow-evaluation-result.json
@@ -448,6 +538,11 @@ jobs:
           BASELINE_POLICY_OUTCOME: ${{ steps.baseline_policy.outcome }}
           OBSERVATION_WINDOW_OUTCOME: ${{ steps.observation_window.outcome }}
           GEMINI_OUTCOME: ${{ steps.gemini.outcome }}
+          GEMINI_REPAIR_2_OUTCOME: ${{ steps.gemini_repair_2.outcome }}
+          GEMINI_REPAIR_3_OUTCOME: ${{ steps.gemini_repair_3.outcome }}
+          AGENT_ATTEMPTS_COMPLETED: ${{ steps.attempt_resolution.outputs.attempts_completed }}
+          AGENT_ATTEMPT_ACCEPTED: ${{ steps.attempt_resolution.outputs.accepted }}
+          AGENT_ATTEMPT_EXHAUSTED: ${{ steps.attempt_resolution.outputs.exhausted }}
           GEMINI_PRIMARY_INSPECT_OUTCOME: ${{ steps.gemini_primary_inspect.outcome }}
           AGENT_INCOMPLETE_FEEDBACK_OUTCOME: ${{ steps.defer_agent_incomplete.outcome }}
           EXTRACT_AGENT_HANDOFF_OUTCOME: ${{ steps.extract_agent_handoff.outcome }}
@@ -502,7 +597,12 @@ jobs:
           BASELINE_POLICY_OUTCOME: ${{ steps.baseline_policy.outcome }}
           OBSERVATION_WINDOW_OUTCOME: ${{ steps.observation_window.outcome }}
           GEMINI_OUTCOME: ${{ steps.gemini.outcome }}
-          RESTORE_PROTECTED_OUTCOME: ${{ steps.restore_protected.outcome }}
+          GEMINI_REPAIR_2_OUTCOME: ${{ steps.gemini_repair_2.outcome }}
+          GEMINI_REPAIR_3_OUTCOME: ${{ steps.gemini_repair_3.outcome }}
+          AGENT_ATTEMPTS_COMPLETED: ${{ steps.attempt_resolution.outputs.attempts_completed }}
+          AGENT_ATTEMPT_ACCEPTED: ${{ steps.attempt_resolution.outputs.accepted }}
+          AGENT_ATTEMPT_EXHAUSTED: ${{ steps.attempt_resolution.outputs.exhausted }}
+          RESTORE_PROTECTED_OUTCOME: ${{ steps.restore_protected_attempt_1.outcome }}
           GEMINI_PRIMARY_INSPECT_OUTCOME: ${{ steps.gemini_primary_inspect.outcome }}
           AGENT_INCOMPLETE_FEEDBACK_OUTCOME: ${{ steps.defer_agent_incomplete.outcome }}
           INCOMPLETE_CANDIDATE_PUBLISH_OUTCOME: ${{ steps.publish_incomplete_candidate.outcome }}

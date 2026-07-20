@@ -29,6 +29,19 @@ if [[ -n "${AGENT_PRIMARY_GEMINI_ARTIFACTS_DIR:-}" && -d "${AGENT_PRIMARY_GEMINI
   cp -R "${AGENT_PRIMARY_GEMINI_ARTIFACTS_DIR}/." "$output_dir/gemini-artifacts-primary/"
 fi
 
+if [[ -n "${AGENT_ATTEMPT_ARTIFACTS_ROOT:-}" ]]; then
+  for attempt_artifacts in "${AGENT_ATTEMPT_ARTIFACTS_ROOT}"/gemini-artifacts-attempt-*; do
+    [[ -d "$attempt_artifacts" ]] || continue
+    attempt_name="$(basename "$attempt_artifacts")"
+    mkdir -p "$output_dir/$attempt_name"
+    cp -R "$attempt_artifacts/." "$output_dir/$attempt_name/"
+  done
+fi
+
+if [[ -n "${AGENT_ATTEMPT_LEDGER_FILE:-}" && -f "${AGENT_ATTEMPT_LEDGER_FILE}" ]]; then
+  cp "${AGENT_ATTEMPT_LEDGER_FILE}" "$output_dir/agent-attempt-ledger.json"
+fi
+
 if [[ -s "$output_dir/git-untracked-files.txt" ]]; then
   mkdir -p "$output_dir/untracked-files"
   while IFS= read -r path; do
@@ -119,6 +132,9 @@ fi
   fi
   if [[ -d "$output_dir/gemini-artifacts-primary" ]]; then
     echo "- Primary Gemini artifacts copied to \`gemini-artifacts-primary/\`"
+  fi
+  if [[ -f "$output_dir/agent-attempt-ledger.json" ]]; then
+    echo "- Bounded attempt ledger copied to \`agent-attempt-ledger.json\`"
   fi
   if [[ -f "$output_dir/baseline-test-result.md" ]]; then
     echo "- Baseline Maven test result copied to \`baseline-test-result.md\`"

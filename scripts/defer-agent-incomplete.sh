@@ -13,6 +13,7 @@ stdout_file="${artifact_dir}/stdout.log"
 candidate_branch="${INCOMPLETE_CANDIDATE_BRANCH:-}"
 candidate_commit="${INCOMPLETE_CANDIDATE_COMMIT:-}"
 handoff_validation_reason="${HANDOFF_VALIDATION_REASON:-}"
+attempt_ledger_file="${AGENT_ATTEMPT_LEDGER_FILE:-}"
 
 if [[ -n "$candidate_branch" && ! "$candidate_branch" =~ ^agent-rejected/[a-zA-Z0-9._-]+$ ]]; then
   echo "INCOMPLETE_CANDIDATE_BRANCH must identify an agent-rejected branch." >&2
@@ -28,12 +29,17 @@ mkdir -p "$feedback_dir"
 temporary_feedback="$(mktemp "${RUNNER_TEMP:-/tmp}/agent-feedback.XXXXXX")"
 prior_feedback="$(mktemp "${RUNNER_TEMP:-/tmp}/prior-agent-feedback.XXXXXX")"
 if [[ -f "$feedback_file" ]]; then
-  if grep -Fq '## Prior Feedback' "$feedback_file"; then
-    sed -n '/^## Prior Feedback$/,$p' "$feedback_file" | sed '1d' > "$prior_feedback"
-  elif grep -Fq '## Subsequent Incomplete Attempt' "$feedback_file"; then
-    sed '/^## Subsequent Incomplete Attempt$/,$d' "$feedback_file" > "$prior_feedback"
-  else
-    cp "$feedback_file" "$prior_feedback"
+  prior_feedback_max_lines="${AGENT_PRIOR_FEEDBACK_MAX_LINES:-360}"
+  if ! [[ "$prior_feedback_max_lines" =~ ^[1-9][0-9]*$ ]]; then
+    echo "AGENT_PRIOR_FEEDBACK_MAX_LINES must be a positive integer." >&2
+    exit 2
+  fi
+  sed -n "1,${prior_feedback_max_lines}p" "$feedback_file" > "$prior_feedback"
+  if (( $(wc -l < "$feedback_file") > prior_feedback_max_lines )); then
+    {
+      echo
+      echo "[Older feedback truncated after ${prior_feedback_max_lines} lines.]"
+    } >> "$prior_feedback"
   fi
 fi
 trap 'rm -f "$temporary_feedback" "$prior_feedback"' EXIT
@@ -44,14 +50,17 @@ trap 'rm -f "$temporary_feedback" "$prior_feedback"' EXIT
   echo "## Latest Incomplete Attempt"
   echo
   if [[ -n "$candidate_branch" && -n "$candidate_commit" ]]; then
-    echo "The agent call left a substantive candidate but not a valid handoff. Its exact source was preserved for assessment on the next run; it was removed from main and no garden tick occurred."
+    echo "The bounded autonomous attempt sequence left a substantive candidate but did not pass validation. The best candidate was preserved for assessment on the next run; it was removed from main and no garden tick occurred."
   else
-    echo "The agent call did not leave both a valid handoff and a publishable substantive candidate. No same-run retry was attempted, no garden tick occurred, and unvalidated worktree changes were removed from main."
+    echo "The bounded autonomous attempt sequence did not leave both a valid handoff and a publishable substantive candidate. No garden tick occurred, and unvalidated worktree changes were removed from main."
   fi
   echo
   echo "- Reason: ${reason}"
   if [[ -n "$handoff_validation_reason" && "$handoff_validation_reason" != "none" ]]; then
     echo "- Handoff validation: ${handoff_validation_reason}"
+  fi
+  if [[ -f "$attempt_ledger_file" ]] && jq -e 'type == "array"' "$attempt_ledger_file" >/dev/null 2>&1; then
+    echo "- Attempts completed: $(jq 'length' "$attempt_ledger_file") of 3"
   fi
   if [[ -n "$candidate_branch" && -n "$candidate_commit" ]]; then
     echo
@@ -65,14 +74,40 @@ trap 'rm -f "$temporary_feedback" "$prior_feedback"' EXIT
   echo
   echo "## Incomplete Change Paths"
   echo
-  git status --short -uall || true
+  if [[ -n "$candidate_commit" ]] && git cat-file -e "${candidate_commit}^{commit}" 2>/dev/null; then
+    git diff --name-status "${candidate_commit}^" "$candidate_commit" || true
+  else
+    git status --short -uall || true
+  fi
   echo
   echo "## Incomplete Change Summary"
   echo
   echo '```text'
-  git diff --stat || true
+  if [[ -n "$candidate_commit" ]] && git cat-file -e "${candidate_commit}^{commit}" 2>/dev/null; then
+    git diff --stat "${candidate_commit}^" "$candidate_commit" || true
+  else
+    git diff --stat || true
+  fi
   echo '```'
   echo
+  if [[ -n "$(git status --short -uall)" ]]; then
+    echo "## Discarded Worktree Residue"
+    echo
+    echo '```text'
+    git status --short -uall || true
+    echo '```'
+    echo
+  fi
+  if [[ -f "$attempt_ledger_file" ]] && jq -e 'type == "array"' "$attempt_ledger_file" >/dev/null 2>&1; then
+    echo "## Bounded Attempt Results"
+    echo
+    echo "Each repair received the preceding deterministic failure and retained the same ecological objective. The preserved candidate is the substantive attempt that reached the highest validation stage."
+    echo
+    echo '```json'
+    jq '[.[] | {attempt, accepted, substantiveChange, candidateCommit, stage, reason, shadow}]' "$attempt_ledger_file"
+    echo '```'
+    echo
+  fi
   if [[ -f "$stdout_file" ]] && jq -e . "$stdout_file" >/dev/null 2>&1; then
     echo "## Agent Output Summary"
     echo

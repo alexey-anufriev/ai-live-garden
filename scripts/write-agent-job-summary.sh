@@ -49,6 +49,10 @@ metadata_value() {
   echo "| Baseline worktree policy | $(value_or_dash "${BASELINE_POLICY_OUTCOME:-}") |"
   echo "| Observation window | $(value_or_dash "${OBSERVATION_WINDOW_OUTCOME:-}") |"
   echo "| Gemini autonomous step | $(value_or_dash "${GEMINI_OUTCOME:-}") |"
+  echo "| Gemini bounded repair attempt 2 | $(value_or_dash "${GEMINI_REPAIR_2_OUTCOME:-}") |"
+  echo "| Gemini bounded repair attempt 3 | $(value_or_dash "${GEMINI_REPAIR_3_OUTCOME:-}") |"
+  echo "| Candidate attempts completed | $(value_or_dash "${AGENT_ATTEMPTS_COMPLETED:-}") / 3 |"
+  echo "| Attempt resolution | accepted=$(value_or_dash "${AGENT_ATTEMPT_ACCEPTED:-}"); exhausted=$(value_or_dash "${AGENT_ATTEMPT_EXHAUSTED:-}") |"
   echo "| Protected file restore | $(value_or_dash "${RESTORE_PROTECTED_OUTCOME:-}") |"
   echo "| Gemini primary output inspection | $(value_or_dash "${GEMINI_PRIMARY_INSPECT_OUTCOME:-}") |"
   echo "| Incomplete agent feedback | $(value_or_dash "${AGENT_INCOMPLETE_FEEDBACK_OUTCOME:-}") |"
@@ -109,9 +113,9 @@ metadata_value() {
     echo "The run failed while inspecting Gemini output for plan-mode/no-op behavior."
   elif [[ "${AGENT_INCOMPLETE_FEEDBACK_OUTCOME:-}" == "success" ]]; then
     if [[ "${INCOMPLETE_CANDIDATE_PUBLISH_OUTCOME:-}" == "success" ]]; then
-      echo "The agent call had an invalid or missing handoff. Its substantive source was preserved on a rejected-candidate branch, the validation reason was committed for the next run, and no same-run retry occurred."
+      echo "All bounded candidate attempts were exhausted. The best substantive source was preserved on a rejected-candidate branch, and the structured attempt ledger was committed for the next run."
     else
-      echo "The agent call was incomplete without a publishable candidate. Its evidence was committed for the next run, unvalidated worktree residue was removed, and no same-run retry occurred."
+      echo "All bounded candidate attempts were exhausted without a publishable candidate. Their structured evidence was committed for the next run and unvalidated residue was removed."
     fi
   elif [[ "${EXTRACT_AGENT_HANDOFF_OUTCOME:-}" == "failure" ]]; then
     echo "The run failed because Gemini did not leave a valid \`.agent-run.json\` file or marked handoff JSON in its output."

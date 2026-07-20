@@ -63,8 +63,17 @@ grep -Fq 'run: scripts/detect-repeated-rejected-candidate.sh agent/shadow-feedba
 grep -Fq 'run: scripts/cleanup-rejected-candidate-branches.sh' "$workflow_file"
 grep -Fq "steps.harness_contracts.outcome == 'success'" "$workflow_file"
 grep -Fq "steps.setup_java.outcome == 'success'" "$workflow_file"
-if grep -Eq 'build-(agent|shadow)-retry-prompt-output\.sh|Run Gemini corrective retry' "$workflow_file"; then
-  echo "The workflow reintroduced a same-run corrective agent loop." >&2
+grep -Fq 'id: attempt_1_assessment' "$workflow_file"
+grep -Fq 'id: attempt_2_assessment' "$workflow_file"
+grep -Fq 'id: attempt_3_assessment' "$workflow_file"
+grep -Fq 'id: attempt_resolution' "$workflow_file"
+grep -Fq 'REJECTED_CANDIDATE_SOURCE_COMMIT:' "$workflow_file"
+if [[ "$(grep -Fc 'name: Run Gemini bounded repair attempt' "$workflow_file")" != "2" ]]; then
+  echo "The workflow must provide exactly two bounded repair calls after the initial agent call." >&2
+  exit 1
+fi
+if grep -Eq 'attempt_4|repair attempt 4|build-(agent|shadow)-retry-prompt-output[.]sh|Run Gemini corrective retry' "$workflow_file"; then
+  echo "The workflow contains an unbounded or obsolete corrective-agent path." >&2
   exit 1
 fi
 
@@ -314,7 +323,9 @@ rm -rf "$shadow_fixture"
 mkdir -p "$fixture_root/scripts" "$fixture_root/agent/plans" "$fixture_root/artifacts"
 for script in find-active-agent-plan.sh agent-substantive-changes.sh validate-agent-handoff.sh count-garden-trait-carriers.sh \
   derive-agent-validation-policy.sh report-complexity-budget.sh extract-agent-handoff.sh \
-  inspect-agent-gemini-output.sh validate-agent-worktree.sh write-output-file.sh; do
+  inspect-agent-gemini-output.sh validate-agent-worktree.sh write-output-file.sh \
+  sync-agent-preflight-handoff.sh build-agent-repair-prompt.sh resolve-agent-attempts.sh \
+  assess-agent-attempt.sh snapshot-agent-candidate.sh; do
   cp "$repository_root/scripts/$script" "$fixture_root/scripts/$script"
 done
 chmod +x "$fixture_root/scripts/"*.sh
@@ -364,6 +375,42 @@ handoff() {
 
 handoff A population.BEETLE increase 1 handoff-active.json
 AGENT_PM_REFERENCE_DATE=2026-07-08 scripts/validate-agent-handoff.sh handoff-active.json >/dev/null
+jq '.causalReach.preflight = {passed:false,observedDelta:null} | .evidence.verification = "Focused tests pass."' \
+  handoff-active.json > handoff-unmeasured.json
+cat > synchronized-shadow-result.json <<'JSON'
+{"passed":true,"baselineAverage":2,"candidateAverage":4,"observedDelta":2}
+JSON
+scripts/sync-agent-preflight-handoff.sh synchronized-shadow-result.json handoff-unmeasured.json
+jq -e '.causalReach.preflight == {"passed":true,"observedDelta":2} and (.evidence.verification | contains("baselineAverage=2") and contains("candidateAverage=4") and contains("observedDelta=2"))' \
+  handoff-unmeasured.json >/dev/null
+AGENT_PM_REFERENCE_DATE=2026-07-08 scripts/validate-agent-handoff.sh handoff-unmeasured.json >/dev/null
+
+cat > attempt-1.json <<'JSON'
+{"attempt":1,"accepted":false,"retryRequired":true,"substantiveChange":true,"candidateCommit":"1111111111111111111111111111111111111111","stageRank":2,"stage":"tests","reason":"candidate-tests-failed","diagnostics":"fixture","shadow":null}
+JSON
+cat > attempt-2.json <<'JSON'
+{"attempt":2,"accepted":false,"retryRequired":true,"substantiveChange":true,"candidateCommit":"2222222222222222222222222222222222222222","stageRank":6,"stage":"shadow","reason":"candidate-shadow-target-missed","diagnostics":"fixture","shadow":{"observedDelta":0}}
+JSON
+cat > attempt-3.json <<'JSON'
+{"attempt":3,"accepted":false,"retryRequired":true,"substantiveChange":false,"candidateCommit":"","stageRank":0,"stage":"output","reason":"handoff-without-substantive-change","diagnostics":"fixture","shadow":null}
+JSON
+GITHUB_OUTPUT=attempt-resolution.outputs scripts/resolve-agent-attempts.sh attempt-ledger.json \
+  attempt-1.json attempt-2.json attempt-3.json >/dev/null
+grep -Fxq 'accepted=false' attempt-resolution.outputs
+grep -Fxq 'exhausted=true' attempt-resolution.outputs
+grep -Fxq 'attempts_completed=3' attempt-resolution.outputs
+grep -Fxq 'best_candidate_commit=2222222222222222222222222222222222222222' attempt-resolution.outputs
+jq -e 'length == 3' attempt-ledger.json >/dev/null
+
+mkdir -p repair-artifacts
+jq -n '{response:"previous response"}' > repair-artifacts/stdout.log
+printf '# Original fixture context\n' > original-context.md
+RUNNER_TEMP="$fixture_root" GITHUB_OUTPUT=repair-prompt.outputs \
+  scripts/build-agent-repair-prompt.sh 2 original-context.md repair-artifacts attempt-1.json repair-context.md
+grep -Fq 'Bounded Repair Attempt 2 of 3' repair-context.md
+grep -Fq 'candidate-tests-failed' repair-context.md
+grep -Fq 'previous response' repair-context.md
+grep -Eq '^text<<agent_output_[0-9]+_[0-9]+_[0-9]+$' repair-prompt.outputs
 jq '.causalReach = {mechanism:"live trait fixture",traits:["nutrient-conserver"],carrierBasis:"existing",activeCarrierCount:1,adoptionPath:"one committed carrier",estimatedPhaseImpact:"1 versus demand 1",clampRisk:"none",previousFeedbackDecision:"none",preflight:{passed:true,observedDelta:1}}' \
   handoff-active.json > handoff-existing-carrier.json
 AGENT_PM_REFERENCE_DATE=2026-07-08 AGENT_GARDEN_STATE_FILE="$causal_state" \
@@ -424,7 +471,14 @@ grep -Fxq 'valid_handoff=true' inspect.outputs
 grep -Fxq 'substantive_change=false' inspect.outputs
 grep -Fxq 'retry_required=true' inspect.outputs
 grep -Fxq 'noop_reason=handoff-without-substantive-change' inspect.outputs
-rm -rf artifacts inspect.outputs
+GITHUB_OUTPUT=assessment.outputs AGENT_PM_REFERENCE_DATE=2026-07-08 \
+  scripts/assess-agent-attempt.sh 1 artifacts missing-baseline.json attempt-assessment.json >/dev/null
+grep -Fxq 'accepted=false' assessment.outputs
+grep -Fxq 'retry_required=true' assessment.outputs
+grep -Fxq 'substantive_change=false' assessment.outputs
+jq -e '.stage == "output" and .reason == "handoff-without-substantive-change"' \
+  attempt-assessment.json >/dev/null
+rm -rf artifacts inspect.outputs assessment.outputs attempt-assessment.json
 
 git config user.name fixture
 git config user.email fixture@example.invalid
@@ -506,6 +560,90 @@ GITHUB_OUTPUT=policy-maintenance.outputs AGENT_PM_REFERENCE_DATE=2026-07-08 \
   AGENT_SOURCE_FILE_LINE_BUDGET=0 scripts/derive-agent-validation-policy.sh handoff-maintenance.json >/dev/null
 grep -Fxq 'shadow_policy=safety' policy-maintenance.outputs
 grep -Fxq 'advance_garden=false' policy-maintenance.outputs
+
+assessment_fixture="$fixture_root/assessment-fixture"
+mkdir -p "$assessment_fixture/scripts" "$assessment_fixture/gemini-artifacts" \
+  "$assessment_fixture/src/main/java/example"
+cp "$repository_root/scripts/assess-agent-attempt.sh" \
+  "$repository_root/scripts/snapshot-agent-candidate.sh" \
+  "$repository_root/scripts/sync-agent-preflight-handoff.sh" "$assessment_fixture/scripts/"
+chmod +x "$assessment_fixture/scripts/"*.sh
+cat > "$assessment_fixture/scripts/inspect-agent-gemini-output.sh" <<'SCRIPT'
+#!/usr/bin/env bash
+set -euo pipefail
+{
+  echo 'valid_handoff=true'
+  echo 'substantive_change=true'
+  echo 'retry_required=false'
+} >> "$GITHUB_OUTPUT"
+SCRIPT
+cat > "$assessment_fixture/scripts/extract-agent-handoff.sh" <<'SCRIPT'
+#!/usr/bin/env bash
+set -euo pipefail
+test -f .agent-run.json
+SCRIPT
+cat > "$assessment_fixture/scripts/validate-tests.sh" <<'SCRIPT'
+#!/usr/bin/env bash
+set -euo pipefail
+: > "$VALIDATE_REPAIR_VIOLATIONS_FILE"
+SCRIPT
+cat > "$assessment_fixture/scripts/validate-agent-worktree.sh" <<'SCRIPT'
+#!/usr/bin/env bash
+set -euo pipefail
+echo 'severity=clean' >> "$GITHUB_OUTPUT"
+: > "$VALIDATE_AGENT_WORKTREE_VIOLATIONS_FILE"
+SCRIPT
+cat > "$assessment_fixture/scripts/derive-agent-validation-policy.sh" <<'SCRIPT'
+#!/usr/bin/env bash
+set -euo pipefail
+echo 'shadow_policy=target' >> "$GITHUB_OUTPUT"
+SCRIPT
+cat > "$assessment_fixture/scripts/detect-repeated-rejected-candidate.sh" <<'SCRIPT'
+#!/usr/bin/env bash
+exit 0
+SCRIPT
+cat > "$assessment_fixture/scripts/evaluate-shadow-candidate.sh" <<'SCRIPT'
+#!/usr/bin/env bash
+set -euo pipefail
+jq -n '{passed:true,baselineAverage:2,candidateAverage:5,observedDelta:3}' > "$SHADOW_EVALUATION_RESULT_FILE"
+SCRIPT
+cat > "$assessment_fixture/scripts/validate-agent-handoff.sh" <<'SCRIPT'
+#!/usr/bin/env bash
+exit 0
+SCRIPT
+chmod +x "$assessment_fixture/scripts/"*.sh
+(
+  cd "$assessment_fixture"
+  git init -q
+  git config user.name fixture
+  git config user.email fixture@example.invalid
+  echo 'package example; class Change {}' > src/main/java/example/Change.java
+  git add .
+  git commit -qm baseline
+  echo 'package example; class Change { int candidate; }' > src/main/java/example/Change.java
+  cat > .agent-run.json <<'JSON'
+{
+  "runMode":"evolution", "pmDirection":"A",
+  "evidence":{"verification":"Focused tests pass."},
+  "causalReach":{"preflight":{"passed":false,"observedDelta":null}}
+}
+JSON
+  printf '{}\n' > gemini-artifacts/stdout.log
+  RUNNER_TEMP="$assessment_fixture/target" GITHUB_OUTPUT=assessment.outputs \
+    scripts/assess-agent-attempt.sh 1 gemini-artifacts baseline-shadow.json result.json >/dev/null
+  grep -Fxq 'accepted=true' assessment.outputs
+  grep -Fxq 'retry_required=false' assessment.outputs
+  jq -e '.accepted == true and .stage == "accepted" and .candidateCommit != ""' result.json >/dev/null
+  jq -e '.causalReach.preflight == {"passed":true,"observedDelta":3}' .agent-run.json >/dev/null
+  jq -e '. == {"runMode":"evolution","pmDirection":"A"}' target/agent-attempt-objective.json >/dev/null
+  jq '.pmDirection = "B"' .agent-run.json > changed-objective.json
+  mv changed-objective.json .agent-run.json
+  RUNNER_TEMP="$assessment_fixture/target" GITHUB_OUTPUT=assessment-2.outputs \
+    scripts/assess-agent-attempt.sh 2 gemini-artifacts baseline-shadow.json result-2.json >/dev/null
+  grep -Fxq 'accepted=false' assessment-2.outputs
+  grep -Fxq 'reason=candidate-objective-changed' assessment-2.outputs
+  jq -e '.stage == "handoff" and .reason == "candidate-objective-changed"' result-2.json >/dev/null
+)
 
 defer_fixture="$fixture_root/defer-fixture"
 defer_remote="$fixture_root/defer-remote.git"
@@ -609,11 +747,21 @@ git init --bare -q "$incomplete_remote"
 mkdir -p "$incomplete_fixture/scripts" "$incomplete_fixture/src/main/java/example" \
   "$incomplete_fixture/gemini-artifacts" "$incomplete_fixture/agent"
 cp "$repository_root/scripts/defer-agent-incomplete.sh" "$repository_root/scripts/publish-rejected-candidate.sh" \
+  "$repository_root/scripts/snapshot-agent-candidate.sh" \
   "$repository_root/scripts/cleanup-rejected-candidate-branches.sh" "$incomplete_fixture/scripts/"
 chmod +x "$incomplete_fixture/scripts/"*.sh
 echo 'package example; class Change {}' > "$incomplete_fixture/src/main/java/example/Change.java"
-printf '# Deferred Shadow Evaluation Feedback\n\n- Branch: `agent-rejected/prior-1`\n' \
-  > "$incomplete_fixture/agent/shadow-feedback.md"
+cat > "$incomplete_fixture/agent/shadow-feedback.md" <<'FEEDBACK'
+# Deferred Autonomous Run Feedback
+
+Immediate previous attempt marker.
+
+- Branch: `agent-rejected/prior-1`
+
+## Prior Feedback
+
+Older feedback marker.
+FEEDBACK
 (
   cd "$incomplete_fixture"
   git init -q
@@ -628,12 +776,19 @@ printf '# Deferred Shadow Evaluation Feedback\n\n- Branch: `agent-rejected/prior
   echo 'partial scratch' > unrelated/scratch.txt
   printf '{"response":"partial agent response","stats":{"tools":{"totalCalls":2}}}\n' \
     > gemini-artifacts/stdout.log
+  candidate_snapshot="$(GITHUB_RUN_ID=67890 scripts/snapshot-agent-candidate.sh 1)"
+  git restore src/main/java/example/Change.java
+  cat > attempt-ledger.json <<JSON
+[{"attempt":1,"accepted":false,"retryRequired":true,"substantiveChange":true,"candidateCommit":"${candidate_snapshot}","stageRank":2,"stage":"tests","reason":"candidate-tests-failed","diagnostics":"fixture","shadow":null}]
+JSON
   GITHUB_OUTPUT=publish-incomplete.outputs GITHUB_RUN_ID=67890 GITHUB_RUN_ATTEMPT=1 \
+    REJECTED_CANDIDATE_SOURCE_COMMIT="$candidate_snapshot" \
     scripts/publish-rejected-candidate.sh >/dev/null
   incomplete_branch="$(sed -n 's/^branch=//p' publish-incomplete.outputs)"
   incomplete_commit="$(sed -n 's/^commit=//p' publish-incomplete.outputs)"
   INCOMPLETE_CANDIDATE_BRANCH="$incomplete_branch" INCOMPLETE_CANDIDATE_COMMIT="$incomplete_commit" \
     HANDOFF_VALIDATION_REASON='Fixture handoff validation failed.' \
+    AGENT_ATTEMPT_LEDGER_FILE=attempt-ledger.json \
     scripts/defer-agent-incomplete.sh gemini-artifacts changes-with-invalid-handoff \
       agent/shadow-feedback.md >/dev/null
   git diff --quiet -- src/main/java/example/Change.java
@@ -643,7 +798,10 @@ printf '# Deferred Shadow Evaluation Feedback\n\n- Branch: `agent-rejected/prior
   grep -Fq 'Fixture handoff validation failed.' agent/shadow-feedback.md
   grep -Fq "Branch: \`${incomplete_branch}\`" agent/shadow-feedback.md
   grep -Fq 'Branch: `agent-rejected/prior-1`' agent/shadow-feedback.md
+  grep -Fq 'Immediate previous attempt marker.' agent/shadow-feedback.md
   grep -Fq '## Latest Incomplete Attempt' agent/shadow-feedback.md
+  grep -Fq '## Bounded Attempt Results' agent/shadow-feedback.md
+  grep -Fq 'candidate-tests-failed' agent/shadow-feedback.md
   grep -Fq '## Prior Feedback' agent/shadow-feedback.md
   if grep -Fq '## Subsequent Incomplete Attempt' agent/shadow-feedback.md; then
     echo "Incomplete feedback retained the obsolete append marker." >&2
