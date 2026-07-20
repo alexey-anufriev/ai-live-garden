@@ -127,6 +127,7 @@ case "$run_mode" in
       ((.causalReach.previousFeedbackDecision // "") | type == "string" and test("^(none|reuse|revise|abandon)$")) and
       (.causalReach.preflight | type == "object") and
       (.causalReach.preflight.passed | type == "boolean") and
+      (((.causalReach.preflight.acceptance // "full") | type == "string" and test("^(full|partial)$"))) and
       ((.causalReach.preflight.observedDelta | type == "number") or .causalReach.preflight.observedDelta == null)
     ' "$handoff_file" >/dev/null; then
       echo "Evolution handoff requires structured causalReach evidence, including traits, carrier basis, phase impact, clamp risk, prior-feedback decision, and preflight result." >&2
@@ -176,30 +177,56 @@ case "$run_mode" in
     if [[ "${AGENT_HANDOFF_ALLOW_UNVERIFIED_PREFLIGHT:-false}" != "true" ]]; then
       preflight_passed="$(jq -r '.causalReach.preflight.passed' "$handoff_file")"
       preflight_delta="$(jq -r '.causalReach.preflight.observedDelta // "null"' "$handoff_file")"
+      preflight_acceptance="$(jq -r '.causalReach.preflight.acceptance // "full"' "$handoff_file")"
       if [[ "$preflight_passed" != "true" || "$preflight_delta" == "null" ]]; then
         echo "Evolution handoff requires a passing causalReach.preflight with a numeric baseline-to-candidate observedDelta." >&2
         exit 1
       fi
-      case "$evaluation_goal" in
-        increase)
-          if awk -v observed="$preflight_delta" -v required="$evaluation_delta" 'BEGIN { exit !(observed < required) }'; then
-            echo "Evolution preflight observedDelta does not meet the declared increase target." >&2
+      if [[ "$preflight_acceptance" == "partial" ]]; then
+        if ! jq -e '.causalReach.preflight.targetPassed == false' "$handoff_file" >/dev/null; then
+          echo "Partial evolution acceptance must explicitly record targetPassed=false." >&2
+          exit 1
+        fi
+        case "$evaluation_goal" in
+          increase)
+            if awk -v observed="$preflight_delta" 'BEGIN { exit !(observed <= 0) }'; then
+              echo "Partial increase acceptance requires a positive observedDelta." >&2
+              exit 1
+            fi
+            ;;
+          decrease)
+            if awk -v observed="$preflight_delta" 'BEGIN { exit !(observed >= 0) }'; then
+              echo "Partial decrease acceptance requires a negative observedDelta." >&2
+              exit 1
+            fi
+            ;;
+          *)
+            echo "Partial acceptance is not valid for preserve targets." >&2
             exit 1
-          fi
-          ;;
-        decrease)
-          if awk -v observed="$preflight_delta" -v required="$evaluation_delta" 'BEGIN { exit !(observed > -required) }'; then
-            echo "Evolution preflight observedDelta does not meet the declared decrease target." >&2
-            exit 1
-          fi
-          ;;
-        preserve)
-          if awk -v observed="$preflight_delta" -v required="$evaluation_delta" 'BEGIN { absolute = observed < 0 ? -observed : observed; exit !(absolute > required) }'; then
-            echo "Evolution preflight observedDelta does not meet the declared preserve tolerance." >&2
-            exit 1
-          fi
-          ;;
-      esac
+            ;;
+        esac
+      else
+        case "$evaluation_goal" in
+          increase)
+            if awk -v observed="$preflight_delta" -v required="$evaluation_delta" 'BEGIN { exit !(observed < required) }'; then
+              echo "Evolution preflight observedDelta does not meet the declared increase target." >&2
+              exit 1
+            fi
+            ;;
+          decrease)
+            if awk -v observed="$preflight_delta" -v required="$evaluation_delta" 'BEGIN { exit !(observed > -required) }'; then
+              echo "Evolution preflight observedDelta does not meet the declared decrease target." >&2
+              exit 1
+            fi
+            ;;
+          preserve)
+            if awk -v observed="$preflight_delta" -v required="$evaluation_delta" 'BEGIN { absolute = observed < 0 ? -observed : observed; exit !(absolute > required) }'; then
+              echo "Evolution preflight observedDelta does not meet the declared preserve tolerance." >&2
+              exit 1
+            fi
+            ;;
+        esac
+      fi
       if ! jq -e '.evidence.verification | test("observed[ -]?delta"; "i")' "$handoff_file" >/dev/null; then
         echo "Evolution evidence.verification must report the baseline-to-candidate observedDelta, not only unit tests." >&2
         exit 1

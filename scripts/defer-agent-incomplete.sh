@@ -101,10 +101,10 @@ trap 'rm -f "$temporary_feedback" "$prior_feedback"' EXIT
   if [[ -f "$attempt_ledger_file" ]] && jq -e 'type == "array"' "$attempt_ledger_file" >/dev/null 2>&1; then
     echo "## Bounded Attempt Results"
     echo
-    echo "Each repair received the preceding deterministic failure and retained the same ecological objective. The preserved candidate is the substantive attempt that reached the highest validation stage."
+    echo "Each repair received the preceding deterministic failure and retained the same ecological objective and acceptance criteria. Zero-effect and wrong-direction results require a different causal mechanism. The preserved candidate is the substantive attempt that reached the highest validation stage."
     echo
     echo '```json'
-    jq '[.[] | {attempt, accepted, substantiveChange, candidateCommit, stage, reason, shadow}]' "$attempt_ledger_file"
+    jq '[.[] | {attempt, accepted, acceptance, substantiveChange, candidateCommit, candidatePatchId, effectClassification, stage, reason, shadow}]' "$attempt_ledger_file"
     echo '```'
     echo
   fi

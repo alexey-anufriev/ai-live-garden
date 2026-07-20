@@ -52,7 +52,7 @@ metadata_value() {
   echo "| Gemini bounded repair attempt 2 | $(value_or_dash "${GEMINI_REPAIR_2_OUTCOME:-}") |"
   echo "| Gemini bounded repair attempt 3 | $(value_or_dash "${GEMINI_REPAIR_3_OUTCOME:-}") |"
   echo "| Candidate attempts completed | $(value_or_dash "${AGENT_ATTEMPTS_COMPLETED:-}") / 3 |"
-  echo "| Attempt resolution | accepted=$(value_or_dash "${AGENT_ATTEMPT_ACCEPTED:-}"); exhausted=$(value_or_dash "${AGENT_ATTEMPT_EXHAUSTED:-}") |"
+  echo "| Attempt resolution | accepted=$(value_or_dash "${AGENT_ATTEMPT_ACCEPTED:-}"); class=$(value_or_dash "${AGENT_ATTEMPT_ACCEPTANCE:-}"); exhausted=$(value_or_dash "${AGENT_ATTEMPT_EXHAUSTED:-}") |"
   echo "| Protected file restore | $(value_or_dash "${RESTORE_PROTECTED_OUTCOME:-}") |"
   echo "| Gemini primary output inspection | $(value_or_dash "${GEMINI_PRIMARY_INSPECT_OUTCOME:-}") |"
   echo "| Incomplete agent feedback | $(value_or_dash "${AGENT_INCOMPLETE_FEEDBACK_OUTCOME:-}") |"
@@ -64,13 +64,7 @@ metadata_value() {
   echo "| Post-Gemini test validation | $(value_or_dash "${POST_TEST_OUTCOME:-}") |"
   echo "| Run mode / shadow policy | $(value_or_dash "${AGENT_RUN_MODE:-}") / $(value_or_dash "${AGENT_SHADOW_POLICY:-}") |"
   echo "| Candidate validation | $(value_or_dash "${CANDIDATE_VALIDATION_OUTCOME:-}") |"
-  echo "| Candidate shadow evaluation | $(value_or_dash "${SHADOW_EVALUATION_OUTCOME:-}") |"
-  echo "| Candidate shadow safety | $(value_or_dash "${SHADOW_SAFETY_EVALUATION_OUTCOME:-}") |"
-  echo "| Shadow operability repair | $(value_or_dash "${SHADOW_REPAIR_EVALUATION_OUTCOME:-}") |"
-  echo "| Rejected candidate branch publication | $(value_or_dash "${REJECTED_CANDIDATE_PUBLISH_OUTCOME:-}") |"
-  echo "| Deferred shadow feedback | $(value_or_dash "${SHADOW_FEEDBACK_OUTCOME:-}") |"
-  echo "| Deferred feedback commit | $(value_or_dash "${SHADOW_FEEDBACK_COMMIT_OUTCOME:-}") |"
-  echo "| Rejected candidate branch cleanup | $(value_or_dash "${REJECTED_CANDIDATE_CLEANUP_OUTCOME:-}") |"
+  echo "| Accepted partial-progress feedback | $(value_or_dash "${PARTIAL_PROGRESS_FEEDBACK_OUTCOME:-}") |"
   echo "| Consumed candidate branch cleanup | $(value_or_dash "${CONSUMED_REJECTED_CANDIDATE_CLEANUP_OUTCOME:-}") |"
   echo "| Garden state advance | $(value_or_dash "${ADVANCE_GARDEN_OUTCOME:-}") |"
   echo "| Automated memory generation | $(value_or_dash "${AUTO_MEMORY_OUTCOME:-}") |"
@@ -121,8 +115,8 @@ metadata_value() {
     echo "The run failed because Gemini did not leave a valid \`.agent-run.json\` file or marked handoff JSON in its output."
   elif [[ "${AGENT_HANDOFF_OUTCOME:-}" == "failure" ]]; then
     echo "The run failed because Gemini did not leave a valid \`.agent-run.json\` handoff."
-  elif [[ ( "${SHADOW_EVALUATION_OUTCOME:-}" == "failure" || "${SHADOW_SAFETY_EVALUATION_OUTCOME:-}" == "failure" || "${SHADOW_REPAIR_EVALUATION_OUTCOME:-}" == "failure" ) && "${SHADOW_FEEDBACK_OUTCOME:-}" == "success" ]]; then
-    echo "DEFERRED_NO_EFFECT: the candidate missed its deterministic ecological target or safety bounds. Its exact source was preserved on a rejected-candidate branch, compact evidence was committed for the next autonomous run, and the garden was not advanced."
+  elif [[ "${AGENT_ATTEMPT_ACCEPTANCE:-}" == "partial" && "${COMMIT_OUTCOME:-}" == "success" ]]; then
+    echo "PARTIAL_PROGRESS: the safe candidate moved its metric in the correct direction, was merged after the final bounded attempt, and left measured continuity feedback for the next run."
   elif [[ "${POST_TEST_OUTCOME:-}" == "failure" ]]; then
     echo "Post-Gemini Maven validation failed. The workflow intentionally commits the failed baseline and deterministic memory so the next autonomous run starts with repair."
   elif [[ "${AUTO_MEMORY_OUTCOME:-}" == "failure" ]]; then

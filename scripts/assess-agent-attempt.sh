@@ -18,9 +18,12 @@ attempt_dir="${RUNNER_TEMP:-/tmp}/agent-attempt-${attempt}"
 mkdir -p "$attempt_dir" "$(dirname "$result_file")"
 
 accepted="false"
+acceptance="none"
 retry_required="true"
 substantive_change="false"
 candidate_commit=""
+candidate_patch_id=""
+effect_classification="unmeasured"
 stage="output"
 stage_rank="0"
 reason="agent-output-invalid"
@@ -36,9 +39,12 @@ write_result() {
   jq -n \
     --argjson attempt "$attempt" \
     --argjson accepted "$accepted" \
+    --arg acceptance "$acceptance" \
     --argjson retryRequired "$retry_required" \
     --argjson substantiveChange "$substantive_change" \
     --arg candidateCommit "$candidate_commit" \
+    --arg candidatePatchId "$candidate_patch_id" \
+    --arg effectClassification "$effect_classification" \
     --argjson stageRank "$stage_rank" \
     --arg stage "$stage" \
     --arg reason "$reason" \
@@ -47,9 +53,12 @@ write_result() {
       {
         attempt: $attempt,
         accepted: $accepted,
+        acceptance: $acceptance,
         retryRequired: $retryRequired,
         substantiveChange: $substantiveChange,
         candidateCommit: $candidateCommit,
+        candidatePatchId: $candidatePatchId,
+        effectClassification: $effectClassification,
         stageRank: $stageRank,
         stage: $stage,
         reason: $reason,
@@ -60,6 +69,7 @@ write_result() {
   if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
     {
       echo "accepted=${accepted}"
+      echo "acceptance=${acceptance}"
       echo "retry_required=${retry_required}"
       echo "substantive_change=${substantive_change}"
       echo "candidate_commit=${candidate_commit}"
@@ -86,6 +96,7 @@ if grep -Fxq 'substantive_change=true' "$inspect_outputs"; then
     cat "$diagnostics_file" >&2
     exit 1
   fi
+  candidate_patch_id="$(git diff HEAD "$candidate_commit" -- src/main src/test pom.xml data/garden-state.txt | git patch-id --stable | awk '{print $1}')"
 fi
 if ! grep -Fxq 'valid_handoff=true' "$inspect_outputs"; then
   reason="$(sed -n 's/^handoff_validation_reason=//p' "$inspect_outputs" | head -n 1)"
@@ -113,7 +124,7 @@ fi
 
 objective_file="${RUNNER_TEMP:-/tmp}/agent-attempt-objective.json"
 current_objective="$attempt_dir/objective.json"
-jq '{runMode, pmDirection}' .agent-run.json > "$current_objective"
+jq '{runMode, pmDirection, evaluation}' .agent-run.json > "$current_objective"
 if [[ -f "$objective_file" ]]; then
   if ! jq -e --slurpfile expected "$objective_file" '. == $expected[0]' "$current_objective" >/dev/null; then
     reason="candidate-objective-changed"
@@ -179,6 +190,17 @@ if [[ "$shadow_policy" == "target" || "$shadow_policy" == "safety" ]]; then
   fi
 fi
 
+previous_result="${RUNNER_TEMP:-/tmp}/agent-attempt-$(( attempt - 1 )).json"
+if (( attempt > 1 )) && [[ -f "$previous_result" ]] &&
+    [[ "$(jq -r '.stage // ""' "$previous_result")" == "shadow" ]] &&
+    [[ -n "$candidate_patch_id" ]] &&
+    [[ "$candidate_patch_id" == "$(jq -r '.candidatePatchId // ""' "$previous_result")" ]]; then
+  reason="same-run-candidate-unchanged"
+  echo "A shadow-rejected source patch must be causally redesigned before another assessment." > "$diagnostics_file"
+  write_result
+  exit 0
+fi
+
 stage="shadow"
 stage_rank="6"
 case "$shadow_policy" in
@@ -190,12 +212,57 @@ case "$shadow_policy" in
           "$attempt_dir/candidate-shadow.json" > "$diagnostics_file" 2>&1; then
       if jq -e '.observedDelta | type == "number"' "$shadow_result_file" >/dev/null 2>&1; then
         scripts/sync-agent-preflight-handoff.sh "$shadow_result_file" .agent-run.json
+        evaluation_goal="$(jq -r '.evaluation.goal' .agent-run.json)"
+        observed_delta="$(jq -r '.observedDelta' "$shadow_result_file")"
+        case "$evaluation_goal" in
+          increase)
+            if awk -v delta="$observed_delta" 'BEGIN { exit !(delta == 0) }'; then
+              effect_classification="inert"
+            elif awk -v delta="$observed_delta" 'BEGIN { exit !(delta > 0) }'; then
+              effect_classification="partial-progress"
+            else
+              effect_classification="wrong-direction"
+            fi
+            ;;
+          decrease)
+            if awk -v delta="$observed_delta" 'BEGIN { exit !(delta == 0) }'; then
+              effect_classification="inert"
+            elif awk -v delta="$observed_delta" 'BEGIN { exit !(delta < 0) }'; then
+              effect_classification="partial-progress"
+            else
+              effect_classification="wrong-direction"
+            fi
+            ;;
+          preserve)
+            effect_classification="wrong-direction"
+            ;;
+        esac
+        if (( attempt == 3 )) && [[ "$effect_classification" == "partial-progress" ]] &&
+            jq -e '.safetyPassed == true' "$shadow_result_file" >/dev/null; then
+          scripts/sync-agent-preflight-handoff.sh "$shadow_result_file" .agent-run.json partial
+          stage="handoff-final"
+          stage_rank="7"
+          if ! scripts/validate-agent-handoff.sh .agent-run.json > "$diagnostics_file" 2>&1; then
+            reason="final-handoff-validation-failed"
+            write_result
+            exit 0
+          fi
+          accepted="true"
+          acceptance="partial"
+          retry_required="false"
+          stage="accepted"
+          stage_rank="8"
+          reason="accepted-partial-progress"
+          write_result
+          exit 0
+        fi
       fi
-      reason="candidate-shadow-target-missed"
+      reason="candidate-shadow-${effect_classification}"
       write_result
       exit 0
     fi
     scripts/sync-agent-preflight-handoff.sh "$shadow_result_file" .agent-run.json
+    effect_classification="target-met"
     ;;
   safety)
     if [[ "${AGENT_BASELINE_SHADOW_OUTCOME:-success}" == "success" ]]; then
@@ -232,6 +299,7 @@ if ! scripts/validate-agent-handoff.sh .agent-run.json > "$diagnostics_file" 2>&
 fi
 
 accepted="true"
+acceptance="full"
 retry_required="false"
 stage="accepted"
 stage_rank="8"

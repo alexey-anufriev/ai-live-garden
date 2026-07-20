@@ -42,25 +42,18 @@ done < <(
     "$workflow_file" | sort -u
 )
 
-grep -Fq 'id: defer_shadow_rejection' "$workflow_file"
-grep -Fq 'scripts/defer-shadow-rejection.sh' "$workflow_file"
-grep -Fq 'id: commit_shadow_feedback' "$workflow_file"
 grep -Fq 'id: defer_agent_incomplete' "$workflow_file"
 grep -Fq 'id: publish_incomplete_candidate' "$workflow_file"
 grep -Fq 'id: cleanup_incomplete_candidates' "$workflow_file"
-grep -Fq 'id: shadow_repair_evaluation' "$workflow_file"
 grep -Fq 'id: validation_policy' "$workflow_file"
-grep -Fq 'id: repeated_candidate' "$workflow_file"
-grep -Fq 'id: shadow_safety_evaluation' "$workflow_file"
 grep -Fq 'id: candidate_validation' "$workflow_file"
-grep -Fq 'id: publish_rejected_candidate' "$workflow_file"
-grep -Fq 'id: cleanup_rejected_candidates' "$workflow_file"
+grep -Fq 'id: record_partial_progress' "$workflow_file"
 grep -Fq 'id: cleanup_consumed_rejected_candidates' "$workflow_file"
 grep -Fq 'run: scripts/defer-agent-incomplete.sh' "$workflow_file"
-grep -Fq 'run: scripts/evaluate-shadow-repair.sh' "$workflow_file"
 grep -Fq 'run: scripts/publish-rejected-candidate.sh' "$workflow_file"
-grep -Fq 'run: scripts/detect-repeated-rejected-candidate.sh agent/shadow-feedback.md "${RUNNER_TEMP}/baseline-shadow.json"' "$workflow_file"
+grep -Fq 'run: scripts/record-agent-partial-progress.sh' "$workflow_file"
 grep -Fq 'run: scripts/cleanup-rejected-candidate-branches.sh' "$workflow_file"
+grep -Fq "vars.AGENT_EXECUTION_MODEL || 'gemini-3.1-pro-preview'" "$workflow_file"
 grep -Fq "steps.harness_contracts.outcome == 'success'" "$workflow_file"
 grep -Fq "steps.setup_java.outcome == 'success'" "$workflow_file"
 grep -Fq 'id: attempt_1_assessment' "$workflow_file"
@@ -74,6 +67,10 @@ if [[ "$(grep -Fc 'name: Run Gemini bounded repair attempt' "$workflow_file")" !
 fi
 if grep -Eq 'attempt_4|repair attempt 4|build-(agent|shadow)-retry-prompt-output[.]sh|Run Gemini corrective retry' "$workflow_file"; then
   echo "The workflow contains an unbounded or obsolete corrective-agent path." >&2
+  exit 1
+fi
+if grep -Eq 'id: (shadow_evaluation|shadow_safety_evaluation|shadow_repair_evaluation|publish_rejected_candidate)' "$workflow_file"; then
+  echo "The workflow retained a redundant post-assessment shadow/rejection path." >&2
   exit 1
 fi
 
@@ -325,7 +322,7 @@ for script in find-active-agent-plan.sh agent-substantive-changes.sh validate-ag
   derive-agent-validation-policy.sh report-complexity-budget.sh extract-agent-handoff.sh \
   inspect-agent-gemini-output.sh validate-agent-worktree.sh write-output-file.sh \
   sync-agent-preflight-handoff.sh build-agent-repair-prompt.sh resolve-agent-attempts.sh \
-  assess-agent-attempt.sh snapshot-agent-candidate.sh; do
+  assess-agent-attempt.sh snapshot-agent-candidate.sh record-agent-partial-progress.sh; do
   cp "$repository_root/scripts/$script" "$fixture_root/scripts/$script"
 done
 chmod +x "$fixture_root/scripts/"*.sh
@@ -385,6 +382,29 @@ jq -e '.causalReach.preflight == {"passed":true,"observedDelta":2} and (.evidenc
   handoff-unmeasured.json >/dev/null
 AGENT_PM_REFERENCE_DATE=2026-07-08 scripts/validate-agent-handoff.sh handoff-unmeasured.json >/dev/null
 
+handoff A population.BEETLE increase 5 handoff-partial.json
+jq '.causalReach.preflight = {passed:false,observedDelta:null}' handoff-partial.json > handoff-partial-unmeasured.json
+cat > partial-shadow-result.json <<'JSON'
+{"passed":false,"safetyPassed":true,"targetPassed":false,"baselineAverage":2,"candidateAverage":4,"observedDelta":2,"requiredDelta":5}
+JSON
+scripts/sync-agent-preflight-handoff.sh partial-shadow-result.json handoff-partial-unmeasured.json partial
+jq -e '.causalReach.preflight == {"passed":true,"acceptance":"partial","targetPassed":false,"observedDelta":2}' \
+  handoff-partial-unmeasured.json >/dev/null
+AGENT_PM_REFERENCE_DATE=2026-07-08 scripts/validate-agent-handoff.sh handoff-partial-unmeasured.json >/dev/null
+jq '.causalReach.preflight.observedDelta = -2' handoff-partial-unmeasured.json > handoff-invalid-partial.json
+if AGENT_PM_REFERENCE_DATE=2026-07-08 scripts/validate-agent-handoff.sh handoff-invalid-partial.json >/dev/null 2>&1; then
+  echo "Evolution handoff accepted wrong-direction partial progress." >&2
+  exit 1
+fi
+cat > partial-ledger.json <<'JSON'
+[{"attempt":3,"accepted":true,"acceptance":"partial","shadow":{"baselineAverage":2,"candidateAverage":4,"observedDelta":2}}]
+JSON
+scripts/record-agent-partial-progress.sh partial-ledger.json handoff-partial-unmeasured.json partial-feedback.md >/dev/null
+grep -Fq '# Accepted Partial Autonomous Progress' partial-feedback.md
+grep -Fq 'Observed delta: 2' partial-feedback.md
+grep -Fq 'Required delta: 5' partial-feedback.md
+grep -Fq 'previousFeedbackDecision' partial-feedback.md
+
 cat > attempt-1.json <<'JSON'
 {"attempt":1,"accepted":false,"retryRequired":true,"substantiveChange":true,"candidateCommit":"1111111111111111111111111111111111111111","stageRank":2,"stage":"tests","reason":"candidate-tests-failed","diagnostics":"fixture","shadow":null}
 JSON
@@ -397,6 +417,7 @@ JSON
 GITHUB_OUTPUT=attempt-resolution.outputs scripts/resolve-agent-attempts.sh attempt-ledger.json \
   attempt-1.json attempt-2.json attempt-3.json >/dev/null
 grep -Fxq 'accepted=false' attempt-resolution.outputs
+grep -Fxq 'acceptance=none' attempt-resolution.outputs
 grep -Fxq 'exhausted=true' attempt-resolution.outputs
 grep -Fxq 'attempts_completed=3' attempt-resolution.outputs
 grep -Fxq 'best_candidate_commit=2222222222222222222222222222222222222222' attempt-resolution.outputs
@@ -411,6 +432,15 @@ grep -Fq 'Bounded Repair Attempt 2 of 3' repair-context.md
 grep -Fq 'candidate-tests-failed' repair-context.md
 grep -Fq 'previous response' repair-context.md
 grep -Eq '^text<<agent_output_[0-9]+_[0-9]+_[0-9]+$' repair-prompt.outputs
+cat > inert-attempt.json <<'JSON'
+{"attempt":2,"accepted":false,"acceptance":"none","effectClassification":"inert","reason":"candidate-shadow-inert","diagnostics":"observedDelta=0","shadow":{"observedDelta":0}}
+JSON
+RUNNER_TEMP="$fixture_root" GITHUB_OUTPUT=redesign-prompt.outputs \
+  scripts/build-agent-repair-prompt.sh 3 original-context.md repair-artifacts inert-attempt.json redesign-context.md
+grep -Fq 'causally inert' redesign-context.md
+grep -Fq 'changing only constants, thresholds, event wording, or its isolated unit test is forbidden' redesign-context.md
+grep -Fq 'final attempt' redesign-context.md
+grep -Fq 'Current Source Diff' redesign-context.md
 jq '.causalReach = {mechanism:"live trait fixture",traits:["nutrient-conserver"],carrierBasis:"existing",activeCarrierCount:1,adoptionPath:"one committed carrier",estimatedPhaseImpact:"1 versus demand 1",clampRisk:"none",previousFeedbackDecision:"none",preflight:{passed:true,observedDelta:1}}' \
   handoff-active.json > handoff-existing-carrier.json
 AGENT_PM_REFERENCE_DATE=2026-07-08 AGENT_GARDEN_STATE_FILE="$causal_state" \
@@ -605,7 +635,11 @@ SCRIPT
 cat > "$assessment_fixture/scripts/evaluate-shadow-candidate.sh" <<'SCRIPT'
 #!/usr/bin/env bash
 set -euo pipefail
-jq -n '{passed:true,baselineAverage:2,candidateAverage:5,observedDelta:3}' > "$SHADOW_EVALUATION_RESULT_FILE"
+if [[ "${SHADOW_FIXTURE_MODE:-full}" == "partial" ]]; then
+  jq -n '{passed:false,safetyPassed:true,targetPassed:false,baselineAverage:2,candidateAverage:4,observedDelta:2,requiredDelta:3}' > "$SHADOW_EVALUATION_RESULT_FILE"
+  exit 1
+fi
+jq -n '{passed:true,safetyPassed:true,targetPassed:true,baselineAverage:2,candidateAverage:5,observedDelta:3,requiredDelta:3}' > "$SHADOW_EVALUATION_RESULT_FILE"
 SCRIPT
 cat > "$assessment_fixture/scripts/validate-agent-handoff.sh" <<'SCRIPT'
 #!/usr/bin/env bash
@@ -623,7 +657,7 @@ chmod +x "$assessment_fixture/scripts/"*.sh
   echo 'package example; class Change { int candidate; }' > src/main/java/example/Change.java
   cat > .agent-run.json <<'JSON'
 {
-  "runMode":"evolution", "pmDirection":"A",
+  "runMode":"evolution", "pmDirection":"A", "evaluation":{"metric":"population.BEETLE","goal":"increase","requiredDelta":3},
   "evidence":{"verification":"Focused tests pass."},
   "causalReach":{"preflight":{"passed":false,"observedDelta":null}}
 }
@@ -635,7 +669,7 @@ JSON
   grep -Fxq 'retry_required=false' assessment.outputs
   jq -e '.accepted == true and .stage == "accepted" and .candidateCommit != ""' result.json >/dev/null
   jq -e '.causalReach.preflight == {"passed":true,"observedDelta":3}' .agent-run.json >/dev/null
-  jq -e '. == {"runMode":"evolution","pmDirection":"A"}' target/agent-attempt-objective.json >/dev/null
+  jq -e '. == {"runMode":"evolution","pmDirection":"A","evaluation":{"metric":"population.BEETLE","goal":"increase","requiredDelta":3}}' target/agent-attempt-objective.json >/dev/null
   jq '.pmDirection = "B"' .agent-run.json > changed-objective.json
   mv changed-objective.json .agent-run.json
   RUNNER_TEMP="$assessment_fixture/target" GITHUB_OUTPUT=assessment-2.outputs \
@@ -643,6 +677,17 @@ JSON
   grep -Fxq 'accepted=false' assessment-2.outputs
   grep -Fxq 'reason=candidate-objective-changed' assessment-2.outputs
   jq -e '.stage == "handoff" and .reason == "candidate-objective-changed"' result-2.json >/dev/null
+
+  jq '.pmDirection = "A" | .causalReach.preflight = {passed:false,observedDelta:null}' .agent-run.json > partial-handoff.json
+  mv partial-handoff.json .agent-run.json
+  echo 'package example; class Change { int candidate; int redesigned; }' > src/main/java/example/Change.java
+  RUNNER_TEMP="$assessment_fixture/target" GITHUB_OUTPUT=assessment-3.outputs SHADOW_FIXTURE_MODE=partial \
+    scripts/assess-agent-attempt.sh 3 gemini-artifacts baseline-shadow.json result-3.json >/dev/null
+  grep -Fxq 'accepted=true' assessment-3.outputs
+  grep -Fxq 'acceptance=partial' assessment-3.outputs
+  grep -Fxq 'retry_required=false' assessment-3.outputs
+  jq -e '.accepted == true and .acceptance == "partial" and .effectClassification == "partial-progress" and .reason == "accepted-partial-progress"' result-3.json >/dev/null
+  jq -e '.causalReach.preflight == {"passed":true,"acceptance":"partial","targetPassed":false,"observedDelta":2}' .agent-run.json >/dev/null
 )
 
 defer_fixture="$fixture_root/defer-fixture"
