@@ -127,7 +127,7 @@ case "$run_mode" in
       ((.causalReach.previousFeedbackDecision // "") | type == "string" and test("^(none|reuse|revise|abandon)$")) and
       (.causalReach.preflight | type == "object") and
       (.causalReach.preflight.passed | type == "boolean") and
-      (((.causalReach.preflight.acceptance // "full") | type == "string" and test("^(full|partial)$"))) and
+      (((.causalReach.preflight.acceptance // "full") | type == "string" and test("^(full|experiment)$"))) and
       ((.causalReach.preflight.observedDelta | type == "number") or .causalReach.preflight.observedDelta == null)
     ' "$handoff_file" >/dev/null; then
       echo "Evolution handoff requires structured causalReach evidence, including traits, carrier basis, phase impact, clamp risk, prior-feedback decision, and preflight result." >&2
@@ -178,33 +178,22 @@ case "$run_mode" in
       preflight_passed="$(jq -r '.causalReach.preflight.passed' "$handoff_file")"
       preflight_delta="$(jq -r '.causalReach.preflight.observedDelta // "null"' "$handoff_file")"
       preflight_acceptance="$(jq -r '.causalReach.preflight.acceptance // "full"' "$handoff_file")"
-      if [[ "$preflight_passed" != "true" || "$preflight_delta" == "null" ]]; then
-        echo "Evolution handoff requires a passing causalReach.preflight with a numeric baseline-to-candidate observedDelta." >&2
+      if [[ "$preflight_delta" == "null" ]]; then
+        echo "Evolution handoff requires a numeric baseline-to-candidate observedDelta." >&2
         exit 1
       fi
-      if [[ "$preflight_acceptance" == "partial" ]]; then
-        if ! jq -e '.causalReach.preflight.targetPassed == false' "$handoff_file" >/dev/null; then
-          echo "Partial evolution acceptance must explicitly record targetPassed=false." >&2
+      if [[ "$preflight_acceptance" == "experiment" ]]; then
+        if [[ "$preflight_passed" != "false" ]] || ! jq -e '
+          .causalReach.preflight.safetyPassed == true and
+          .causalReach.preflight.targetPassed == false and
+          ((.causalReach.preflight.verdict // "") | test("^(inert|partial-progress|wrong-direction)$"))
+        ' "$handoff_file" >/dev/null; then
+          echo "Safe experiment acceptance requires passed=false, safetyPassed=true, targetPassed=false, and a measured verdict." >&2
           exit 1
         fi
-        case "$evaluation_goal" in
-          increase)
-            if awk -v observed="$preflight_delta" 'BEGIN { exit !(observed <= 0) }'; then
-              echo "Partial increase acceptance requires a positive observedDelta." >&2
-              exit 1
-            fi
-            ;;
-          decrease)
-            if awk -v observed="$preflight_delta" 'BEGIN { exit !(observed >= 0) }'; then
-              echo "Partial decrease acceptance requires a negative observedDelta." >&2
-              exit 1
-            fi
-            ;;
-          *)
-            echo "Partial acceptance is not valid for preserve targets." >&2
-            exit 1
-            ;;
-        esac
+      elif [[ "$preflight_passed" != "true" ]]; then
+        echo "Full evolution acceptance requires causalReach.preflight.passed=true." >&2
+        exit 1
       else
         case "$evaluation_goal" in
           increase)

@@ -18,7 +18,7 @@ env:
 jobs:
   agent:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 50
 
     steps:
       - name: Checkout repository
@@ -131,81 +131,11 @@ jobs:
           AGENT_BASELINE_SHADOW_OUTCOME: ${{ steps.baseline_shadow.outcome }}
         run: scripts/assess-agent-attempt.sh 1 gemini-artifacts "${RUNNER_TEMP}/baseline-shadow.json" "${RUNNER_TEMP}/agent-attempt-1.json"
 
-      - name: Build bounded repair prompt for attempt 2
-        id: repair_prompt_2
-        if: ${{ !cancelled() && steps.attempt_1_assessment.outputs.retry_required == 'true' }}
-        shell: bash
-        run: scripts/build-agent-repair-prompt.sh 2 "${RUNNER_TEMP}/agent-context.md" gemini-artifacts "${RUNNER_TEMP}/agent-attempt-1.json" "${RUNNER_TEMP}/agent-repair-2.md"
-
-      - name: Run Gemini bounded repair attempt 2
-        id: gemini_repair_2
-        if: ${{ !cancelled() && steps.repair_prompt_2.outcome == 'success' }}
-        uses: google-github-actions/run-gemini-cli@v0.1.22
-        env:
-          GEMINI_CLI_TRUST_WORKSPACE: "true"
-        with:
-          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
-          gemini_cli_version: ${{ env.GEMINI_CLI_VERSION }}
-          gemini_model: ${{ env.EXECUTION_MODEL }}
-          prompt: ${{ steps.repair_prompt_2.outputs.text }}
-          upload_artifacts: false
-
-      - name: Restore protected files after attempt 2
-        id: restore_protected_attempt_2
-        if: ${{ !cancelled() && steps.gemini_repair_2.outcome == 'success' }}
-        shell: bash
-        run: scripts/restore-agent-protected-files.sh
-
-      - name: Assess autonomous attempt 2
-        id: attempt_2_assessment
-        if: ${{ !cancelled() && steps.restore_protected_attempt_2.outcome == 'success' }}
-        shell: bash
-        env:
-          AGENT_BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
-          AGENT_BASELINE_POLICY_OUTCOME: ${{ steps.baseline_policy.outcome }}
-          AGENT_BASELINE_SHADOW_OUTCOME: ${{ steps.baseline_shadow.outcome }}
-        run: scripts/assess-agent-attempt.sh 2 gemini-artifacts "${RUNNER_TEMP}/baseline-shadow.json" "${RUNNER_TEMP}/agent-attempt-2.json"
-
-      - name: Build bounded repair prompt for attempt 3
-        id: repair_prompt_3
-        if: ${{ !cancelled() && steps.attempt_2_assessment.outputs.retry_required == 'true' }}
-        shell: bash
-        run: scripts/build-agent-repair-prompt.sh 3 "${RUNNER_TEMP}/agent-context.md" gemini-artifacts "${RUNNER_TEMP}/agent-attempt-2.json" "${RUNNER_TEMP}/agent-repair-3.md"
-
-      - name: Run Gemini bounded repair attempt 3
-        id: gemini_repair_3
-        if: ${{ !cancelled() && steps.repair_prompt_3.outcome == 'success' }}
-        uses: google-github-actions/run-gemini-cli@v0.1.22
-        env:
-          GEMINI_CLI_TRUST_WORKSPACE: "true"
-        with:
-          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
-          gemini_cli_version: ${{ env.GEMINI_CLI_VERSION }}
-          gemini_model: ${{ env.EXECUTION_MODEL }}
-          prompt: ${{ steps.repair_prompt_3.outputs.text }}
-          upload_artifacts: false
-
-      - name: Restore protected files after attempt 3
-        id: restore_protected_attempt_3
-        if: ${{ !cancelled() && steps.gemini_repair_3.outcome == 'success' }}
-        shell: bash
-        run: scripts/restore-agent-protected-files.sh
-
-      - name: Assess autonomous attempt 3
-        id: attempt_3_assessment
-        if: ${{ !cancelled() && steps.restore_protected_attempt_3.outcome == 'success' }}
-        shell: bash
-        env:
-          AGENT_BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
-          AGENT_BASELINE_POLICY_OUTCOME: ${{ steps.baseline_policy.outcome }}
-          AGENT_BASELINE_SHADOW_OUTCOME: ${{ steps.baseline_shadow.outcome }}
-        run: scripts/assess-agent-attempt.sh 3 gemini-artifacts "${RUNNER_TEMP}/baseline-shadow.json" "${RUNNER_TEMP}/agent-attempt-3.json"
-
-      - name: Resolve bounded autonomous attempts
+      - name: Resolve autonomous experiment
         id: attempt_resolution
         if: ${{ !cancelled() && steps.attempt_1_assessment.outcome == 'success' }}
         shell: bash
-        run: scripts/resolve-agent-attempts.sh "${RUNNER_TEMP}/agent-attempt-ledger.json" "${RUNNER_TEMP}/agent-attempt-1.json" "${RUNNER_TEMP}/agent-attempt-2.json" "${RUNNER_TEMP}/agent-attempt-3.json"
+        run: scripts/resolve-agent-attempts.sh "${RUNNER_TEMP}/agent-attempt-ledger.json" "${RUNNER_TEMP}/agent-attempt-1.json"
 
       - name: Inspect accepted Gemini autonomous result
         id: gemini_primary_inspect
@@ -232,9 +162,9 @@ jobs:
         env:
           INCOMPLETE_CANDIDATE_BRANCH: ${{ steps.publish_incomplete_candidate.outputs.branch }}
           INCOMPLETE_CANDIDATE_COMMIT: ${{ steps.publish_incomplete_candidate.outputs.commit }}
-          HANDOFF_VALIDATION_REASON: "Attempt ${{ steps.attempt_resolution.outputs.attempts_completed }} stopped at ${{ steps.attempt_resolution.outputs.stage }}: ${{ steps.attempt_resolution.outputs.reason }}"
+          HANDOFF_VALIDATION_REASON: "The single experiment stopped at ${{ steps.attempt_resolution.outputs.stage }}: ${{ steps.attempt_resolution.outputs.reason }}"
           AGENT_ATTEMPT_LEDGER_FILE: ${{ steps.attempt_resolution.outputs.ledger_file }}
-        run: scripts/defer-agent-incomplete.sh gemini-artifacts "attempts-exhausted" agent/shadow-feedback.md
+        run: scripts/defer-agent-incomplete.sh gemini-artifacts "experiment-unsafe-or-invalid" agent/shadow-feedback.md
 
       - name: Commit incomplete agent feedback
         id: commit_agent_feedback
@@ -276,7 +206,6 @@ jobs:
       - name: Validate tests after Gemini changes
         id: post_test_final
         if: ${{ !cancelled() && steps.agent_handoff.outcome == 'success' }}
-        continue-on-error: true
         timeout-minutes: 4
         shell: bash
         env:
@@ -286,7 +215,6 @@ jobs:
       - name: Validate agent worktree before memory
         id: agent_worktree_repair_input
         if: ${{ !cancelled() && steps.agent_handoff.outcome == 'success' }}
-        continue-on-error: true
         shell: bash
         env:
           VALIDATE_AGENT_WORKTREE_SCOPE: changed
@@ -320,17 +248,11 @@ jobs:
         shell: bash
         run: echo "Candidate accepted as ${{ steps.attempt_resolution.outputs.acceptance }} progress by the authoritative attempt assessment."
 
-      - name: Record accepted partial progress for the next run
-        id: record_partial_progress
-        if: ${{ !cancelled() && steps.candidate_validation.outcome == 'success' && steps.attempt_resolution.outputs.acceptance == 'partial' }}
+      - name: Prepare experiment verdict for the next run
+        id: prepare_experiment_verdict
+        if: ${{ !cancelled() && steps.candidate_validation.outcome == 'success' && steps.validation_policy.outputs.run_mode == 'evolution' }}
         shell: bash
-        run: scripts/record-agent-partial-progress.sh "${RUNNER_TEMP}/agent-attempt-ledger.json" .agent-run.json agent/shadow-feedback.md
-
-      - name: Clear consumed shadow feedback
-        id: clear_shadow_feedback
-        if: ${{ !cancelled() && steps.candidate_validation.outcome == 'success' && steps.validation_policy.outputs.run_mode == 'evolution' && steps.attempt_resolution.outputs.acceptance == 'full' }}
-        shell: bash
-        run: rm -f agent/shadow-feedback.md
+        run: scripts/record-agent-verdict.sh "${RUNNER_TEMP}/agent-attempt-ledger.json" .agent-run.json "${RUNNER_TEMP}/agent-shadow-feedback.md"
 
       - name: Advance persistent garden state
         id: advance_garden
@@ -339,16 +261,22 @@ jobs:
 
       - name: Generate memory artifacts
         id: auto_memory
-        if: ${{ !cancelled() && (steps.agent_worktree_repair_input.outputs.severity == 'clean' || steps.agent_worktree_repair_input.outputs.severity == 'deferred') && (steps.post_test_final.outcome == 'failure' || steps.candidate_validation.outcome == 'success') }}
+        if: ${{ !cancelled() && steps.candidate_validation.outcome == 'success' }}
         shell: bash
         env:
           AGENT_BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
           AGENT_BASELINE_POLICY_OUTCOME: ${{ steps.baseline_policy.outcome }}
         run: scripts/agent-auto-postprocess.sh --test-outcome "${{ steps.post_test_final.outcome }}" --garden-advance-outcome "${{ steps.advance_garden.outcome }}" --worktree-policy-severity "${{ steps.agent_worktree_repair_input.outputs.severity }}" --checks "mvn -B test"
 
+      - name: Record experiment verdict for the next run
+        id: record_experiment_verdict
+        if: ${{ !cancelled() && steps.auto_memory.outcome == 'success' && steps.prepare_experiment_verdict.outcome == 'success' }}
+        shell: bash
+        run: mv "${RUNNER_TEMP}/agent-shadow-feedback.md" agent/shadow-feedback.md
+
       - name: Validate required memory updates
         id: required_memory_final
-        if: ${{ !cancelled() && steps.auto_memory.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.auto_memory.outcome == 'success' && (steps.record_experiment_verdict.outcome == 'success' || steps.validation_policy.outputs.run_mode != 'evolution') }}
         shell: bash
         env:
           POST_TEST_OUTCOME: ${{ steps.post_test_final.outcome }}
@@ -448,8 +376,6 @@ jobs:
           BASELINE_POLICY_OUTCOME: ${{ steps.baseline_policy.outcome }}
           OBSERVATION_WINDOW_OUTCOME: ${{ steps.observation_window.outcome }}
           GEMINI_OUTCOME: ${{ steps.gemini.outcome }}
-          GEMINI_REPAIR_2_OUTCOME: ${{ steps.gemini_repair_2.outcome }}
-          GEMINI_REPAIR_3_OUTCOME: ${{ steps.gemini_repair_3.outcome }}
           AGENT_ATTEMPTS_COMPLETED: ${{ steps.attempt_resolution.outputs.attempts_completed }}
           AGENT_ATTEMPT_ACCEPTED: ${{ steps.attempt_resolution.outputs.accepted }}
           AGENT_ATTEMPT_ACCEPTANCE: ${{ steps.attempt_resolution.outputs.acceptance }}
@@ -462,7 +388,7 @@ jobs:
           AGENT_RUN_MODE: ${{ steps.validation_policy.outputs.run_mode }}
           AGENT_SHADOW_POLICY: ${{ steps.validation_policy.outputs.shadow_policy }}
           CANDIDATE_VALIDATION_OUTCOME: ${{ steps.candidate_validation.outcome }}
-          PARTIAL_PROGRESS_FEEDBACK_OUTCOME: ${{ steps.record_partial_progress.outcome }}
+          EXPERIMENT_VERDICT_OUTCOME: ${{ steps.record_experiment_verdict.outcome }}
           ADVANCE_GARDEN_OUTCOME: ${{ steps.advance_garden.outcome }}
           AUTO_MEMORY_OUTCOME: ${{ steps.auto_memory.outcome }}
           REQUIRED_MEMORY_OUTCOME: ${{ steps.required_memory_final.outcome }}
@@ -491,7 +417,7 @@ jobs:
 
       - name: Clean consumed rejected candidate branches
         id: cleanup_consumed_rejected_candidates
-        if: ${{ !cancelled() && steps.commit_changes.outcome == 'success' && (steps.clear_shadow_feedback.outcome == 'success' || steps.record_partial_progress.outcome == 'success') }}
+        if: ${{ !cancelled() && steps.commit_changes.outcome == 'success' && (steps.record_experiment_verdict.outcome == 'success' || steps.validation_policy.outputs.run_mode != 'evolution') }}
         shell: bash
         run: scripts/cleanup-rejected-candidate-branches.sh || echo "::warning::Rejected candidate branch cleanup will be retried by a later run."
 
@@ -503,8 +429,6 @@ jobs:
           BASELINE_POLICY_OUTCOME: ${{ steps.baseline_policy.outcome }}
           OBSERVATION_WINDOW_OUTCOME: ${{ steps.observation_window.outcome }}
           GEMINI_OUTCOME: ${{ steps.gemini.outcome }}
-          GEMINI_REPAIR_2_OUTCOME: ${{ steps.gemini_repair_2.outcome }}
-          GEMINI_REPAIR_3_OUTCOME: ${{ steps.gemini_repair_3.outcome }}
           AGENT_ATTEMPTS_COMPLETED: ${{ steps.attempt_resolution.outputs.attempts_completed }}
           AGENT_ATTEMPT_ACCEPTED: ${{ steps.attempt_resolution.outputs.accepted }}
           AGENT_ATTEMPT_ACCEPTANCE: ${{ steps.attempt_resolution.outputs.acceptance }}
@@ -521,7 +445,7 @@ jobs:
           AGENT_RUN_MODE: ${{ steps.validation_policy.outputs.run_mode }}
           AGENT_SHADOW_POLICY: ${{ steps.validation_policy.outputs.shadow_policy }}
           CANDIDATE_VALIDATION_OUTCOME: ${{ steps.candidate_validation.outcome }}
-          PARTIAL_PROGRESS_FEEDBACK_OUTCOME: ${{ steps.record_partial_progress.outcome }}
+          EXPERIMENT_VERDICT_OUTCOME: ${{ steps.record_experiment_verdict.outcome }}
           CONSUMED_REJECTED_CANDIDATE_CLEANUP_OUTCOME: ${{ steps.cleanup_consumed_rejected_candidates.outcome }}
           ADVANCE_GARDEN_OUTCOME: ${{ steps.advance_garden.outcome }}
           AUTO_MEMORY_OUTCOME: ${{ steps.auto_memory.outcome }}

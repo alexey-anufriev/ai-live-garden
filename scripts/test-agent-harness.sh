@@ -47,26 +47,25 @@ grep -Fq 'id: publish_incomplete_candidate' "$workflow_file"
 grep -Fq 'id: cleanup_incomplete_candidates' "$workflow_file"
 grep -Fq 'id: validation_policy' "$workflow_file"
 grep -Fq 'id: candidate_validation' "$workflow_file"
-grep -Fq 'id: record_partial_progress' "$workflow_file"
+grep -Fq 'id: prepare_experiment_verdict' "$workflow_file"
+grep -Fq 'id: record_experiment_verdict' "$workflow_file"
 grep -Fq 'id: cleanup_consumed_rejected_candidates' "$workflow_file"
 grep -Fq 'run: scripts/defer-agent-incomplete.sh' "$workflow_file"
 grep -Fq 'run: scripts/publish-rejected-candidate.sh' "$workflow_file"
-grep -Fq 'run: scripts/record-agent-partial-progress.sh' "$workflow_file"
+grep -Fq 'run: scripts/record-agent-verdict.sh' "$workflow_file"
 grep -Fq 'run: scripts/cleanup-rejected-candidate-branches.sh' "$workflow_file"
 grep -Fq "vars.AGENT_EXECUTION_MODEL || 'gemini-3.1-flash-lite'" "$workflow_file"
 grep -Fq "steps.harness_contracts.outcome == 'success'" "$workflow_file"
 grep -Fq "steps.setup_java.outcome == 'success'" "$workflow_file"
 grep -Fq 'id: attempt_1_assessment' "$workflow_file"
-grep -Fq 'id: attempt_2_assessment' "$workflow_file"
-grep -Fq 'id: attempt_3_assessment' "$workflow_file"
 grep -Fq 'id: attempt_resolution' "$workflow_file"
 grep -Fq 'REJECTED_CANDIDATE_SOURCE_COMMIT:' "$workflow_file"
-if [[ "$(grep -Fc 'name: Run Gemini bounded repair attempt' "$workflow_file")" != "2" ]]; then
-  echo "The workflow must provide exactly two bounded repair calls after the initial agent call." >&2
+if [[ "$(grep -Fc 'uses: google-github-actions/run-gemini-cli@' "$workflow_file")" != "1" ]]; then
+  echo "The workflow must provide exactly one autonomous agent call." >&2
   exit 1
 fi
-if grep -Eq 'attempt_4|repair attempt 4|build-(agent|shadow)-retry-prompt-output[.]sh|Run Gemini corrective retry' "$workflow_file"; then
-  echo "The workflow contains an unbounded or obsolete corrective-agent path." >&2
+if grep -Eq 'attempt_[234]|gemini_repair|repair_prompt|Run Gemini bounded repair|build-agent-repair-prompt' "$workflow_file"; then
+  echo "The workflow contains an obsolete same-run repair path." >&2
   exit 1
 fi
 if grep -Eq 'id: (shadow_evaluation|shadow_safety_evaluation|shadow_repair_evaluation|publish_rejected_candidate)' "$workflow_file"; then
@@ -321,8 +320,8 @@ mkdir -p "$fixture_root/scripts" "$fixture_root/agent/plans" "$fixture_root/arti
 for script in find-active-agent-plan.sh agent-substantive-changes.sh validate-agent-handoff.sh count-garden-trait-carriers.sh \
   derive-agent-validation-policy.sh report-complexity-budget.sh extract-agent-handoff.sh \
   inspect-agent-gemini-output.sh validate-agent-worktree.sh write-output-file.sh \
-  sync-agent-preflight-handoff.sh build-agent-repair-prompt.sh resolve-agent-attempts.sh \
-  assess-agent-attempt.sh snapshot-agent-candidate.sh record-agent-partial-progress.sh; do
+  sync-agent-preflight-handoff.sh resolve-agent-attempts.sh assess-agent-attempt.sh \
+  snapshot-agent-candidate.sh record-agent-verdict.sh; do
   cp "$repository_root/scripts/$script" "$fixture_root/scripts/$script"
 done
 chmod +x "$fixture_root/scripts/"*.sh
@@ -382,65 +381,34 @@ jq -e '.causalReach.preflight == {"passed":true,"observedDelta":2} and (.evidenc
   handoff-unmeasured.json >/dev/null
 AGENT_PM_REFERENCE_DATE=2026-07-08 scripts/validate-agent-handoff.sh handoff-unmeasured.json >/dev/null
 
-handoff A population.BEETLE increase 5 handoff-partial.json
-jq '.causalReach.preflight = {passed:false,observedDelta:null}' handoff-partial.json > handoff-partial-unmeasured.json
-cat > partial-shadow-result.json <<'JSON'
-{"passed":false,"safetyPassed":true,"targetPassed":false,"baselineAverage":2,"candidateAverage":4,"observedDelta":2,"requiredDelta":5}
+handoff A population.BEETLE increase 5 handoff-experiment.json
+jq '.causalReach.preflight = {passed:false,observedDelta:null}' handoff-experiment.json > handoff-experiment-unmeasured.json
+cat > inert-shadow-result.json <<'JSON'
+{"passed":false,"safetyPassed":true,"targetPassed":false,"baselineAverage":2,"candidateAverage":2,"observedDelta":0,"requiredDelta":5}
 JSON
-scripts/sync-agent-preflight-handoff.sh partial-shadow-result.json handoff-partial-unmeasured.json partial
-jq -e '.causalReach.preflight == {"passed":true,"acceptance":"partial","targetPassed":false,"observedDelta":2}' \
-  handoff-partial-unmeasured.json >/dev/null
-AGENT_PM_REFERENCE_DATE=2026-07-08 scripts/validate-agent-handoff.sh handoff-partial-unmeasured.json >/dev/null
-jq '.causalReach.preflight.observedDelta = -2' handoff-partial-unmeasured.json > handoff-invalid-partial.json
-if AGENT_PM_REFERENCE_DATE=2026-07-08 scripts/validate-agent-handoff.sh handoff-invalid-partial.json >/dev/null 2>&1; then
-  echo "Evolution handoff accepted wrong-direction partial progress." >&2
-  exit 1
-fi
-cat > partial-ledger.json <<'JSON'
-[{"attempt":3,"accepted":true,"acceptance":"partial","shadow":{"baselineAverage":2,"candidateAverage":4,"observedDelta":2}}]
+scripts/sync-agent-preflight-handoff.sh inert-shadow-result.json handoff-experiment-unmeasured.json experiment inert
+jq -e '.causalReach.preflight == {"passed":false,"acceptance":"experiment","safetyPassed":true,"targetPassed":false,"verdict":"inert","observedDelta":0}' \
+  handoff-experiment-unmeasured.json >/dev/null
+AGENT_PM_REFERENCE_DATE=2026-07-08 scripts/validate-agent-handoff.sh handoff-experiment-unmeasured.json >/dev/null
+cat > experiment-ledger.json <<'JSON'
+[{"attempt":1,"accepted":true,"acceptance":"experiment","effectClassification":"inert","shadow":{"safetyPassed":true,"targetPassed":false,"baselineAverage":2,"candidateAverage":2,"observedDelta":0}}]
 JSON
-scripts/record-agent-partial-progress.sh partial-ledger.json handoff-partial-unmeasured.json partial-feedback.md >/dev/null
-grep -Fq '# Accepted Partial Autonomous Progress' partial-feedback.md
-grep -Fq 'Observed delta: 2' partial-feedback.md
-grep -Fq 'Required delta: 5' partial-feedback.md
-grep -Fq 'previousFeedbackDecision' partial-feedback.md
+scripts/record-agent-verdict.sh experiment-ledger.json handoff-experiment-unmeasured.json experiment-feedback.md >/dev/null
+grep -Fq '# Autonomous Experiment Verdict' experiment-feedback.md
+grep -Fq 'Classification: `inert`' experiment-feedback.md
+grep -Fq 'Observed delta: 0' experiment-feedback.md
+grep -Fq 'code is already on main' experiment-feedback.md
 
 cat > attempt-1.json <<'JSON'
-{"attempt":1,"accepted":false,"retryRequired":true,"substantiveChange":true,"candidateCommit":"1111111111111111111111111111111111111111","stageRank":2,"stage":"tests","reason":"candidate-tests-failed","diagnostics":"fixture","shadow":null}
+{"attempt":1,"accepted":false,"retryRequired":false,"substantiveChange":true,"candidateCommit":"1111111111111111111111111111111111111111","stageRank":2,"stage":"tests","reason":"candidate-tests-failed","diagnostics":"fixture","shadow":null}
 JSON
-cat > attempt-2.json <<'JSON'
-{"attempt":2,"accepted":false,"retryRequired":true,"substantiveChange":true,"candidateCommit":"2222222222222222222222222222222222222222","stageRank":6,"stage":"shadow","reason":"candidate-shadow-target-missed","diagnostics":"fixture","shadow":{"observedDelta":0}}
-JSON
-cat > attempt-3.json <<'JSON'
-{"attempt":3,"accepted":false,"retryRequired":true,"substantiveChange":false,"candidateCommit":"","stageRank":0,"stage":"output","reason":"handoff-without-substantive-change","diagnostics":"fixture","shadow":null}
-JSON
-GITHUB_OUTPUT=attempt-resolution.outputs scripts/resolve-agent-attempts.sh attempt-ledger.json \
-  attempt-1.json attempt-2.json attempt-3.json >/dev/null
+GITHUB_OUTPUT=attempt-resolution.outputs scripts/resolve-agent-attempts.sh attempt-ledger.json attempt-1.json >/dev/null
 grep -Fxq 'accepted=false' attempt-resolution.outputs
 grep -Fxq 'acceptance=none' attempt-resolution.outputs
 grep -Fxq 'exhausted=true' attempt-resolution.outputs
-grep -Fxq 'attempts_completed=3' attempt-resolution.outputs
-grep -Fxq 'best_candidate_commit=2222222222222222222222222222222222222222' attempt-resolution.outputs
-jq -e 'length == 3' attempt-ledger.json >/dev/null
-
-mkdir -p repair-artifacts
-jq -n '{response:"previous response"}' > repair-artifacts/stdout.log
-printf '# Original fixture context\n' > original-context.md
-RUNNER_TEMP="$fixture_root" GITHUB_OUTPUT=repair-prompt.outputs \
-  scripts/build-agent-repair-prompt.sh 2 original-context.md repair-artifacts attempt-1.json repair-context.md
-grep -Fq 'Bounded Repair Attempt 2 of 3' repair-context.md
-grep -Fq 'candidate-tests-failed' repair-context.md
-grep -Fq 'previous response' repair-context.md
-grep -Eq '^text<<agent_output_[0-9]+_[0-9]+_[0-9]+$' repair-prompt.outputs
-cat > inert-attempt.json <<'JSON'
-{"attempt":2,"accepted":false,"acceptance":"none","effectClassification":"inert","reason":"candidate-shadow-inert","diagnostics":"observedDelta=0","shadow":{"observedDelta":0}}
-JSON
-RUNNER_TEMP="$fixture_root" GITHUB_OUTPUT=redesign-prompt.outputs \
-  scripts/build-agent-repair-prompt.sh 3 original-context.md repair-artifacts inert-attempt.json redesign-context.md
-grep -Fq 'causally inert' redesign-context.md
-grep -Fq 'changing only constants, thresholds, event wording, or its isolated unit test is forbidden' redesign-context.md
-grep -Fq 'final attempt' redesign-context.md
-grep -Fq 'Current Source Diff' redesign-context.md
+grep -Fxq 'attempts_completed=1' attempt-resolution.outputs
+grep -Fxq 'best_candidate_commit=1111111111111111111111111111111111111111' attempt-resolution.outputs
+jq -e 'length == 1' attempt-ledger.json >/dev/null
 jq '.causalReach = {mechanism:"live trait fixture",traits:["nutrient-conserver"],carrierBasis:"existing",activeCarrierCount:1,adoptionPath:"one committed carrier",estimatedPhaseImpact:"1 versus demand 1",clampRisk:"none",previousFeedbackDecision:"none",preflight:{passed:true,observedDelta:1}}' \
   handoff-active.json > handoff-existing-carrier.json
 AGENT_PM_REFERENCE_DATE=2026-07-08 AGENT_GARDEN_STATE_FILE="$causal_state" \
@@ -504,7 +472,7 @@ grep -Fxq 'noop_reason=handoff-without-substantive-change' inspect.outputs
 GITHUB_OUTPUT=assessment.outputs AGENT_PM_REFERENCE_DATE=2026-07-08 \
   scripts/assess-agent-attempt.sh 1 artifacts missing-baseline.json attempt-assessment.json >/dev/null
 grep -Fxq 'accepted=false' assessment.outputs
-grep -Fxq 'retry_required=true' assessment.outputs
+grep -Fxq 'retry_required=false' assessment.outputs
 grep -Fxq 'substantive_change=false' assessment.outputs
 jq -e '.stage == "output" and .reason == "handoff-without-substantive-change"' \
   attempt-assessment.json >/dev/null
@@ -628,15 +596,15 @@ cat > "$assessment_fixture/scripts/derive-agent-validation-policy.sh" <<'SCRIPT'
 set -euo pipefail
 echo 'shadow_policy=target' >> "$GITHUB_OUTPUT"
 SCRIPT
-cat > "$assessment_fixture/scripts/detect-repeated-rejected-candidate.sh" <<'SCRIPT'
-#!/usr/bin/env bash
-exit 0
-SCRIPT
 cat > "$assessment_fixture/scripts/evaluate-shadow-candidate.sh" <<'SCRIPT'
 #!/usr/bin/env bash
 set -euo pipefail
-if [[ "${SHADOW_FIXTURE_MODE:-full}" == "partial" ]]; then
-  jq -n '{passed:false,safetyPassed:true,targetPassed:false,baselineAverage:2,candidateAverage:4,observedDelta:2,requiredDelta:3}' > "$SHADOW_EVALUATION_RESULT_FILE"
+if [[ "${SHADOW_FIXTURE_MODE:-full}" == "inert" ]]; then
+  jq -n '{passed:false,safetyPassed:true,targetPassed:false,baselineAverage:2,candidateAverage:2,observedDelta:0,requiredDelta:3}' > "$SHADOW_EVALUATION_RESULT_FILE"
+  exit 1
+fi
+if [[ "${SHADOW_FIXTURE_MODE:-full}" == "unsafe" ]]; then
+  jq -n '{passed:false,safetyPassed:false,targetPassed:false,baselineAverage:2,candidateAverage:0,observedDelta:-2,requiredDelta:3}' > "$SHADOW_EVALUATION_RESULT_FILE"
   exit 1
 fi
 jq -n '{passed:true,safetyPassed:true,targetPassed:true,baselineAverage:2,candidateAverage:5,observedDelta:3,requiredDelta:3}' > "$SHADOW_EVALUATION_RESULT_FILE"
@@ -669,121 +637,41 @@ JSON
   grep -Fxq 'retry_required=false' assessment.outputs
   jq -e '.accepted == true and .stage == "accepted" and .candidateCommit != ""' result.json >/dev/null
   jq -e '.causalReach.preflight == {"passed":true,"observedDelta":3}' .agent-run.json >/dev/null
-  jq -e '. == {"runMode":"evolution","pmDirection":"A","evaluation":{"metric":"population.BEETLE","goal":"increase","requiredDelta":3}}' target/agent-attempt-objective.json >/dev/null
-  jq '.pmDirection = "B"' .agent-run.json > changed-objective.json
-  mv changed-objective.json .agent-run.json
-  RUNNER_TEMP="$assessment_fixture/target" GITHUB_OUTPUT=assessment-2.outputs \
-    scripts/assess-agent-attempt.sh 2 gemini-artifacts baseline-shadow.json result-2.json >/dev/null
-  grep -Fxq 'accepted=false' assessment-2.outputs
-  grep -Fxq 'reason=candidate-objective-changed' assessment-2.outputs
-  jq -e '.stage == "handoff" and .reason == "candidate-objective-changed"' result-2.json >/dev/null
-
-  jq '.pmDirection = "A" | .causalReach.preflight = {passed:false,observedDelta:null}' .agent-run.json > partial-handoff.json
-  mv partial-handoff.json .agent-run.json
-  echo 'package example; class Change { int candidate; int redesigned; }' > src/main/java/example/Change.java
-  RUNNER_TEMP="$assessment_fixture/target" GITHUB_OUTPUT=assessment-3.outputs SHADOW_FIXTURE_MODE=partial \
-    scripts/assess-agent-attempt.sh 3 gemini-artifacts baseline-shadow.json result-3.json >/dev/null
-  grep -Fxq 'accepted=true' assessment-3.outputs
-  grep -Fxq 'acceptance=partial' assessment-3.outputs
-  grep -Fxq 'retry_required=false' assessment-3.outputs
-  jq -e '.accepted == true and .acceptance == "partial" and .effectClassification == "partial-progress" and .reason == "accepted-partial-progress"' result-3.json >/dev/null
-  jq -e '.causalReach.preflight == {"passed":true,"acceptance":"partial","targetPassed":false,"observedDelta":2}' .agent-run.json >/dev/null
-)
-
-defer_fixture="$fixture_root/defer-fixture"
-defer_remote="$fixture_root/defer-remote.git"
-git init --bare -q "$defer_remote"
-mkdir -p "$defer_fixture/scripts" "$defer_fixture/src/main/java/example" "$defer_fixture/src/test/java/example"
-cp "$repository_root/scripts/defer-shadow-rejection.sh" "$repository_root/scripts/validate-agent-handoff.sh" \
-  "$repository_root/scripts/find-active-agent-plan.sh" "$repository_root/scripts/publish-rejected-candidate.sh" \
-  "$repository_root/scripts/cleanup-rejected-candidate-branches.sh" \
-  "$repository_root/scripts/detect-repeated-rejected-candidate.sh" "$defer_fixture/scripts/"
-chmod +x "$defer_fixture/scripts/"*.sh
-echo 'package example; class Change {}' > "$defer_fixture/src/main/java/example/Change.java"
-(
-  cd "$defer_fixture"
-  git init -q
-  git config user.name fixture
-  git config user.email fixture@example.invalid
-  git add scripts src/main/java/example/Change.java
-  git commit -qm baseline
-  git remote add origin "$defer_remote"
-  git push -q -u origin HEAD:main
-  echo 'package example; class Change { int rejected; }' > src/main/java/example/Change.java
-  echo 'package example; class RejectedTest {}' > src/test/java/example/RejectedTest.java
+  git restore --worktree --staged .
+  rm -f .agent-run.json
+  echo 'package example; class Change { int inert; }' > src/main/java/example/Change.java
   cat > .agent-run.json <<'JSON'
 {
-  "runMode":"evolution", "acceptanceSource":"agent",
-  "title":"Rejected fixture", "task":"Exercise deferral.", "why":"Regression coverage.",
-  "summary":"Rejected source.", "observations":"No delta.", "next":"Use the evidence.",
-  "expectedGardenEffect":"Increase beetles.", "pmDirection":"none",
-  "evidence":{"bottleneck":"fixture","currentState":"fixture","verification":"preflight observedDelta 1"},
-  "evaluation":{"metric":"population.BEETLE","goal":"increase","requiredDelta":1},
-  "causalReach":{"mechanism":"global fixture","traits":[],"carrierBasis":"not-applicable","activeCarrierCount":0,"adoptionPath":"not-applicable","estimatedPhaseImpact":"fixture impact 1","clampRisk":"none","previousFeedbackDecision":"none","preflight":{"passed":true,"observedDelta":1}},
-  "codeMap":[{"path":"src/main/java/example/Change.java","description":"Fixture behavior."}],
-  "requests":[], "state":{"immediateDirections":[],"constraints":[]}
+  "runMode":"evolution", "pmDirection":"A", "evaluation":{"metric":"population.BEETLE","goal":"increase","requiredDelta":3},
+  "evidence":{"verification":"Focused tests pass."},
+  "causalReach":{"preflight":{"passed":false,"observedDelta":null}}
 }
 JSON
-  cat > shadow-runs.json <<'JSON'
-[{"seed":17,"requestedSteps":5,"completedSteps":5,"status":"completed","initial":{"total":1,"counts":{"BEETLE":1}},"final":{"total":1,"counts":{"BEETLE":1}},"minimumTotal":1,"maximumTotal":1}]
+  rm -rf target
+  RUNNER_TEMP="$assessment_fixture/target" GITHUB_OUTPUT=assessment-inert.outputs SHADOW_FIXTURE_MODE=inert \
+    scripts/assess-agent-attempt.sh 1 gemini-artifacts baseline-shadow.json result-inert.json >/dev/null
+  grep -Fxq 'accepted=true' assessment-inert.outputs
+  grep -Fxq 'acceptance=experiment' assessment-inert.outputs
+  grep -Fxq 'retry_required=false' assessment-inert.outputs
+  jq -e '.accepted == true and .acceptance == "experiment" and .effectClassification == "inert" and .reason == "accepted-safe-experiment-inert"' result-inert.json >/dev/null
+  jq -e '.causalReach.preflight == {"passed":false,"acceptance":"experiment","safetyPassed":true,"targetPassed":false,"verdict":"inert","observedDelta":0}' .agent-run.json >/dev/null
+
+  git restore --worktree --staged .
+  rm -f .agent-run.json
+  echo 'package example; class Change { int unsafe; }' > src/main/java/example/Change.java
+  cat > .agent-run.json <<'JSON'
+{
+  "runMode":"evolution", "pmDirection":"A", "evaluation":{"metric":"population.BEETLE","goal":"increase","requiredDelta":3},
+  "evidence":{"verification":"Focused tests pass."},
+  "causalReach":{"preflight":{"passed":false,"observedDelta":null}}
+}
 JSON
-  GITHUB_OUTPUT=publish.outputs GITHUB_RUN_ID=12345 GITHUB_RUN_ATTEMPT=2 \
-    bash scripts/publish-rejected-candidate.sh >/dev/null
-  rejected_branch="$(sed -n 's/^branch=//p' publish.outputs)"
-  rejected_commit="$(sed -n 's/^commit=//p' publish.outputs)"
-  [[ "$rejected_branch" == "agent-rejected/12345-2" ]]
-  [[ "$rejected_commit" =~ ^[0-9a-f]{40}$ ]]
-  git --git-dir="$defer_remote" show "${rejected_commit}:src/main/java/example/Change.java" | \
-    grep -Fq 'int rejected'
-  git --git-dir="$defer_remote" show "${rejected_commit}:src/test/java/example/RejectedTest.java" | \
-    grep -Fq 'RejectedTest'
-  if git --git-dir="$defer_remote" cat-file -e "${rejected_commit}:.agent-run.json" 2>/dev/null; then
-    echo "Rejected candidate branch incorrectly included the machine handoff." >&2
-    exit 1
-  fi
-  cat > shadow-result.json <<'JSON'
-{"passed":false,"safetyPassed":true,"targetPassed":false,"metric":"population.BEETLE","goal":"increase","requiredDelta":1,"baselineAverage":1,"candidateAverage":1,"observedDelta":0,"seeds":[17,43]}
-JSON
-  REJECTED_CANDIDATE_BRANCH="$rejected_branch" REJECTED_CANDIDATE_COMMIT="$rejected_commit" \
-    SHADOW_BASELINE_FILE=shadow-runs.json SHADOW_CANDIDATE_FILE=shadow-runs.json \
-    scripts/defer-shadow-rejection.sh shadow-result.json .agent-run.json agent/shadow-feedback.md >/dev/null
-  git diff --quiet -- src/main/java/example/Change.java
-  [[ ! -e src/test/java/example/RejectedTest.java ]]
-  [[ ! -e .agent-run.json ]]
-  grep -Fq '"observedDelta": 0' agent/shadow-feedback.md
-  grep -Fq "Branch: \`${rejected_branch}\`" agent/shadow-feedback.md
-  grep -Fq "Commit: \`${rejected_commit}\`" agent/shadow-feedback.md
-  grep -Fq '## Baseline Shadow Runs' agent/shadow-feedback.md
-  grep -Fq '## Candidate Shadow Runs' agent/shadow-feedback.md
-  grep -Fq '## What Acceptance Required' agent/shadow-feedback.md
-  grep -Fq 'The declared ecological target was missed' agent/shadow-feedback.md
-  if grep -Eq 'codeMap|## Rejected Change Paths|## Rejected Change Summary' agent/shadow-feedback.md; then
-    echo "Compact rejection feedback duplicated source details preserved on the branch." >&2
-    exit 1
-  fi
-  echo 'package example; class Change { int rejected; }' > src/main/java/example/Change.java
-  mkdir -p src/test/java/example
-  echo 'package example; class RejectedTest {}' > src/test/java/example/RejectedTest.java
-  if REPEATED_CANDIDATE_RESULT_FILE=repeated-result.json \
-      scripts/detect-repeated-rejected-candidate.sh agent/shadow-feedback.md shadow-runs.json >/dev/null 2>&1; then
-    echo "An identical previous rejection was not detected." >&2
-    exit 1
-  fi
-  jq -e '.reason == "repeated-previous-rejection" and .previousRejectedCommit == $commit' \
-    --arg commit "$rejected_commit" repeated-result.json >/dev/null
-  jq '.[0].initial.total = 2' shadow-runs.json > changed-shadow-runs.json
-  scripts/detect-repeated-rejected-candidate.sh agent/shadow-feedback.md changed-shadow-runs.json >/dev/null
-  echo 'package example; class Change { int revised; }' > src/main/java/example/Change.java
-  scripts/detect-repeated-rejected-candidate.sh agent/shadow-feedback.md shadow-runs.json >/dev/null
-  git restore src/main/java/example/Change.java
-  rm -f src/test/java/example/RejectedTest.java repeated-result.json changed-shadow-runs.json
-  bash scripts/cleanup-rejected-candidate-branches.sh "$rejected_branch" >/dev/null
-  git ls-remote --exit-code --heads origin "refs/heads/${rejected_branch}" >/dev/null
-  bash scripts/cleanup-rejected-candidate-branches.sh >/dev/null
-  if git ls-remote --exit-code --heads origin "refs/heads/${rejected_branch}" >/dev/null 2>&1; then
-    echo "Consumed rejected candidate branch was not removed." >&2
-    exit 1
-  fi
+  rm -rf target
+  RUNNER_TEMP="$assessment_fixture/target" GITHUB_OUTPUT=assessment-unsafe.outputs SHADOW_FIXTURE_MODE=unsafe \
+    scripts/assess-agent-attempt.sh 1 gemini-artifacts baseline-shadow.json result-unsafe.json >/dev/null
+  grep -Fxq 'accepted=false' assessment-unsafe.outputs
+  grep -Fxq 'reason=candidate-shadow-unsafe-or-unmeasured' assessment-unsafe.outputs
+  jq -e '.accepted == false and .effectClassification == "wrong-direction"' result-unsafe.json >/dev/null
 )
 
 incomplete_fixture="$fixture_root/incomplete-fixture"
@@ -824,7 +712,7 @@ FEEDBACK
   candidate_snapshot="$(GITHUB_RUN_ID=67890 scripts/snapshot-agent-candidate.sh 1)"
   git restore src/main/java/example/Change.java
   cat > attempt-ledger.json <<JSON
-[{"attempt":1,"accepted":false,"retryRequired":true,"substantiveChange":true,"candidateCommit":"${candidate_snapshot}","stageRank":2,"stage":"tests","reason":"candidate-tests-failed","diagnostics":"fixture","shadow":null}]
+[{"attempt":1,"accepted":false,"retryRequired":false,"substantiveChange":true,"candidateCommit":"${candidate_snapshot}","stageRank":2,"stage":"tests","reason":"candidate-tests-failed","diagnostics":"fixture","shadow":null}]
 JSON
   GITHUB_OUTPUT=publish-incomplete.outputs GITHUB_RUN_ID=67890 GITHUB_RUN_ATTEMPT=1 \
     REJECTED_CANDIDATE_SOURCE_COMMIT="$candidate_snapshot" \
@@ -845,7 +733,7 @@ JSON
   grep -Fq 'Branch: `agent-rejected/prior-1`' agent/shadow-feedback.md
   grep -Fq 'Immediate previous attempt marker.' agent/shadow-feedback.md
   grep -Fq '## Latest Incomplete Attempt' agent/shadow-feedback.md
-  grep -Fq '## Bounded Attempt Results' agent/shadow-feedback.md
+  grep -Fq '## Experiment Result' agent/shadow-feedback.md
   grep -Fq 'candidate-tests-failed' agent/shadow-feedback.md
   grep -Fq '## Prior Feedback' agent/shadow-feedback.md
   if grep -Fq '## Subsequent Incomplete Attempt' agent/shadow-feedback.md; then

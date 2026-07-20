@@ -7,8 +7,8 @@ if (( $# != 4 )); then
 fi
 
 attempt="$1"
-if ! [[ "$attempt" =~ ^[123]$ ]]; then
-  echo "ATTEMPT must be 1, 2, or 3." >&2
+if [[ "$attempt" != "1" ]]; then
+  echo "The autonomous experiment workflow supports exactly one attempt per run." >&2
   exit 2
 fi
 artifact_dir="$2"
@@ -19,7 +19,7 @@ mkdir -p "$attempt_dir" "$(dirname "$result_file")"
 
 accepted="false"
 acceptance="none"
-retry_required="true"
+retry_required="false"
 substantive_change="false"
 candidate_commit=""
 candidate_patch_id=""
@@ -122,24 +122,6 @@ if ! AGENT_HANDOFF_ALLOW_UNVERIFIED_PREFLIGHT=true \
   exit 0
 fi
 
-objective_file="${RUNNER_TEMP:-/tmp}/agent-attempt-objective.json"
-current_objective="$attempt_dir/objective.json"
-jq '{runMode, pmDirection, evaluation}' .agent-run.json > "$current_objective"
-if [[ -f "$objective_file" ]]; then
-  if ! jq -e --slurpfile expected "$objective_file" '. == $expected[0]' "$current_objective" >/dev/null; then
-    reason="candidate-objective-changed"
-    {
-      echo "Bounded repairs must keep the original run mode and PM direction."
-      echo "Expected: $(jq -c . "$objective_file")"
-      echo "Received: $(jq -c . "$current_objective")"
-    } > "$diagnostics_file"
-    write_result
-    exit 0
-  fi
-else
-  cp "$current_objective" "$objective_file"
-fi
-
 stage="tests"
 stage_rank="2"
 test_violations="$attempt_dir/test-violations.txt"
@@ -176,31 +158,6 @@ if ! AGENT_HANDOFF_ALLOW_UNVERIFIED_PREFLIGHT=true GITHUB_OUTPUT="$policy_output
 fi
 shadow_policy="$(sed -n 's/^shadow_policy=//p' "$policy_outputs" | head -n 1)"
 
-if [[ "$shadow_policy" == "target" || "$shadow_policy" == "safety" ]]; then
-  stage="repeat-guard"
-  stage_rank="5"
-  repeated_result="$attempt_dir/repeated-result.json"
-  if ! REPEATED_CANDIDATE_RESULT_FILE="$repeated_result" \
-      scripts/detect-repeated-rejected-candidate.sh agent/shadow-feedback.md "$baseline_shadow_file" \
-      > "$diagnostics_file" 2>&1; then
-    reason="repeated-previous-rejection"
-    cp "$repeated_result" "$shadow_result_file" 2>/dev/null || true
-    write_result
-    exit 0
-  fi
-fi
-
-previous_result="${RUNNER_TEMP:-/tmp}/agent-attempt-$(( attempt - 1 )).json"
-if (( attempt > 1 )) && [[ -f "$previous_result" ]] &&
-    [[ "$(jq -r '.stage // ""' "$previous_result")" == "shadow" ]] &&
-    [[ -n "$candidate_patch_id" ]] &&
-    [[ "$candidate_patch_id" == "$(jq -r '.candidatePatchId // ""' "$previous_result")" ]]; then
-  reason="same-run-candidate-unchanged"
-  echo "A shadow-rejected source patch must be causally redesigned before another assessment." > "$diagnostics_file"
-  write_result
-  exit 0
-fi
-
 stage="shadow"
 stage_rank="6"
 case "$shadow_policy" in
@@ -211,7 +168,6 @@ case "$shadow_policy" in
         scripts/evaluate-shadow-candidate.sh "$baseline_shadow_file" .agent-run.json \
           "$attempt_dir/candidate-shadow.json" > "$diagnostics_file" 2>&1; then
       if jq -e '.observedDelta | type == "number"' "$shadow_result_file" >/dev/null 2>&1; then
-        scripts/sync-agent-preflight-handoff.sh "$shadow_result_file" .agent-run.json
         evaluation_goal="$(jq -r '.evaluation.goal' .agent-run.json)"
         observed_delta="$(jq -r '.observedDelta' "$shadow_result_file")"
         case "$evaluation_goal" in
@@ -237,9 +193,8 @@ case "$shadow_policy" in
             effect_classification="wrong-direction"
             ;;
         esac
-        if (( attempt == 3 )) && [[ "$effect_classification" == "partial-progress" ]] &&
-            jq -e '.safetyPassed == true' "$shadow_result_file" >/dev/null; then
-          scripts/sync-agent-preflight-handoff.sh "$shadow_result_file" .agent-run.json partial
+        if jq -e '.safetyPassed == true' "$shadow_result_file" >/dev/null; then
+          scripts/sync-agent-preflight-handoff.sh "$shadow_result_file" .agent-run.json experiment "$effect_classification"
           stage="handoff-final"
           stage_rank="7"
           if ! scripts/validate-agent-handoff.sh .agent-run.json > "$diagnostics_file" 2>&1; then
@@ -248,16 +203,16 @@ case "$shadow_policy" in
             exit 0
           fi
           accepted="true"
-          acceptance="partial"
+          acceptance="experiment"
           retry_required="false"
           stage="accepted"
           stage_rank="8"
-          reason="accepted-partial-progress"
+          reason="accepted-safe-experiment-${effect_classification}"
           write_result
           exit 0
         fi
       fi
-      reason="candidate-shadow-${effect_classification}"
+      reason="candidate-shadow-unsafe-or-unmeasured"
       write_result
       exit 0
     fi

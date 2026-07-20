@@ -50,9 +50,9 @@ trap 'rm -f "$temporary_feedback" "$prior_feedback"' EXIT
   echo "## Latest Incomplete Attempt"
   echo
   if [[ -n "$candidate_branch" && -n "$candidate_commit" ]]; then
-    echo "The bounded autonomous attempt sequence left a substantive candidate but did not pass validation. The best candidate was preserved for assessment on the next run; it was removed from main and no garden tick occurred."
+    echo "The single autonomous experiment left a substantive candidate but failed a hard validity, test, policy, measurement, or safety gate. The candidate was preserved for assessment on the next run; it was removed from main and no garden tick occurred."
   else
-    echo "The bounded autonomous attempt sequence did not leave both a valid handoff and a publishable substantive candidate. No garden tick occurred, and unvalidated worktree changes were removed from main."
+    echo "The single autonomous experiment did not leave both a valid handoff and a publishable safe candidate. No garden tick occurred, and unvalidated worktree changes were removed from main."
   fi
   echo
   echo "- Reason: ${reason}"
@@ -60,7 +60,7 @@ trap 'rm -f "$temporary_feedback" "$prior_feedback"' EXIT
     echo "- Handoff validation: ${handoff_validation_reason}"
   fi
   if [[ -f "$attempt_ledger_file" ]] && jq -e 'type == "array"' "$attempt_ledger_file" >/dev/null 2>&1; then
-    echo "- Attempts completed: $(jq 'length' "$attempt_ledger_file") of 3"
+    echo "- Agent calls completed: $(jq 'length' "$attempt_ledger_file") of 1"
   fi
   if [[ -n "$candidate_branch" && -n "$candidate_commit" ]]; then
     echo
@@ -99,9 +99,9 @@ trap 'rm -f "$temporary_feedback" "$prior_feedback"' EXIT
     echo
   fi
   if [[ -f "$attempt_ledger_file" ]] && jq -e 'type == "array"' "$attempt_ledger_file" >/dev/null 2>&1; then
-    echo "## Bounded Attempt Results"
+    echo "## Experiment Result"
     echo
-    echo "Each repair received the preceding deterministic failure and retained the same ecological objective and acceptance criteria. Zero-effect and wrong-direction results require a different causal mechanism. The preserved candidate is the substantive attempt that reached the highest validation stage."
+    echo "This source did not satisfy the hard executable contract. Inspect the exact failure before deciding whether to revise or abandon the preserved candidate. Safe target misses are committed normally and do not appear in this section."
     echo
     echo '```json'
     jq '[.[] | {attempt, accepted, acceptance, substantiveChange, candidateCommit, candidatePatchId, effectClassification, stage, reason, shadow}]' "$attempt_ledger_file"

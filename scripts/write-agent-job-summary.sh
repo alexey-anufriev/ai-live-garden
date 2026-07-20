@@ -49,10 +49,8 @@ metadata_value() {
   echo "| Baseline worktree policy | $(value_or_dash "${BASELINE_POLICY_OUTCOME:-}") |"
   echo "| Observation window | $(value_or_dash "${OBSERVATION_WINDOW_OUTCOME:-}") |"
   echo "| Gemini autonomous step | $(value_or_dash "${GEMINI_OUTCOME:-}") |"
-  echo "| Gemini bounded repair attempt 2 | $(value_or_dash "${GEMINI_REPAIR_2_OUTCOME:-}") |"
-  echo "| Gemini bounded repair attempt 3 | $(value_or_dash "${GEMINI_REPAIR_3_OUTCOME:-}") |"
-  echo "| Candidate attempts completed | $(value_or_dash "${AGENT_ATTEMPTS_COMPLETED:-}") / 3 |"
-  echo "| Attempt resolution | accepted=$(value_or_dash "${AGENT_ATTEMPT_ACCEPTED:-}"); class=$(value_or_dash "${AGENT_ATTEMPT_ACCEPTANCE:-}"); exhausted=$(value_or_dash "${AGENT_ATTEMPT_EXHAUSTED:-}") |"
+  echo "| Agent calls completed | $(value_or_dash "${AGENT_ATTEMPTS_COMPLETED:-}") / 1 |"
+  echo "| Experiment resolution | accepted=$(value_or_dash "${AGENT_ATTEMPT_ACCEPTED:-}"); class=$(value_or_dash "${AGENT_ATTEMPT_ACCEPTANCE:-}"); exhausted=$(value_or_dash "${AGENT_ATTEMPT_EXHAUSTED:-}") |"
   echo "| Protected file restore | $(value_or_dash "${RESTORE_PROTECTED_OUTCOME:-}") |"
   echo "| Gemini primary output inspection | $(value_or_dash "${GEMINI_PRIMARY_INSPECT_OUTCOME:-}") |"
   echo "| Incomplete agent feedback | $(value_or_dash "${AGENT_INCOMPLETE_FEEDBACK_OUTCOME:-}") |"
@@ -64,7 +62,7 @@ metadata_value() {
   echo "| Post-Gemini test validation | $(value_or_dash "${POST_TEST_OUTCOME:-}") |"
   echo "| Run mode / shadow policy | $(value_or_dash "${AGENT_RUN_MODE:-}") / $(value_or_dash "${AGENT_SHADOW_POLICY:-}") |"
   echo "| Candidate validation | $(value_or_dash "${CANDIDATE_VALIDATION_OUTCOME:-}") |"
-  echo "| Accepted partial-progress feedback | $(value_or_dash "${PARTIAL_PROGRESS_FEEDBACK_OUTCOME:-}") |"
+  echo "| Experiment verdict | $(value_or_dash "${EXPERIMENT_VERDICT_OUTCOME:-}") |"
   echo "| Consumed candidate branch cleanup | $(value_or_dash "${CONSUMED_REJECTED_CANDIDATE_CLEANUP_OUTCOME:-}") |"
   echo "| Garden state advance | $(value_or_dash "${ADVANCE_GARDEN_OUTCOME:-}") |"
   echo "| Automated memory generation | $(value_or_dash "${AUTO_MEMORY_OUTCOME:-}") |"
@@ -107,18 +105,18 @@ metadata_value() {
     echo "The run failed while inspecting Gemini output for plan-mode/no-op behavior."
   elif [[ "${AGENT_INCOMPLETE_FEEDBACK_OUTCOME:-}" == "success" ]]; then
     if [[ "${INCOMPLETE_CANDIDATE_PUBLISH_OUTCOME:-}" == "success" ]]; then
-      echo "All bounded candidate attempts were exhausted. The best substantive source was preserved on a rejected-candidate branch, and the structured attempt ledger was committed for the next run."
+      echo "The single experiment was unsafe or invalid. Its substantive source was preserved on a rejected-candidate branch, and the structured evidence was committed for the next run."
     else
-      echo "All bounded candidate attempts were exhausted without a publishable candidate. Their structured evidence was committed for the next run and unvalidated residue was removed."
+      echo "The single experiment was unsafe or invalid and had no publishable candidate. Its structured evidence was committed for the next run and unvalidated residue was removed."
     fi
   elif [[ "${EXTRACT_AGENT_HANDOFF_OUTCOME:-}" == "failure" ]]; then
     echo "The run failed because Gemini did not leave a valid \`.agent-run.json\` file or marked handoff JSON in its output."
   elif [[ "${AGENT_HANDOFF_OUTCOME:-}" == "failure" ]]; then
     echo "The run failed because Gemini did not leave a valid \`.agent-run.json\` handoff."
-  elif [[ "${AGENT_ATTEMPT_ACCEPTANCE:-}" == "partial" && "${COMMIT_OUTCOME:-}" == "success" ]]; then
-    echo "PARTIAL_PROGRESS: the safe candidate moved its metric in the correct direction, was merged after the final bounded attempt, and left measured continuity feedback for the next run."
+  elif [[ "${EXPERIMENT_VERDICT_OUTCOME:-}" == "success" && "${COMMIT_OUTCOME:-}" == "success" ]]; then
+    echo "The safe experiment was committed with its measured verdict. The next run receives that verdict and must keep, revise, or revert the current implementation using new evidence."
   elif [[ "${POST_TEST_OUTCOME:-}" == "failure" ]]; then
-    echo "Post-Gemini Maven validation failed. The workflow intentionally commits the failed baseline and deterministic memory so the next autonomous run starts with repair."
+    echo "Post-assessment Maven validation failed. The candidate was not committed because tests are a hard safety gate."
   elif [[ "${AUTO_MEMORY_OUTCOME:-}" == "failure" ]]; then
     echo "The run failed while generating deterministic memory artifacts."
   elif [[ "${SUMMARY_APPEND_ONLY_OUTCOME:-}" == "failure" ]]; then
@@ -130,7 +128,7 @@ metadata_value() {
   elif [[ "${AGENT_WORKTREE_SEVERITY:-}" == "hard" ]]; then
     echo "The run failed because the final worktree contained hard policy violations that cannot be safely committed as repair input."
   elif [[ "${AGENT_WORKTREE_SEVERITY:-}" == "deferred" ]]; then
-    echo "Final worktree policy found repairable source-quality violations. The workflow intentionally commits them so the next autonomous run starts with repair."
+    echo "Final worktree policy found source-quality violations. The candidate was not committed."
   elif [[ "${COMMIT_OUTCOME:-}" == "success" ]]; then
     echo "The run reached the commit step."
   else

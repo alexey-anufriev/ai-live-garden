@@ -40,7 +40,7 @@ if ! scripts/capture-shadow-simulation.sh "$candidate_file" >/dev/null; then
     }
   ' > "$result_file"
   cat "$result_file"
-  echo "Candidate shadow capture failed; the autonomous change was rejected." >&2
+  echo "Candidate shadow capture failed; the autonomous change could not be safely measured." >&2
   exit 1
 fi
 
@@ -99,7 +99,7 @@ jq -n \
 
 cat "$result_file"
 if ! jq -e '.passed == true' "$result_file" >/dev/null; then
-  echo "Candidate shadow evaluation rejected the autonomous change." >&2
+  echo "Candidate shadow evaluation did not meet the complete target-and-safety contract." >&2
   exit 1
 fi
 

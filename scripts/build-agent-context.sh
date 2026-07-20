@@ -266,13 +266,13 @@ append_baseline_shadow_result() {
     .maximumTotal
   ] | "| " + (map(tostring) | join(" | ")) + " |"' "$baseline_shadow_file"
   echo
-  echo "### Shadow Acceptance Contract"
+  echo "### Shadow Evaluation Contract"
   echo
   echo "- Baseline and candidate start from the same committed state, use the same seeds, and run the same bounded number of ticks."
   echo "- CI averages the declared final metric across seeds for each side, then calculates \`observedDelta = candidateAverage - baselineAverage\`."
   echo "- \`increase\` passes only when \`observedDelta >= requiredDelta\`; \`decrease\` passes only when \`observedDelta <= -requiredDelta\`; \`preserve\` passes only when \`abs(observedDelta) <= requiredDelta\`."
   echo "- Target validation also requires safety: every candidate run must complete, remain within the population bounds, and preserve every critical population that existed at the baseline final state."
-  echo "- Full acceptance meets the declared target. After the final bounded attempt, a safe nonzero delta in the requested direction may be merged as measured partial progress; it leaves continuity feedback for the next run. Zero delta, wrong direction, unsafe results, preserve-target misses, and identical previous rejections are rejected and preserved on an \`agent-rejected/\` branch."
+  echo "- The target classifies impact; it is not a merge gate. Safe coherent code is committed with a \`target-met\`, \`partial-progress\`, \`inert\`, or \`wrong-direction\` verdict for the next run. Invalid, unmeasured, test-failing, policy-violating, or unsafe candidates remain off main and may be preserved on an \`agent-rejected/\` branch."
   echo "- Never invent a shadow result. If you run the preflight, report baseline-to-candidate delta, never only initial-to-final movement within one simulation. CI independently reruns the executable candidate contract and writes its authoritative differential evidence into an accepted evolution handoff."
   echo
   echo "Before finalizing an evolution run: write the proposed evaluation into \`.agent-run.json\`, run \`scripts/run-maven-tests-with-timeout.sh\`, then, when time permits, run \`SHADOW_EVALUATION_RESULT_FILE=target/agent-preflight-result.json scripts/evaluate-shadow-candidate.sh target/agent-baseline-shadow.json .agent-run.json target/agent-candidate-shadow.json\`. Set preflight to false/null until measured. CI always repeats this contract and synchronizes the authoritative result. For safety-only modes add \`SHADOW_EVALUATION_POLICY=safety\`; skip this preflight for test-only repair and diagnostic modes."
@@ -283,7 +283,7 @@ append_shadow_feedback() {
   echo "## Previous Autonomous Feedback"
   echo
   if [[ -f "$shadow_feedback_file" ]]; then
-    echo "A previous attempt exists and is supplied in full below. This is mandatory decision input, not optional history. Before selecting work, inspect the preserved commit when one is listed and decide explicitly to reuse, revise, or abandon its hypothesis. State that decision and its evidence in \`evidence.bottleneck\` or \`observations\`. Do not repeat the same diff or causal approach unchanged. The same diff against the same baseline context is deterministically rejected before shadow simulation."
+    echo "A previous experiment verdict or invalid-candidate report is supplied in full below. This is mandatory decision input, not optional history. If it is a verdict, the evaluated code is already on main; inspect it and decide explicitly to reuse, revise, or abandon it. If a preserved branch is listed, inspect that exact commit. State the decision and evidence in \`evidence.bottleneck\` or \`observations\`. Inert or wrong-direction code should normally be corrected or reverted before adding a disconnected mechanism."
     echo
     sed -n '1,$p' "$shadow_feedback_file"
   else
@@ -420,7 +420,7 @@ append_compact_journal_entry() {
   echo "- When Ecological Outcome History reports stagnation, use a bottleneck-first change: reproduce the blocker from the current persisted population, identify the active gate, and fix that gate with a focused behavior test. Do not add or tune another named trait unless current organisms carry it or the change includes a credible adoption path."
   echo "- A passing unit test proves the modeled rule, not impact on the living state. Report both current-state evidence and the behavioral verification in the handoff."
   echo "- Evolution handoffs must include \`causalReach\`. Declare exact trait names and their actual committed carrier count, or use \`carrierBasis=adoption\` with a concrete acquisition path, or \`not-applicable\` for a global non-trait mechanism. Estimate the phase impact against the dominant competing term and identify clamp risk."
-  echo "- Evolution runs declare one measurable ecological shadow target in \`evaluation\`. Prefer a truthful task-specific target with \`acceptanceSource=agent\` and the smallest nontrivial delta that proves causal reach in this bounded window. The PM default is a desired fallback outcome, not a mandatory merge threshold; use it exactly only with \`acceptanceSource=pm\`. CI locks the first valid evaluation, so repairs cannot lower it after seeing a result."
+  echo "- Evolution runs declare one measurable ecological shadow target in \`evaluation\`. Prefer a truthful task-specific target with \`acceptanceSource=agent\` and the smallest nontrivial delta that proves causal reach in this bounded window. The PM default is a desired fallback outcome, not a mandatory merge threshold; use it exactly only with \`acceptanceSource=pm\`. The target is declared before measurement and classifies the result; safe code is not discarded merely for missing it."
   echo "- CI derives validation from \`runMode\`: evolution uses target plus safety; production repair, recovery, and eligible maintenance use safety only; test-only repair and diagnostic work skip shadow simulation. Only evolution and recovery advance the persistent garden."
   echo "- For an evolution run, use the Baseline Shadow Simulation section as the acceptance baseline and declare a truthful evaluation. Run the exact candidate preflight when possible; otherwise leave preflight false/null. The harness measures and writes the authoritative delta before acceptance. A measured zero delta requires a different direct mechanism, not a larger constant on the same path. Unit tests alone are not ecological validation."
   echo "- You have god-mode recovery authority when persisted state causes runaway growth, timeouts, corruption, or prevents autonomous recovery. You may deterministically rebalance, cull, reseed, migrate, or directly repair \`data/garden-state.txt\`; prefer the program's \`recover\` command, preserve ecological roles, add an explanatory event, and report before/after counts."
@@ -541,7 +541,7 @@ append_compact_journal_entry() {
 JSON
   echo
   echo "Do not wrap the actual \`.agent-run.json\` file in Markdown fences. Do not wrap the final marked JSON block in Markdown fences either."
-  echo "For evolution, populate \`causalReach\` truthfully. Use \`scripts/count-garden-trait-carriers.sh TRAIT\`; a zero-carrier trait requires \`carrierBasis=adoption\` and a concrete acquisition path in the same change. Set preflight to \`passed=false\` and \`observedDelta=null\` until measured; never guess. CI independently runs the shadow contract, synchronizes the measured result into the handoff, and requests a bounded repair when the target misses."
+  echo "For evolution, populate \`causalReach\` truthfully. Use \`scripts/count-garden-trait-carriers.sh TRAIT\`; a zero-carrier trait requires \`carrierBasis=adoption\` and a concrete acquisition path in the same change. Set preflight to \`passed=false\` and \`observedDelta=null\` until measured; never guess. CI independently runs the shadow contract, synchronizes the measured result into the handoff, commits safe coherent code, and records its verdict for the next run."
   echo
   echo "## Current Agent Memory"
   echo

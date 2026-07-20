@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if (( $# < 2 )); then
-  echo "Usage: $0 LEDGER_FILE ATTEMPT_RESULT [...]" >&2
+if (( $# != 2 )); then
+  echo "Usage: $0 LEDGER_FILE ATTEMPT_RESULT" >&2
   exit 2
 fi
 
@@ -29,8 +29,9 @@ substantive_change="$(jq -r '.substantiveChange' "$latest_result")"
 stage="$(jq -r '.stage' "$latest_result")"
 reason="$(jq -r '.reason' "$latest_result")"
 effect_classification="$(jq -r '.effectClassification // "unmeasured"' "$latest_result")"
-exhausted="false"
-if [[ "$accepted" != "true" && "$attempts_completed" -ge 3 ]]; then
+if [[ "$accepted" == "true" ]]; then
+  exhausted="false"
+else
   exhausted="true"
 fi
 best_candidate_commit="$(jq -r '
@@ -60,4 +61,4 @@ if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
   } >> "$GITHUB_OUTPUT"
 fi
 
-echo "Agent attempts resolved: completed=${attempts_completed}, accepted=${accepted}, acceptance=${acceptance}, exhausted=${exhausted}, stage=${stage}, reason=${reason}, effect=${effect_classification}, bestCandidateAttempt=${best_candidate_attempt}."
+echo "Agent experiment resolved: accepted=${accepted}, acceptance=${acceptance}, exhausted=${exhausted}, stage=${stage}, reason=${reason}, effect=${effect_classification}."
