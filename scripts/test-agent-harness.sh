@@ -5,6 +5,16 @@ repository_root="$(cd "$(dirname "$0")/.." && pwd)"
 fixture_root="$(mktemp -d)"
 trap 'rm -rf "$fixture_root"' EXIT
 
+assert_contains() {
+  local expected="$1"
+  local file="$2"
+
+  if ! grep -Fq "$expected" "$file"; then
+    echo "Expected ${file} to contain: ${expected}" >&2
+    return 1
+  fi
+}
+
 workflow_file="$repository_root/.github/workflows/evolve.yml"
 while IFS= read -r workflow_script; do
   if [[ ! -f "$repository_root/$workflow_script" ]]; then
@@ -57,6 +67,13 @@ prompt_metadata="$fixture_root/agent-context.metadata"
 prompt_outputs="$fixture_root/prompt.outputs"
 baseline_shadow="$fixture_root/baseline-shadow.json"
 shadow_feedback="$fixture_root/shadow-feedback.md"
+prompt_plans="$fixture_root/prompt-plans"
+mkdir -p "$prompt_plans"
+cat > "$prompt_plans/2026-01-02.md" <<'PLAN'
+# Fixture Garden Direction
+
+### A. Exercise the legacy plan prompt
+PLAN
 cat > "$baseline_shadow" <<'JSON'
 [
   {
@@ -91,6 +108,8 @@ FEEDBACK
     AGENT_BASELINE_SHADOW_FILE="$baseline_shadow" \
     AGENT_BASELINE_SHADOW_OUTCOME=success \
     AGENT_SHADOW_FEEDBACK_FILE="$shadow_feedback" \
+    AGENT_PM_PLANS_DIR="$prompt_plans" \
+    AGENT_PM_REFERENCE_DATE=2026-01-02 \
     GARDEN_OUTCOME_HISTORY_LIMIT=1 \
     scripts/build-agent-context.sh "$prompt_context"
   PATH=/usr/bin:/bin GITHUB_OUTPUT="$prompt_outputs" \
@@ -107,13 +126,36 @@ grep -Fq 'observedDelta = candidateAverage - baselineAverage' "$prompt_outputs"
 grep -Fq 'mandatory decision input, not optional history' "$prompt_outputs"
 grep -Fq '## Current Causal Reach Diagnostics' "$prompt_outputs"
 grep -Fq 'causalReach' "$prompt_outputs"
-grep -Fq 'legacy plan has no machine-readable acceptance sidecar' "$prompt_outputs"
+assert_contains 'legacy plan has no machine-readable acceptance sidecar' "$prompt_outputs"
 grep -Fq 'AGENT_CONTEXT_BYTES=' "$prompt_metadata"
 grep -Fq "AGENT_CONTEXT_BASELINE_SHADOW_FILE=${baseline_shadow}" "$prompt_metadata"
 grep -Fq 'AGENT_CONTEXT_BASELINE_SHADOW_OUTCOME=success' "$prompt_metadata"
 grep -Fq "AGENT_CONTEXT_SHADOW_FEEDBACK_FILE=${shadow_feedback}" "$prompt_metadata"
 prompt_delimiter="$(sed -n '1s/^text<<//p' "$prompt_outputs")"
 [[ "$(tail -n 1 "$prompt_outputs")" == "$prompt_delimiter" ]]
+
+cat > "$prompt_plans/2026-01-02.json" <<'JSON'
+{"directions":[{"label":"A","shadowAcceptance":{"metric":"nutrients","goal":"increase","requiredDelta":1}}]}
+JSON
+structured_prompt_context="$fixture_root/structured-agent-context.md"
+(
+  cd "$repository_root"
+  AGENT_CONTEXT_METADATA_FILE="$fixture_root/structured-agent-context.metadata" \
+    AGENT_CONTEXT_RECENT_JOURNAL_LIMIT=1 \
+    AGENT_BASELINE_SHADOW_FILE="$baseline_shadow" \
+    AGENT_BASELINE_SHADOW_OUTCOME=success \
+    AGENT_SHADOW_FEEDBACK_FILE="$shadow_feedback" \
+    AGENT_PM_PLANS_DIR="$prompt_plans" \
+    AGENT_PM_REFERENCE_DATE=2026-01-02 \
+    GARDEN_OUTCOME_HISTORY_LIMIT=1 \
+    scripts/build-agent-context.sh "$structured_prompt_context"
+)
+assert_contains "set \`acceptanceSource=pm\` only when using the plan sidecar's default shadow acceptance exactly" \
+  "$structured_prompt_context"
+if grep -Fq 'legacy plan has no machine-readable acceptance sidecar' "$structured_prompt_context"; then
+  echo "Structured PM plan context incorrectly used the legacy-plan instruction." >&2
+  exit 1
+fi
 
 causal_state="$fixture_root/causal-state.txt"
 cat > "$causal_state" <<'STATE'
