@@ -1,0 +1,96 @@
+{
+  "antiPatterns": [
+    "Supporting further predator population growth while nutrients are critically low.",
+    "Ignoring the disparity between active nutrients (9) and the nutrient buffer (100).",
+    "Focusing on population expansion traits while the ecological network is failing to sustain existing density."
+  ],
+  "date": "2026-07-20",
+  "directions": [
+    {
+      "acceptanceSignal": "Fox population growth rate slows down significantly.",
+      "avoid": "Traits that improve predator efficiency or reproductive rate.",
+      "expectedGardenEffect": "Stabilization or decrease in fox population growth rate.",
+      "label": "A",
+      "shadowAcceptance": {
+        "goal": "decrease",
+        "metric": "population.FOX",
+        "requiredDelta": 100
+      },
+      "title": "Limit Fox Metabolic Over-Exploitation",
+      "why": "The current population size is over-taxing the ecosystem."
+    },
+    {
+      "acceptanceSignal": "Active nutrient levels increase steadily toward 20+.",
+      "avoid": "Traits that increase consumer consumption rates.",
+      "expectedGardenEffect": "Increase in active nutrient levels.",
+      "label": "B",
+      "shadowAcceptance": {
+        "goal": "increase",
+        "metric": "nutrients",
+        "requiredDelta": 5
+      },
+      "title": "Accelerate Nutrient Buffer Release",
+      "why": "The buffer (100) is full while nutrients are low (9); the system bottleneck is conversion."
+    },
+    {
+      "acceptanceSignal": "Improved nutrient regeneration rate observed in population snapshots.",
+      "avoid": "Focusing on fungal biomass growth at the expense of decomposition rate.",
+      "expectedGardenEffect": "Increased rate of energy conversion into the nutrient pool.",
+      "label": "C",
+      "shadowAcceptance": {
+        "goal": "preserve",
+        "metric": "totalOrganisms",
+        "requiredDelta": 0
+      },
+      "title": "Enhance Fungal Decomposition Efficiency",
+      "why": "Fungal foundation needs better throughput to sustain the energy requirements of the current predator density."
+    },
+    {
+      "acceptanceSignal": "Beetle population stabilizes above 150.",
+      "avoid": "Traits that heavily increase predation pressure on beetles.",
+      "expectedGardenEffect": "Steady, resilient beetle population numbers.",
+      "label": "D",
+      "shadowAcceptance": {
+        "goal": "increase",
+        "metric": "population.BEETLE",
+        "requiredDelta": 10
+      },
+      "title": "Beetle Population Stabilization",
+      "why": "Beetle population (140) is declining, threatening the primary prey base for the now-massive fox population."
+    }
+  ],
+  "review": {
+    "overallMark": "partially achieved",
+    "previousPlanDate": "2026-07-19",
+    "results": [
+      {
+        "evidence": "Nutrient levels remain low (9); the buffer (100) is under-utilized despite the massive growth in consumer population.",
+        "label": "A",
+        "mark": "not achieved"
+      },
+      {
+        "evidence": "Fungal/Root networks remain stable, but nutrient cycling throughput is insufficient for current population levels.",
+        "label": "B",
+        "mark": "partially achieved"
+      },
+      {
+        "evidence": "Fox population exploded from 1634 to 3434, the opposite of metabolic stability.",
+        "label": "C",
+        "mark": "not achieved"
+      },
+      {
+        "evidence": "Beetle population declined slightly from 181 to 140, indicating stress in the prey population.",
+        "label": "D",
+        "mark": "partially achieved"
+      }
+    ],
+    "summary": "Fox population grew explosively (doubled from 1634 to 3434), surpassing all stability goals. Nutrient levels improved slightly (3 to 9) but remain critically low. Beetle population declined from 181 to 140, indicating instability in the prey base."
+  },
+  "stateSignals": [
+    "Fox population 3434 (massive growth)",
+    "Nutrients 9 (critically low)",
+    "NutrientBuffer 100 (untapped)",
+    "Beetle population 140 (declining)"
+  ],
+  "thesis": "The fox population has reached an unsustainable level (3434) relative to the critically low nutrient pool (9). To prevent a catastrophic system crash, we must shift focus from supporting expansion to enforcing metabolic constraint on predators, accelerating the release of the abundant nutrient buffer (100) into the active pool, and bolstering the foundational decomposer (Fungus) network."
+}
