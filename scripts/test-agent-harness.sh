@@ -16,6 +16,12 @@ assert_contains() {
 }
 
 workflow_file="$repository_root/.github/workflows/evolve.yml"
+for serialized_workflow in evolve.yml tick.yml pm.yml story.yml; do
+  serialized_workflow_file="$repository_root/.github/workflows/$serialized_workflow"
+  assert_contains 'group: ai-live-garden-main' "$serialized_workflow_file"
+  assert_contains 'ref: ${{ github.ref_name }}' "$serialized_workflow_file"
+done
+
 while IFS= read -r workflow_script; do
   if [[ ! -f "$repository_root/$workflow_script" ]]; then
     echo "Workflow references a missing shell script: ${workflow_script}" >&2
