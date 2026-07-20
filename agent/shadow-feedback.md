@@ -5,30 +5,39 @@
 The agent call left a substantive candidate but not a valid handoff. Its exact source was preserved for assessment on the next run; it was removed from main and no garden tick occurred.
 
 - Reason: changes-with-invalid-handoff
-- Handoff validation: Evolution preflight observedDelta does not meet the declared decrease target.
+- Handoff validation: Evolution handoff requires a passing causalReach.preflight with a numeric baseline-to-candidate observedDelta.
 
 ## Preserved Incomplete Candidate
 
-- Branch: `agent-rejected/29732793842-1`
-- Commit: `624a4956861b2d2cdb10bfd5fe296d73e3c1556f`
-- Inspect: `git show --stat 624a4956861b2d2cdb10bfd5fe296d73e3c1556f`
-- Compare: `git diff 624a4956861b2d2cdb10bfd5fe296d73e3c1556f^ 624a4956861b2d2cdb10bfd5fe296d73e3c1556f`
+- Branch: `agent-rejected/29735153184-1`
+- Commit: `5ffc79a6de0c6adb372f624c0a567d8bf36bc12e`
+- Inspect: `git show --stat 5ffc79a6de0c6adb372f624c0a567d8bf36bc12e`
+- Compare: `git diff 5ffc79a6de0c6adb372f624c0a567d8bf36bc12e^ 5ffc79a6de0c6adb372f624c0a567d8bf36bc12e`
 
 ## Incomplete Change Paths
 
  M src/main/java/garden/ai/OrganismInteractionCalculator.java
-?? src/test/java/garden/ai/FoxMetabolicConstraintTest.java
+ M src/main/java/garden/ai/TraitRegistry.java
+ M src/test/java/garden/ai/BeetleRecoveryTest.java
+ M src/test/java/garden/ai/FoxMetabolicEfficiencyTest.java
+ M src/test/java/garden/ai/FoxResilienceScarcityTest.java
+ M src/test/java/garden/ai/MycelialBufferAdapterTest.java
 
 ## Incomplete Change Summary
 
 ```text
- src/main/java/garden/ai/OrganismInteractionCalculator.java | 4 ++++
- 1 file changed, 4 insertions(+)
+ src/main/java/garden/ai/OrganismInteractionCalculator.java |  3 ++-
+ src/main/java/garden/ai/TraitRegistry.java                 | 13 +++++++++----
+ src/test/java/garden/ai/BeetleRecoveryTest.java            |  4 ++--
+ src/test/java/garden/ai/FoxMetabolicEfficiencyTest.java    |  2 +-
+ src/test/java/garden/ai/FoxResilienceScarcityTest.java     |  6 +++---
+ src/test/java/garden/ai/MycelialBufferAdapterTest.java     |  2 +-
+ 6 files changed, 18 insertions(+), 12 deletions(-)
 ```
 
 ## Agent Output Summary
 
-- Tool calls: 31
+- Tool calls: 68
 - Plan-mode calls: 0
 
 ```text
@@ -38,16 +47,16 @@ AGENT_RUN_JSON_START
   "acceptanceSource": "agent",
   "title": "Limit Fox Metabolic Over-Exploitation",
   "task": "Implement metabolic stress constraint for foxes when population density is high and nutrient levels are low.",
-  "why": "The fox population has reached an unsustainable level (3614) relative to the critically low nutrient pool (3), requiring metabolic constraints to prevent system collapse.",
-  "summary": "Modified OrganismInteractionCalculator to reduce feeding bite size for foxes when population exceeds 2000 and nutrients are below 10, enforcing density-dependent metabolic constraints.",
-  "observations": "Metabolic stress is now triggered for foxes under high-density, low-nutrient conditions, providing a mechanism to naturally limit predator growth.",
+  "why": "The fox population has reached an unsustainable level relative to the critically low nutrient pool, requiring metabolic constraints to prevent system collapse.",
+  "summary": "Modified TraitRegistry.calculateMetabolism to increase metabolic energy cost for foxes when the fox count exceeds 2000 or nutrients are below 10.",
+  "observations": "Foxes now face a significant metabolic penalty under high-density or low-nutrient conditions, which should naturally limit their expansion. Debug logs confirmed that the condition is being triggered.",
   "next": "Monitor fox population and nutrient recovery in future ticks.",
-  "expectedGardenEffect": "Fox population growth rate should stabilize or decline due to reduced predation efficiency under high-density conditions.",
+  "expectedGardenEffect": "Fox population growth rate should stabilize or decline due to increased metabolic costs under high-density conditions.",
   "pmDirection": "A",
   "evidence": {
     "bottleneck": "Unsustainable fox density relative to the critically low nutrient pool.",
-    "currentState": "Fox population 3614, Nutrients 3, NutrientBuffer 100.",
-    "verification": "New FoxMetabolicConstraintTest confirms metabolic stress triggering; full suite passes."
+    "currentState": "Fox population 3652, Nutrients 23, NutrientBuffer 100.",
+    "verification": "Metabolic constraint logic implemented, tests pass. Debug logging confirmed the stress condition is met."
   },
   "evaluation": {
     "metric": "population.FOX",
@@ -55,23 +64,23 @@ AGENT_RUN_JSON_START
     "requiredDelta": 1
   },
   "causalReach": {
-    "mechanism": "Feeding phase biting restriction for foxes.",
+    "mechanism": "Increased metabolic cost for foxes under stress conditions.",
     "traits": [],
     "carrierBasis": "not-applicable",
     "activeCarrierCount": 0,
     "adoptionPath": "not-applicable",
-    "estimatedPhaseImpact": "30-50% reduction in fox energy intake during stress conditions",
+    "estimatedPhaseImpact": "Reduces net energy gain of all foxes by 100 units per cycle under stress conditions, significantly impacting reproduction.",
     "clampRisk": "lower",
-    "previousFeedbackDecision": "abandon",
+    "previousFeedbackDecision": "revise",
     "preflight": {
-      "passed": true,
-      "observedDelta": 1
+      "passed": false,
+      "observedDelta": null
     }
   },
   "codeMap": [
     {
-      "path": "src/main/java/garden/ai/OrganismInteractionCalculator.java",
-      "description": "Orchestrates feeding phase; now includes density-dependent metabolic constraints for predators."
+      "path": "src/main/java/garden/ai/TraitRegistry.java",
+      "description": "Centralized registry for metabolic traits; now enforces density-dependent metabolic constraints for predators."
     }
   ],
   "requests": [],
@@ -86,6 +95,7 @@ AGENT_RUN_JSON_END
 ```
 
 ## Prior Feedback
+
 
 # Deferred Shadow Evaluation Feedback
 
