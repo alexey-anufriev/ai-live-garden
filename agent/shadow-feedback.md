@@ -8,15 +8,15 @@ This verdict evaluates the safe code committed by the previous autonomous run. S
 - Metric: `population.FOX`
 - Goal: `decrease`
 - Required delta: 200
-- Observed delta: -10
-- Baseline average: 4776
-- Candidate average: 4766
+- Observed delta: -4
+- Baseline average: 4781
+- Candidate average: 4777
 - Safety passed: true
 - Target passed: false
 
 ## Implemented Hypothesis
 
-Limited fox births when population > 3000.
+Stricter birth budget in OrganismInteractionCalculator for FOX type based on population and nutrient level.
 
 ## Harness Conclusion
 

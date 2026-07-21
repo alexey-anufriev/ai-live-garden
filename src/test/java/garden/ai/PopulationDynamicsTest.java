@@ -82,6 +82,22 @@ class PopulationDynamicsTest {
     }
 
     @Test
+    void foxBirthBudgetDependsOnNutrients() {
+        // High fox population, low nutrients -> limited birth budget
+        Environment lowNutrients = new Environment(100, 100, 100, 10, 100);
+        List<Organism> organisms = new ArrayList<>();
+        for (int i = 0; i < 2500; i++) {
+            organisms.add(Organism.of("fox-" + i, OrganismType.FOX, 50, 1));
+        }
+        
+        assertThat(OrganismInteractionCalculator.typeBirthBudget(OrganismType.FOX, organisms, lowNutrients)).isEqualTo(1);
+        
+        // High fox population, high nutrients -> normal birth budget
+        Environment highNutrients = new Environment(100, 100, 100, 80, 100);
+        assertThat(OrganismInteractionCalculator.typeBirthBudget(OrganismType.FOX, organisms, highNutrients)).isEqualTo(6);
+    }
+
+    @Test
     void foxBirthBudgetDependsOnPopulation() {
         Environment env = new Environment(100, 100, 100, 100, 100);
         List<Organism> organisms = new ArrayList<>();
@@ -90,7 +106,7 @@ class PopulationDynamicsTest {
             organisms.add(Organism.of("fox-" + i, OrganismType.FOX, 50, 1));
         }
         
-        assertThat(OrganismInteractionCalculator.typeBirthBudget(OrganismType.FOX, organisms, env)).isEqualTo(1);
+        assertThat(OrganismInteractionCalculator.typeBirthBudget(OrganismType.FOX, organisms, env)).isEqualTo(0);
         
         // 2000 foxes
         organisms = new ArrayList<>();
