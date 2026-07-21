@@ -63,6 +63,9 @@ metadata_value() {
   echo "| Run mode / shadow policy | $(value_or_dash "${AGENT_RUN_MODE:-}") / $(value_or_dash "${AGENT_SHADOW_POLICY:-}") |"
   echo "| Candidate validation | $(value_or_dash "${CANDIDATE_VALIDATION_OUTCOME:-}") |"
   echo "| Experiment verdict | $(value_or_dash "${EXPERIMENT_VERDICT_OUTCOME:-}") |"
+  echo "| Journal path synchronization | $(value_or_dash "${JOURNAL_SYNC_OUTCOME:-}") |"
+  echo "| Accepted finalization | complete=$(value_or_dash "${ACCEPTED_FINALIZATION_COMPLETE:-}"); reason=$(value_or_dash "${ACCEPTED_FINALIZATION_REASON:-}") |"
+  echo "| Accepted fallback commit | $(value_or_dash "${ACCEPTED_FALLBACK_COMMIT_OUTCOME:-}") |"
   echo "| Consumed candidate branch cleanup | $(value_or_dash "${CONSUMED_REJECTED_CANDIDATE_CLEANUP_OUTCOME:-}") |"
   echo "| Garden state advance | $(value_or_dash "${ADVANCE_GARDEN_OUTCOME:-}") |"
   echo "| Automated memory generation | $(value_or_dash "${AUTO_MEMORY_OUTCOME:-}") |"
@@ -113,6 +116,8 @@ metadata_value() {
     echo "The run failed because Gemini did not leave a valid \`.agent-run.json\` file or marked handoff JSON in its output."
   elif [[ "${AGENT_HANDOFF_OUTCOME:-}" == "failure" ]]; then
     echo "The run failed because Gemini did not leave a valid \`.agent-run.json\` handoff."
+  elif [[ "${ACCEPTED_FALLBACK_COMMIT_OUTCOME:-}" == "success" ]]; then
+    echo "The source candidate had already passed its executable contract. A later tick or generated-memory failure was rolled back, while the accepted source and measured verdict were committed for the next run."
   elif [[ "${EXPERIMENT_VERDICT_OUTCOME:-}" == "success" && "${COMMIT_OUTCOME:-}" == "success" ]]; then
     echo "The safe experiment was committed with its measured verdict. The next run receives that verdict and must keep, revise, or revert the current implementation using new evidence."
   elif [[ "${POST_TEST_OUTCOME:-}" == "failure" ]]; then

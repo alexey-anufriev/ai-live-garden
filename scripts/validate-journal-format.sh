@@ -46,7 +46,7 @@ changed_paths_for_journal() {
   } | sort -u |
     while IFS= read -r path; do
       case "$path" in
-        agent/journal/archive/*)
+        agent/journal/archive/*|agent/last-run.md)
           ;;
         *)
           printf '%s\n' "$path"

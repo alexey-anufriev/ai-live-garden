@@ -49,11 +49,19 @@ grep -Fq 'id: validation_policy' "$workflow_file"
 grep -Fq 'id: candidate_validation' "$workflow_file"
 grep -Fq 'id: prepare_experiment_verdict' "$workflow_file"
 grep -Fq 'id: record_experiment_verdict' "$workflow_file"
+grep -Fq 'id: snapshot_accepted_handoff' "$workflow_file"
+grep -Fq 'id: sync_agent_journal' "$workflow_file"
+grep -Fq 'id: accepted_finalization' "$workflow_file"
+grep -Fq 'id: commit_accepted_fallback' "$workflow_file"
 grep -Fq 'id: cleanup_consumed_rejected_candidates' "$workflow_file"
 grep -Fq 'run: scripts/defer-agent-incomplete.sh' "$workflow_file"
 grep -Fq 'run: scripts/publish-rejected-candidate.sh' "$workflow_file"
 grep -Fq 'run: scripts/record-agent-verdict.sh' "$workflow_file"
+grep -Fq 'run: scripts/sync-agent-journal-paths.sh' "$workflow_file"
+grep -Fq 'run: scripts/resolve-agent-finalization.sh' "$workflow_file"
+grep -Fq 'scripts/prepare-accepted-candidate-fallback.sh \' "$workflow_file"
 grep -Fq 'run: scripts/cleanup-rejected-candidate-branches.sh' "$workflow_file"
+grep -Fq "steps.candidate_validation.outcome == 'success' && steps.accepted_finalization.outputs.complete != 'true'" "$workflow_file"
 grep -Fq "vars.AGENT_EXECUTION_MODEL || 'gemini-3.1-flash-lite'" "$workflow_file"
 grep -Fq "steps.harness_contracts.outcome == 'success'" "$workflow_file"
 grep -Fq "steps.setup_java.outcome == 'success'" "$workflow_file"
@@ -745,6 +753,160 @@ JSON
   grep -Fq 'partial agent response' agent/shadow-feedback.md
   scripts/cleanup-rejected-candidate-branches.sh "$incomplete_branch" agent-rejected/prior-1 >/dev/null
   git ls-remote --exit-code --heads origin "refs/heads/${incomplete_branch}" >/dev/null
+)
+
+journal_sync_fixture="$fixture_root/journal-sync-fixture"
+mkdir -p "$journal_sync_fixture/scripts" "$journal_sync_fixture/src/main/java/example" \
+  "$journal_sync_fixture/agent/journal" "$journal_sync_fixture/agent"
+cp "$repository_root/scripts/sync-agent-journal-paths.sh" \
+  "$repository_root/scripts/validate-journal-format.sh" "$journal_sync_fixture/scripts/"
+chmod +x "$journal_sync_fixture/scripts/"*.sh
+(
+  cd "$journal_sync_fixture"
+  git init -q
+  git config user.name fixture
+  git config user.email fixture@example.invalid
+  echo 'package example; class Change {}' > src/main/java/example/Change.java
+  echo '# Previous verdict' > agent/shadow-feedback.md
+  echo '# Previous status' > agent/last-run.md
+  git add .
+  git commit -qm baseline
+  echo 'package example; class Change { int accepted; }' > src/main/java/example/Change.java
+  echo '# Current verdict' > agent/shadow-feedback.md
+  cat > agent/journal/0001-fixture.md <<'JOURNAL'
+# Accepted fixture
+
+## Timestamp
+
+2026-07-21T12:00:00Z
+
+## Chosen task
+
+Preserve the accepted fixture.
+
+## Why this task was chosen
+
+It verifies final-path synchronization.
+
+## Files changed
+
+- `src/main/java/example/Change.java`
+
+## Checks run
+
+- `mvn test`
+
+## Result of `mvn test`
+
+Passed.
+
+## Observations
+
+The final verdict is generated after the journal.
+
+## Possible next directions
+
+Continue from the measured verdict.
+JOURNAL
+  scripts/sync-agent-journal-paths.sh >/dev/null
+  grep -Fq '`agent/shadow-feedback.md`' agent/journal/0001-fixture.md
+  grep -Fq '`agent/journal/0001-fixture.md`' agent/journal/0001-fixture.md
+  grep -Fq '`src/main/java/example/Change.java`' agent/journal/0001-fixture.md
+  echo '# Current operational status' > agent/last-run.md
+  JOURNAL_MVN_TEST_OUTCOME=success scripts/validate-journal-format.sh >/dev/null
+  if grep -Fq '`agent/last-run.md`' agent/journal/0001-fixture.md; then
+    echo 'Operational last-run status must not enter the experiment journal path contract.' >&2
+    exit 1
+  fi
+)
+
+finalization_fixture="$fixture_root/finalization-fixture"
+mkdir -p "$finalization_fixture"
+(
+  cd "$finalization_fixture"
+  GITHUB_OUTPUT=complete.outputs \
+    AGENT_RUN_MODE=evolution AGENT_ADVANCE_GARDEN=true \
+    SNAPSHOT_HANDOFF_OUTCOME=success PREPARE_VERDICT_OUTCOME=success \
+    ADVANCE_GARDEN_OUTCOME=success AUTO_MEMORY_OUTCOME=success \
+    RECORD_VERDICT_OUTCOME=success SYNC_JOURNAL_OUTCOME=success \
+    REQUIRED_MEMORY_OUTCOME=success JOURNAL_FORMAT_OUTCOME=success \
+    SUMMARY_FORMAT_OUTCOME=success SUMMARY_APPEND_ONLY_OUTCOME=success \
+    ARCHIVE_JOURNAL_OUTCOME=success ARCHIVE_SUMMARIES_OUTCOME=success \
+    AGENT_WORKTREE_OUTCOME=success AGENT_WORKTREE_SEVERITY=clean \
+    "$repository_root/scripts/resolve-agent-finalization.sh" >/dev/null
+  grep -Fxq 'complete=true' complete.outputs
+  GITHUB_OUTPUT=fallback.outputs \
+    AGENT_RUN_MODE=evolution AGENT_ADVANCE_GARDEN=true \
+    SNAPSHOT_HANDOFF_OUTCOME=success PREPARE_VERDICT_OUTCOME=success \
+    ADVANCE_GARDEN_OUTCOME=success AUTO_MEMORY_OUTCOME=success \
+    RECORD_VERDICT_OUTCOME=success SYNC_JOURNAL_OUTCOME=success \
+    REQUIRED_MEMORY_OUTCOME=success JOURNAL_FORMAT_OUTCOME=failure \
+    SUMMARY_FORMAT_OUTCOME=skipped SUMMARY_APPEND_ONLY_OUTCOME=skipped \
+    ARCHIVE_JOURNAL_OUTCOME=skipped ARCHIVE_SUMMARIES_OUTCOME=skipped \
+    AGENT_WORKTREE_OUTCOME=skipped AGENT_WORKTREE_SEVERITY=missing \
+    "$repository_root/scripts/resolve-agent-finalization.sh" >/dev/null
+  grep -Fxq 'complete=false' fallback.outputs
+  grep -Fq 'JOURNAL_FORMAT_OUTCOME=failure' fallback.outputs
+)
+
+fallback_fixture="$fixture_root/accepted-fallback-fixture"
+fallback_inputs="$fixture_root/accepted-fallback-inputs"
+mkdir -p "$fallback_fixture/scripts" "$fallback_fixture/src/main/java/example" \
+  "$fallback_fixture/src/test/java/example" "$fallback_fixture/data" \
+  "$fallback_fixture/agent/journal" "$fallback_fixture/agent/summaries/daily" "$fallback_fixture/agent" \
+  "$fallback_inputs"
+cp "$repository_root/scripts/prepare-accepted-candidate-fallback.sh" \
+  "$repository_root/scripts/snapshot-agent-candidate.sh" \
+  "$repository_root/scripts/agent-substantive-changes.sh" \
+  "$repository_root/scripts/record-agent-verdict.sh" "$fallback_fixture/scripts/"
+chmod +x "$fallback_fixture/scripts/"*.sh
+(
+  cd "$fallback_fixture"
+  git init -q
+  git config user.name fixture
+  git config user.email fixture@example.invalid
+  echo 'package example; class Change {}' > src/main/java/example/Change.java
+  echo 'cycle=1' > data/garden-state.txt
+  echo '# Baseline README' > README.md
+  echo '# Older feedback' > agent/shadow-feedback.md
+  git add .
+  git commit -qm baseline
+  echo 'package example; class Change { int accepted; }' > src/main/java/example/Change.java
+  echo 'package example; class AcceptedTest {}' > src/test/java/example/AcceptedTest.java
+  candidate_commit="$(GITHUB_RUN_ID=777 scripts/snapshot-agent-candidate.sh 1)"
+  cat > "$fallback_inputs/accepted-agent-run.json" <<'JSON'
+{
+  "runMode":"evolution", "pmDirection":"A",
+  "evaluation":{"metric":"population.BEETLE","goal":"increase","requiredDelta":1},
+  "causalReach":{"mechanism":"Accepted fixture mechanism."}
+}
+JSON
+  cat > "$fallback_inputs/attempt-ledger.json" <<'JSON'
+[{"accepted":true,"acceptance":"experiment","effectClassification":"inert","shadow":{"safetyPassed":true,"targetPassed":false,"observedDelta":0,"baselineAverage":2,"candidateAverage":2}}]
+JSON
+  scripts/record-agent-verdict.sh "$fallback_inputs/attempt-ledger.json" \
+    "$fallback_inputs/accepted-agent-run.json" "$fallback_inputs/prepared-verdict.md" >/dev/null
+  echo 'cycle=4' > data/garden-state.txt
+  echo '# Generated README' > README.md
+  echo '# Generated journal' > agent/journal/0001-generated.md
+  echo '# Generated summary' > agent/summaries/daily/2026-07-21.md
+  echo 'must not survive' > root-scratch.txt
+  echo '{}' > .agent-run.json
+  AGENT_FINALIZATION_REASON='JOURNAL_FORMAT_OUTCOME=failure' \
+    scripts/prepare-accepted-candidate-fallback.sh "$candidate_commit" evolution \
+      "$fallback_inputs/attempt-ledger.json" "$fallback_inputs/accepted-agent-run.json" \
+      "$fallback_inputs/prepared-verdict.md" >/dev/null
+  grep -Fq 'int accepted' src/main/java/example/Change.java
+  grep -Fq 'class AcceptedTest' src/test/java/example/AcceptedTest.java
+  grep -Fxq 'cycle=1' data/garden-state.txt
+  grep -Fxq '# Baseline README' README.md
+  [[ ! -e agent/journal/0001-generated.md ]]
+  [[ ! -e agent/summaries/daily/2026-07-21.md ]]
+  [[ ! -e root-scratch.txt ]]
+  [[ ! -e .agent-run.json ]]
+  grep -Fq 'Classification: `inert`' agent/shadow-feedback.md
+  grep -Fq 'JOURNAL_FORMAT_OUTCOME=failure' agent/shadow-feedback.md
+  scripts/agent-substantive-changes.sh | grep -Fq 'src/main/java/example/Change.java'
 )
 
 observation_fixture="$fixture_root/observation-fixture"

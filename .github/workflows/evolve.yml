@@ -248,20 +248,30 @@ jobs:
         shell: bash
         run: echo "Candidate accepted as ${{ steps.attempt_resolution.outputs.acceptance }} progress by the authoritative attempt assessment."
 
+      - name: Snapshot accepted handoff for finalization recovery
+        id: snapshot_accepted_handoff
+        if: ${{ !cancelled() && steps.candidate_validation.outcome == 'success' }}
+        continue-on-error: true
+        shell: bash
+        run: cp .agent-run.json "${RUNNER_TEMP}/accepted-agent-run.json"
+
       - name: Prepare experiment verdict for the next run
         id: prepare_experiment_verdict
-        if: ${{ !cancelled() && steps.candidate_validation.outcome == 'success' && steps.validation_policy.outputs.run_mode == 'evolution' }}
+        if: ${{ !cancelled() && steps.snapshot_accepted_handoff.outcome == 'success' && steps.validation_policy.outputs.run_mode == 'evolution' }}
+        continue-on-error: true
         shell: bash
-        run: scripts/record-agent-verdict.sh "${RUNNER_TEMP}/agent-attempt-ledger.json" .agent-run.json "${RUNNER_TEMP}/agent-shadow-feedback.md"
+        run: scripts/record-agent-verdict.sh "${RUNNER_TEMP}/agent-attempt-ledger.json" "${RUNNER_TEMP}/accepted-agent-run.json" "${RUNNER_TEMP}/agent-shadow-feedback.md"
 
       - name: Advance persistent garden state
         id: advance_garden
         if: ${{ !cancelled() && steps.candidate_validation.outcome == 'success' && steps.validation_policy.outputs.advance_garden == 'true' }}
+        continue-on-error: true
         run: mvn -B -q exec:java -Dexec.args="tick --steps 3"
 
       - name: Generate memory artifacts
         id: auto_memory
-        if: ${{ !cancelled() && steps.candidate_validation.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.candidate_validation.outcome == 'success' && (steps.advance_garden.outcome == 'success' || steps.advance_garden.outcome == 'skipped') }}
+        continue-on-error: true
         shell: bash
         env:
           AGENT_BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
@@ -271,12 +281,21 @@ jobs:
       - name: Record experiment verdict for the next run
         id: record_experiment_verdict
         if: ${{ !cancelled() && steps.auto_memory.outcome == 'success' && steps.prepare_experiment_verdict.outcome == 'success' }}
+        continue-on-error: true
         shell: bash
         run: mv "${RUNNER_TEMP}/agent-shadow-feedback.md" agent/shadow-feedback.md
 
+      - name: Synchronize generated journal with final paths
+        id: sync_agent_journal
+        if: ${{ !cancelled() && steps.auto_memory.outcome == 'success' && (steps.record_experiment_verdict.outcome == 'success' || steps.validation_policy.outputs.run_mode != 'evolution') }}
+        continue-on-error: true
+        shell: bash
+        run: scripts/sync-agent-journal-paths.sh
+
       - name: Validate required memory updates
         id: required_memory_final
-        if: ${{ !cancelled() && steps.auto_memory.outcome == 'success' && (steps.record_experiment_verdict.outcome == 'success' || steps.validation_policy.outputs.run_mode != 'evolution') }}
+        if: ${{ !cancelled() && steps.sync_agent_journal.outcome == 'success' }}
+        continue-on-error: true
         shell: bash
         env:
           POST_TEST_OUTCOME: ${{ steps.post_test_final.outcome }}
@@ -287,6 +306,7 @@ jobs:
       - name: Validate journal format
         id: journal_format_final
         if: ${{ !cancelled() && steps.required_memory_final.outcome == 'success' }}
+        continue-on-error: true
         shell: bash
         env:
           JOURNAL_MVN_TEST_OUTCOME: ${{ steps.post_test_final.outcome }}
@@ -296,6 +316,7 @@ jobs:
       - name: Validate summary format
         id: summary_format_final
         if: ${{ !cancelled() && steps.journal_format_final.outcome == 'success' }}
+        continue-on-error: true
         shell: bash
         env:
           VALIDATE_REPAIR_VIOLATIONS_FILE: ${{ runner.temp }}/summary-format-violations.txt
@@ -304,6 +325,7 @@ jobs:
       - name: Validate append-only summaries
         id: summary_append_only_final
         if: ${{ !cancelled() && steps.summary_format_final.outcome == 'success' }}
+        continue-on-error: true
         shell: bash
         env:
           SUMMARY_APPEND_ONLY_VIOLATIONS_FILE: ${{ runner.temp }}/summary-append-only-violations.txt
@@ -312,12 +334,14 @@ jobs:
       - name: Archive old journal entries
         id: archive_journal
         if: ${{ !cancelled() && steps.summary_append_only_final.outcome == 'success' }}
+        continue-on-error: true
         shell: bash
         run: scripts/archive-journal.sh
 
       - name: Archive old summary files
         id: archive_summaries
         if: ${{ !cancelled() && steps.archive_journal.outcome == 'success' }}
+        continue-on-error: true
         shell: bash
         run: scripts/archive-summaries.sh
 
@@ -333,13 +357,29 @@ jobs:
           AGENT_BASELINE_POLICY_OUTCOME: ${{ steps.baseline_policy.outcome }}
         run: scripts/validate-agent-worktree.sh
 
-      - name: Fail on hard final worktree policy
-        if: ${{ !cancelled() && steps.agent_worktree_final.outputs.severity == 'hard' }}
+      - name: Resolve accepted candidate finalization
+        id: accepted_finalization
+        if: ${{ !cancelled() && steps.candidate_validation.outcome == 'success' }}
+        continue-on-error: true
         shell: bash
-        run: |
-          echo "Hard agent worktree policy violations cannot be committed as autonomous repair input."
-          cat "${RUNNER_TEMP}/agent-worktree-violations.txt"
-          exit 1
+        env:
+          AGENT_RUN_MODE: ${{ steps.validation_policy.outputs.run_mode }}
+          AGENT_ADVANCE_GARDEN: ${{ steps.validation_policy.outputs.advance_garden }}
+          SNAPSHOT_HANDOFF_OUTCOME: ${{ steps.snapshot_accepted_handoff.outcome }}
+          PREPARE_VERDICT_OUTCOME: ${{ steps.prepare_experiment_verdict.outcome }}
+          ADVANCE_GARDEN_OUTCOME: ${{ steps.advance_garden.outcome }}
+          AUTO_MEMORY_OUTCOME: ${{ steps.auto_memory.outcome }}
+          RECORD_VERDICT_OUTCOME: ${{ steps.record_experiment_verdict.outcome }}
+          SYNC_JOURNAL_OUTCOME: ${{ steps.sync_agent_journal.outcome }}
+          REQUIRED_MEMORY_OUTCOME: ${{ steps.required_memory_final.outcome }}
+          JOURNAL_FORMAT_OUTCOME: ${{ steps.journal_format_final.outcome }}
+          SUMMARY_FORMAT_OUTCOME: ${{ steps.summary_format_final.outcome }}
+          SUMMARY_APPEND_ONLY_OUTCOME: ${{ steps.summary_append_only_final.outcome }}
+          ARCHIVE_JOURNAL_OUTCOME: ${{ steps.archive_journal.outcome }}
+          ARCHIVE_SUMMARIES_OUTCOME: ${{ steps.archive_summaries.outcome }}
+          AGENT_WORKTREE_OUTCOME: ${{ steps.agent_worktree_final.outcome }}
+          AGENT_WORKTREE_SEVERITY: ${{ steps.agent_worktree_final.outputs.severity }}
+        run: scripts/resolve-agent-finalization.sh
 
       - name: Collect failure diagnostics
         id: collect_failure_diagnostics
@@ -369,7 +409,8 @@ jobs:
 
       - name: Record workflow check status
         id: record_workflow_status
-        if: ${{ !cancelled() && (steps.agent_worktree_final.outputs.severity == 'clean' || steps.agent_worktree_final.outputs.severity == 'deferred') }}
+        if: ${{ !cancelled() && steps.accepted_finalization.outputs.complete == 'true' }}
+        continue-on-error: true
         shell: bash
         env:
           BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
@@ -402,22 +443,40 @@ jobs:
 
       - name: Collect change diagnostics
         id: collect_change_diagnostics
-        if: ${{ !cancelled() && steps.record_workflow_status.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.accepted_finalization.outputs.complete == 'true' }}
+        continue-on-error: true
         shell: bash
         run: scripts/collect-agent-change-diagnostics.sh "${{ runner.temp }}/agent-change-diagnostics.md"
 
       - name: Commit changes directly to main
         id: commit_changes
-        if: ${{ !cancelled() && steps.collect_change_diagnostics.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.accepted_finalization.outputs.complete == 'true' }}
         shell: bash
         env:
           COMMIT_MESSAGE_PREFIX: "feat: autonomous garden evolution"
           COMMIT_TIMESTAMP_FORMAT: "%Y-%m-%dT%H:%MZ"
         run: scripts/commit-if-changed.sh .
 
+      - name: Preserve accepted candidate after finalization failure
+        id: commit_accepted_fallback
+        if: ${{ !cancelled() && steps.candidate_validation.outcome == 'success' && steps.accepted_finalization.outputs.complete != 'true' }}
+        shell: bash
+        env:
+          AGENT_FINALIZATION_REASON: accepted-finalization=${{ steps.accepted_finalization.outcome }}; ${{ steps.accepted_finalization.outputs.reason }}
+          COMMIT_MESSAGE_PREFIX: "feat: autonomous garden evolution"
+          COMMIT_TIMESTAMP_FORMAT: "%Y-%m-%dT%H:%MZ"
+        run: |
+          scripts/prepare-accepted-candidate-fallback.sh \
+            "${{ steps.attempt_resolution.outputs.best_candidate_commit }}" \
+            "${{ steps.validation_policy.outputs.run_mode }}" \
+            "${RUNNER_TEMP}/agent-attempt-ledger.json" \
+            "${RUNNER_TEMP}/accepted-agent-run.json" \
+            "${RUNNER_TEMP}/agent-shadow-feedback.md"
+          scripts/commit-if-changed.sh .
+
       - name: Clean consumed rejected candidate branches
         id: cleanup_consumed_rejected_candidates
-        if: ${{ !cancelled() && steps.commit_changes.outcome == 'success' && (steps.record_experiment_verdict.outcome == 'success' || steps.validation_policy.outputs.run_mode != 'evolution') }}
+        if: ${{ !cancelled() && (steps.commit_changes.outcome == 'success' || steps.commit_accepted_fallback.outcome == 'success') }}
         shell: bash
         run: scripts/cleanup-rejected-candidate-branches.sh || echo "::warning::Rejected candidate branch cleanup will be retried by a later run."
 
@@ -446,6 +505,10 @@ jobs:
           AGENT_SHADOW_POLICY: ${{ steps.validation_policy.outputs.shadow_policy }}
           CANDIDATE_VALIDATION_OUTCOME: ${{ steps.candidate_validation.outcome }}
           EXPERIMENT_VERDICT_OUTCOME: ${{ steps.record_experiment_verdict.outcome }}
+          JOURNAL_SYNC_OUTCOME: ${{ steps.sync_agent_journal.outcome }}
+          ACCEPTED_FINALIZATION_COMPLETE: ${{ steps.accepted_finalization.outputs.complete }}
+          ACCEPTED_FINALIZATION_REASON: ${{ steps.accepted_finalization.outputs.reason }}
+          ACCEPTED_FALLBACK_COMMIT_OUTCOME: ${{ steps.commit_accepted_fallback.outcome }}
           CONSUMED_REJECTED_CANDIDATE_CLEANUP_OUTCOME: ${{ steps.cleanup_consumed_rejected_candidates.outcome }}
           ADVANCE_GARDEN_OUTCOME: ${{ steps.advance_garden.outcome }}
           AUTO_MEMORY_OUTCOME: ${{ steps.auto_memory.outcome }}
