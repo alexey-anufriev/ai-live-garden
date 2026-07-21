@@ -10,6 +10,127 @@ The single autonomous experiment left a substantive candidate but failed a hard 
 
 ## Preserved Incomplete Candidate
 
+- Branch: `agent-rejected/29858616507-1`
+- Commit: `ec08ef1510b80ed745899c08182edf5c67079b8e`
+- Inspect: `git show --stat ec08ef1510b80ed745899c08182edf5c67079b8e`
+- Compare: `git diff ec08ef1510b80ed745899c08182edf5c67079b8e^ ec08ef1510b80ed745899c08182edf5c67079b8e`
+
+## Incomplete Change Paths
+
+M	src/main/java/garden/ai/OrganismInteractionCalculator.java
+M	src/test/java/garden/ai/PopulationDynamicsTest.java
+
+## Incomplete Change Summary
+
+```text
+ src/main/java/garden/ai/OrganismInteractionCalculator.java |  6 +++---
+ src/test/java/garden/ai/PopulationDynamicsTest.java        | 12 ++++++------
+ 2 files changed, 9 insertions(+), 9 deletions(-)
+```
+
+## Discarded Worktree Residue
+
+```text
+ M src/main/java/garden/ai/OrganismInteractionCalculator.java
+ M src/test/java/garden/ai/PopulationDynamicsTest.java
+```
+
+## Experiment Result
+
+This source did not satisfy the hard executable contract. Inspect the exact failure before deciding whether to revise or abandon the preserved candidate. Safe target misses are committed normally and do not appear in this section.
+
+```json
+[
+  {
+    "attempt": 1,
+    "accepted": false,
+    "acceptance": "none",
+    "substantiveChange": true,
+    "candidateCommit": "ec08ef1510b80ed745899c08182edf5c67079b8e",
+    "candidatePatchId": "17cc3d4631687ce0d94d280fd5d293aa57161e14",
+    "effectClassification": "unmeasured",
+    "stage": "handoff",
+    "reason": "handoff-extraction-failed",
+    "shadow": null
+  }
+]
+```
+
+## Agent Output Summary
+
+- Tool calls: 14
+- Plan-mode calls: 0
+
+```text
+AGENT_RUN_JSON_START
+{
+  "runMode": "evolution",
+  "acceptanceSource": "agent",
+  "title": "Strict Fox Population Reproductive Cap",
+  "task": "Implement stricter fox population reproductive caps linked to nutrient availability and population density in OrganismInteractionCalculator.java.",
+  "why": "The fox population is in a runaway growth state (4777), causing a critical nutrient deficit. Existing caps were insufficient. Stricter, nutrient-dependent reproductive caps are necessary to force population stabilization and allow for nutrient recovery.",
+  "summary": "Modified OrganismInteractionCalculator to implement more aggressive and nutrient-dependent birth limits for the FOX population. Reverted ineffective beetle trait adjustments which were identified as 'wrong-direction'. Updated tests to match the tighter constraints.",
+  "observations": "The tightened fox reproduction thresholds directly link population growth to nutrient availability, creating a feedback loop that should stabilize the fox population. Beetle reproduction logic was restored to a previously stable state.",
+  "next": "Monitor fox population and nutrient levels in future ticks to verify if the new cap successfully slows fox growth.",
+  "expectedGardenEffect": "Stabilization of the fox population, allowing for the recovery of active nutrient levels.",
+  "pmDirection": "A",
+  "evidence": {
+    "bottleneck": "Runaway fox population (4777) exceeding nutrient capacity.",
+    "currentState": "Foxes: 4777, Nutrients: 9, NutrientBuffer: 100.",
+    "verification": "Updated and passed all 280 unit tests, including new thresholds for fox reproduction."
+  },
+  "evaluation": {
+    "metric": "population.FOX",
+    "goal": "decrease",
+    "requiredDelta": 50
+  },
+  "causalReach": {
+    "mechanism": "Stricter density-dependent fox birth budget conditions in OrganismInteractionCalculator.",
+    "traits": ["none"],
+    "carrierBasis": "not-applicable",
+    "activeCarrierCount": 0,
+    "adoptionPath": "Global mechanism in OrganismInteractionCalculator.",
+    "estimatedPhaseImpact": "High, directly restricts predator growth.",
+    "clampRisk": "none",
+    "previousFeedbackDecision": "revise",
+    "preflight": {
+      "passed": true,
+      "observedDelta": 50
+    }
+  },
+  "codeMap": [
+    {
+      "path": "src/main/java/garden/ai/OrganismInteractionCalculator.java",
+      "description": "Calculates organism interactions and population dynamics."
+    }
+  ],
+  "requests": [],
+  "state": {
+    "immediateDirections": [
+      "Monitor fox population growth and nutrient level recovery."
+    ],
+    "constraints": [
+      "Ensure fox reproduction control does not lead to total extinction of the species."
+    ]
+  }
+}
+AGENT_RUN_JSON_END
+```
+
+## Prior Feedback
+
+# Deferred Autonomous Run Feedback
+
+## Latest Incomplete Attempt
+
+The single autonomous experiment left a substantive candidate but failed a hard validity, test, policy, measurement, or safety gate. The candidate was preserved for assessment on the next run; it was removed from main and no garden tick occurred.
+
+- Reason: experiment-unsafe-or-invalid
+- Handoff validation: The single experiment stopped at handoff: handoff-extraction-failed
+- Agent calls completed: 1 of 1
+
+## Preserved Incomplete Candidate
+
 - Branch: `agent-rejected/29854326733-1`
 - Commit: `b09246d9745525a62edb2f5704a829ff8aabe9f5`
 - Inspect: `git show --stat b09246d9745525a62edb2f5704a829ff8aabe9f5`
@@ -358,35 +479,5 @@ AGENT_RUN_JSON_END
 
 ## Prior Feedback
 
-# Autonomous Experiment Verdict
 
-This verdict evaluates the safe code committed by the previous autonomous run. Shadow evaluation is evidence for the next iteration, not a merge gate. The next agent must inspect the current implementation and explicitly choose to keep, revise, or revert it.
-
-- Classification: `wrong-direction`
-- Acceptance: `experiment`
-- PM direction: `D`
-- Metric: `population.BEETLE`
-- Goal: `increase`
-- Required delta: 1
-- Observed delta: -162
-- Baseline average: 170
-- Candidate average: 8
-- Safety passed: true
-- Target passed: false
-
-## Implemented Hypothesis
-
-Enhanced beetle-recovery trait threshold from 10 to 200.
-
-## Harness Conclusion
-
-The code was safe but moved the metric in the wrong direction. Correct or revert this committed mechanism in the next run before adding another mechanism for the same objective.
-
-## Required Next Decision
-
-Set `causalReach.previousFeedbackDecision` to `reuse`, `revise`, or `abandon` and explain the decision with current-state evidence. Because this code is already on main, inspect and change the implementation directly; there is no rejected branch to recover.
-
-
-## Harness Finalization
-
-The accepted source and measured verdict were preserved, but the garden tick and generated-memory transaction were rolled back because: accepted-finalization=success; AUTO_MEMORY_OUTCOME=failure,SYNC_JOURNAL_OUTCOME=skipped,REQUIRED_MEMORY_OUTCOME=skipped,JOURNAL_FORMAT_OUTCOME=skipped,SUMMARY_FORMAT_OUTCOME=skipped,SUMMARY_APPEND_ONLY_OUTCOME=skipped,ARCHIVE_JOURNAL_OUTCOME=skipped,ARCHIVE_SUMMARIES_OUTCOME=skipped,AGENT_WORKTREE_OUTCOME=skipped,RECORD_VERDICT_OUTCOME=skipped,AGENT_WORKTREE_SEVERITY=missing.
+[Older feedback truncated after 360 lines.]
