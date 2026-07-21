@@ -2,6 +2,155 @@
 
 ## Latest Incomplete Attempt
 
+The single autonomous experiment left a substantive candidate but failed a hard validity, test, policy, measurement, or safety gate. The candidate was preserved for assessment on the next run; it was removed from main and no garden tick occurred.
+
+- Reason: experiment-unsafe-or-invalid
+- Handoff validation: The single experiment stopped at handoff: handoff-extraction-failed
+- Agent calls completed: 1 of 1
+
+## Preserved Incomplete Candidate
+
+- Branch: `agent-rejected/29819568350-1`
+- Commit: `26ec2e3b802aa09797919bcad419fdef2fb82e39`
+- Inspect: `git show --stat 26ec2e3b802aa09797919bcad419fdef2fb82e39`
+- Compare: `git diff 26ec2e3b802aa09797919bcad419fdef2fb82e39^ 26ec2e3b802aa09797919bcad419fdef2fb82e39`
+
+## Incomplete Change Paths
+
+M	src/main/java/garden/ai/Environment.java
+M	src/main/java/garden/ai/GardenRenderer.java
+M	src/main/java/garden/ai/OrganismInteractionCalculator.java
+M	src/test/java/garden/ai/EnvironmentTest.java
+M	src/test/java/garden/ai/GardenTest.java
+M	src/test/java/garden/ai/NutrientMobilizerTest.java
+M	src/test/java/garden/ai/PlantBreakdownTest.java
+
+## Incomplete Change Summary
+
+```text
+ src/main/java/garden/ai/Environment.java           | 26 +++++++++++-----------
+ src/main/java/garden/ai/GardenRenderer.java        |  3 ++-
+ .../garden/ai/OrganismInteractionCalculator.java   |  2 +-
+ src/test/java/garden/ai/EnvironmentTest.java       |  8 +++----
+ src/test/java/garden/ai/GardenTest.java            |  6 ++---
+ src/test/java/garden/ai/NutrientMobilizerTest.java |  4 ++--
+ src/test/java/garden/ai/PlantBreakdownTest.java    | 10 ++++-----
+ 7 files changed, 30 insertions(+), 29 deletions(-)
+```
+
+## Discarded Worktree Residue
+
+```text
+ M src/main/java/garden/ai/Environment.java
+ M src/main/java/garden/ai/GardenRenderer.java
+ M src/main/java/garden/ai/OrganismInteractionCalculator.java
+ M src/test/java/garden/ai/EnvironmentTest.java
+ M src/test/java/garden/ai/GardenTest.java
+ M src/test/java/garden/ai/NutrientMobilizerTest.java
+ M src/test/java/garden/ai/PlantBreakdownTest.java
+```
+
+## Experiment Result
+
+This source did not satisfy the hard executable contract. Inspect the exact failure before deciding whether to revise or abandon the preserved candidate. Safe target misses are committed normally and do not appear in this section.
+
+```json
+[
+  {
+    "attempt": 1,
+    "accepted": false,
+    "acceptance": "none",
+    "substantiveChange": true,
+    "candidateCommit": "26ec2e3b802aa09797919bcad419fdef2fb82e39",
+    "candidatePatchId": "a39cacbf37374bb71a5d6793f8bdefde02385b4f",
+    "effectClassification": "unmeasured",
+    "stage": "handoff",
+    "reason": "handoff-extraction-failed",
+    "shadow": null
+  }
+]
+```
+
+## Agent Output Summary
+
+- Tool calls: 35
+- Plan-mode calls: 0
+
+```text
+I have successfully integrated the `nutrient-distributor` trait into the nutrient buffer release acceleration mechanism to resolve the critical nutrient scarcity bottleneck, aligning with PM Direction B.
+
+### Summary of Changes
+1.  **Environment.java:** Updated the `next` and `diagnostic` methods to include `distributorCount`, and incorporated this count into the nutrient buffer release rate calculation, allowing for more adaptive and responsive nutrient release.
+2.  **OrganismInteractionCalculator.java:** Updated the `calculateEnvironmentalDynamics` method to pass the already-calculated `distributorCount` to the `Environment` for its release rate calculation, fixing a discrepancy where the distributor trait was used in feeding phase calculations but not for buffer release.
+3.  **Tests:** Updated all tests in `EnvironmentTest.java`, `GardenTest.java`, `NutrientMobilizerTest.java`, and `PlantBreakdownTest.java` to accommodate the updated method signatures, ensuring continued test suite integrity.
+
+All 277 tests passed, confirming the mechanism and maintaining baseline stability.
+
+AGENT_RUN_JSON_START
+{
+  "runMode": "evolution",
+  "acceptanceSource": "agent",
+  "title": "Accelerate Nutrient Buffer Release via Nutrient-Distributor",
+  "task": "Include the abundant 'nutrient-distributor' trait in the nutrient buffer release acceleration calculation.",
+  "why": "The ecosystem bottleneck is low active nutrient availability despite a full buffer. 'nutrient-distributor' is abundant (732 carriers) and highly suitable for driving efficient nutrient cycling, providing a sustainable, high-impact mechanism for rebalancing the nutrient pool.",
+  "summary": "Modified Environment.java and OrganismInteractionCalculator.java to incorporate 'nutrient-distributor' trait count in buffer release acceleration. Fixed method signatures and updated impacted tests to maintain baseline integrity.",
+  "observations": "Using an abundant trait like 'nutrient-distributor' ensures a robust, reliable effect on nutrient release, directly addressing the bottleneck identified in the PM direction.",
+  "next": "Monitor nutrient recovery in future ticks.",
+  "expectedGardenEffect": "Significant increase in active nutrient levels, stabilizing the ecosystem foundation.",
+  "pmDirection": "B",
+  "evidence": {
+    "bottleneck": "Nutrient buffer release rate is too slow to meet the demands of the current population.",
+    "currentState": "Nutrients=9, Buffer=100.",
+    "verification": "All 277 tests passed, confirming the mechanism and maintaining baseline integrity."
+  },
+  "evaluation": {
+    "metric": "nutrients",
+    "goal": "increase",
+    "requiredDelta": 1
+  },
+  "causalReach": {
+    "mechanism": "Incorporated nutrient-distributor count into buffer release rate, increasing nutrient turnover.",
+    "traits": [
+      "nutrient-distributor"
+    ],
+    "carrierBasis": "existing",
+    "activeCarrierCount": 732,
+    "adoptionPath": "not-applicable",
+    "estimatedPhaseImpact": "Substantial acceleration of nutrient release due to the high carrier count of 'nutrient-distributor'.",
+    "clampRisk": "none",
+    "previousFeedbackDecision": "revise",
+    "preflight": {
+      "passed": true,
+      "observedDelta": 1
+    }
+  },
+  "codeMap": [
+    {
+      "path": "src/main/java/garden/ai/Environment.java",
+      "description": "Environment management, updated to utilize distributorCount for faster buffer release."
+    },
+    {
+      "path": "src/main/java/garden/ai/OrganismInteractionCalculator.java",
+      "description": "Calculates organism interactions, updated to count and pass distributorCount."
+    }
+  ],
+  "requests": [],
+  "state": {
+    "immediateDirections": [
+      "Monitor nutrient trends and consumer population stability."
+    ],
+    "constraints": []
+  }
+}
+AGENT_RUN_JSON_END
+```
+
+## Prior Feedback
+
+# Deferred Autonomous Run Feedback
+
+## Latest Incomplete Attempt
+
 The bounded autonomous attempt sequence left a substantive candidate but did not pass validation. The best candidate was preserved for assessment on the next run; it was removed from main and no garden tick occurred.
 
 - Reason: attempts-exhausted
@@ -358,184 +507,5 @@ The bounded autonomous attempt sequence left a substantive candidate but did not
 
 - Reason: attempts-exhausted
 - Handoff validation: Attempt 3 stopped at shadow: candidate-shadow-target-missed
-- Attempts completed: 3 of 3
-
-## Preserved Incomplete Candidate
-
-- Branch: `agent-rejected/29747652584-1`
-- Commit: `67d9c20ab17b33fc0092ca63e50832267e4f3c25`
-- Inspect: `git show --stat 67d9c20ab17b33fc0092ca63e50832267e4f3c25`
-- Compare: `git diff 67d9c20ab17b33fc0092ca63e50832267e4f3c25^ 67d9c20ab17b33fc0092ca63e50832267e4f3c25`
-
-## Incomplete Change Paths
-
-M	src/main/java/garden/ai/OrganismInteractionCalculator.java
-M	src/main/java/garden/ai/TraitRegistry.java
-M	src/test/java/garden/ai/BeetleRecoveryTest.java
-M	src/test/java/garden/ai/FoxMetabolicEfficiencyTest.java
-A	src/test/java/garden/ai/FoxPopulationConstraintTest.java
-M	src/test/java/garden/ai/FoxResilienceScarcityTest.java
-
-## Incomplete Change Summary
-
-```text
- .../garden/ai/OrganismInteractionCalculator.java   |  7 +++--
- src/main/java/garden/ai/TraitRegistry.java         |  7 ++++-
- src/test/java/garden/ai/BeetleRecoveryTest.java    |  4 +--
- .../java/garden/ai/FoxMetabolicEfficiencyTest.java |  2 +-
- .../garden/ai/FoxPopulationConstraintTest.java     | 35 ++++++++++++++++++++++
- .../java/garden/ai/FoxResilienceScarcityTest.java  |  6 ++--
- 6 files changed, 51 insertions(+), 10 deletions(-)
-```
-
-## Discarded Worktree Residue
-
-```text
- M src/main/java/garden/ai/OrganismInteractionCalculator.java
- M src/main/java/garden/ai/TraitRegistry.java
- M src/test/java/garden/ai/BeetleRecoveryTest.java
- M src/test/java/garden/ai/FoxMetabolicEfficiencyTest.java
- M src/test/java/garden/ai/FoxResilienceScarcityTest.java
-?? src/test/java/garden/ai/FoxPopulationConstraintTest.java
-```
-
-## Bounded Attempt Results
-
-Each repair received the preceding deterministic failure and retained the same ecological objective. The preserved candidate is the substantive attempt that reached the highest validation stage.
-
-```json
-[
-  {
-    "attempt": 1,
-    "accepted": false,
-    "substantiveChange": true,
-    "candidateCommit": "237c43805b393f49e4517ba9a001cba74724e4fb",
-    "stage": "handoff",
-    "reason": "handoff-extraction-failed",
-    "shadow": null
-  },
-  {
-    "attempt": 2,
-    "accepted": false,
-    "substantiveChange": true,
-    "candidateCommit": "9d418e48598322e5c3347911a182ba54cd57671f",
-    "stage": "shadow",
-    "reason": "candidate-shadow-target-missed",
-    "shadow": {
-      "passed": false,
-      "policy": "target",
-      "safetyPassed": true,
-      "targetPassed": false,
-      "metric": "population.FOX",
-      "goal": "decrease",
-      "requiredDelta": 100,
-      "baselineAverage": 3930,
-      "candidateAverage": 3930,
-      "observedDelta": 0,
-      "seeds": [
-        17,
-        43
-      ]
-    }
-  },
-  {
-    "attempt": 3,
-    "accepted": false,
-    "substantiveChange": true,
-    "candidateCommit": "67d9c20ab17b33fc0092ca63e50832267e4f3c25",
-    "stage": "shadow",
-    "reason": "candidate-shadow-target-missed",
-    "shadow": {
-      "passed": false,
-      "policy": "target",
-      "safetyPassed": true,
-      "targetPassed": false,
-      "metric": "population.FOX",
-      "goal": "decrease",
-      "requiredDelta": 100,
-      "baselineAverage": 3930,
-      "candidateAverage": 3930,
-      "observedDelta": 0,
-      "seeds": [
-        17,
-        43
-      ]
-    }
-  }
-]
-```
-
-## Agent Output Summary
-
-- Tool calls: 15
-- Plan-mode calls: 0
-
-```text
-I have strengthened the metabolic constraint on foxes to better enforce population stabilization per PM Direction A. I increased the metabolic penalty from 2 to 8 for foxes when the population exceeds 2000 and nutrients are critically low (below 25). I updated `FoxPopulationConstraintTest` to verify the new penalty and confirmed that all relevant tests pass.
-
-AGENT_RUN_JSON_START
-{
-  "runMode": "evolution",
-  "acceptanceSource": "agent",
-  "title": "Limit Fox Metabolic Over-Exploitation",
-  "task": "Increase the metabolic penalty for foxes in high-population, low-nutrient conditions.",
-  "why": "The fox population (3900) remains unsustainable despite the previous metabolic penalty (2). Increasing the penalty to 8 will force a stronger metabolic constraint, enforcing population stabilization.",
-  "summary": "Increased the metabolic penalty for foxes in `TraitRegistry.calculateMetabolism` from 2 to 8 when population exceeds 2000 and nutrients are low. Updated `FoxPopulationConstraintTest` to reflect the stronger penalty.",
-  "observations": "The metabolic penalty is a robust, self-regulating control mechanism. Strengthening it should better counter the observed fox population expansion.",
-  "next": "Monitor fox population and nutrient dynamics in future ticks to evaluate the impact of the increased penalty.",
-  "expectedGardenEffect": "Significant stabilization or decrease in fox population growth rate.",
-  "pmDirection": "A",
-  "evidence": {
-    "bottleneck": "High predator population (3900) in a low-nutrient environment (19).",
-    "currentState": "Foxes 3900, Nutrients 19, NutrientBuffer 100.",
-    "verification": "Tests pass, including the updated FoxPopulationConstraintTest."
-  },
-  "evaluation": {
-    "metric": "population.FOX",
-    "goal": "decrease",
-    "requiredDelta": 100
-  },
-  "causalReach": {
-    "mechanism": "Increased metabolic cost for foxes based on high population and nutrient scarcity.",
-    "traits": [],
-    "carrierBasis": "not-applicable",
-    "activeCarrierCount": 0,
-    "adoptionPath": "not-applicable",
-    "estimatedPhaseImpact": "Stronger metabolic penalty slows fox reproduction significantly in scarce conditions.",
-    "clampRisk": "none",
-    "previousFeedbackDecision": "revise",
-    "preflight": {
-      "passed": false,
-      "observedDelta": null
-    }
-  },
-  "codeMap": [
-    {
-      "path": "src/main/java/garden/ai/TraitRegistry.java",
-      "description": "Registry for metabolic traits, updated with a stronger population-based constraint."
-    },
-    {
-      "path": "src/test/java/garden/ai/FoxPopulationConstraintTest.java",
-      "description": "Updated to reflect the strengthened metabolic penalty."
-    }
-  ],
-  "requests": [],
-  "state": {
-    "immediateDirections": [
-      "Monitor fox population growth."
-    ]
-  }
-}
-AGENT_RUN_JSON_END
-```
-
-## Prior Feedback
-
-# Deferred Autonomous Run Feedback
-
-## Latest Incomplete Attempt
-
-The agent call left a substantive candidate but not a valid handoff. Its exact source was preserved for assessment on the next run; it was removed from main and no garden tick occurred.
-
 
 [Older feedback truncated after 360 lines.]
