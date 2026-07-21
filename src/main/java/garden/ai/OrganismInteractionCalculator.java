@@ -155,7 +155,7 @@ public class OrganismInteractionCalculator {
             changed = changed.withEnergy(changed.energy() + growth);
         } else {
             long beetleCount = context.allOrganisms().stream().filter(o -> o.type() == OrganismType.BEETLE).count();
-            if (organism.type() == OrganismType.BEETLE && beetleCount < 100) {
+            if (organism.type() == OrganismType.BEETLE && beetleCount < 200) {
                 changed = changed.withTrait("beetle-recovery");
                 changed = changed.withTrait("prolific");
                 changed = changed.withTrait("resourceful-breeder");
@@ -407,7 +407,7 @@ public class OrganismInteractionCalculator {
             int birthsForType = birthsByType.getOrDefault(childType, 0);
             long beetleCount = context.organisms().stream().filter(o -> o.type() == OrganismType.BEETLE).count();
             boolean hasBirthCapacity = (birthsThisCycle < totalBirthBudget && birthsForType < typeBirthBudget)
-                                       || (childType == OrganismType.BEETLE && beetleCount < 100);
+                                       || (childType == OrganismType.BEETLE && beetleCount < 200);
             boolean isBeetleReproduction = (organism.type() == OrganismType.BEETLE);
             boolean canReproduce = hasBirthCapacity
                     && (organism.energy() >= reproductionThreshold(organism, context.environment(), context.fungalContribution(), context.organisms())
@@ -430,7 +430,7 @@ public class OrganismInteractionCalculator {
                 Organism child = organism.child(childId, childType, TraitRegistry.getMutationTrait(context.cycle(), organism, childType, context.environment()));
                 
                 if (childType == OrganismType.BEETLE) {
-                    if (beetleCount < 100) {
+                    if (beetleCount < 200) {
                         child = child.withTrait("beetle-recovery").withTrait("prolific").withTrait("resourceful-breeder");
                     }
                 }

@@ -718,7 +718,7 @@ public class TraitRegistry {
                 if (organism.type() == OrganismType.FOX) return new MetabolicEffect(0, 20, new GardenEvent(cycle, "%s optimized its reproductive energy storage.".formatted(organism.id())));
                 break;
             case "beetle-recovery":
-                if (organism.type() == OrganismType.BEETLE && beetleCount < 10) {
+                if (organism.type() == OrganismType.BEETLE && beetleCount < 200) {
                     return new MetabolicEffect(0, 30, new GardenEvent(cycle, "%s gained significant energy for population recovery.".formatted(organism.id())));
                 }
                 break;

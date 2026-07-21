@@ -11,14 +11,14 @@ public class BeetleRecoveryTest {
         Environment env = new Environment(100, 100, 100, 50, 50);
         Organism beetle = Organism.of("beetle-1", OrganismType.BEETLE, 10, 2, "beetle-recovery");
         
-        // Pass a beetleCount < 10
+        // Pass a beetleCount < 200
         TraitRegistry.MetabolicEffect effect = TraitRegistry.calculateMetabolism(1, beetle, env, 0, 0, 0, 1);
         
         assertTrue(effect.energyBonus() >= 15, "Beetle with beetle-recovery should get significant energy bonus when population is low");
         
-        // Pass a beetleCount >= 10
-        TraitRegistry.MetabolicEffect effect2 = TraitRegistry.calculateMetabolism(1, beetle, env, 0, 0, 0, 10);
+        // Pass a beetleCount >= 200
+        TraitRegistry.MetabolicEffect effect2 = TraitRegistry.calculateMetabolism(1, beetle, env, 0, 0, 0, 200);
         
-        assertTrue(effect2.energyBonus() == 0, "Beetle with beetle-recovery should not get energy bonus when population is 10 or more");
+        assertTrue(effect2.energyBonus() == 0, "Beetle with beetle-recovery should not get energy bonus when population is 200 or more");
     }
 }
