@@ -80,4 +80,24 @@ class PopulationDynamicsTest {
         assertThat(OrganismInteractionCalculator.typeBirthBudget(OrganismType.BEETLE, organisms, medBuffer)).isEqualTo(1);
         assertThat(OrganismInteractionCalculator.typeBirthBudget(OrganismType.BEETLE, organisms, highBuffer)).isEqualTo(3);
     }
+
+    @Test
+    void foxBirthBudgetDependsOnPopulation() {
+        Environment env = new Environment(100, 100, 100, 100, 100);
+        List<Organism> organisms = new ArrayList<>();
+        // 3001 foxes
+        for (int i = 0; i < 3001; i++) {
+            organisms.add(Organism.of("fox-" + i, OrganismType.FOX, 50, 1));
+        }
+        
+        assertThat(OrganismInteractionCalculator.typeBirthBudget(OrganismType.FOX, organisms, env)).isEqualTo(1);
+        
+        // 2000 foxes
+        organisms = new ArrayList<>();
+        for (int i = 0; i < 2000; i++) {
+            organisms.add(Organism.of("fox-" + i, OrganismType.FOX, 50, 1));
+        }
+        
+        assertThat(OrganismInteractionCalculator.typeBirthBudget(OrganismType.FOX, organisms, env)).isEqualTo(6);
+    }
 }

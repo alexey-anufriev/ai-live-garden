@@ -355,6 +355,10 @@ public class OrganismInteractionCalculator {
 
         if (childType == OrganismType.BEETLE && typeCount < 10) return 10;
 
+        if (childType == OrganismType.FOX) {
+            return (typeCount > 3000) ? 1 : FUNCTIONAL_TYPE_BIRTH_BUDGET;
+        }
+
         if (total >= DENSITY_PRESSURE_MINIMUM_POPULATION && typeCount * 2 > total) {
             return 0;
         }
@@ -369,8 +373,7 @@ public class OrganismInteractionCalculator {
             if (typeCount * 3 > total) return 1;
         }
 
-        if (childType == OrganismType.FOX
-                || childType == OrganismType.FUNGUS
+        if (childType == OrganismType.FUNGUS
                 || childType == OrganismType.ROOT_NETWORK) {
             return FUNCTIONAL_TYPE_BIRTH_BUDGET;
         }
