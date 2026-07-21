@@ -1,0 +1,96 @@
+{
+  "antiPatterns": [
+    "Prioritizing predator reproductive-efficiency traits while nutrients are critically low.",
+    "Ignoring the disconnect between the full buffer and the empty nutrient pool.",
+    "Focusing on biomass growth of consumers when the foundation (nutrients) is failing."
+  ],
+  "date": "2026-07-21",
+  "directions": [
+    {
+      "acceptanceSignal": "Fox population growth rate slows down significantly.",
+      "avoid": "Traits that increase predator energy gain or individual survival.",
+      "expectedGardenEffect": "Stabilization of the fox population growth rate.",
+      "label": "A",
+      "shadowAcceptance": {
+        "goal": "decrease",
+        "metric": "population.FOX",
+        "requiredDelta": 200
+      },
+      "title": "Fox Population Reproductive Cap",
+      "why": "The current population size is over-taxing the ecosystem and cannot be sustained by existing nutrient generation."
+    },
+    {
+      "acceptanceSignal": "Active nutrient levels increase toward 20+.",
+      "avoid": "Traits that increase nutrient consumption rates.",
+      "expectedGardenEffect": "Steady increase in active nutrient pool.",
+      "label": "B",
+      "shadowAcceptance": {
+        "goal": "increase",
+        "metric": "nutrients",
+        "requiredDelta": 10
+      },
+      "title": "Adaptive Nutrient Buffer Transduction",
+      "why": "The buffer is full, but active nutrients are critically low; the system requires a mechanism to bypass inefficient conversion."
+    },
+    {
+      "acceptanceSignal": "Improved nutrient regeneration rate observed in population snapshots.",
+      "avoid": "Traits that increase beetle predation pressure.",
+      "expectedGardenEffect": "Enhanced nutrient regeneration rate from decomposers.",
+      "label": "C",
+      "shadowAcceptance": {
+        "goal": "increase",
+        "metric": "nutrients",
+        "requiredDelta": 5
+      },
+      "title": "Fungal-Beetle Nutrient Synergy",
+      "why": "The fungal-beetle pathway is the primary natural conduit for energy back into the nutrient pool."
+    },
+    {
+      "acceptanceSignal": "Beetle population stabilizes above 180.",
+      "avoid": "Traits that increase beetle vulnerability or predation risk.",
+      "expectedGardenEffect": "Resilient, stable beetle population despite high predator density.",
+      "label": "D",
+      "shadowAcceptance": {
+        "goal": "increase",
+        "metric": "population.BEETLE",
+        "requiredDelta": 20
+      },
+      "title": "Beetle Population Protective Resilience",
+      "why": "The prey base is the only thing preventing total fox collapse, and it remains vulnerable to over-predation."
+    }
+  ],
+  "review": {
+    "overallMark": "not achieved",
+    "previousPlanDate": "2026-07-20",
+    "results": [
+      {
+        "evidence": "Fox population grew from 3434 to 4689.",
+        "label": "A",
+        "mark": "not achieved"
+      },
+      {
+        "evidence": "Nutrients decreased from 9 to 6.",
+        "label": "B",
+        "mark": "not achieved"
+      },
+      {
+        "evidence": "Active nutrient levels remain critically low.",
+        "label": "C",
+        "mark": "not achieved"
+      },
+      {
+        "evidence": "Beetle population increased slightly (140 to 164).",
+        "label": "D",
+        "mark": "partially achieved"
+      }
+    ],
+    "summary": "The fox population continued its explosive growth (3434 to 4689), ignoring metabolic constraints and exacerbating the critical nutrient shortage (dropped from 9 to 6)."
+  },
+  "stateSignals": [
+    "FOX population 4689 (runaway growth)",
+    "Nutrients 6 (critical deficit)",
+    "NutrientBuffer 100 (full, unused)",
+    "BEETLE population 164 (insufficient for predator density)"
+  ],
+  "thesis": "The fox population runaway (4689) is causing a critical nutrient crisis (6). We must transition from optimizing individual metabolic efficiency—which has ironically fueled expansion—to enforcing structural population caps and aggressive nutrient-conversion throughput to restore the active nutrient pool from the 100-value buffer."
+}
