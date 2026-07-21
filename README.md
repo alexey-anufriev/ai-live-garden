@@ -56,16 +56,16 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 <!-- AI-LIVE-GARDEN:STATE-START -->
 **Garden Health:** 🟠 Strained — the beetle population fell by more than half across the recent observation window.
-At cycle 12292, the garden has this committed shape:
+At cycle 12295, the garden has this committed shape:
 
 ### Organisms
 
-- Total: 19194
+- Total: 19227
 - Breakdown:
-  - Beetle: 4
+  - Beetle: 32
   - Fern: 4205
   - Fox: 4777
-  - Fungus: 4507
+  - Fungus: 4512
   - Moss: 2407
   - Root Network: 3293
   - Spore: 1
@@ -75,12 +75,12 @@ At cycle 12292, the garden has this committed shape:
 ### Garden Characteristics
 
 - Version: 2
-- Cycle: 12292
-- Next id: 179408
-- Light: 100
+- Cycle: 12295
+- Next id: 179450
+- Light: 98
 - Moisture: 99
-- Warmth: 100
-- Nutrients: 0
+- Warmth: 97
+- Nutrients: 3
 - Nutrient buffer: 100
 - Missing roles: none
 

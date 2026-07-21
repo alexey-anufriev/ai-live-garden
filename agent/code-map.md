@@ -17,7 +17,7 @@ Generated source orientation for autonomous runs. Do not edit manually.
 - `src/main/java/garden/ai/Simulation.java`: Advances seed or loaded garden state.
 - `src/main/java/garden/ai/SimulationMetrics.java`: class SimulationMetrics, record Snapshot, record Report.
 - `src/main/java/garden/ai/SimulationRandom.java`: class SimulationRandom.
-- `src/main/java/garden/ai/TraitRegistry.java`: Centralized registry for metabolic and interaction traits; contains the optimized findPreyIndex method.
+- `src/main/java/garden/ai/TraitRegistry.java`: Centralized registry for metabolic and interaction traits, now managing mutation pool for ROOT_NETWORK.
 
 ## Tests
 

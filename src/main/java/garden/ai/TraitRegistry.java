@@ -557,10 +557,11 @@ public class TraitRegistry {
         }
         if (childType == OrganismType.ROOT_NETWORK && SimulationRandom.current().nextDouble() < 0.3) {
             double r = SimulationRandom.current().nextDouble();
-            if (r < 0.20) return "reproductive-efficiency";
-            else if (r < 0.40) return "nutrient-dependent-reproduction";
-            else if (r < 0.60) return "nutrient-pioneer";
-            else if (r < 0.80) return "mutualist-synergy";
+            if (r < 0.16) return "reproductive-efficiency";
+            else if (r < 0.32) return "nutrient-dependent-reproduction";
+            else if (r < 0.48) return "nutrient-pioneer";
+            else if (r < 0.64) return "mutualist-synergy";
+            else if (r < 0.80) return "buffer-siphon";
             else return "root-nutrient-amplifier";
         }
         if (environment.nutrients() < 40 && SimulationRandom.current().nextDouble() < 0.3) {

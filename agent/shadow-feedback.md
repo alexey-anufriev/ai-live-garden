@@ -4,19 +4,19 @@ This verdict evaluates the safe code committed by the previous autonomous run. S
 
 - Classification: `inert`
 - Acceptance: `experiment`
-- PM direction: `A`
-- Metric: `population.FOX`
-- Goal: `decrease`
-- Required delta: 200
+- PM direction: `B`
+- Metric: `nutrients`
+- Goal: `increase`
+- Required delta: 1
 - Observed delta: 0
-- Baseline average: 4777
-- Candidate average: 4777
+- Baseline average: 16
+- Candidate average: 16
 - Safety passed: true
 - Target passed: false
 
 ## Implemented Hypothesis
 
-Stricter nutrient-dependent birth budget for FOX.
+Trait-based buffer-to-soil nutrient siphon.
 
 ## Harness Conclusion
 
