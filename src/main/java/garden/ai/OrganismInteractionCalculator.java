@@ -356,8 +356,9 @@ public class OrganismInteractionCalculator {
         if (childType == OrganismType.BEETLE && typeCount < 10) return 10;
 
         if (childType == OrganismType.FOX) {
-            if (typeCount > 3000) return 0;
-            if (typeCount > 2000 && environment.nutrients() < 20) return 1;
+            if (typeCount > 2500) return 0;
+            if (typeCount > 1500 && environment.nutrients() < 30) return 0;
+            if (typeCount > 1000 && environment.nutrients() < 10) return 1;
             return FUNCTIONAL_TYPE_BIRTH_BUDGET;
         }
 

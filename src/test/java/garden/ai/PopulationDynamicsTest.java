@@ -90,11 +90,29 @@ class PopulationDynamicsTest {
             organisms.add(Organism.of("fox-" + i, OrganismType.FOX, 50, 1));
         }
         
-        assertThat(OrganismInteractionCalculator.typeBirthBudget(OrganismType.FOX, organisms, lowNutrients)).isEqualTo(1);
+        // Should be 0 based on new threshold: typeCount > 1500 && nutrients < 30
+        assertThat(OrganismInteractionCalculator.typeBirthBudget(OrganismType.FOX, organisms, lowNutrients)).isEqualTo(0);
         
         // High fox population, high nutrients -> normal birth budget
         Environment highNutrients = new Environment(100, 100, 100, 80, 100);
         assertThat(OrganismInteractionCalculator.typeBirthBudget(OrganismType.FOX, organisms, highNutrients)).isEqualTo(6);
+    }
+
+    @Test
+    void foxBirthBudgetIsStricterWithLowNutrients() {
+        // High fox population, low nutrients -> limited birth budget
+        Environment lowNutrients = new Environment(100, 100, 100, 5, 100);
+        List<Organism> organisms = new ArrayList<>();
+        for (int i = 0; i < 1600; i++) {
+            organisms.add(Organism.of("fox-" + i, OrganismType.FOX, 50, 1));
+        }
+        
+        // Should be 0 based on new threshold: typeCount > 1500 && nutrients < 30
+        assertThat(OrganismInteractionCalculator.typeBirthBudget(OrganismType.FOX, organisms, lowNutrients)).isEqualTo(0);
+        
+        // High fox population, moderate nutrients -> normal birth budget
+        Environment modNutrients = new Environment(100, 100, 100, 40, 100);
+        assertThat(OrganismInteractionCalculator.typeBirthBudget(OrganismType.FOX, organisms, modNutrients)).isEqualTo(6);
     }
 
     @Test
