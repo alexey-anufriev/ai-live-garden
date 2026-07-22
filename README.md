@@ -55,17 +55,17 @@ This is still an experiment. Do not store valuable secrets or production code in
 
 ## Current Garden State
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟠 Strained — an essential ecological role is below three viable organisms.
-At cycle 12430, the garden has this committed shape:
+**Garden Health:** 🟢 Flourishing — all essential roles are viable without recent collapse, dominance, or resource exhaustion.
+At cycle 12435, the garden has this committed shape:
 
 ### Organisms
 
-- Total: 19509
+- Total: 19575
 - Breakdown:
-  - Beetle: 2
-  - Fern: 4119
+  - Beetle: 64
+  - Fern: 4116
   - Fox: 4777
-  - Fungus: 4809
+  - Fungus: 4816
   - Moss: 2407
   - Root Network: 3394
   - Spore: 1
@@ -75,12 +75,12 @@ At cycle 12430, the garden has this committed shape:
 ### Garden Characteristics
 
 - Version: 2
-- Cycle: 12430
-- Next id: 183852
-- Light: 100
-- Moisture: 99
+- Cycle: 12435
+- Next id: 183937
+- Light: 98
+- Moisture: 100
 - Warmth: 97
-- Nutrients: 0
+- Nutrients: 12
 - Nutrient buffer: 100
 - Missing roles: none
 
