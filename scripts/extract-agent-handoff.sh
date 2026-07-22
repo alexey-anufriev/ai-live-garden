@@ -45,6 +45,7 @@ if [[ -z "$output_file" ]]; then
 fi
 
 if [[ -f "$output_file" ]]; then
+  scripts/normalize-agent-handoff.sh "$output_file"
   scripts/validate-agent-handoff.sh "$output_file"
   exit 0
 fi
@@ -87,6 +88,7 @@ try_candidate() {
   [[ -s "$candidate_file" ]] || return 1
   jq '.' "$candidate_file" > "${candidate_file}.normalized" 2>/dev/null || return 1
   mv "${candidate_file}.normalized" "$candidate_file"
+  scripts/normalize-agent-handoff.sh "$candidate_file"
 
   candidate_error="${tmp_dir}/candidate-error.txt"
   if valid_handoff "$candidate_file" 2> "$candidate_error"; then

@@ -285,7 +285,13 @@ append_shadow_feedback() {
   if [[ -f "$shadow_feedback_file" ]]; then
     echo "A previous experiment verdict or invalid-candidate report is supplied in full below. This is mandatory decision input, not optional history. If it is a verdict, the evaluated code is already on main; inspect it and decide explicitly to reuse, revise, or abandon it. If a preserved branch is listed, inspect that exact commit. State the decision and evidence in \`evidence.bottleneck\` or \`observations\`. Inert or wrong-direction code should normally be corrected or reverted before adding a disconnected mechanism."
     echo
-    sed -n '1,$p' "$shadow_feedback_file"
+    awk '
+      /^## Prior Feedback$/ {
+        prior_sections++
+        if (prior_sections >= 2) exit
+      }
+      { print }
+    ' "$shadow_feedback_file"
   else
     echo "No deferred autonomous feedback is awaiting consumption."
   fi
@@ -452,6 +458,7 @@ append_compact_journal_entry() {
   echo "- Write \`.agent-run.json\` as the machine-readable handoff described below. This file is required."
   echo "- A handoff is not a completed run by itself. Before CI advances the garden, the worktree must contain a substantive agent-authored change under \`src/main/\`, \`src/test/\`, \`pom.xml\`, or an emergency change to \`data/garden-state.txt\`."
   echo "- Also include the same JSON object in your final response between \`AGENT_RUN_JSON_START\` and \`AGENT_RUN_JSON_END\` markers so the harness can recover the handoff if direct file creation fails."
+  echo "- Treat the handoff as experiment intent, not a second implementation task. CI deterministically normalizes eligible recovery/evolution classification, mode metadata, unambiguous PM direction, and trait-carrier counts before validation. Spend the run on coherent tested code; mechanically repairable handoff metadata will not discard it."
   echo "- Before finishing, compare the final diff to the chosen task and remove accidental edits, scratch files, speculative comments, and unrelated assertion changes."
   echo "- Do not modify \`AGENTS.md\`, \`GEMINI.md\`, \`.github/\`, \`story/\`, license files, secrets, or prior journal entries."
   echo "- Do not read \`agent/journal/archive/\` or summary archive folders during a normal run."

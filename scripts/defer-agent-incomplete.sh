@@ -29,16 +29,19 @@ mkdir -p "$feedback_dir"
 temporary_feedback="$(mktemp "${RUNNER_TEMP:-/tmp}/agent-feedback.XXXXXX")"
 prior_feedback="$(mktemp "${RUNNER_TEMP:-/tmp}/prior-agent-feedback.XXXXXX")"
 if [[ -f "$feedback_file" ]]; then
-  prior_feedback_max_lines="${AGENT_PRIOR_FEEDBACK_MAX_LINES:-360}"
+  prior_feedback_max_lines="${AGENT_PRIOR_FEEDBACK_MAX_LINES:-180}"
   if ! [[ "$prior_feedback_max_lines" =~ ^[1-9][0-9]*$ ]]; then
     echo "AGENT_PRIOR_FEEDBACK_MAX_LINES must be a positive integer." >&2
     exit 2
   fi
-  sed -n "1,${prior_feedback_max_lines}p" "$feedback_file" > "$prior_feedback"
-  if (( $(wc -l < "$feedback_file") > prior_feedback_max_lines )); then
+  awk -v maximum="$prior_feedback_max_lines" '
+    /^## Prior Feedback$/ { exit }
+    NR <= maximum { print }
+  ' "$feedback_file" > "$prior_feedback"
+  if (( $(awk '/^## Prior Feedback$/ { exit } { count++ } END { print count }' "$feedback_file") > prior_feedback_max_lines )); then
     {
       echo
-      echo "[Older feedback truncated after ${prior_feedback_max_lines} lines.]"
+      echo "[Previous attempt truncated after ${prior_feedback_max_lines} lines.]"
     } >> "$prior_feedback"
   fi
 fi

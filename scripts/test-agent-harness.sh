@@ -113,6 +113,14 @@ cat > "$shadow_feedback" <<'FEEDBACK'
 # Deferred Shadow Evaluation Feedback
 
 Previous candidate observed delta: 0.
+
+## Prior Feedback
+
+Immediate predecessor marker.
+
+## Prior Feedback
+
+Recursively embedded old marker that must not enter the compact prompt.
 FEEDBACK
 (
   cd "$repository_root"
@@ -141,6 +149,11 @@ grep -Fq '| 17 | 5 | completed | 10 | 20 | 9 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 2 | 9
 grep -Fq 'scripts/evaluate-shadow-candidate.sh target/agent-baseline-shadow.json' "$prompt_outputs"
 grep -Fq '## Previous Autonomous Feedback' "$prompt_outputs"
 grep -Fq 'Previous candidate observed delta: 0.' "$prompt_outputs"
+grep -Fq 'Immediate predecessor marker.' "$prompt_outputs"
+if grep -Fq 'Recursively embedded old marker' "$prompt_outputs"; then
+  echo "Compact context recursively included obsolete feedback history." >&2
+  exit 1
+fi
 grep -Fq 'observedDelta = candidateAverage - baselineAverage' "$prompt_outputs"
 grep -Fq 'mandatory decision input, not optional history' "$prompt_outputs"
 grep -Fq '## Current Causal Reach Diagnostics' "$prompt_outputs"
@@ -326,7 +339,7 @@ rm -rf "$shadow_fixture"
 
 mkdir -p "$fixture_root/scripts" "$fixture_root/agent/plans" "$fixture_root/artifacts"
 for script in find-active-agent-plan.sh agent-substantive-changes.sh validate-agent-handoff.sh count-garden-trait-carriers.sh \
-  derive-agent-validation-policy.sh report-complexity-budget.sh extract-agent-handoff.sh \
+  derive-agent-validation-policy.sh report-complexity-budget.sh normalize-agent-handoff.sh extract-agent-handoff.sh \
   inspect-agent-gemini-output.sh validate-agent-worktree.sh write-output-file.sh \
   sync-agent-preflight-handoff.sh resolve-agent-attempts.sh assess-agent-attempt.sh \
   snapshot-agent-candidate.sh record-agent-verdict.sh; do
@@ -379,6 +392,22 @@ handoff() {
 
 handoff A population.BEETLE increase 1 handoff-active.json
 AGENT_PM_REFERENCE_DATE=2026-07-08 scripts/validate-agent-handoff.sh handoff-active.json >/dev/null
+jq '.runMode = "recovery" | .acceptanceSource = "mode"' handoff-active.json > handoff-colloquial-recovery.json
+AGENT_PM_REFERENCE_DATE=2026-07-08 scripts/normalize-agent-handoff.sh handoff-colloquial-recovery.json 2>/dev/null
+jq -e '
+  .runMode == "evolution" and .acceptanceSource == "agent" and .pmDirection == "A" and
+  (.harnessNormalization.applied | index("reclassified ineligible recovery as measured evolution") != null)
+' handoff-colloquial-recovery.json >/dev/null
+AGENT_PM_REFERENCE_DATE=2026-07-08 scripts/validate-agent-handoff.sh handoff-colloquial-recovery.json >/dev/null
+jq '.runMode = "recovery" | .acceptanceSource = "mode"' handoff-active.json > direct-agent-run.json
+AGENT_PM_REFERENCE_DATE=2026-07-08 scripts/extract-agent-handoff.sh --output direct-agent-run.json >/dev/null 2>&1
+jq -e '.runMode == "evolution" and .acceptanceSource == "agent"' direct-agent-run.json >/dev/null
+jq '.causalReach.carrierBasis = "not-applicable" | .causalReach.traits = ["nutrient-conserver"] | .causalReach.activeCarrierCount = 999' \
+  handoff-active.json > handoff-global-carrier-noise.json
+AGENT_PM_REFERENCE_DATE=2026-07-08 scripts/normalize-agent-handoff.sh handoff-global-carrier-noise.json 2>/dev/null
+jq -e '.causalReach.traits == [] and .causalReach.activeCarrierCount == 0' \
+  handoff-global-carrier-noise.json >/dev/null
+AGENT_PM_REFERENCE_DATE=2026-07-08 scripts/validate-agent-handoff.sh handoff-global-carrier-noise.json >/dev/null
 jq '.causalReach.preflight = {passed:false,observedDelta:null} | .evidence.verification = "Focused tests pass."' \
   handoff-active.json > handoff-unmeasured.json
 cat > synchronized-shadow-result.json <<'JSON'
@@ -421,6 +450,12 @@ jq '.causalReach = {mechanism:"live trait fixture",traits:["nutrient-conserver"]
   handoff-active.json > handoff-existing-carrier.json
 AGENT_PM_REFERENCE_DATE=2026-07-08 AGENT_GARDEN_STATE_FILE="$causal_state" \
   scripts/validate-agent-handoff.sh handoff-existing-carrier.json >/dev/null
+jq '.causalReach.activeCarrierCount = 999' handoff-existing-carrier.json > handoff-stale-carrier-count.json
+AGENT_PM_REFERENCE_DATE=2026-07-08 AGENT_GARDEN_STATE_FILE="$causal_state" \
+  scripts/normalize-agent-handoff.sh handoff-stale-carrier-count.json 2>/dev/null
+jq -e '.causalReach.activeCarrierCount == 1' handoff-stale-carrier-count.json >/dev/null
+AGENT_PM_REFERENCE_DATE=2026-07-08 AGENT_GARDEN_STATE_FILE="$causal_state" \
+  scripts/validate-agent-handoff.sh handoff-stale-carrier-count.json >/dev/null
 jq '.causalReach.traits = ["nutrient-demand-regulator"] | .causalReach.activeCarrierCount = 0' \
   handoff-existing-carrier.json > handoff-zero-carrier.json
 if AGENT_PM_REFERENCE_DATE=2026-07-08 AGENT_GARDEN_STATE_FILE="$causal_state" \
@@ -524,17 +559,14 @@ VALIDATE_AGENT_WORKTREE_SCOPE=changed scripts/validate-agent-worktree.sh >/dev/n
 mkdir -p artifacts
 jq -n --rawfile response handoff-pm-mismatch.json \
   '{response:("AGENT_RUN_JSON_START\n" + $response + "AGENT_RUN_JSON_END")}' > artifacts/stdout.log
-GITHUB_OUTPUT=inspect-invalid.outputs AGENT_PM_REFERENCE_DATE=2026-07-08 \
+GITHUB_OUTPUT=inspect-normalized.outputs AGENT_PM_REFERENCE_DATE=2026-07-08 \
   scripts/inspect-agent-gemini-output.sh artifacts >/dev/null
-grep -Fxq 'valid_handoff=false' inspect-invalid.outputs
-grep -Fxq 'handoff_candidate=true' inspect-invalid.outputs
-grep -Fxq 'noop_reason=changes-with-invalid-handoff' inspect-invalid.outputs
-if ! grep -Fq 'handoff_validation_reason=Agent evaluation must exactly match' inspect-invalid.outputs; then
-  echo "Invalid handoff diagnostics did not expose the semantic validator reason:" >&2
-  cat inspect-invalid.outputs >&2
-  exit 1
-fi
-rm -rf artifacts inspect-invalid.outputs
+grep -Fxq 'valid_handoff=true' inspect-normalized.outputs
+grep -Fxq 'artifact_handoff=true' inspect-normalized.outputs
+grep -Fxq 'substantive_change=true' inspect-normalized.outputs
+grep -Fxq 'retry_required=false' inspect-normalized.outputs
+grep -Fxq 'noop_reason=none' inspect-normalized.outputs
+rm -rf artifacts inspect-normalized.outputs
 GITHUB_OUTPUT=policy-evolution.outputs AGENT_PM_REFERENCE_DATE=2026-07-08 \
   scripts/derive-agent-validation-policy.sh handoff-active.json >/dev/null
 grep -Fxq 'run_mode=evolution' policy-evolution.outputs
@@ -744,6 +776,10 @@ JSON
   grep -Fq '## Experiment Result' agent/shadow-feedback.md
   grep -Fq 'candidate-tests-failed' agent/shadow-feedback.md
   grep -Fq '## Prior Feedback' agent/shadow-feedback.md
+  if grep -Fq 'Older feedback marker.' agent/shadow-feedback.md; then
+    echo "Incomplete feedback recursively retained older rejection history." >&2
+    exit 1
+  fi
   if grep -Fq '## Subsequent Incomplete Attempt' agent/shadow-feedback.md; then
     echo "Incomplete feedback retained the obsolete append marker." >&2
     exit 1
