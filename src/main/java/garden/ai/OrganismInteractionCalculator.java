@@ -409,15 +409,16 @@ public class OrganismInteractionCalculator {
             boolean hasBirthCapacity = (birthsThisCycle < totalBirthBudget && birthsForType < typeBirthBudget)
                                        || (childType == OrganismType.BEETLE && beetleCount < 200);
             boolean isBeetleReproduction = (organism.type() == OrganismType.BEETLE);
+            boolean isEmergencyBeetleReproduction = (isBeetleReproduction && beetleCount < 100);
             boolean canReproduce = hasBirthCapacity
                     && (organism.energy() >= reproductionThreshold(organism, context.environment(), context.fungalContribution(), context.organisms())
                     || (isFungalSuccession && organism.energy() >= 4)
                     || (isBeetleReproduction && beetleCount == 1 && organism.energy() >= 8));
 
-            if (organism.traits().contains("stressed") && !organism.traits().contains("fungal-symbiote") && !isFungalSuccession && !isNutrientPioneer) {
+            if (organism.traits().contains("stressed") && !organism.traits().contains("fungal-symbiote") && !isFungalSuccession && !isNutrientPioneer && !isEmergencyBeetleReproduction) {
                 canReproduce = false;
             }
-            if (organism.traits().contains("starving") && !organism.traits().contains("resourceful-breeder")) {
+            if (organism.traits().contains("starving") && !organism.traits().contains("resourceful-breeder") && !isEmergencyBeetleReproduction) {
                 canReproduce = false;
             }
             if (organism.traits().contains("cautious-breeder") && context.environment().nutrients() < 10) {
