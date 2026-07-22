@@ -1,0 +1,95 @@
+{
+  "antiPatterns": [
+    "Introducing traits that increase predator efficiency.",
+    "Ignoring prey population collapse in favor of predator population control.",
+    "Treating transient nutrient spikes from consumer collapse as sustainable nutrient generation."
+  ],
+  "date": "2026-07-22",
+  "directions": [
+    {
+      "acceptanceSignal": "Beetle population exceeds 100.",
+      "avoid": "Traits that increase fox predation efficacy.",
+      "expectedGardenEffect": "Rapid increase in beetle population.",
+      "label": "A",
+      "shadowAcceptance": {
+        "goal": "increase",
+        "metric": "population.BEETLE",
+        "requiredDelta": 50
+      },
+      "title": "Emergency Beetle Population Recovery",
+      "why": "The beetle population is near extinction, which will trigger a total collapse of the fox population and the nutrient cycle."
+    },
+    {
+      "acceptanceSignal": "Fox population trend begins to decline.",
+      "avoid": "Traits that improve fox metabolic energy balance or survival.",
+      "expectedGardenEffect": "Decrease in fox population growth rate or absolute decline.",
+      "label": "B",
+      "shadowAcceptance": {
+        "goal": "decrease",
+        "metric": "population.FOX",
+        "requiredDelta": 200
+      },
+      "title": "Strict Fox Reproductive Stagnation",
+      "why": "The fox population is unsustainable and must be reduced or capped immediately to allow the ecosystem to recover."
+    },
+    {
+      "acceptanceSignal": "Active nutrient pool stabilizes above 50.",
+      "avoid": "Traits that increase fox consumption of beetle energy.",
+      "expectedGardenEffect": "Stable, rising active nutrient levels.",
+      "label": "C",
+      "shadowAcceptance": {
+        "goal": "increase",
+        "metric": "nutrients",
+        "requiredDelta": 10
+      },
+      "title": "Establish Fungal-Beetle Nutrient Loop",
+      "why": "Active nutrient levels are volatile; a stable pathway from fungal decomposition to beetle-assisted cycling is required."
+    },
+    {
+      "acceptanceSignal": "Active nutrient levels sustained by buffer release.",
+      "avoid": "Mechanisms that release nutrients faster than consumers can effectively utilize them.",
+      "expectedGardenEffect": "Higher baseline active nutrient levels without triggering consumer runaway.",
+      "label": "D",
+      "shadowAcceptance": {
+        "goal": "increase",
+        "metric": "nutrients",
+        "requiredDelta": 20
+      },
+      "title": "Buffer-Siphon to Active Nutrient Conversion",
+      "why": "The nutrient buffer is full (100) while the ecosystem is in a nutrient-starved state; this disconnection must be bridged."
+    }
+  ],
+  "review": {
+    "overallMark": "not achieved",
+    "previousPlanDate": "2026-07-21",
+    "results": [
+      {
+        "evidence": "Fox population grew slightly from 4689 to 4777.",
+        "label": "A",
+        "mark": "not achieved"
+      },
+      {
+        "evidence": "Nutrients rose from 6 to 47, but beetle population crashed, which is the primary cause.",
+        "label": "B",
+        "mark": "partially achieved"
+      },
+      {
+        "evidence": "No clear evidence of improved nutrient regeneration from fungal-beetle pathway.",
+        "label": "C",
+        "mark": "not achieved"
+      },
+      {
+        "evidence": "Beetle population collapsed from 164 to 16.",
+        "label": "D",
+        "mark": "not achieved"
+      }
+    ],
+    "summary": "The fox population has continued to grow (4689 to 4777), and the beetle population has collapsed (164 to 16). The nutrient crisis persists, with active nutrients remaining low (47, though this is a sharp increase from 6, likely due to a population crash in other areas or some inadvertent release). The aggressive fox population control traits have not yet stabilized the predator population."
+  },
+  "stateSignals": [
+    "BEETLE population collapsed to 16.",
+    "FOX population remains dangerously high at 4777.",
+    "Nutrient volatility is extreme (active nutrients 47, buffer 100)."
+  ],
+  "thesis": "The ecosystem is currently experiencing a severe demographic collapse of the prey species (BEETLE) coupled with runaway predator (FOX) numbers, leading to intense nutrient volatility. The recent spike in nutrients is an artifact of the prey crash rather than a stable cycle. We must urgently protect the beetle population from extinction while enforcing strict metabolic and reproductive limits on the fox population to force reliance on sustainable, rather than extractive, nutrient cycles."
+}
