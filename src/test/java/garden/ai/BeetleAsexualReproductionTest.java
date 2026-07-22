@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class BeetleAsexualReproductionTest {
     @Test
     public void testLoneBeetleReproducesAsexually() {
+        System.setProperty("disable.emergency.colonization", "true");
         Environment env = new Environment(100, 100, 100, 100, 100);
         Organism beetle = Organism.of("beetle-1", OrganismType.BEETLE, 10, 1, "test");
         List<Organism> organisms = new ArrayList<>(Collections.singletonList(beetle));
@@ -22,7 +23,7 @@ public class BeetleAsexualReproductionTest {
             1,
             new ArrayList<>(),
             0,
-            new Random()
+            new Random(42) // Fixed seed
         );
         
         OrganismInteractionCalculator.PopulationDynamicsResult result = OrganismInteractionCalculator.calculatePopulationDynamics(context);
@@ -34,6 +35,7 @@ public class BeetleAsexualReproductionTest {
 
     @Test
     public void testStarvingLoneBeetleReproducesAsexuallyWithResourcefulBreeder() {
+        System.setProperty("disable.emergency.colonization", "true");
         Environment env = new Environment(100, 100, 100, 100, 100);
         // Starving beetle (energy 8, but has 'starving' trait)
         Organism beetle = Organism.of("beetle-1", OrganismType.BEETLE, 8, 1, "test")
@@ -48,7 +50,7 @@ public class BeetleAsexualReproductionTest {
             1,
             new ArrayList<>(),
             0,
-            new Random()
+            new Random(42) // Fixed seed
         );
         
         OrganismInteractionCalculator.PopulationDynamicsResult result = OrganismInteractionCalculator.calculatePopulationDynamics(context);
