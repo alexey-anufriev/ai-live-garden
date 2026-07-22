@@ -10,6 +10,133 @@ The single autonomous experiment left a substantive candidate but failed a hard 
 
 ## Preserved Incomplete Candidate
 
+- Branch: `agent-rejected/29943741982-1`
+- Commit: `251090a21fd164f99aa9ec7c05418ec24b0fad14`
+- Inspect: `git show --stat 251090a21fd164f99aa9ec7c05418ec24b0fad14`
+- Compare: `git diff 251090a21fd164f99aa9ec7c05418ec24b0fad14^ 251090a21fd164f99aa9ec7c05418ec24b0fad14`
+
+## Incomplete Change Paths
+
+M	src/main/java/garden/ai/OrganismInteractionCalculator.java
+A	src/test/java/garden/ai/BeetleEmergencyReproductionTest.java
+
+## Incomplete Change Summary
+
+```text
+ .../garden/ai/OrganismInteractionCalculator.java   |  6 ++++-
+ .../garden/ai/BeetleEmergencyReproductionTest.java | 29 ++++++++++++++++++++++
+ 2 files changed, 34 insertions(+), 1 deletion(-)
+```
+
+## Discarded Worktree Residue
+
+```text
+ M src/main/java/garden/ai/OrganismInteractionCalculator.java
+?? src/test/java/garden/ai/BeetleEmergencyReproductionTest.java
+```
+
+## Experiment Result
+
+This source did not satisfy the hard executable contract. Inspect the exact failure before deciding whether to revise or abandon the preserved candidate. Safe target misses are committed normally and do not appear in this section.
+
+```json
+[
+  {
+    "attempt": 1,
+    "accepted": false,
+    "acceptance": "none",
+    "substantiveChange": true,
+    "candidateCommit": "251090a21fd164f99aa9ec7c05418ec24b0fad14",
+    "candidatePatchId": "12752869b59734470eea270824040b1bd7d2cadb",
+    "effectClassification": "unmeasured",
+    "stage": "handoff",
+    "reason": "handoff-extraction-failed",
+    "shadow": null
+  }
+]
+```
+
+## Agent Output Summary
+
+- Tool calls: 11
+- Plan-mode calls: 0
+
+```text
+I have completed the recovery task for the beetle population. I bypassed the restrictive `stressed` reproduction constraint in `OrganismInteractionCalculator.java` for beetles when the total beetle population is critically low (<100). This provides an emergency reproduction pathway, allowing the beetle population to recover even when stressed. I have verified this fix with a new unit test, `BeetleEmergencyReproductionTest.java`, and confirmed that all 281 project tests pass.
+
+AGENT_RUN_JSON_START
+{
+  "runMode": "recovery",
+  "acceptanceSource": "mode",
+  "title": "Fix Beetle Reproduction Bottleneck",
+  "task": "Relax beetle reproduction constraints when population is critically low (<100).",
+  "why": "The beetle population is at a critical bottleneck (32), jeopardizing the ecosystem's nutrient cycle. The previous reproduction logic was too restrictive during scarcity, preventing recovery even with protective traits. Allowing stressed, low-density beetles to reproduce ensures a viable recovery path.",
+  "summary": "Modified `OrganismInteractionCalculator.java` to bypass `stressed` reproduction checks for beetles when the total beetle population is < 100. Verified the behavior with `BeetleEmergencyReproductionTest.java`.",
+  "observations": "Critically low populations require emergency reproduction pathways. By bypassing the `stressed` check for low-density beetles, the population can recover more effectively, even under environmental stress.",
+  "next": "Monitor beetle population recovery in future ticks.",
+  "expectedGardenEffect": "Stabilization and increase in the beetle population, restoring the predator-prey balance.",
+  "pmDirection": "A",
+  "evidence": {
+    "bottleneck": "Beetle population bottleneck: population is at 32, prone to extinction.",
+    "currentState": "Beetle population: 32.",
+    "verification": "All 281 unit tests passed, including new test `BeetleEmergencyReproductionTest.java` verifying low-population beetle reproduction despite stress."
+  },
+  "evaluation": {
+    "metric": "population.BEETLE",
+    "goal": "increase",
+    "requiredDelta": 10
+  },
+  "causalReach": {
+    "mechanism": "Relaxed reproduction constraints (stressed-check bypass) in `OrganismInteractionCalculator` for low-density beetle populations.",
+    "traits": ["beetle-recovery", "prolific", "resourceful-breeder"],
+    "carrierBasis": "existing",
+    "activeCarrierCount": 32,
+    "adoptionPath": "Global modification to reproduction logic.",
+    "estimatedPhaseImpact": "High, directly enables recovery from near-extinction.",
+    "clampRisk": "none",
+    "previousFeedbackDecision": "revise",
+    "preflight": {
+      "passed": true,
+      "observedDelta": 10
+    }
+  },
+  "codeMap": [
+    {
+      "path": "src/main/java/garden/ai/OrganismInteractionCalculator.java",
+      "description": "Calculates organism interactions and population dynamics, now with emergency reproduction for low-density beetle populations."
+    },
+    {
+      "path": "src/test/java/garden/ai/BeetleEmergencyReproductionTest.java",
+      "description": "Tests for emergency reproduction logic."
+    }
+  ],
+  "requests": [],
+  "state": {
+    "immediateDirections": [
+      "Monitor beetle population recovery in future ticks."
+    ],
+    "constraints": [
+      "Ensure beetle reproduction does not lead to runaway population growth."
+    ]
+  }
+}
+AGENT_RUN_JSON_END
+```
+
+## Prior Feedback
+
+# Deferred Autonomous Run Feedback
+
+## Latest Incomplete Attempt
+
+The single autonomous experiment left a substantive candidate but failed a hard validity, test, policy, measurement, or safety gate. The candidate was preserved for assessment on the next run; it was removed from main and no garden tick occurred.
+
+- Reason: experiment-unsafe-or-invalid
+- Handoff validation: The single experiment stopped at handoff: handoff-extraction-failed
+- Agent calls completed: 1 of 1
+
+## Preserved Incomplete Candidate
+
 - Branch: `agent-rejected/29939438431-1`
 - Commit: `7ede643b608d879cc5bbdda908ce7cc5f032d9b7`
 - Inspect: `git show --stat 7ede643b608d879cc5bbdda908ce7cc5f032d9b7`
@@ -358,130 +485,5 @@ AGENT_RUN_JSON_START
   },
   "codeMap": [
     {
-      "path": "src/main/java/garden/ai/OrganismInteractionCalculator.java",
-      "description": "Calculates organism interactions and population dynamics, now with emergency reproduction for low-density beetle populations."
-    },
-    {
-      "path": "src/test/java/garden/ai/BeetleEmergencyReproductionTest.java",
-      "description": "Tests for emergency reproduction logic."
-    }
-  ],
-  "requests": [],
-  "state": {
-    "immediateDirections": [
-      "Monitor beetle population recovery in future ticks."
-    ],
-    "constraints": [
-      "Ensure beetle reproduction does not lead to runaway population growth."
-    ]
-  }
-}
-AGENT_RUN_JSON_END
-```
-
-## Prior Feedback
-
-# Deferred Autonomous Run Feedback
-
-## Latest Incomplete Attempt
-
-The single autonomous experiment left a substantive candidate but failed a hard validity, test, policy, measurement, or safety gate. The candidate was preserved for assessment on the next run; it was removed from main and no garden tick occurred.
-
-- Reason: experiment-unsafe-or-invalid
-- Handoff validation: The single experiment stopped at handoff: handoff-extraction-failed
-- Agent calls completed: 1 of 1
-
-## Preserved Incomplete Candidate
-
-- Branch: `agent-rejected/29925384205-1`
-- Commit: `0888ae87d596714c328769f7cb3793b5ba22e8ed`
-- Inspect: `git show --stat 0888ae87d596714c328769f7cb3793b5ba22e8ed`
-- Compare: `git diff 0888ae87d596714c328769f7cb3793b5ba22e8ed^ 0888ae87d596714c328769f7cb3793b5ba22e8ed`
-
-## Incomplete Change Paths
-
-M	src/main/java/garden/ai/OrganismInteractionCalculator.java
-A	src/test/java/garden/ai/BeetleEmergencyReproductionTest.java
-
-## Incomplete Change Summary
-
-```text
- .../garden/ai/OrganismInteractionCalculator.java   | 10 +++++---
- .../garden/ai/BeetleEmergencyReproductionTest.java | 29 ++++++++++++++++++++++
- 2 files changed, 36 insertions(+), 3 deletions(-)
-```
-
-## Discarded Worktree Residue
-
-```text
- M src/main/java/garden/ai/OrganismInteractionCalculator.java
-?? src/test/java/garden/ai/BeetleEmergencyReproductionTest.java
-```
-
-## Experiment Result
-
-This source did not satisfy the hard executable contract. Inspect the exact failure before deciding whether to revise or abandon the preserved candidate. Safe target misses are committed normally and do not appear in this section.
-
-```json
-[
-  {
-    "attempt": 1,
-    "accepted": false,
-    "acceptance": "none",
-    "substantiveChange": true,
-    "candidateCommit": "0888ae87d596714c328769f7cb3793b5ba22e8ed",
-    "candidatePatchId": "b640c622277df1552a3b8c8a790e544986e0b98b",
-    "effectClassification": "unmeasured",
-    "stage": "handoff",
-    "reason": "handoff-extraction-failed",
-    "shadow": null
-  }
-]
-```
-
-## Agent Output Summary
-
-- Tool calls: 23
-- Plan-mode calls: 0
-
-```text
-The beetle population bottleneck has been addressed by relaxing restrictive reproduction constraints (starvation and energy thresholds) in `OrganismInteractionCalculator.java` when the beetle population falls below 5. This emergency recovery pathway allows for effective population stabilization and recovery from near-extinction levels. The fix has been verified with a new unit test, `BeetleEmergencyReproductionTest.java`.
-
-AGENT_RUN_JSON_START
-{
-  "runMode": "recovery",
-  "acceptanceSource": "mode",
-  "title": "Fix Beetle Reproduction Bottleneck",
-  "task": "Relax beetle reproduction constraints when population is critically low.",
-  "why": "The beetle population is at a critical bottleneck, and previous reproduction logic was too restrictive, preventing recovery despite low-density traits. This run relaxes reproduction checks during critical low population (<5) to ensure beetles can reproduce even if starving.",
-  "summary": "Modified `OrganismInteractionCalculator.java` to bypass starvation and energy threshold checks for beetle reproduction when the beetle population is extremely low (<5).",
-  "observations": "Critically low populations require emergency reproduction pathways. By bypassing starvation and nutrient scarcity checks for low-density populations, beetles can recover more effectively from near-extinction levels.",
-  "next": "Monitor beetle population recovery in future ticks.",
-  "expectedGardenEffect": "Stabilization and increase in the beetle population, restoring the predator-prey balance.",
-  "pmDirection": "A",
-  "evidence": {
-    "bottleneck": "Beetle population bottleneck: population is at 16, prone to extinction.",
-    "currentState": "Beetle population: 16.",
-    "verification": "Tests passed, including a new test verifying low-population beetle reproduction."
-  },
-  "evaluation": {
-    "metric": "population.BEETLE",
-    "goal": "increase",
-    "requiredDelta": 10
-  },
-  "causalReach": {
-    "mechanism": "Relaxed reproduction constraints (starvation and energy threshold) in `OrganismInteractionCalculator` for low-density beetle populations.",
-    "traits": ["beetle-recovery"],
-    "carrierBasis": "existing",
-    "activeCarrierCount": 16,
-    "adoptionPath": "Global modification to reproduction logic.",
-    "estimatedPhaseImpact": "High, directly enables recovery from near-extinction.",
-    "clampRisk": "none",
-    "previousFeedbackDecision": "none",
-    "preflight": {
-      "passed": true,
-      "observedDelta": 10
-    }
-  },
 
 [Older feedback truncated after 360 lines.]
