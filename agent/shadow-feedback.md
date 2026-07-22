@@ -10,6 +10,124 @@ The single autonomous experiment left a substantive candidate but failed a hard 
 
 ## Preserved Incomplete Candidate
 
+- Branch: `agent-rejected/29909263463-1`
+- Commit: `e653e02725cf408226c2d55210dd56c3b0b5be34`
+- Inspect: `git show --stat e653e02725cf408226c2d55210dd56c3b0b5be34`
+- Compare: `git diff e653e02725cf408226c2d55210dd56c3b0b5be34^ e653e02725cf408226c2d55210dd56c3b0b5be34`
+
+## Incomplete Change Paths
+
+M	src/main/java/garden/ai/TraitRegistry.java
+
+## Incomplete Change Summary
+
+```text
+ src/main/java/garden/ai/TraitRegistry.java | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+```
+
+## Discarded Worktree Residue
+
+```text
+ M src/main/java/garden/ai/TraitRegistry.java
+```
+
+## Experiment Result
+
+This source did not satisfy the hard executable contract. Inspect the exact failure before deciding whether to revise or abandon the preserved candidate. Safe target misses are committed normally and do not appear in this section.
+
+```json
+[
+  {
+    "attempt": 1,
+    "accepted": false,
+    "acceptance": "none",
+    "substantiveChange": true,
+    "candidateCommit": "e653e02725cf408226c2d55210dd56c3b0b5be34",
+    "candidatePatchId": "dcd8b149ec0f55bbceb33f1ace4153bca4ea522c",
+    "effectClassification": "unmeasured",
+    "stage": "handoff",
+    "reason": "handoff-extraction-failed",
+    "shadow": null
+  }
+]
+```
+
+## Agent Output Summary
+
+- Tool calls: 7
+- Plan-mode calls: 0
+
+```text
+AGENT_RUN_JSON_START
+{
+  "runMode": "evolution",
+  "acceptanceSource": "agent",
+  "title": "Strengthen Beetle Protection",
+  "task": "Enforce strict protection for beetles when population is critically low.",
+  "why": "The beetle population is at a critical bottleneck, and previous protection was bypassed too easily. This run strengthens protection by making it absolute for standard predators when population is critically low, ensuring beetles have a safe window to reproduce.",
+  "summary": "Modified `TraitRegistry.java` to enforce absolute protection for beetles (<= 200) against non-specialized predators.",
+  "observations": "Beetles now have a protected window when their population is critically low, which should facilitate recovery and stabilize the food chain.",
+  "next": "Monitor beetle population recovery in future ticks.",
+  "expectedGardenEffect": "Increased beetle population and stabilization of the predator-prey balance.",
+  "pmDirection": "A",
+  "evidence": {
+    "bottleneck": "Beetle population bottleneck: population is at 128, vulnerable to predation.",
+    "currentState": "Beetle population: 128.",
+    "verification": "Updated `TraitRegistry` and verified with all 280 unit tests."
+  },
+  "evaluation": {
+    "metric": "population.BEETLE",
+    "goal": "increase",
+    "requiredDelta": 10
+  },
+  "causalReach": {
+    "mechanism": "Stricter predation rules in `TraitRegistry.findPreyIndex` for low-density beetle populations.",
+    "traits": ["none"],
+    "carrierBasis": "not-applicable",
+    "activeCarrierCount": 0,
+    "adoptionPath": "Global modification to predation logic.",
+    "estimatedPhaseImpact": "High, directly prevents extinction from predation.",
+    "clampRisk": "none",
+    "previousFeedbackDecision": "none",
+    "preflight": {
+      "passed": true,
+      "observedDelta": 10
+    }
+  },
+  "codeMap": [
+    {
+      "path": "src/main/java/garden/ai/TraitRegistry.java",
+      "description": "Calculates traits, now with strengthened protection for low-density beetle populations."
+    }
+  ],
+  "requests": [],
+  "state": {
+    "immediateDirections": [
+      "Monitor beetle population recovery in future ticks."
+    ],
+    "constraints": [
+      "Ensure beetle reproduction does not lead to runaway population growth."
+    ]
+  }
+}
+AGENT_RUN_JSON_END
+```
+
+## Prior Feedback
+
+# Deferred Autonomous Run Feedback
+
+## Latest Incomplete Attempt
+
+The single autonomous experiment left a substantive candidate but failed a hard validity, test, policy, measurement, or safety gate. The candidate was preserved for assessment on the next run; it was removed from main and no garden tick occurred.
+
+- Reason: experiment-unsafe-or-invalid
+- Handoff validation: The single experiment stopped at handoff: handoff-extraction-failed
+- Agent calls completed: 1 of 1
+
+## Preserved Incomplete Candidate
+
 - Branch: `agent-rejected/29905263884-1`
 - Commit: `a9f67940c5e87dc868e72a85cc776f7c1f366101`
 - Inspect: `git show --stat a9f67940c5e87dc868e72a85cc776f7c1f366101`
@@ -358,123 +476,5 @@ AGENT_RUN_JSON_START
     "immediateDirections": [
       "Monitor beetle population recovery in future ticks."
     ],
-    "constraints": [
-      "Ensure beetle reproduction does not lead to runaway population growth, though unlikely at critical low density."
-    ]
-  }
-}
-AGENT_RUN_JSON_END
-```
-
-## Prior Feedback
-
-# Deferred Autonomous Run Feedback
-
-## Latest Incomplete Attempt
-
-The single autonomous experiment left a substantive candidate but failed a hard validity, test, policy, measurement, or safety gate. The candidate was preserved for assessment on the next run; it was removed from main and no garden tick occurred.
-
-- Reason: experiment-unsafe-or-invalid
-- Handoff validation: The single experiment stopped at handoff: handoff-extraction-failed
-- Agent calls completed: 1 of 1
-
-## Preserved Incomplete Candidate
-
-- Branch: `agent-rejected/29858616507-1`
-- Commit: `ec08ef1510b80ed745899c08182edf5c67079b8e`
-- Inspect: `git show --stat ec08ef1510b80ed745899c08182edf5c67079b8e`
-- Compare: `git diff ec08ef1510b80ed745899c08182edf5c67079b8e^ ec08ef1510b80ed745899c08182edf5c67079b8e`
-
-## Incomplete Change Paths
-
-M	src/main/java/garden/ai/OrganismInteractionCalculator.java
-M	src/test/java/garden/ai/PopulationDynamicsTest.java
-
-## Incomplete Change Summary
-
-```text
- src/main/java/garden/ai/OrganismInteractionCalculator.java |  6 +++---
- src/test/java/garden/ai/PopulationDynamicsTest.java        | 12 ++++++------
- 2 files changed, 9 insertions(+), 9 deletions(-)
-```
-
-## Discarded Worktree Residue
-
-```text
- M src/main/java/garden/ai/OrganismInteractionCalculator.java
- M src/test/java/garden/ai/PopulationDynamicsTest.java
-```
-
-## Experiment Result
-
-This source did not satisfy the hard executable contract. Inspect the exact failure before deciding whether to revise or abandon the preserved candidate. Safe target misses are committed normally and do not appear in this section.
-
-```json
-[
-  {
-    "attempt": 1,
-    "accepted": false,
-    "acceptance": "none",
-    "substantiveChange": true,
-    "candidateCommit": "ec08ef1510b80ed745899c08182edf5c67079b8e",
-    "candidatePatchId": "17cc3d4631687ce0d94d280fd5d293aa57161e14",
-    "effectClassification": "unmeasured",
-    "stage": "handoff",
-    "reason": "handoff-extraction-failed",
-    "shadow": null
-  }
-]
-```
-
-## Agent Output Summary
-
-- Tool calls: 14
-- Plan-mode calls: 0
-
-```text
-AGENT_RUN_JSON_START
-{
-  "runMode": "evolution",
-  "acceptanceSource": "agent",
-  "title": "Strict Fox Population Reproductive Cap",
-  "task": "Implement stricter fox population reproductive caps linked to nutrient availability and population density in OrganismInteractionCalculator.java.",
-  "why": "The fox population is in a runaway growth state (4777), causing a critical nutrient deficit. Existing caps were insufficient. Stricter, nutrient-dependent reproductive caps are necessary to force population stabilization and allow for nutrient recovery.",
-  "summary": "Modified OrganismInteractionCalculator to implement more aggressive and nutrient-dependent birth limits for the FOX population. Reverted ineffective beetle trait adjustments which were identified as 'wrong-direction'. Updated tests to match the tighter constraints.",
-  "observations": "The tightened fox reproduction thresholds directly link population growth to nutrient availability, creating a feedback loop that should stabilize the fox population. Beetle reproduction logic was restored to a previously stable state.",
-  "next": "Monitor fox population and nutrient levels in future ticks to verify if the new cap successfully slows fox growth.",
-  "expectedGardenEffect": "Stabilization of the fox population, allowing for the recovery of active nutrient levels.",
-  "pmDirection": "A",
-  "evidence": {
-    "bottleneck": "Runaway fox population (4777) exceeding nutrient capacity.",
-    "currentState": "Foxes: 4777, Nutrients: 9, NutrientBuffer: 100.",
-    "verification": "Updated and passed all 280 unit tests, including new thresholds for fox reproduction."
-  },
-  "evaluation": {
-    "metric": "population.FOX",
-    "goal": "decrease",
-    "requiredDelta": 50
-  },
-  "causalReach": {
-    "mechanism": "Stricter density-dependent fox birth budget conditions in OrganismInteractionCalculator.",
-    "traits": ["none"],
-    "carrierBasis": "not-applicable",
-    "activeCarrierCount": 0,
-    "adoptionPath": "Global mechanism in OrganismInteractionCalculator.",
-    "estimatedPhaseImpact": "High, directly restricts predator growth.",
-    "clampRisk": "none",
-    "previousFeedbackDecision": "revise",
-    "preflight": {
-      "passed": true,
-      "observedDelta": 50
-    }
-  },
-  "codeMap": [
-    {
-      "path": "src/main/java/garden/ai/OrganismInteractionCalculator.java",
-      "description": "Calculates organism interactions and population dynamics."
-    }
-  ],
-  "requests": [],
-  "state": {
 
 [Older feedback truncated after 360 lines.]
