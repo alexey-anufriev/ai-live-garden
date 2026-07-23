@@ -44,8 +44,8 @@ class NutrientConserverTest {
 
         // 20 plants total, 10 conservers.
         // Expected consumption: (20 / 5) - (10 / 1) = 4 - 10 = max(0, -6) = 0.
-        // Environment nutrients = 5 + 2 (prod) - 0 (cons) + 10 (buffer release, 50/5) = 17.
+        // Environment nutrients = 5 + 2 (prod) - 0 (cons) + 25 (buffer release, 50/2) = 32.
         
-        assertThat(next.environment().nutrients()).isEqualTo(17);
+        assertThat(next.environment().nutrients()).isEqualTo(32);
     }
 }

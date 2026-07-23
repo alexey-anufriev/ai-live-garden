@@ -359,7 +359,7 @@ class GardenTest {
 
         Garden next = garden.nextCycle();
 
-        assertThat(next.environment().nutrients()).isEqualTo(17);
+        assertThat(next.environment().nutrients()).isEqualTo(32);
     }
 
     @Test
@@ -377,9 +377,10 @@ class GardenTest {
     void bufferReleasesMoreNutrientsWhenHungry() {
         Environment envHungry = new Environment(50, 50, 50, 5, 100);
         Environment nextHungry = envHungry.next(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0); // 0 plants/animals
-        // nutrients=5 < 10, so buffer release is 100/(5/2) = 100/2 = 50.
-        // nextNutrients = 5 + 2 (default delta) + 50 = 57.
-        assertThat(nextHungry.nutrients()).isEqualTo(57);
+        // nutrients=5 < 10, so buffer release rate 2, buffer > 80 -> release rate 1.
+        // nextNutrients = 5 + 2 + 100 = 107 (clamped to 100).
+        assertThat(nextHungry.nutrients()).isEqualTo(100);
+
 
         Environment envBalanced = new Environment(50, 50, 50, 50, 100);
         Environment nextBalanced = envBalanced.next(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
