@@ -156,9 +156,14 @@ public class OrganismInteractionCalculator {
         } else {
             long beetleCount = context.allOrganisms().stream().filter(o -> o.type() == OrganismType.BEETLE).count();
             long foxCount = context.allOrganisms().stream().filter(o -> o.type() == OrganismType.FOX).count();
-            if (organism.type() == OrganismType.FOX && foxCount > 100) {
-                changed = changed.withEnergy(-1000); // More aggressive culling
-                context.events().add(new GardenEvent(context.cycle(), "%s was culled due to unsustainable population (total=%d).".formatted(changed.id(), foxCount)));
+            if (organism.type() == OrganismType.FOX) {
+                if (foxCount > 2000) {
+                    changed = changed.withEnergy(-100000); // Extremely aggressive
+                    context.events().add(new GardenEvent(context.cycle(), "%s was radicalized (culled) due to unsustainable population (total=%d).".formatted(changed.id(), foxCount)));
+                } else if (foxCount > 1000) {
+                    changed = changed.withEnergy(-1000); // Aggressive
+                    context.events().add(new GardenEvent(context.cycle(), "%s was culled due to unsustainable population (total=%d).".formatted(changed.id(), foxCount)));
+                }
             }
             if (organism.type() == OrganismType.BEETLE && beetleCount < 1000) {
                 changed = changed.withTrait("beetle-recovery");

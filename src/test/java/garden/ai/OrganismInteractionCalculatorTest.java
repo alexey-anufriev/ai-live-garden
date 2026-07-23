@@ -141,6 +141,28 @@ class OrganismInteractionCalculatorTest {
     }
 
     @Test
+    void foxCullingAggressiveAtHighPopulation() {
+        Environment env = new Environment(50, 50, 50, 100, 100);
+
+        // Create 1500 foxes
+        List<Organism> organisms = IntStream.range(0, 1500)
+                .mapToObj(i -> Organism.of("fox-" + i, OrganismType.FOX, 20, 1))
+                .collect(Collectors.toList());
+
+        OrganismInteractionCalculator.PassiveChangeContext context = new OrganismInteractionCalculator.PassiveChangeContext(
+                env, 1, new ArrayList<>(), new TraitRegistry.ContributionResult(0,0,0,0), organisms);
+
+        List<Organism> changed = OrganismInteractionCalculator.calculatePassiveChanges(context);
+
+        // Many foxes should have reduced energy (energy < 20)
+        long culledFoxes = changed.stream()
+                .filter(o -> o.type() == OrganismType.FOX && o.energy() < 20)
+                .count();
+
+        assertThat(culledFoxes).isEqualTo(1500);
+    }
+
+    @Test
     void beetleReproductionRestrictedAtHighPopulation() {
         Environment env = new Environment(50, 50, 50, 100, 100);
         // Create 14000 total organisms, 3001 of them being beetles
@@ -153,10 +175,10 @@ class OrganismInteractionCalculatorTest {
                     }
                 })
                 .collect(Collectors.toList());
-        
+
         // Should be restricted
         int budget = OrganismInteractionCalculator.typeBirthBudget(OrganismType.BEETLE, organisms, env);
         assertThat(budget).isEqualTo(0);
     }
-}
+    }
 

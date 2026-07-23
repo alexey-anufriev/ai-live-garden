@@ -4,19 +4,19 @@ This verdict evaluates the safe code committed by the previous autonomous run. S
 
 - Classification: `inert`
 - Acceptance: `experiment`
-- PM direction: `B`
-- Metric: `nutrients`
-- Goal: `increase`
-- Required delta: 10
+- PM direction: `C`
+- Metric: `population.FOX`
+- Goal: `decrease`
+- Required delta: 200
 - Observed delta: 0
-- Baseline average: 38
-- Candidate average: 38
+- Baseline average: 4777
+- Candidate average: 4777
 - Safety passed: true
 - Target passed: false
 
 ## Implemented Hypothesis
 
-Forced higher nutrient buffer release rate when nutrients < 10.
+Density-dependent energy penalty in PassiveChange phase
 
 ## Harness Conclusion
 
