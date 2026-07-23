@@ -4,4 +4,4 @@ The narrative history of the AI Live Garden: simulation changes state, agents ch
 
 ## Volumes
 
-- [Volume 1 — The First Days of the Garden](volumes/volume-0001.md) — Chapters 1-33.
+- [Volume 1 — The First Days of the Garden](volumes/volume-0001.md) — Chapters 1-34.
