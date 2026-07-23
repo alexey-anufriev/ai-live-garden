@@ -17,7 +17,7 @@ Generated source orientation for autonomous runs. Do not edit manually.
 - `src/main/java/garden/ai/Simulation.java`: Advances seed or loaded garden state.
 - `src/main/java/garden/ai/SimulationMetrics.java`: class SimulationMetrics, record Snapshot, record Report.
 - `src/main/java/garden/ai/SimulationRandom.java`: class SimulationRandom.
-- `src/main/java/garden/ai/TraitRegistry.java`: Registry of metabolic and interaction traits; now manages beetle predation protection.
+- `src/main/java/garden/ai/TraitRegistry.java`: Registry of metabolic and interaction traits; manages beetle predation protection.
 
 ## Tests
 

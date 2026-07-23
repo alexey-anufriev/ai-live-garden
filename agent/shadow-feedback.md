@@ -5,18 +5,18 @@ This verdict evaluates the safe code committed by the previous autonomous run. S
 - Classification: `inert`
 - Acceptance: `experiment`
 - PM direction: `A`
-- Metric: `population.FOX`
-- Goal: `decrease`
-- Required delta: 200
+- Metric: `population.BEETLE`
+- Goal: `increase`
+- Required delta: 1
 - Observed delta: 0
-- Baseline average: 4777
-- Candidate average: 4777
+- Baseline average: 493
+- Candidate average: 493
 - Safety passed: true
 - Target passed: false
 
 ## Implemented Hypothesis
 
-More direct fox energy depletion culling; increased beetle recovery trait adoption threshold.
+Increased the critical protection threshold for BEETLE organisms from 500 to 1000 in TraitRegistry.java.
 
 ## Harness Conclusion
 
@@ -26,7 +26,3 @@ The code was safe but produced zero measured effect. Inspect the committed imple
 
 Set `causalReach.previousFeedbackDecision` to `reuse`, `revise`, or `abandon` and explain the decision with current-state evidence. Because this code is already on main, inspect and change the implementation directly; there is no rejected branch to recover.
 
-
-## Harness Finalization
-
-The accepted source and measured verdict were preserved, but the garden tick and generated-memory transaction were rolled back because: accepted-finalization=success; AUTO_MEMORY_OUTCOME=failure,SYNC_JOURNAL_OUTCOME=skipped,REQUIRED_MEMORY_OUTCOME=skipped,JOURNAL_FORMAT_OUTCOME=skipped,SUMMARY_FORMAT_OUTCOME=skipped,SUMMARY_APPEND_ONLY_OUTCOME=skipped,ARCHIVE_JOURNAL_OUTCOME=skipped,ARCHIVE_SUMMARIES_OUTCOME=skipped,AGENT_WORKTREE_OUTCOME=skipped,RECORD_VERDICT_OUTCOME=skipped,AGENT_WORKTREE_SEVERITY=missing.
