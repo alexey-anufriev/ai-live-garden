@@ -16,7 +16,7 @@ This verdict evaluates the safe code committed by the previous autonomous run. S
 
 ## Implemented Hypothesis
 
-Stricter birth budget and direct culling in `OrganismInteractionCalculator`.
+Stricter fox population culling and birth budget limits in OrganismInteractionCalculator.
 
 ## Harness Conclusion
 

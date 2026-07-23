@@ -156,9 +156,9 @@ public class OrganismInteractionCalculator {
         } else {
             long beetleCount = context.allOrganisms().stream().filter(o -> o.type() == OrganismType.BEETLE).count();
             long foxCount = context.allOrganisms().stream().filter(o -> o.type() == OrganismType.FOX).count();
-            if (organism.type() == OrganismType.FOX && foxCount > 1000) {
+            if (organism.type() == OrganismType.FOX && foxCount > 300) {
                 changed = changed.withEnergy(0);
-                context.events().add(new GardenEvent(context.cycle(), "%s was culled due to overpopulation.".formatted(changed.id())));
+                context.events().add(new GardenEvent(context.cycle(), "%s was culled due to unsustainable population (total=%d).".formatted(changed.id(), foxCount)));
             }
             if (organism.type() == OrganismType.BEETLE && beetleCount < 200) {
                 changed = changed.withTrait("beetle-recovery");
@@ -361,8 +361,8 @@ public class OrganismInteractionCalculator {
         if (childType == OrganismType.BEETLE && typeCount < 10) return 10;
 
         if (childType == OrganismType.FOX) {
-            if (typeCount > 500) return 0; // Strict limit: 500
-            if (environment.nutrients() < 20) return 0;
+            if (typeCount > 200) return 0; // Stricter limit: 200
+            if (environment.nutrients() < 30) return 0;
             return FUNCTIONAL_TYPE_BIRTH_BUDGET;
         }
 

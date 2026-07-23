@@ -86,18 +86,21 @@ class PopulationDynamicsTest {
         // High fox population, low nutrients -> limited birth budget
         Environment lowNutrients = new Environment(100, 100, 100, 10, 100);
         List<Organism> organisms = new ArrayList<>();
-        // Population <= 500 -> functional birth budget
-        for (int i = 0; i < 400; i++) {
+        // Population > 200 -> limited birth budget regardless of nutrients
+        for (int i = 0; i < 300; i++) {
             organisms.add(Organism.of("fox-" + i, OrganismType.FOX, 50, 1));
         }
         
-        // typeCount <= 500 && nutrients < 20 -> 0 (nutrients < 20 check)
         assertThat(OrganismInteractionCalculator.typeBirthBudget(OrganismType.FOX, organisms, lowNutrients)).isEqualTo(0);
         
-        // High fox population, high nutrients -> normal birth budget
+        // Low fox population, high nutrients -> normal birth budget
+        List<Organism> fewOrganisms = new ArrayList<>();
+        for (int i = 0; i < 100; i++) {
+            fewOrganisms.add(Organism.of("fox-" + i, OrganismType.FOX, 50, 1));
+        }
+        
         Environment highNutrients = new Environment(100, 100, 100, 80, 100);
-        // typeCount <= 500 && nutrients >= 20 -> 6 (functional birth budget)
-        assertThat(OrganismInteractionCalculator.typeBirthBudget(OrganismType.FOX, organisms, highNutrients)).isEqualTo(6);
+        assertThat(OrganismInteractionCalculator.typeBirthBudget(OrganismType.FOX, fewOrganisms, highNutrients)).isEqualTo(6);
     }
 
     @Test
@@ -105,14 +108,18 @@ class PopulationDynamicsTest {
         // High fox population, low nutrients -> limited birth budget
         Environment lowNutrients = new Environment(100, 100, 100, 5, 100);
         List<Organism> organisms = new ArrayList<>();
-        for (int i = 0; i < 300; i++) {
+        for (int i = 0; i < 250; i++) {
             organisms.add(Organism.of("fox-" + i, OrganismType.FOX, 50, 1));
         }
         
-        // typeCount > 250 && nutrients < 10 -> 0
+        // typeCount > 200 -> 0
         assertThat(OrganismInteractionCalculator.typeBirthBudget(OrganismType.FOX, organisms, lowNutrients)).isEqualTo(0);
         
-        // High fox population, moderate nutrients -> normal birth budget
+        // Low fox population, moderate nutrients -> normal birth budget
+        organisms = new ArrayList<>();
+        for (int i = 0; i < 100; i++) {
+            organisms.add(Organism.of("fox-" + i, OrganismType.FOX, 50, 1));
+        }
         Environment modNutrients = new Environment(100, 100, 100, 40, 100);
         assertThat(OrganismInteractionCalculator.typeBirthBudget(OrganismType.FOX, organisms, modNutrients)).isEqualTo(6);
     }
