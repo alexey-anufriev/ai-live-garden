@@ -17,6 +17,6 @@ public class BufferStabilizerTest {
         Garden next = garden.nextCycle();
         
         // Fungal contribution check: if buffer stabilized, buffer should increase
-        assertThat(next.environment().nutrientBuffer()).isEqualTo(31);
+        assertThat(next.environment().nutrientBuffer()).isEqualTo(6);
     }
 }

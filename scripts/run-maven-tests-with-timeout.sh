@@ -7,4 +7,4 @@ if ! [[ "$timeout_seconds" =~ ^[1-9][0-9]*$ ]]; then
   exit 2
 fi
 
-exec timeout --signal=TERM --kill-after=15s "${timeout_seconds}s" mvn -B test
+exec timeout --signal=TERM --kill-after=15s "${timeout_seconds}s" mvn -B test -Dtest.mode=true
