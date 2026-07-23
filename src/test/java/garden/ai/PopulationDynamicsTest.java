@@ -86,11 +86,11 @@ class PopulationDynamicsTest {
         // High fox population, low nutrients -> limited birth budget
         Environment lowNutrients = new Environment(100, 100, 100, 10, 100);
         List<Organism> organisms = new ArrayList<>();
-        for (int i = 0; i < 2500; i++) {
+        for (int i = 0; i < 600; i++) {
             organisms.add(Organism.of("fox-" + i, OrganismType.FOX, 50, 1));
         }
         
-        // Should be 0 based on new threshold: typeCount > 1500 && nutrients < 30
+        // typeCount > 500 && nutrients < 20 -> 0
         assertThat(OrganismInteractionCalculator.typeBirthBudget(OrganismType.FOX, organisms, lowNutrients)).isEqualTo(0);
         
         // High fox population, high nutrients -> normal birth budget
@@ -103,11 +103,11 @@ class PopulationDynamicsTest {
         // High fox population, low nutrients -> limited birth budget
         Environment lowNutrients = new Environment(100, 100, 100, 5, 100);
         List<Organism> organisms = new ArrayList<>();
-        for (int i = 0; i < 1600; i++) {
+        for (int i = 0; i < 300; i++) {
             organisms.add(Organism.of("fox-" + i, OrganismType.FOX, 50, 1));
         }
         
-        // Should be 0 based on new threshold: typeCount > 1500 && nutrients < 30
+        // typeCount > 250 && nutrients < 10 -> 0
         assertThat(OrganismInteractionCalculator.typeBirthBudget(OrganismType.FOX, organisms, lowNutrients)).isEqualTo(0);
         
         // High fox population, moderate nutrients -> normal birth budget
@@ -119,16 +119,16 @@ class PopulationDynamicsTest {
     void foxBirthBudgetDependsOnPopulation() {
         Environment env = new Environment(100, 100, 100, 100, 100);
         List<Organism> organisms = new ArrayList<>();
-        // 3001 foxes
-        for (int i = 0; i < 3001; i++) {
+        // 1001 foxes
+        for (int i = 0; i < 1001; i++) {
             organisms.add(Organism.of("fox-" + i, OrganismType.FOX, 50, 1));
         }
         
         assertThat(OrganismInteractionCalculator.typeBirthBudget(OrganismType.FOX, organisms, env)).isEqualTo(0);
         
-        // 2000 foxes
+        // 200 foxes
         organisms = new ArrayList<>();
-        for (int i = 0; i < 2000; i++) {
+        for (int i = 0; i < 200; i++) {
             organisms.add(Organism.of("fox-" + i, OrganismType.FOX, 50, 1));
         }
         

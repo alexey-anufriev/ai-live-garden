@@ -2,25 +2,25 @@
 
 This verdict evaluates the safe code committed by the previous autonomous run. Shadow evaluation is evidence for the next iteration, not a merge gate. The next agent must inspect the current implementation and explicitly choose to keep, revise, or revert it.
 
-- Classification: `target-met`
-- Acceptance: `full`
-- PM direction: `A`
-- Metric: `population.BEETLE`
-- Goal: `increase`
-- Required delta: 10
-- Observed delta: 255
-- Baseline average: 16
-- Candidate average: 271
+- Classification: `inert`
+- Acceptance: `experiment`
+- PM direction: `C`
+- Metric: `population.FOX`
+- Goal: `decrease`
+- Required delta: 200
+- Observed delta: 0
+- Baseline average: 4777
+- Candidate average: 4777
 - Safety passed: true
-- Target passed: true
+- Target passed: false
 
 ## Implemented Hypothesis
 
-Predation inhibition and nutrient buffer release optimization.
+Stricter birth budget limiting for FOX in OrganismInteractionCalculator.
 
 ## Harness Conclusion
 
-The expected differential was achieved. Keep the mechanism unless later living-state evidence contradicts it, then choose the next bounded milestone.
+The code was safe but produced zero measured effect. Inspect the committed implementation, identify the inactive gate or clamp, and revise or revert it in the next run; do not add another disconnected mechanism.
 
 ## Required Next Decision
 
