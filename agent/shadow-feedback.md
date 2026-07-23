@@ -9,14 +9,14 @@ This verdict evaluates the safe code committed by the previous autonomous run. S
 - Goal: `increase`
 - Required delta: 1
 - Observed delta: 0
-- Baseline average: 493
-- Candidate average: 493
+- Baseline average: 547
+- Candidate average: 547
 - Safety passed: true
 - Target passed: false
 
 ## Implemented Hypothesis
 
-Increased the critical protection threshold for BEETLE organisms from 500 to 1000 in TraitRegistry.java.
+Predation inhibition threshold.
 
 ## Harness Conclusion
 

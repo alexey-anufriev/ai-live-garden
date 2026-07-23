@@ -93,7 +93,7 @@ public class TraitRegistry {
 
         // Critical protection for beetle population
         if (candidate.type() == OrganismType.BEETLE) {
-            if (totalBeetles <= 1000 && !Boolean.getBoolean("test.mode")) return false;
+            if (totalBeetles <= 2000 && !Boolean.getBoolean("test.mode")) return false;
         }
 
         boolean bypassStealth = stealthHunter || isApexPredator || isPredatorScout ||
