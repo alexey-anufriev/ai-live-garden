@@ -1,0 +1,96 @@
+{
+  "antiPatterns": [
+    "Prioritizing minor trait optimization over fundamental demographic survival.",
+    "Focusing on fox reproductive traits that have proven ineffective in halting population growth.",
+    "Allowing the nutrient buffer to remain full while the garden starves."
+  ],
+  "date": "2026-07-23",
+  "directions": [
+    {
+      "acceptanceSignal": "Beetle population begins to increase sustainably.",
+      "avoid": "Traits that increase fox hunting efficacy or focus on generalist predation.",
+      "expectedGardenEffect": "Immediate cessation of fox predation on beetles and initiation of emergency reproductive recovery.",
+      "label": "A",
+      "shadowAcceptance": {
+        "goal": "increase",
+        "metric": "population.BEETLE",
+        "requiredDelta": 20
+      },
+      "title": "Emergency Beetle Preservation",
+      "why": "The beetle population is at 4; extinction is imminent."
+    },
+    {
+      "acceptanceSignal": "Active nutrient level rises above 10.",
+      "avoid": "Releasing nutrients faster than they can be consumed by foundational organisms (fungus/root network).",
+      "expectedGardenEffect": "Active nutrient levels rise as the buffer is converted to usable energy for foundational organisms.",
+      "label": "B",
+      "shadowAcceptance": {
+        "goal": "increase",
+        "metric": "nutrients",
+        "requiredDelta": 10
+      },
+      "title": "Force Nutrient Buffer Release",
+      "why": "Active nutrients are 0 while the buffer is at 100, causing mass starvation."
+    },
+    {
+      "acceptanceSignal": "Fox population trend shows a clear downward trajectory.",
+      "avoid": "Traits that increase fox metabolic efficiency or stress resilience.",
+      "expectedGardenEffect": "Rapid decline in fox population.",
+      "label": "C",
+      "shadowAcceptance": {
+        "goal": "decrease",
+        "metric": "population.FOX",
+        "requiredDelta": 200
+      },
+      "title": "Radical Fox Reduction",
+      "why": "Fox population (4777) is fundamentally unsustainable given zero nutrients and minimal prey."
+    },
+    {
+      "acceptanceSignal": "Fungal and root network populations stabilize or increase.",
+      "avoid": "Traits that divert energy away from foundational network growth.",
+      "expectedGardenEffect": "Increased biomass or stability in foundational organisms.",
+      "label": "D",
+      "shadowAcceptance": {
+        "goal": "increase",
+        "metric": "totalOrganisms",
+        "requiredDelta": 100
+      },
+      "title": "Foundation Stability",
+      "why": "The foundational organisms (fungus/root network) need better energy access to survive while nutrients and beetles recover."
+    }
+  ],
+  "review": {
+    "overallMark": "not achieved",
+    "previousPlanDate": "2026-07-22",
+    "results": [
+      {
+        "evidence": "Beetle population dropped from 16 to 4.",
+        "label": "A",
+        "mark": "not achieved"
+      },
+      {
+        "evidence": "Fox population stable at 4777.",
+        "label": "B",
+        "mark": "not achieved"
+      },
+      {
+        "evidence": "Active nutrients remain 0.",
+        "label": "C",
+        "mark": "not achieved"
+      },
+      {
+        "evidence": "Active nutrients remain 0, nutrient buffer remains 100.",
+        "label": "D",
+        "mark": "not achieved"
+      }
+    ],
+    "summary": "The beetle population collapsed from 16 to 4, nutrients remain at 0, and the fox population remains high at 4777. The previous plan's interventions did not succeed in halting the demographic crisis or fixing the nutrient paradox."
+  },
+  "stateSignals": [
+    "BEETLE population critical: 4",
+    "Active nutrients: 0",
+    "NutrientBuffer: 100",
+    "FOX population: 4777"
+  ],
+  "thesis": "The ecosystem is in a critical state with beetle extinction imminent (only 4 remaining) and an acute nutrient starvation (0 active nutrients despite a full 100 buffer). Previous attempts to cap fox reproduction via behavioral traits have failed to induce a population decline or stabilize the nutrient cycle. We must shift focus to immediate, drastic protective measures for the remaining beetles and force the release of the locked nutrient buffer to revitalize the foundational fungal and root network, enabling the system to sustain life beyond the current starvation cycle."
+}
