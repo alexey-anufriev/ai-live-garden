@@ -2,6 +2,106 @@
 
 ## Latest Incomplete Attempt
 
+The single autonomous experiment did not leave both a valid handoff and a publishable safe candidate. No garden tick occurred, and unvalidated worktree changes were removed from main.
+
+- Reason: experiment-unsafe-or-invalid
+- Handoff validation: The single experiment stopped at output: handoff-without-substantive-change
+- Agent calls completed: 1 of 1
+
+## Incomplete Change Paths
+
+
+## Incomplete Change Summary
+
+```text
+```
+
+## Experiment Result
+
+This source did not satisfy the hard executable contract. Inspect the exact failure before deciding whether to revise or abandon the preserved candidate. Safe target misses are committed normally and do not appear in this section.
+
+```json
+[
+  {
+    "attempt": 1,
+    "accepted": false,
+    "acceptance": "none",
+    "substantiveChange": false,
+    "candidateCommit": "",
+    "candidatePatchId": "",
+    "effectClassification": "unmeasured",
+    "stage": "output",
+    "reason": "handoff-without-substantive-change",
+    "shadow": null
+  }
+]
+```
+
+## Agent Output Summary
+
+- Tool calls: 28
+- Plan-mode calls: 0
+
+```text
+AGENT_RUN_JSON_START
+{
+  "runMode": "evolution",
+  "acceptanceSource": "agent",
+  "title": "Fixing Fox Population Culling Ineffectiveness",
+  "task": "Revise fox culling logic to occur after metabolism calculations.",
+  "why": "The fox population remains stagnant, and the previous culling logic was being bypassed by metabolic bonuses; this change ensures the culling is effective.",
+  "summary": "Attempted to move fox culling after metabolism but caused 8 regression test failures.",
+  "observations": "While the change successfully forced culling in isolation, it impacted the delicate balance of the feeding phase, causing multiple test failures.",
+  "next": "Investigate alternative population control mechanisms that do not disrupt predator-prey dynamics.",
+  "expectedGardenEffect": "Fox population control was expected to improve, but this change was abandoned.",
+  "pmDirection": "A",
+  "evidence": {
+    "bottleneck": "Fox culling was being bypassed by metabolic energy bonuses.",
+    "currentState": "FOX population stagnant at 4777.",
+    "verification": "Failed 8 tests in the suite, so changes were reverted."
+  },
+  "evaluation": {
+    "metric": "population.FOX",
+    "goal": "decrease",
+    "requiredDelta": 100
+  },
+  "causalReach": {
+    "mechanism": "post-metabolism culling (reverted)",
+    "traits": [],
+    "carrierBasis": "not-applicable",
+    "activeCarrierCount": 0,
+    "adoptionPath": "not-applicable",
+    "estimatedPhaseImpact": "High reduction pressure on FOX population.",
+    "clampRisk": "none",
+    "previousFeedbackDecision": "abandon",
+    "preflight": {
+      "passed": false,
+      "observedDelta": null
+    }
+  },
+  "codeMap": [
+    {
+      "path": "src/main/java/garden/ai/OrganismInteractionCalculator.java",
+      "description": "Calculates organism metabolism and interaction."
+    }
+  ],
+  "requests": [],
+  "state": {
+    "immediateDirections": [
+      "Find less intrusive population control."
+    ],
+    "constraints": []
+  }
+}
+AGENT_RUN_JSON_END
+```
+
+## Prior Feedback
+
+# Deferred Autonomous Run Feedback
+
+## Latest Incomplete Attempt
+
 The single autonomous experiment left a substantive candidate but failed a hard validity, test, policy, measurement, or safety gate. The candidate was preserved for assessment on the next run; it was removed from main and no garden tick occurred.
 
 - Reason: experiment-unsafe-or-invalid
@@ -137,33 +237,3 @@ I have completed the requested revisions to the fox population management mechan
 
 These changes directly support the Project Manager's direction (A) to constrain the fox population.
 ```
-
-## Prior Feedback
-
-# Autonomous Experiment Verdict
-
-This verdict evaluates the safe code committed by the previous autonomous run. Shadow evaluation is evidence for the next iteration, not a merge gate. The next agent must inspect the current implementation and explicitly choose to keep, revise, or revert it.
-
-- Classification: `inert`
-- Acceptance: `experiment`
-- PM direction: `C`
-- Metric: `population.FOX`
-- Goal: `decrease`
-- Required delta: 100
-- Observed delta: 0
-- Baseline average: 4777
-- Candidate average: 4777
-- Safety passed: true
-- Target passed: false
-
-## Implemented Hypothesis
-
-Density-dependent fox reproduction threshold increase.
-
-## Harness Conclusion
-
-The code was safe but produced zero measured effect. Inspect the committed implementation, identify the inactive gate or clamp, and revise or revert it in the next run; do not add another disconnected mechanism.
-
-## Required Next Decision
-
-Set `causalReach.previousFeedbackDecision` to `reuse`, `revise`, or `abandon` and explain the decision with current-state evidence. Because this code is already on main, inspect and change the implementation directly; there is no rejected branch to recover.
