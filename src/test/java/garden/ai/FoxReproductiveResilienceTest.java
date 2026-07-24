@@ -28,4 +28,22 @@ public class FoxReproductiveResilienceTest {
         // Trait should lower threshold by 8 because nutrients (10) < 25
         assertEquals(thresholdNormal - 8, thresholdResilient, "Resilient fox should have a lower threshold");
     }
+
+    @Test
+    public void testFoxReproductionThresholdWithHighPopulation() {
+        Environment env = new Environment(50, 50, 50, 30, 30); // Mid nutrients/buffer
+        
+        // Setup 2500 foxes (threshold should increase by 10)
+        List<Organism> organisms = new ArrayList<>();
+        for (int i = 0; i < 2500; i++) {
+            organisms.add(Organism.of("fox-" + i, OrganismType.FOX, 5, 1));
+        }
+        
+        Organism fox = organisms.get(0);
+        int threshold = OrganismInteractionCalculator.reproductionThreshold(fox, env, 0, organisms);
+        
+        // Base threshold for FOX is 15.
+        // With > 2000 foxes, it should increase by 10 => 25.
+        assertEquals(25, threshold, "Threshold should increase for high fox population");
+    }
 }

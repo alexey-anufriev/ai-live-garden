@@ -4,19 +4,22 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 13088
+- Cycle: 13301
 - Health: Stable (🟡)
-- Nutrients: 6.
+- Nutrients: 9.
 - NutrientBuffer: 100.
-- Active organisms: 21204 total across beetle, fern fox, fungus moss, root network spore.
+- Active organisms: 22432 total across beetle, fern fox, fungus moss, root network spore.
 - Missing roles: none.
-- Latest agent handoff: Radical Fox Reduction.
-- Latest result: Implemented a multi-tier density-dependent culling mechanism for foxes in OrganismInteractionCalculator. When the population exceeds 1000, foxes receive an energy penalty. When it exceeds 2000, they are culled extremely aggressively to ensure a rapid population decline..
+- Latest agent handoff: Fox Population Reproductive Constraint.
+- Latest result: Modified OrganismInteractionCalculator.reproductionThreshold to increase the reproduction threshold for foxes when the total fox population exceeds 2000 and 4000. Verified with new test cases..
 
 ## Immediate Directions
 
-- Observe fox population decline.
+- Monitor fox population decline.
 
 ## Constraints & Known Bad Ideas
 
-- Prevent fox extinction by monitoring the population reduction.
+- Do not attempt to fix the simulation in one run.
+- Do not add another named adaptation merely because recent runs did so.
+- Do not add another observability-only or tests-only change merely because it is easy to validate.
+- Do not treat the full nutrient buffer as proof of health while nutrients are zero or ecological roles are absent.
