@@ -155,12 +155,6 @@ public class OrganismInteractionCalculator {
             changed = changed.withEnergy(changed.energy() + growth);
         } else {
             long beetleCount = context.allOrganisms().stream().filter(o -> o.type() == OrganismType.BEETLE).count();
-            long foxCount = context.allOrganisms().stream().filter(o -> o.type() == OrganismType.FOX).count();
-            if (organism.type() == OrganismType.FOX && foxCount > 2000) {
-                // Directly remove the organism by setting energy to 0 (death)
-                changed = changed.withEnergy(0);
-                context.events().add(new GardenEvent(context.cycle(), "%s was removed due to unsustainable population density (total=%d).".formatted(changed.id(), foxCount)));
-            }
             if (organism.type() == OrganismType.BEETLE && beetleCount < 1000) {
                 changed = changed.withTrait("beetle-recovery");
                 changed = changed.withTrait("prolific");
@@ -197,7 +191,7 @@ public class OrganismInteractionCalculator {
             }
         }
 
-        return maybeMutate(changed, context.cycle(), context.events(), context.environment());
+        return applyCulling(maybeMutate(changed, context.cycle(), context.events(), context.environment()), context);
     }
 
     private static Organism maybeMutate(Organism organism, int cycle, List<GardenEvent> events, Environment environment) {
@@ -223,6 +217,17 @@ public class OrganismInteractionCalculator {
         Organism changed = organism.withTrait(trait).withCuriosity(organism.curiosity() + 1);
         events.add(new GardenEvent(cycle, "%s adapted a %s trait.".formatted(organism.id(), trait)));
         return changed;
+    }
+
+    private static Organism applyCulling(Organism organism, PassiveChangeContext context) {
+        if (organism.type() == OrganismType.FOX) {
+            long foxCount = context.allOrganisms().stream().filter(o -> o.type() == OrganismType.FOX).count();
+            if (foxCount > 2000) {
+                context.events().add(new GardenEvent(context.cycle(), "%s was removed due to unsustainable population density (total=%d).".formatted(organism.id(), foxCount)));
+                return organism.withEnergy(0);
+            }
+        }
+        return organism;
     }
 
     private static Optional<GardenEvent> maybeDescribeChange(Organism before, Organism after, Environment environment, int cycle) {

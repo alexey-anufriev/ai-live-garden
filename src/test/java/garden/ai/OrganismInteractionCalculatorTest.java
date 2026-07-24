@@ -141,6 +141,30 @@ class OrganismInteractionCalculatorTest {
     }
 
     @Test
+    void foxCullingNotRevivedByMetabolicBonus() {
+        Environment env = new Environment(50, 50, 50, 100, 100);
+
+        // Create 2500 foxes (threshold is 2000)
+        // Give them a trait that provides a metabolic bonus (fox-metabolic-efficiency)
+        List<Organism> organisms = IntStream.range(0, 2500)
+                .mapToObj(i -> Organism.of("fox-" + i, OrganismType.FOX, 20, 1, "fox-metabolic-efficiency"))
+                .collect(Collectors.toList());
+
+        OrganismInteractionCalculator.PassiveChangeContext context = new OrganismInteractionCalculator.PassiveChangeContext(
+                env, 1, new ArrayList<>(), new TraitRegistry.ContributionResult(0,0,0,0), organisms);
+
+        List<Organism> changed = OrganismInteractionCalculator.calculatePassiveChanges(context);
+
+        // Foxes should have energy set to 0 (culled)
+        // If metabolic bonus is added back, energy will be > 0.
+        long revivedFoxes = changed.stream()
+                .filter(o -> o.type() == OrganismType.FOX && o.energy() > 0)
+                .count();
+
+        assertThat(revivedFoxes).isEqualTo(0);
+    }
+
+    @Test
     void foxCullingAggressiveAtHighPopulation() {
         Environment env = new Environment(50, 50, 50, 100, 100);
 
