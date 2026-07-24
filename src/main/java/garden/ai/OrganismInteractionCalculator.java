@@ -118,12 +118,13 @@ public class OrganismInteractionCalculator {
     ) {}
 
     public static List<Organism> calculatePassiveChanges(PassiveChangeContext context) {
+        long foxCount = context.allOrganisms().stream().filter(o -> o.type() == OrganismType.FOX).count();
         return context.allOrganisms().stream()
-                .map(organism -> calculateSingle(organism, context))
+                .map(organism -> calculateSingle(organism, context, foxCount))
                 .collect(Collectors.toList());
     }
 
-    private static Organism calculateSingle(Organism organism, PassiveChangeContext context) {
+    private static Organism calculateSingle(Organism organism, PassiveChangeContext context, long foxCount) {
         Organism changed = organism;
         if (organism.type().isPlant()) {
             int growth = context.environment().favorsPlants() ? 2 : 0;
@@ -155,12 +156,6 @@ public class OrganismInteractionCalculator {
             changed = changed.withEnergy(changed.energy() + growth);
         } else {
             long beetleCount = context.allOrganisms().stream().filter(o -> o.type() == OrganismType.BEETLE).count();
-            long foxCount = context.allOrganisms().stream().filter(o -> o.type() == OrganismType.FOX).count();
-            if (organism.type() == OrganismType.FOX && foxCount > 2000) {
-                // Directly remove the organism by setting energy to 0 (death)
-                changed = changed.withEnergy(0);
-                context.events().add(new GardenEvent(context.cycle(), "%s was removed due to unsustainable population density (total=%d).".formatted(changed.id(), foxCount)));
-            }
             if (organism.type() == OrganismType.BEETLE && beetleCount < 1000) {
                 changed = changed.withTrait("beetle-recovery");
                 changed = changed.withTrait("prolific");
@@ -197,7 +192,12 @@ public class OrganismInteractionCalculator {
             }
         }
 
-        return maybeMutate(changed, context.cycle(), context.events(), context.environment());
+        Organism result = maybeMutate(changed, context.cycle(), context.events(), context.environment());
+        if (result.type() == OrganismType.FOX && foxCount > 2000) {
+            context.events().add(new GardenEvent(context.cycle(), "%s was removed due to unsustainable population density (total=%d).".formatted(result.id(), foxCount)));
+            return result.withEnergy(0);
+        }
+        return result;
     }
 
     private static Organism maybeMutate(Organism organism, int cycle, List<GardenEvent> events, Environment environment) {
