@@ -551,10 +551,8 @@ public class OrganismInteractionCalculator {
                 threshold -= 1;
             }
             long foxCount = organisms.stream().filter(o -> o.type() == OrganismType.FOX).count();
-            if (foxCount > 4000) {
-                threshold += 20;
-            } else if (foxCount > 2000) {
-                threshold += 10;
+            if (foxCount > 2000) {
+                threshold += 200; // Significantly increase threshold to halt reproduction
             }
         }
         if (organism.type() == OrganismType.ROOT_NETWORK && environment.nutrientBuffer() > 50 && organism.traits().contains("buffer-optimizer")) {
