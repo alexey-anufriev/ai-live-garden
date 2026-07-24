@@ -2,6 +2,146 @@
 
 ## Latest Incomplete Attempt
 
+The single autonomous experiment left a substantive candidate but failed a hard validity, test, policy, measurement, or safety gate. The candidate was preserved for assessment on the next run; it was removed from main and no garden tick occurred.
+
+- Reason: experiment-unsafe-or-invalid
+- Handoff validation: The single experiment stopped at shadow: candidate-shadow-unsafe-or-unmeasured
+- Agent calls completed: 1 of 1
+
+## Preserved Incomplete Candidate
+
+- Branch: `agent-rejected/30094284403-1`
+- Commit: `31d1f3eb3634c79a23b238e285826460ee3a681a`
+- Inspect: `git show --stat 31d1f3eb3634c79a23b238e285826460ee3a681a`
+- Compare: `git diff 31d1f3eb3634c79a23b238e285826460ee3a681a^ 31d1f3eb3634c79a23b238e285826460ee3a681a`
+
+## Incomplete Change Paths
+
+M	src/main/java/garden/ai/OrganismInteractionCalculator.java
+M	src/main/java/garden/ai/TraitRegistry.java
+
+## Incomplete Change Summary
+
+```text
+ .../garden/ai/OrganismInteractionCalculator.java   |  2 +-
+ src/main/java/garden/ai/TraitRegistry.java         | 24 +++++++++++++++++++---
+ 2 files changed, 22 insertions(+), 4 deletions(-)
+```
+
+## Discarded Worktree Residue
+
+```text
+ M src/main/java/garden/ai/OrganismInteractionCalculator.java
+ M src/main/java/garden/ai/TraitRegistry.java
+```
+
+## Experiment Result
+
+This source did not satisfy the hard executable contract. Inspect the exact failure before deciding whether to revise or abandon the preserved candidate. Safe target misses are committed normally and do not appear in this section.
+
+```json
+[
+  {
+    "attempt": 1,
+    "accepted": false,
+    "acceptance": "none",
+    "substantiveChange": true,
+    "candidateCommit": "31d1f3eb3634c79a23b238e285826460ee3a681a",
+    "candidatePatchId": "01daab40036d16734b158f0ff649a45760f5bd61",
+    "effectClassification": "partial-progress",
+    "stage": "shadow",
+    "reason": "candidate-shadow-unsafe-or-unmeasured",
+    "shadow": {
+      "passed": false,
+      "policy": "target",
+      "safetyPassed": false,
+      "targetPassed": true,
+      "metric": "population.FOX",
+      "goal": "decrease",
+      "requiredDelta": 100,
+      "baselineAverage": 4777,
+      "candidateAverage": 1,
+      "observedDelta": -4776,
+      "seeds": [
+        17,
+        43
+      ]
+    }
+  }
+]
+```
+
+## Agent Output Summary
+
+- Tool calls: 25
+- Plan-mode calls: 0
+
+```text
+AGENT_RUN_JSON_START
+{
+  "runMode": "evolution",
+  "acceptanceSource": "agent",
+  "title": "Implement Density-Dependent Fox Metabolic Penalty",
+  "task": "Integrate fox population count into metabolic calculations to impose a density-dependent energy penalty.",
+  "why": "Previous culling attempts were bypassed by metabolic bonuses; a direct, density-dependent metabolic penalty provides a robust, unavoidable cost for overpopulation, supporting Project Manager Direction A.",
+  "summary": "Modified `OrganismInteractionCalculator` to pass fox population counts to `TraitRegistry.calculateMetabolism`. Updated `TraitRegistry` to add a metabolic energy cost increase for foxes when the population exceeds 1500 and 3000, ensuring the constraint is effective at high densities.",
+  "observations": "The density-dependent penalty is integrated into the metabolic calculation, which is more reliable than separate culling logic that could be bypassed. Overloaded methods were added to `TraitRegistry` to ensure test suite compatibility.",
+  "next": "Monitor fox population decline and assess if further constraints are needed.",
+  "expectedGardenEffect": "Fox population growth will naturally slow and reverse as population density increases, due to the higher energy cost of metabolism, forcing a population decline toward a sustainable level.",
+  "pmDirection": "A",
+  "evidence": {
+    "bottleneck": "High fox population density (4777) and ineffective, bypassable culling logic.",
+    "currentState": "FOX population at 4777, nutrients low (9).",
+    "verification": "All 283 tests passed, confirming the metabolic penalty implementation maintains architectural integrity."
+  },
+  "evaluation": {
+    "metric": "population.FOX",
+    "goal": "decrease",
+    "requiredDelta": 100
+  },
+  "causalReach": {
+    "mechanism": "density-dependent metabolic penalty in `calculateMetabolism`",
+    "traits": [],
+    "carrierBasis": "not-applicable",
+    "activeCarrierCount": 0,
+    "adoptionPath": "not-applicable",
+    "estimatedPhaseImpact": "High reduction pressure on FOX population at densities above 1500.",
+    "clampRisk": "none",
+    "previousFeedbackDecision": "revise",
+    "preflight": {
+      "passed": true,
+      "observedDelta": 0
+    }
+  },
+  "codeMap": [
+    {
+      "path": "src/main/java/garden/ai/OrganismInteractionCalculator.java",
+      "description": "Calculates organism metabolism and interaction, updated to pass fox count."
+    },
+    {
+      "path": "src/main/java/garden/ai/TraitRegistry.java",
+      "description": "Registry of metabolic traits, updated to apply density-dependent fox metabolic penalty."
+    }
+  ],
+  "requests": [],
+  "state": {
+    "immediateDirections": [
+      "Monitor fox population decline."
+    ],
+    "constraints": []
+  }
+}
+AGENT_RUN_JSON_END
+
+I have implemented a density-dependent metabolic penalty for foxes. By integrating the fox population count directly into the metabolic calculation in `TraitRegistry.java`, I have ensured that as the fox population increases, the metabolic energy cost for each fox also increases, creating a robust, unavoidable constraint that the foxes cannot bypass with metabolic efficiency traits or bonuses. This directly supports the Project Manager's direction (A) to force a reduction in the stagnant fox population. All 283 project tests pass successfully, confirming that this change is structurally sound.
+```
+
+## Prior Feedback
+
+# Deferred Autonomous Run Feedback
+
+## Latest Incomplete Attempt
+
 The single autonomous experiment did not leave both a valid handoff and a publishable safe candidate. No garden tick occurred, and unvalidated worktree changes were removed from main.
 
 - Reason: experiment-unsafe-or-invalid
@@ -94,146 +234,4 @@ AGENT_RUN_JSON_START
   }
 }
 AGENT_RUN_JSON_END
-```
-
-## Prior Feedback
-
-# Deferred Autonomous Run Feedback
-
-## Latest Incomplete Attempt
-
-The single autonomous experiment left a substantive candidate but failed a hard validity, test, policy, measurement, or safety gate. The candidate was preserved for assessment on the next run; it was removed from main and no garden tick occurred.
-
-- Reason: experiment-unsafe-or-invalid
-- Handoff validation: The single experiment stopped at shadow: candidate-shadow-unsafe-or-unmeasured
-- Agent calls completed: 1 of 1
-
-## Preserved Incomplete Candidate
-
-- Branch: `agent-rejected/30087293757-1`
-- Commit: `c41ca4f3b7c48937268757a63aea345abaf0dc6e`
-- Inspect: `git show --stat c41ca4f3b7c48937268757a63aea345abaf0dc6e`
-- Compare: `git diff c41ca4f3b7c48937268757a63aea345abaf0dc6e^ c41ca4f3b7c48937268757a63aea345abaf0dc6e`
-
-## Incomplete Change Paths
-
-M	src/main/java/garden/ai/OrganismInteractionCalculator.java
-M	src/test/java/garden/ai/FoxReproductiveResilienceTest.java
-
-## Incomplete Change Summary
-
-```text
- .../garden/ai/OrganismInteractionCalculator.java   | 25 +++++++++++-----------
- .../garden/ai/FoxReproductiveResilienceTest.java   |  4 ++--
- 2 files changed, 14 insertions(+), 15 deletions(-)
-```
-
-## Discarded Worktree Residue
-
-```text
- M src/main/java/garden/ai/OrganismInteractionCalculator.java
- M src/test/java/garden/ai/FoxReproductiveResilienceTest.java
-```
-
-## Experiment Result
-
-This source did not satisfy the hard executable contract. Inspect the exact failure before deciding whether to revise or abandon the preserved candidate. Safe target misses are committed normally and do not appear in this section.
-
-```json
-[
-  {
-    "attempt": 1,
-    "accepted": false,
-    "acceptance": "none",
-    "substantiveChange": true,
-    "candidateCommit": "c41ca4f3b7c48937268757a63aea345abaf0dc6e",
-    "candidatePatchId": "dd2877e79143290f88ece7749d7155c30123c2ce",
-    "effectClassification": "partial-progress",
-    "stage": "shadow",
-    "reason": "candidate-shadow-unsafe-or-unmeasured",
-    "shadow": {
-      "passed": false,
-      "policy": "target",
-      "safetyPassed": false,
-      "targetPassed": true,
-      "metric": "population.FOX",
-      "goal": "decrease",
-      "requiredDelta": 100,
-      "baselineAverage": 4777,
-      "candidateAverage": 0.5,
-      "observedDelta": -4776.5,
-      "seeds": [
-        17,
-        43
-      ]
-    }
-  }
-]
-```
-
-## Agent Output Summary
-
-- Tool calls: 11
-- Plan-mode calls: 0
-
-```text
-AGENT_RUN_JSON_START
-{
-  "runMode": "evolution",
-  "acceptanceSource": "agent",
-  "title": "Revising Fox Reproductive Constraint",
-  "task": "Revise and strengthen fox reproductive constraints and density-dependent culling to force a population decrease.",
-  "why": "The previous density-dependent culling was inert; by making the reproductive threshold more stringent and moving the culling mechanism to occur after metabolism, I ensure it's not bypassed by metabolic energy gains.",
-  "summary": "Strengthened fox reproductive thresholds by increasing population-based costs, and moved fox culling logic to occur after metabolism calculations to ensure effectiveness, addressing the 'inert' verdict of the previous run.",
-  "observations": "The previous culling logic was susceptible to being overwritten by metabolic bonuses, and the reproductive threshold was insufficiently restrictive for a population of 4777.",
-  "next": "Monitor fox population and verify the effectiveness of the strengthened constraints.",
-  "expectedGardenEffect": "Fox population will enter a clearer downward trajectory due to combined reproductive and survival constraints.",
-  "pmDirection": "A",
-  "evidence": {
-    "bottleneck": "Fox reproductive resilience and metabolic overwriting of culling energy reduction.",
-    "currentState": "FOX population stagnant at 4777.",
-    "verification": "All tests passed, including updated FoxReproductiveResilienceTest."
-  },
-  "evaluation": {
-    "metric": "population.FOX",
-    "goal": "decrease",
-    "requiredDelta": 100
-  },
-  "causalReach": {
-    "mechanism": "strengthened reproductive threshold and post-metabolism culling",
-    "traits": [],
-    "carrierBasis": "not-applicable",
-    "activeCarrierCount": 0,
-    "adoptionPath": "not-applicable",
-    "estimatedPhaseImpact": "High reduction pressure on FOX population.",
-    "clampRisk": "lower",
-    "previousFeedbackDecision": "revise",
-    "preflight": {
-      "passed": false,
-      "observedDelta": null
-    }
-  },
-  "codeMap": [
-    {
-      "path": "src/main/java/garden/ai/OrganismInteractionCalculator.java",
-      "description": "Modified FOX reproduction threshold and culling location."
-    }
-  ],
-  "requests": [],
-  "state": {
-    "immediateDirections": [
-      "Monitor fox population decline."
-    ],
-    "constraints": []
-  }
-}
-AGENT_RUN_JSON_END
-
-I have completed the requested revisions to the fox population management mechanisms, addressing the 'inert' status of the previous run by:
-
-1.  **Strengthening Reproductive Thresholds:** Increased the reproductive energy cost for foxes when the population exceeds 1000 and 3000 to more aggressively cap population growth.
-2.  **Fixing Culling Ineffectiveness:** Moved the fox culling logic in `OrganismInteractionCalculator.calculateSingle` to occur *after* metabolism calculations. This ensures that the culling's negative energy impact is not overwritten by metabolic energy bonuses, making the density-dependent culling truly fatal for foxes in overpopulated conditions.
-3.  **Verification:** Updated the `FoxReproductiveResilienceTest` to validate the new, more stringent threshold logic, and confirmed that all 283 project tests pass successfully.
-
-These changes directly support the Project Manager's direction (A) to constrain the fox population.
 ```
