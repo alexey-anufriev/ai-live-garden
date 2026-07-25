@@ -33,7 +33,7 @@ public class FoxReproductiveResilienceTest {
     public void testFoxReproductionThresholdWithHighPopulation() {
         Environment env = new Environment(50, 50, 50, 30, 30); // Mid nutrients/buffer
         
-        // Setup 2500 foxes (threshold should increase by 200)
+        // Setup 2500 foxes (threshold should increase by 500)
         List<Organism> organisms = new ArrayList<>();
         for (int i = 0; i < 2500; i++) {
             organisms.add(Organism.of("fox-" + i, OrganismType.FOX, 5, 1));
@@ -43,7 +43,7 @@ public class FoxReproductiveResilienceTest {
         int threshold = OrganismInteractionCalculator.reproductionThreshold(fox, env, 0, organisms);
         
         // Base threshold for FOX is 15.
-        // With > 2000 foxes, it should increase by 200 => 215.
-        assertEquals(215, threshold, "Threshold should increase for high fox population");
+        // With > 150 foxes, it should increase by 500 => 515.
+        assertEquals(515, threshold, "Threshold should increase for high fox population");
     }
 }

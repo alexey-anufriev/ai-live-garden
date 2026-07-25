@@ -23,4 +23,22 @@ public class FoxReproductiveConstraintTest {
         // If starving, it should increase by 500 => 515.
         assertEquals(515, threshold, "Threshold should increase by 500 for starving foxes");
     }
+
+    @Test
+    public void testFoxReproductionThresholdWithHighDensity() {
+        Environment env = new Environment(50, 50, 50, 30, 30);
+        
+        List<Organism> organisms = new ArrayList<>();
+        // Add 160 foxes
+        for (int i = 0; i < 160; i++) {
+            organisms.add(Organism.of("fox-" + i, OrganismType.FOX, 10, 1));
+        }
+        Organism fox = organisms.get(0);
+        
+        int threshold = OrganismInteractionCalculator.reproductionThreshold(fox, env, 0, organisms);
+        
+        // Base threshold for FOX is 15.
+        // If density > 150, threshold increases by 500 => 515.
+        assertEquals(515, threshold, "Threshold should increase by 500 for high fox density");
+    }
 }

@@ -4,19 +4,19 @@ This verdict evaluates the safe code committed by the previous autonomous run. S
 
 - Classification: `inert`
 - Acceptance: `experiment`
-- PM direction: `B`
-- Metric: `nutrientBuffer`
+- PM direction: `A`
+- Metric: `population.FOX`
 - Goal: `decrease`
-- Required delta: 5
+- Required delta: 20
 - Observed delta: 0
-- Baseline average: 100
-- Candidate average: 100
+- Baseline average: 206
+- Candidate average: 206
 - Safety passed: true
 - Target passed: false
 
 ## Implemented Hypothesis
 
-Forced buffer release when nutrientBuffer >= 95.
+Increased fox reproduction threshold at lower population densities.
 
 ## Harness Conclusion
 
