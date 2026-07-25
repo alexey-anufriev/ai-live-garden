@@ -33,7 +33,7 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
         int warmthDelta = cycle % 5 == 0 ? -3 : 2;
         int nutrientDelta = 2 + animalCount / 2 - Math.max(0, plantCount / 5 - plantConsumptionReduction - rootConsumptionReduction);
         
-        int releaseRate = nutrients < 5 ? 2 : (nutrients < 10 ? 5 : 10);
+        int releaseRate = nutrients < 5 ? 2 : (nutrients < 10 ? 5 : (nutrients < 50 ? 8 : 10));
         // Force buffer release when nutrients are low
         if (nutrients < 10) {
             releaseRate = (nutrients == 0) ? 1 : 2;
@@ -76,7 +76,7 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
         if (nutrients >= 25) {
             return "stable";
         }
-        int releaseRate = nutrients < 5 ? 2 : (nutrients < 10 ? 5 : 10);
+        int releaseRate = nutrients < 5 ? 2 : (nutrients < 10 ? 5 : (nutrients < 50 ? 8 : 10));
         releaseRate = Math.max(1, releaseRate - mobilizerCount - releaserCount - acceleratorCount);
         int released = nutrientBuffer / releaseRate;
         if (nutrientBuffer < 10) {
@@ -96,7 +96,7 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
         int fernConsumption = (int) Math.max(0, fernCount / 5 - fernConsumptionReduction);
         int consumption = Math.max(0, mossConsumption + fernConsumption - rootConsumptionReduction);
         
-        int releaseRate = nutrients < 5 ? 2 : (nutrients < 10 ? 5 : 10);
+        int releaseRate = nutrients < 5 ? 2 : (nutrients < 10 ? 5 : (nutrients < 50 ? 8 : 10));
         releaseRate = Math.max(1, releaseRate - mobilizerCount - releaserCount - acceleratorCount);
         int released = nutrientBuffer / releaseRate;
         int unmetDemand = Math.max(0, consumption - (nutrients + released));

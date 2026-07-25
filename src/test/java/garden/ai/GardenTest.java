@@ -291,17 +291,18 @@ class GardenTest {
     }
 
     @Test
-    void rootNetworkIncreasesNutrients() {
+    void rootNetworkIncreasesNutrientsSignificantlyWhenHungry() {
         // One root network
         Organism root = Organism.of("root-1", OrganismType.ROOT_NETWORK, 10, 1, "network");
-        // Environment with 50 nutrients
-        Environment env = new Environment(50, 50, 50, 50, 50);
+        // Environment with 20 nutrients (hungry)
+        Environment env = new Environment(50, 50, 50, 20, 50);
         Garden garden = new Garden(0, 2, env, List.of(root), List.of());
 
         Garden next = garden.nextCycle();
 
-        assertThat(next.environment().nutrients()).isEqualTo(57);
+        assertThat(next.environment().nutrients()).isEqualTo(28);
     }
+
 
     @Test
     void rootNetworkIncreasesNutrientsEvenMoreWhenExtremelyHungry() {
@@ -318,19 +319,6 @@ class GardenTest {
     }
 
     @Test
-    void rootNetworkIncreasesNutrientsSignificantlyWhenHungry() {
-        // One root network
-        Organism root = Organism.of("root-1", OrganismType.ROOT_NETWORK, 10, 1, "network");
-        // Environment with 20 nutrients (hungry)
-        Environment env = new Environment(50, 50, 50, 20, 50);
-        Garden garden = new Garden(0, 2, env, List.of(root), List.of());
-
-        Garden next = garden.nextCycle();
-
-        assertThat(next.environment().nutrients()).isEqualTo(27);
-    }
-
-    @Test
     void rootNetworkIncreasesNutrientsSignificantlyWhenHavingNutrientSharerTrait() {
         // One root network with nutrient-sharer.
         Organism root = Organism.of("root-1", OrganismType.ROOT_NETWORK, 10, 1, "nutrient-sharer");
@@ -342,8 +330,9 @@ class GardenTest {
 
         // nutrientSharerCount=1. 
         // Contribution = 1*4 + 1*8 = 12.
-        // newBuffer = 50 (initial) + 12 (contribution) - 5 (releasedFromBuffer) = 57.
-        assertThat(next.environment().nutrientBuffer()).isEqualTo(57);
+        // releaseRate = 8 (for nutrients=20). Buffer release = 50 / 8 = 6.
+        // newBuffer = 50 (initial) + 12 (contribution) - 6 (releasedFromBuffer) = 56.
+        assertThat(next.environment().nutrientBuffer()).isEqualTo(56);
     }
 
 
@@ -692,8 +681,9 @@ class GardenTest {
 
         // bufferOptimizerCount=1. 
         // Contribution = 1*4 + 1*8 = 12.
-        // newBuffer = 50 (initial) + 12 (contribution) - 5 (releasedFromBuffer) = 57.
-        assertThat(next.environment().nutrientBuffer()).isEqualTo(57);
+        // releaseRate = 8 (for nutrients=20). Buffer release = 50 / 8 = 6.
+        // newBuffer = 50 (initial) + 12 (contribution) - 6 (releasedFromBuffer) = 56.
+        assertThat(next.environment().nutrientBuffer()).isEqualTo(56);
     }
 
     @Test
@@ -721,8 +711,9 @@ class GardenTest {
 
         // nutrientTranslocatorCount=1. 
         // Contribution = 1*4 + 1*16 = 20.
-        // newBuffer = 50 (initial) + 20 (contribution) - 5 (releasedFromBuffer) = 65.
-        assertThat(next.environment().nutrientBuffer()).isEqualTo(65);
+        // releaseRate = 8 (for nutrients=20). Buffer release = 50 / 8 = 6.
+        // newBuffer = 50 (initial) + 20 (contribution) - 6 (releasedFromBuffer) = 64.
+        assertThat(next.environment().nutrientBuffer()).isEqualTo(64);
     }
 
     @Test
@@ -737,8 +728,9 @@ class GardenTest {
 
         // nutrientReclaimerCount=1. 
         // Contribution = 1*4 + 1*10 = 14.
-        // newBuffer = 50 (initial) + 14 (contribution) - 5 (releasedFromBuffer) = 59.
-        assertThat(next.environment().nutrientBuffer()).isEqualTo(59);
+        // releaseRate = 8 (for nutrients=20). Buffer release = 50 / 8 = 6.
+        // newBuffer = 50 (initial) + 14 (contribution) - 6 (releasedFromBuffer) = 58.
+        assertThat(next.environment().nutrientBuffer()).isEqualTo(58);
     }
 
     @Test
