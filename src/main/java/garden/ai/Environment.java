@@ -40,7 +40,7 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
         }
         
         // Reduce release rate if mobilizers, releasers, accelerators, recyclers, or distributors are present (lower rate = higher release)
-        releaseRate = Math.max(1, releaseRate - mobilizerCount - releaserCount - acceleratorCount - recyclerCount - distributorCount);
+        releaseRate = Math.max(1, releaseRate - (mobilizerCount + releaserCount + acceleratorCount + recyclerCount + distributorCount) * 2);
         if (nutrientBuffer > 80) releaseRate = Math.max(1, releaseRate / 2);
         int releasedFromBuffer = nutrientBuffer / releaseRate;
         int syphoned = Math.min(nutrientBuffer, siphonCount * 5);
