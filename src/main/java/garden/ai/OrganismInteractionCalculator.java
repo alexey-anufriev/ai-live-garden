@@ -162,6 +162,10 @@ public class OrganismInteractionCalculator {
                 changed = changed.withTrait("resourceful-breeder");
             }
             TraitRegistry.MetabolicEffect result = TraitRegistry.calculateMetabolism(context.cycle(), changed, context.environment(), context.contribution().mossContribution(), context.contribution().fungalContribution(), context.contribution().fungalAttractorContribution(), beetleCount);
+            if (organism.type() == OrganismType.FOX && foxCount > 100) {
+                int metabolicPenalty = (foxCount > 200) ? 5 : 2;
+                result = new TraitRegistry.MetabolicEffect(result.metabolismChange() + metabolicPenalty, result.energyBonus(), result.event());
+            }
             if (result.event() != null) {
                 context.events().add(result.event());
             }
