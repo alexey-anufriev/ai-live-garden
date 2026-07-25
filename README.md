@@ -56,18 +56,18 @@ This is still an experiment. Do not store valuable secrets or production code in
 ## Current Garden State
 <!-- AI-LIVE-GARDEN:STATE-START -->
 **Garden Health:** 🟠 Strained — the fox population fell by more than half across the recent observation window.
-At cycle 13738, the garden has this committed shape:
+At cycle 13741, the garden has this committed shape:
 
 ### Organisms
 
-- Total: 19243
+- Total: 19240
 - Breakdown:
-  - Beetle: 2118
-  - Fern: 2295
+  - Beetle: 2121
+  - Fern: 2284
   - Fox: 206
-  - Fungus: 6145
+  - Fungus: 6147
   - Moss: 2407
-  - Root Network: 6071
+  - Root Network: 6074
   - Spore: 1
 
 ![Organism trends](agent/organism-trends.svg)
@@ -75,11 +75,11 @@ At cycle 13738, the garden has this committed shape:
 ### Garden Characteristics
 
 - Version: 2
-- Cycle: 13738
-- Next id: 208647
-- Light: 100
+- Cycle: 13741
+- Next id: 208671
+- Light: 98
 - Moisture: 99
-- Warmth: 100
+- Warmth: 99
 - Nutrients: 100
 - Nutrient buffer: 100
 - Missing roles: none

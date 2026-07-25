@@ -8,10 +8,10 @@ import java.util.ArrayList;
 public class BufferReleaseOptimizerTest {
     @Test
     void optimizerIncreasesNutrientRelease() {
-        // Nutrients=50, buffer=100.
+        // Nutrients=50, buffer=50.
         // releaseRate = 10 (without optimizer).
-        // With 1 optimizer: releaseRate = 10 - 1 = 9.
-        Environment env = new Environment(50, 50, 50, 50, 100);
+        // With 1 optimizer: releaseRate = 10 - 2 = 8.
+        Environment env = new Environment(50, 50, 50, 50, 50);
         
         // Optimizer organism
         Organism optimizer = Organism.of("root-optimizer", OrganismType.ROOT_NETWORK, 10, 5, "buffer-release-optimizer");
@@ -29,8 +29,8 @@ public class BufferReleaseOptimizerTest {
         );
         OrganismInteractionCalculator.EnvironmentalDynamicsResult resultWith = OrganismInteractionCalculator.calculateEnvironmentalDynamics(contextWith);
 
-        // Without optimizer: release = 100/10 = 10. nutrients = 50 + 2 - 20 (consumption) + 10 = 42.
-        // With optimizer: release = 100/9 = 11. nutrients = 50 + 2 - 20 (consumption) + 11 = 43.
+        // Without optimizer: release = 50/10 = 5. nutrients = 50 + 2 - 20 (consumption) + 5 = 37.
+        // With optimizer: release = 50/8 = 6.25 -> 6. nutrients = 50 + 2 - 20 (consumption) + 6 = 38.
         assertThat(resultWith.nextEnvironment().nutrients()).isGreaterThan(resultNo.nextEnvironment().nutrients());
     }
 }
