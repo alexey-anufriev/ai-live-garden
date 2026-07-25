@@ -156,11 +156,6 @@ public class OrganismInteractionCalculator {
         } else {
             long beetleCount = context.allOrganisms().stream().filter(o -> o.type() == OrganismType.BEETLE).count();
             long foxCount = context.allOrganisms().stream().filter(o -> o.type() == OrganismType.FOX).count();
-            if (organism.type() == OrganismType.FOX && foxCount > 2000) {
-                // Directly remove the organism by setting energy to 0 (death)
-                changed = changed.withEnergy(0);
-                context.events().add(new GardenEvent(context.cycle(), "%s was removed due to unsustainable population density (total=%d).".formatted(changed.id(), foxCount)));
-            }
             if (organism.type() == OrganismType.BEETLE && beetleCount < 1000) {
                 changed = changed.withTrait("beetle-recovery");
                 changed = changed.withTrait("prolific");
@@ -172,6 +167,12 @@ public class OrganismInteractionCalculator {
             }
             changed = changed.withEnergy(changed.energy() + result.energyBonus() - result.metabolismChange())
                     .withCuriosity(changed.curiosity() + (context.cycle() % 4 == 0 ? 1 : 0));
+
+            if (organism.type() == OrganismType.FOX && foxCount > 2000) {
+                // Directly remove the organism by setting energy to 0 (death)
+                changed = changed.withEnergy(0);
+                context.events().add(new GardenEvent(context.cycle(), "%s was removed due to unsustainable population density (total=%d).".formatted(changed.id(), foxCount)));
+            }
         }
 
         maybeDescribeChange(organism, changed, context.environment(), context.cycle()).ifPresent(context.events()::add);
@@ -209,8 +210,7 @@ public class OrganismInteractionCalculator {
             trait = "reproductive-efficiency";
         } else if ((organism.traits().contains("stressed") || organism.traits().contains("starving")) && SimulationRandom.current().nextDouble() < 0.4) {
             if (organism.type() == OrganismType.FOX) {
-                String[] foxResilienceTraits = {"metabolic-resilience", "resourceful-breeder", "fox-metabolic-efficiency"};
-                trait = foxResilienceTraits[Math.floorMod(cycle + organism.generation(), foxResilienceTraits.length)];
+                trait = TraitRegistry.getMutationTrait(cycle, organism, organism.type(), environment);
             } else if (organism.type() == OrganismType.FUNGUS || organism.type() == OrganismType.ROOT_NETWORK) {
                 trait = "metabolic-resilience";
             } else {
@@ -553,6 +553,9 @@ public class OrganismInteractionCalculator {
             long foxCount = organisms.stream().filter(o -> o.type() == OrganismType.FOX).count();
             if (foxCount > 2000) {
                 threshold += 200; // Significantly increase threshold to halt reproduction
+            }
+            if (organism.traits().contains("stressed") || organism.traits().contains("starving")) {
+                threshold += 500;
             }
         }
         if (organism.type() == OrganismType.ROOT_NETWORK && environment.nutrientBuffer() > 50 && organism.traits().contains("buffer-optimizer")) {
