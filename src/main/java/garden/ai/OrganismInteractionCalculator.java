@@ -168,7 +168,7 @@ public class OrganismInteractionCalculator {
             changed = changed.withEnergy(changed.energy() + result.energyBonus() - result.metabolismChange())
                     .withCuriosity(changed.curiosity() + (context.cycle() % 4 == 0 ? 1 : 0));
 
-            if (organism.type() == OrganismType.FOX && foxCount > 2000) {
+            if (organism.type() == OrganismType.FOX && foxCount > 250) {
                 // Directly remove the organism by setting energy to 0 (death)
                 changed = changed.withEnergy(0);
                 context.events().add(new GardenEvent(context.cycle(), "%s was removed due to unsustainable population density (total=%d).".formatted(changed.id(), foxCount)));
@@ -551,15 +551,15 @@ public class OrganismInteractionCalculator {
                 threshold -= 1;
             }
             long foxCount = organisms.stream().filter(o -> o.type() == OrganismType.FOX).count();
-            if (foxCount > 150) {
-                threshold += 500; // Significantly increase threshold to halt reproduction
-            } else if (foxCount > 100) {
-                threshold += 200;
+            if (foxCount > 100) {
+                threshold += 1000;
             } else if (foxCount > 50) {
-                threshold += 50;
+                threshold += 500;
+            } else if (foxCount > 25) {
+                threshold += 200;
             }
             if (organism.traits().contains("starving")) {
-                threshold += 500;
+                threshold += 1000;
             }
         }
         if (organism.type() == OrganismType.ROOT_NETWORK && environment.nutrientBuffer() > 50 && organism.traits().contains("buffer-optimizer")) {
