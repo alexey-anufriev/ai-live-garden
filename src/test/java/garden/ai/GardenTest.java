@@ -367,7 +367,7 @@ class GardenTest {
         // Nutrients < 5, buffer = 100. Should use releaseRate = 2.
         // With buffer > 80, releaseRate = 2 / 2 = 1.
         Environment envHungry = new Environment(50, 50, 50, 2, 100);
-        Environment nextHungry = envHungry.next(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0); // 0 plants/animals
+        Environment nextHungry = envHungry.next(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0); // 0 plants/animals
         // nutrients=2 < 5, so buffer release is 100/1 = 100.
         // nextNutrients = 2 + 2 (default delta) + 100 = 104 (clamped to 100).
         assertThat(nextHungry.nutrients()).isEqualTo(100);
@@ -376,14 +376,14 @@ class GardenTest {
     @Test
     void bufferReleasesMoreNutrientsWhenHungry() {
         Environment envHungry = new Environment(50, 50, 50, 5, 100);
-        Environment nextHungry = envHungry.next(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0); // 0 plants/animals
+        Environment nextHungry = envHungry.next(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0); // 0 plants/animals
         // nutrients=5 < 10, so buffer release rate 2, buffer > 80 -> release rate 1.
         // nextNutrients = 5 + 2 + 100 = 107 (clamped to 100).
         assertThat(nextHungry.nutrients()).isEqualTo(100);
 
 
         Environment envBalanced = new Environment(50, 50, 50, 50, 100);
-        Environment nextBalanced = envBalanced.next(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        Environment nextBalanced = envBalanced.next(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
         // nutrients=50 >= 10, so buffer release is 100/(10/2) = 100/5 = 20.
         // nextNutrients = 50 + 2 (default delta) + 20 = 72.
         assertThat(nextBalanced.nutrients()).isEqualTo(72);

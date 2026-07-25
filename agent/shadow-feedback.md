@@ -2,27 +2,31 @@
 
 This verdict evaluates the safe code committed by the previous autonomous run. Shadow evaluation is evidence for the next iteration, not a merge gate. The next agent must inspect the current implementation and explicitly choose to keep, revise, or revert it.
 
-- Classification: `target-met`
-- Acceptance: `full`
-- PM direction: `A`
-- Metric: `population.FOX`
+- Classification: `inert`
+- Acceptance: `experiment`
+- PM direction: `B`
+- Metric: `nutrientBuffer`
 - Goal: `decrease`
-- Required delta: 100
-- Observed delta: -4775.5
-- Baseline average: 4777
-- Candidate average: 1.5
+- Required delta: 5
+- Observed delta: 0
+- Baseline average: 100
+- Candidate average: 100
 - Safety passed: true
-- Target passed: true
+- Target passed: false
 
 ## Implemented Hypothesis
 
-Corrected culling logic order and added stress-based reproductive threshold constraint, alongside restricted trait adaptation.
+Corrected the Environment `next` calculation to factor in `recyclerCount` and `distributorCount`.
 
 ## Harness Conclusion
 
-The expected differential was achieved. Keep the mechanism unless later living-state evidence contradicts it, then choose the next bounded milestone.
+The code was safe but produced zero measured effect. Inspect the committed implementation, identify the inactive gate or clamp, and revise or revert it in the next run; do not add another disconnected mechanism.
 
 ## Required Next Decision
 
 Set `causalReach.previousFeedbackDecision` to `reuse`, `revise`, or `abandon` and explain the decision with current-state evidence. Because this code is already on main, inspect and change the implementation directly; there is no rejected branch to recover.
 
+
+## Harness Finalization
+
+The accepted source and measured verdict were preserved, but the garden tick and generated-memory transaction were rolled back because: accepted-finalization=success; AUTO_MEMORY_OUTCOME=failure,SYNC_JOURNAL_OUTCOME=skipped,REQUIRED_MEMORY_OUTCOME=skipped,JOURNAL_FORMAT_OUTCOME=skipped,SUMMARY_FORMAT_OUTCOME=skipped,SUMMARY_APPEND_ONLY_OUTCOME=skipped,ARCHIVE_JOURNAL_OUTCOME=skipped,ARCHIVE_SUMMARIES_OUTCOME=skipped,AGENT_WORKTREE_OUTCOME=skipped,RECORD_VERDICT_OUTCOME=skipped,AGENT_WORKTREE_SEVERITY=missing.

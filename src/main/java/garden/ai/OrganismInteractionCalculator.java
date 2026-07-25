@@ -61,7 +61,7 @@ public class OrganismInteractionCalculator {
         
         int reductionFactor = context.environment().nutrients() < 10 ? 1 : 5;
         int plantConsumptionReduction = (int) ((mossConserverCount + mossScavengerCount + fernConserverCount) / reductionFactor);
-        Environment nextEnvironment = context.environment().next(context.nextCycle(), (int) plantCount, (int) animalCount, contribution.rootContribution(), contribution.fungalContribution(), plantConsumptionReduction, (int) demandRegulatorCount / 2, (int) (mobilizerCount + fungalNutrientMobilizerCount), (int) releaserCount, (int) acceleratorCount, (int) siphonCount);
+        Environment nextEnvironment = context.environment().next(context.nextCycle(), (int) plantCount, (int) animalCount, contribution.rootContribution(), contribution.fungalContribution(), plantConsumptionReduction, (int) demandRegulatorCount / 2, (int) (mobilizerCount + fungalNutrientMobilizerCount), (int) releaserCount, (int) acceleratorCount, (int) recyclerCount, (int) distributorCount, (int) siphonCount);
         
         int production = 2 + (int)animalCount / 2;
         int mossConsumption = (int)Math.max(0, mossCount / 5 - (mossConserverCount + mossScavengerCount) / reductionFactor);

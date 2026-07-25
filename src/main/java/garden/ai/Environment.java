@@ -23,11 +23,11 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
      * @param rootContribution nutrient contribution from root networks
      * @return the next normalized environment
      */
-    public Environment next(int cycle, int plantCount, int animalCount, int rootContribution, int fungalContribution, int plantConsumptionReduction, int rootConsumptionReduction, int mobilizerCount, int releaserCount, int acceleratorCount) {
-        return next(cycle, plantCount, animalCount, rootContribution, fungalContribution, plantConsumptionReduction, rootConsumptionReduction, mobilizerCount, releaserCount, acceleratorCount, 0);
+    public Environment next(int cycle, int plantCount, int animalCount, int rootContribution, int fungalContribution, int plantConsumptionReduction, int rootConsumptionReduction, int mobilizerCount, int releaserCount, int acceleratorCount, int recyclerCount, int distributorCount) {
+        return next(cycle, plantCount, animalCount, rootContribution, fungalContribution, plantConsumptionReduction, rootConsumptionReduction, mobilizerCount, releaserCount, acceleratorCount, recyclerCount, distributorCount, 0);
     }
 
-    public Environment next(int cycle, int plantCount, int animalCount, int rootContribution, int fungalContribution, int plantConsumptionReduction, int rootConsumptionReduction, int mobilizerCount, int releaserCount, int acceleratorCount, int siphonCount) {
+    public Environment next(int cycle, int plantCount, int animalCount, int rootContribution, int fungalContribution, int plantConsumptionReduction, int rootConsumptionReduction, int mobilizerCount, int releaserCount, int acceleratorCount, int recyclerCount, int distributorCount, int siphonCount) {
         int lightDelta = cycle % 2 == 0 ? 3 : -2;
         int moistureDelta = cycle % 3 == 0 ? 4 : -1;
         int warmthDelta = cycle % 5 == 0 ? -3 : 2;
@@ -39,8 +39,8 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
             releaseRate = (nutrients == 0) ? 1 : 2;
         }
         
-        // Reduce release rate if mobilizers, releasers, or accelerators are present (lower rate = higher release)
-        releaseRate = Math.max(1, releaseRate - mobilizerCount - releaserCount - acceleratorCount);
+        // Reduce release rate if mobilizers, releasers, accelerators, recyclers, or distributors are present (lower rate = higher release)
+        releaseRate = Math.max(1, releaseRate - mobilizerCount - releaserCount - acceleratorCount - recyclerCount - distributorCount);
         if (nutrientBuffer > 80) releaseRate = Math.max(1, releaseRate / 2);
         int releasedFromBuffer = nutrientBuffer / releaseRate;
         int syphoned = Math.min(nutrientBuffer, siphonCount * 5);
