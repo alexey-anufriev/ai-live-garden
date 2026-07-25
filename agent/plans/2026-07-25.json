@@ -1,0 +1,95 @@
+{
+  "antiPatterns": [
+    "Repeatedly attempting the same density-dependent culling mechanism that has failed in the last three cycles.",
+    "Focusing on fox reproductive traits that don't account for energy scarcity."
+  ],
+  "date": "2026-07-25",
+  "directions": [
+    {
+      "acceptanceSignal": "Fox population drops below 4750.",
+      "avoid": "Traits that increase fox metabolic efficiency or stress resilience.",
+      "expectedGardenEffect": "Downward trend in fox population.",
+      "label": "A",
+      "shadowAcceptance": {
+        "goal": "decrease",
+        "metric": "population.FOX",
+        "requiredDelta": 27
+      },
+      "title": "Indirect Fox Reproductive Constraint",
+      "why": "Direct density-dependent culling and simple reproductive caps have failed. Target fox reproductive resilience specifically when individuals are under metabolic stress/starvation."
+    },
+    {
+      "acceptanceSignal": "Nutrient buffer drops below 95.",
+      "avoid": "Mechanisms that dump the entire buffer at once without consumption capacity.",
+      "expectedGardenEffect": "Reduction in nutrient buffer and further increase in active nutrients.",
+      "label": "B",
+      "shadowAcceptance": {
+        "goal": "decrease",
+        "metric": "nutrientBuffer",
+        "requiredDelta": 5
+      },
+      "title": "Optimize Nutrient Buffer Release",
+      "why": "Active nutrients have improved, but the 100-unit nutrient buffer remains locked, indicating a failure to convert stored energy effectively."
+    },
+    {
+      "acceptanceSignal": "Fungal population increases.",
+      "avoid": "Mechanisms that only benefit higher-trophic-level organisms.",
+      "expectedGardenEffect": "Increased biomass in foundational organisms (FUNGUS/ROOT_NETWORK).",
+      "label": "C",
+      "shadowAcceptance": {
+        "goal": "increase",
+        "metric": "population.FUNGUS",
+        "requiredDelta": 50
+      },
+      "title": "Enhance Fungal-Root Synergy",
+      "why": "Foundational organisms are successfully growing; further synergy will make them more competitive for energy against foxes."
+    },
+    {
+      "acceptanceSignal": "Beetle population remains above 1950.",
+      "avoid": "Traits that focus on beetle reproduction at the cost of survival against predators.",
+      "expectedGardenEffect": "Stable growth of the beetle population.",
+      "label": "D",
+      "shadowAcceptance": {
+        "goal": "increase",
+        "metric": "population.BEETLE",
+        "requiredDelta": 10
+      },
+      "title": "Sustain Beetle Growth",
+      "why": "The beetle population is thriving but remains vulnerable. Maintain current gains."
+    }
+  ],
+  "review": {
+    "overallMark": "partially achieved",
+    "previousPlanDate": "2026-07-24",
+    "results": [
+      {
+        "evidence": "Fox population remains exactly 4777.",
+        "label": "A",
+        "mark": "not achieved"
+      },
+      {
+        "evidence": "Active nutrients increased from 9 to 61, but the nutrient buffer remains stuck at 100.",
+        "label": "B",
+        "mark": "partially achieved"
+      },
+      {
+        "evidence": "Beetle population increased from 1303 to 1996.",
+        "label": "C",
+        "mark": "achieved"
+      },
+      {
+        "evidence": "Fungal population increased from 5568 to 6041.",
+        "label": "D",
+        "mark": "achieved"
+      }
+    ],
+    "summary": "Beetle and foundational organism growth were successful, but direct fox control attempts remain inert, and the nutrient buffer remains stagnant despite active nutrient improvements."
+  },
+  "stateSignals": [
+    "FOX population static at 4777.",
+    "NutrientBuffer stagnant at 100.",
+    "FUNGUS population healthy growth to 6041.",
+    "BEETLE population healthy growth to 1996."
+  ],
+  "thesis": "The ecosystem is thriving in beetle and fungal counts but remains structurally imbalanced due to an excessively high and unresponsive fox population. With beetle recovery secured, the immediate priority is to break the fox's dominance of the energy cycle. Previous attempts to cap the fox population have been inert; we must now shift strategies to either directly constrain fox reproductive resilience or shift resource allocation so aggressively toward foundational organisms (fungus/root network) that the fox population declines due to natural resource competition and scarcity."
+}
