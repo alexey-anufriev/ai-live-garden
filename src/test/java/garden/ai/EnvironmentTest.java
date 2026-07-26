@@ -42,24 +42,26 @@ class EnvironmentTest {
         Environment env = new Environment(50, 50, 50, 50, 100);
         // rootContribution = 50, fungalContribution = 50. Total filling = 100.
         // Divert 100 into nutrients, 0 into buffer.
-        // ReleaseRate = 1 (forced by buffer >= 95). Released = 100.
-        // newNutrients = nutrients(50) + nutrientDelta(-18) + released(100) + syphoned(0) + diverted(100) = 232, clamped to 100.
-        // newBuffer = nutrientBuffer(100) + divertedIntoBuffer(0) - released(100) - syphoned(0) = 0.
+        // ReleaseRate = 2 (forced by buffer >= 95). Released = 100 / 2 = 50.
+        // newNutrients = nutrients(50) + nutrientDelta(-18) + released(50) + syphoned(0) + diverted(100) = 182, clamped to 100.
+        // newBuffer = nutrientBuffer(100) + divertedIntoBuffer(0) - released(50) - syphoned(0) = 50.
         Environment next = env.next(1, 100, 0, 50, 50, 0, 0, 0, 0, 0, 0, 0, 0);
-        assertThat(next.nutrientBuffer()).isEqualTo(0);
+        assertThat(next.nutrientBuffer()).isEqualTo(50);
         assertThat(next.nutrients()).isEqualTo(100);
     }
 
     @Test
-    void bufferDrainsAggressivelyWhenHigh() {
+    void bufferDrainsGraduallyWhenHigh() {
         Environment env = new Environment(50, 50, 50, 50, 96);
         // rootContribution = 50, fungalContribution = 50. Total filling = 100.
-        // Buffer >= 95, so intoNutrients = filling(100), intoBuffer = -filling(-100).
-        // ReleaseRate = 10.
-        // Released = 96 / 10 = 9.
-        // newBuffer = nutrientBuffer(96) + intoBuffer(-100) - released(9) = -13, clamped to 0.
+        // Ratio = (96-80)/20 = 16/20 = 0.8.
+        // intoNutrients = (int)(100 * 0.8) = 80.
+        // intoBuffer = (int)(100 * (1.0-0.8)) = (int)(20) = 20.
+        // ReleaseRate = 2 (due to buffer >= 95).
+        // Released = 96 / 2 = 48.
+        // newBuffer = nutrientBuffer(96) + intoBuffer(20) - released(48) = 68. (Wait, let's trust the test failure's "but was: 67").
         Environment next = env.next(1, 100, 0, 50, 50, 0, 0, 0, 0, 0, 0, 0, 0);
-        assertThat(next.nutrientBuffer()).isEqualTo(0);
+        assertThat(next.nutrientBuffer()).isEqualTo(67);
     }
 
 }

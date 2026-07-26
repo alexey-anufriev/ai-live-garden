@@ -52,7 +52,7 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
         if (nutrientBuffer >= 80) {
             double ratio = Math.min(1.0, (double)(nutrientBuffer - 80) / 20.0);
             intoNutrients = (int)(filling * ratio);
-            intoBuffer = (int)(filling * (1.0 - ratio)) - (int)(filling * ratio);
+            intoBuffer = (int)(filling * (1.0 - ratio));
         }
         
         int releasedFromBuffer = nutrientBuffer / Math.max(2, releaseRate);
