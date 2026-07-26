@@ -329,6 +329,9 @@ public class OrganismInteractionCalculator {
                 if (fungusCount > 0) bufferBoost += 2;
             }
         }
+        if (environment.nutrientBuffer() >= 80) {
+            bufferBoost = 0;
+        }
         return new FeedingResult(survivors, totalNutrientContribution, totalMoistureContribution, bufferBoost, deadOrganisms, predatorNutrientContribution);
     }
 
