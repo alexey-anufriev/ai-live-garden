@@ -52,12 +52,12 @@ class EnvironmentTest {
 
     @Test
     void bufferDrainsAggressivelyWhenHigh() {
-        Environment env = new Environment(50, 50, 50, 50, 85);
+        Environment env = new Environment(50, 50, 50, 50, 96);
         // rootContribution = 50, fungalContribution = 50. Total filling = 100.
-        // Buffer >= 80, so intoNutrients = filling(100), intoBuffer = -filling(-100).
+        // Buffer >= 95, so intoNutrients = filling(100), intoBuffer = -filling(-100).
         // ReleaseRate = 10.
-        // Released = 85 / 10 = 8.
-        // newBuffer = nutrientBuffer(85) + intoBuffer(-100) - released(8) = -23, clamped to 0.
+        // Released = 96 / 10 = 9.
+        // newBuffer = nutrientBuffer(96) + intoBuffer(-100) - released(9) = -13, clamped to 0.
         Environment next = env.next(1, 100, 0, 50, 50, 0, 0, 0, 0, 0, 0, 0, 0);
         assertThat(next.nutrientBuffer()).isEqualTo(0);
     }

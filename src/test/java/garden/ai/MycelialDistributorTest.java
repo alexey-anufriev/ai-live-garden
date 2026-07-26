@@ -30,9 +30,9 @@ public class MycelialDistributorTest {
         Organism starvingDistributor = distributor.withEnergy(0); 
         Organism noDistributor = Organism.of("hare-2", OrganismType.HARE, 1, 0);
 
-        // Environment starts with buffer at 85
-        Garden gardenDistributor = new Garden(0, 100, new Environment(50, 50, 50, 50, 85), List.of(fungus, starvingDistributor), List.of());
-        Garden gardenNoDistributor = new Garden(0, 100, new Environment(50, 50, 50, 50, 85), List.of(fungus, noDistributor), List.of());
+        // Environment starts with buffer at 96
+        Garden gardenDistributor = new Garden(0, 100, new Environment(50, 50, 50, 50, 96), List.of(fungus, starvingDistributor), List.of());
+        Garden gardenNoDistributor = new Garden(0, 100, new Environment(50, 50, 50, 50, 96), List.of(fungus, noDistributor), List.of());
         
         Garden nextDistributor = gardenDistributor.nextCycle();
         Garden nextNoDistributor = gardenNoDistributor.nextCycle();

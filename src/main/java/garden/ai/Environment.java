@@ -49,7 +49,7 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
         int filling = rootContribution + fungalContribution;
         int intoNutrients = 0;
         int intoBuffer = filling;
-        if (nutrientBuffer >= 80) {
+        if (nutrientBuffer >= 95) {
             intoNutrients = filling;
             intoBuffer = -filling;
         }

@@ -4,19 +4,22 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 14047
-- Health: Stable (🟡)
+- Cycle: 14070
+- Health: Flourishing (🟢)
 - Nutrients: 100.
-- NutrientBuffer: 0.
-- Active organisms: 19308 total across beetle, fern fox, fungus moss, root network spore.
+- NutrientBuffer: 100.
+- Active organisms: 19233 total across beetle, fern fox, fungus moss, root network spore.
 - Missing roles: none.
-- Latest agent handoff: Diagnose and Unlock Nutrient Buffer.
-- Latest result: Modified OrganismInteractionCalculator to cap bufferBoost to 0 when the nutrient buffer is >= 80. Added a test in MycelialDistributorTest to verify the behavior..
+- Latest agent handoff: Unlock Nutrient Buffer via Dynamic Thresholding.
+- Latest result: Modified Environment.java and OrganismInteractionCalculator.java to increase the buffer drainage and boost-capping threshold to 95. Updated EnvironmentTest and MycelialDistributorTest to reflect the new threshold..
 
 ## Immediate Directions
 
-- Monitor nutrient buffer levels.
+- Monitor buffer levels to ensure they stay within the new dynamic 80-95 range.
 
 ## Constraints & Known Bad Ideas
 
-- Keep buffer boost controlled at high saturation.
+- Do not attempt to fix the simulation in one run.
+- Do not add another named adaptation merely because recent runs did so.
+- Do not add another observability-only or tests-only change merely because it is easy to validate.
+- Do not treat the full nutrient buffer as proof of health while nutrients are zero or ecological roles are absent.

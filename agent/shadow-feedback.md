@@ -6,17 +6,17 @@ This verdict evaluates the safe code committed by the previous autonomous run. S
 - Acceptance: `experiment`
 - PM direction: `A`
 - Metric: `nutrientBuffer`
-- Goal: `decrease`
+- Goal: `increase`
 - Required delta: 1
 - Observed delta: 0
-- Baseline average: 0
-- Candidate average: 0
+- Baseline average: 100
+- Candidate average: 100
 - Safety passed: true
 - Target passed: false
 
 ## Implemented Hypothesis
 
-Feeding phase bufferBoost application.
+Relaxed buffer drainage threshold.
 
 ## Harness Conclusion
 
