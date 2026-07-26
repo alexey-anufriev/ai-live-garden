@@ -4,14 +4,14 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 14136
-- Health: Flourishing (🟢)
+- Cycle: 14157
+- Health: Stable (🟡)
 - Nutrients: 100.
-- NutrientBuffer: 100.
-- Active organisms: 19042 total across beetle, fern fox, fungus moss, root network spore.
+- NutrientBuffer: 0.
+- Active organisms: 18997 total across beetle, fern fox, fungus moss, root network spore.
 - Missing roles: none.
-- Latest agent handoff: Fix Nutrient Buffer Drainage Bug.
-- Latest result: Modified the intoBuffer calculation in Environment.next() to stop active drainage when nutrientBuffer >= 80. Updated EnvironmentTest to reflect this fix..
+- Latest agent handoff: Fix Nutrient Buffer Input Underflow.
+- Latest result: Modified `Environment.next()` to ensure `intoBuffer` is always non-negative before applying ratio-based buffer filling logic, ensuring the buffer can accumulate nutrients effectively..
 
 ## Immediate Directions
 
@@ -19,4 +19,7 @@ Compact current memory for future autonomous runs.
 
 ## Constraints & Known Bad Ideas
 
-- Do not over-drain the buffer.
+- Do not attempt to fix the simulation in one run.
+- Do not add another named adaptation merely because recent runs did so.
+- Do not add another observability-only or tests-only change merely because it is easy to validate.
+- Do not treat the full nutrient buffer as proof of health while nutrients are zero or ecological roles are absent.
