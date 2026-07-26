@@ -4,18 +4,20 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 14011
+- Cycle: 14029
 - Health: Stable (🟡)
 - Nutrients: 100.
-- NutrientBuffer: 5.
-- Active organisms: 19377 total across beetle, fern fox, fungus moss, root network spore.
+- NutrientBuffer: 0.
+- Active organisms: 19341 total across beetle, fern fox, fungus moss, root network spore.
 - Missing roles: none.
-- Latest agent handoff: Unlock Nutrient Buffer via Stricter Regulation.
-- Latest result: Diverted all nutrient inflow to soil nutrients when buffer >= 80, and increased the buffer release rate for buffer >= 80, to promote buffer reduction..
+- Latest agent handoff: Implement Aggressive Nutrient Buffer Drainage.
+- Latest result: Modified Environment.next() to set intoBuffer to -filling when the nutrient buffer is >= 80, actively draining it. Added a new unit test in EnvironmentTest to verify this behavior..
 
 ## Immediate Directions
 
-- Monitor if the nutrient buffer decreases below 95 as expected.
+- Prefer outcome-changing work with visible consequences for future ticks of the current or recoverable garden.
+- Consolidate or connect existing mechanics before adding another named adaptation, diagnostic, renderer line, event log, or test-only change.
+- Focus on recovery pathways for missing ecological roles, nutrient-buffer usefulness, population balance, and clearer state transitions.
 
 ## Constraints & Known Bad Ideas
 

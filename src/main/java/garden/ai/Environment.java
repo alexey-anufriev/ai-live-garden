@@ -51,7 +51,7 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
         int intoBuffer = filling;
         if (nutrientBuffer >= 80) {
             intoNutrients = filling;
-            intoBuffer = 0;
+            intoBuffer = -filling;
         }
         
         int releasedFromBuffer = nutrientBuffer / releaseRate;
