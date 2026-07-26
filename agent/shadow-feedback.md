@@ -6,7 +6,7 @@ This verdict evaluates the safe code committed by the previous autonomous run. S
 - Acceptance: `experiment`
 - PM direction: `A`
 - Metric: `nutrientBuffer`
-- Goal: `increase`
+- Goal: `decrease`
 - Required delta: 1
 - Observed delta: 0
 - Baseline average: 0
@@ -16,7 +16,7 @@ This verdict evaluates the safe code committed by the previous autonomous run. S
 
 ## Implemented Hypothesis
 
-Refined buffer inflow diversion logic (lower threshold 50% vs 80%) and removed aggressive clamping.
+Increased siphon effectiveness from 5x to 6x siphon count.
 
 ## Harness Conclusion
 

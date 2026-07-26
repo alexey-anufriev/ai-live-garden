@@ -65,4 +65,15 @@ class EnvironmentTest {
         assertThat(next.nutrientBuffer()).isEqualTo(55);
     }
 
+    @Test
+    void siphonReducesBufferEffectively() {
+        // Environment with buffer 100.
+        Environment env = new Environment(50, 50, 50, 50, 100);
+        // siphonCount = 10. Syphoned = min(100, 10 * 6) = 60.
+        // ReleaseRate = 2. Released = 100 / 2 = 50.
+        // newBuffer = 100 + intoBuffer(0) - 50 - 60 = -10, clamped to 0.
+        Environment next = env.next(1, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10);
+        assertThat(next.nutrientBuffer()).isEqualTo(0);
+    }
+
 }

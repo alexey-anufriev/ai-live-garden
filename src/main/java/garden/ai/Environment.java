@@ -56,11 +56,12 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
         }
         
         int releasedFromBuffer = nutrientBuffer / Math.max(2, releaseRate);
-        int syphoned = Math.min(nutrientBuffer, siphonCount * 5);
+        int syphoned = Math.min(nutrientBuffer, siphonCount * 6);
         int newNutrients = nutrients + nutrientDelta + releasedFromBuffer + syphoned + intoNutrients;
         int newBuffer = nutrientBuffer + intoBuffer - releasedFromBuffer - syphoned;
-        
+
         return new Environment(light + lightDelta, moisture + moistureDelta, warmth + warmthDelta, newNutrients, newBuffer);
+
     }
 
     /**
