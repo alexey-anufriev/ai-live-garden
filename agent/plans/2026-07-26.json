@@ -1,0 +1,95 @@
+{
+  "antiPatterns": [
+    "Repeatedly attempting the same density-dependent culling mechanism that was already successful.",
+    "Ignoring the stagnant NutrientBuffer while focusing solely on population counts."
+  ],
+  "date": "2026-07-26",
+  "directions": [
+    {
+      "acceptanceSignal": "Nutrient buffer drops below 95.",
+      "avoid": "Mechanisms that dump the entire buffer at once without consumption capacity.",
+      "expectedGardenEffect": "Reduction in nutrient buffer and increase in available nutrients.",
+      "label": "A",
+      "shadowAcceptance": {
+        "goal": "decrease",
+        "metric": "nutrientBuffer",
+        "requiredDelta": 1
+      },
+      "title": "Diagnose and Unlock Nutrient Buffer",
+      "why": "The nutrient buffer has remained at 100 despite improvements in active nutrients, indicating a functional bottleneck in energy conversion."
+    },
+    {
+      "acceptanceSignal": "Fox population remains between 150 and 300.",
+      "avoid": "Aggressive culling traits that threaten extinction.",
+      "expectedGardenEffect": "Fox population maintains a stable level consistent with the new lower density.",
+      "label": "B",
+      "shadowAcceptance": {
+        "goal": "preserve",
+        "metric": "population.FOX",
+        "requiredDelta": 1
+      },
+      "title": "Stabilize Fox Population Balance",
+      "why": "With fox population reduced, it is crucial to ensure it reaches a stable, sustainable density rather than crashing or rebounding."
+    },
+    {
+      "acceptanceSignal": "Nutrient utilization efficiency improves.",
+      "avoid": "Mechanisms that prioritize single organism growth over system-wide synergy.",
+      "expectedGardenEffect": "Higher growth rates for FUNGUS and ROOT_NETWORK.",
+      "label": "C",
+      "shadowAcceptance": {
+        "goal": "increase",
+        "metric": "nutrients",
+        "requiredDelta": 1
+      },
+      "title": "Strengthen Fungal-Root Nutrient Cycling",
+      "why": "Improving nutrient uptake and circulation efficiency will support foundational organisms and increase the overall resilience of the ecosystem."
+    },
+    {
+      "acceptanceSignal": "Beetle population stays above 2200.",
+      "avoid": "Predatory traits that undermine recent beetle gains.",
+      "expectedGardenEffect": "Beetle population growth stabilizes.",
+      "label": "D",
+      "shadowAcceptance": {
+        "goal": "preserve",
+        "metric": "population.BEETLE",
+        "requiredDelta": 1
+      },
+      "title": "Maintain Beetle Population Resilience",
+      "why": "The beetle population is at a healthy level; maintaining this stability is vital as the ecosystem balances following the fox reduction."
+    }
+  ],
+  "review": {
+    "overallMark": "partially achieved",
+    "previousPlanDate": "2026-07-25",
+    "results": [
+      {
+        "evidence": "Fox population dropped from 4777 to 206.",
+        "label": "A",
+        "mark": "achieved"
+      },
+      {
+        "evidence": "NutrientBuffer remains stagnant at 100.",
+        "label": "B",
+        "mark": "not achieved"
+      },
+      {
+        "evidence": "Fungal population increased from 6108 to 6343.",
+        "label": "C",
+        "mark": "achieved"
+      },
+      {
+        "evidence": "Beetle population increased from 2077 to 2377.",
+        "label": "D",
+        "mark": "achieved"
+      }
+    ],
+    "summary": "The radical fox reduction (from 4777 to 206) was a major success of the previous PM plan. However, the nutrient buffer remains stagnant at 100, necessitating a shift in strategy from population control to resource management and ecosystem stability."
+  },
+  "stateSignals": [
+    "FOX population reduced to 206",
+    "NutrientBuffer stagnant at 100",
+    "BEETLE population stable at 2377",
+    "FUNGUS population stable at 6343"
+  ],
+  "thesis": "The ecosystem has successfully achieved a radical fox population reduction, dropping from 4777 to 206, validating the effectiveness of previous constraints. With the primary predatory pressure significantly relieved, the priority now shifts from drastic population control to ecosystem stability and resource efficiency. We must diagnose the stagnant nutrient buffer to unlock trapped resources and ensure the new population balance is sustainable."
+}
