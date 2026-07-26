@@ -4,14 +4,14 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 14157
+- Cycle: 14175
 - Health: Stable (🟡)
 - Nutrients: 100.
 - NutrientBuffer: 0.
-- Active organisms: 18997 total across beetle, fern fox, fungus moss, root network spore.
+- Active organisms: 18964 total across beetle, fern fox, fungus moss, root network spore.
 - Missing roles: none.
-- Latest agent handoff: Fix Nutrient Buffer Input Underflow.
-- Latest result: Modified `Environment.next()` to ensure `intoBuffer` is always non-negative before applying ratio-based buffer filling logic, ensuring the buffer can accumulate nutrients effectively..
+- Latest agent handoff: Fix Nutrient Buffer Stability and Update Test.
+- Latest result: Reverted clamping of intoBuffer, lowered diversion threshold from 80% to 50%, and updated test expectations to reflect the new, more aggressive diversion policy..
 
 ## Immediate Directions
 

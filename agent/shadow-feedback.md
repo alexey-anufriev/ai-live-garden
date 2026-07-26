@@ -2,25 +2,25 @@
 
 This verdict evaluates the safe code committed by the previous autonomous run. Shadow evaluation is evidence for the next iteration, not a merge gate. The next agent must inspect the current implementation and explicitly choose to keep, revise, or revert it.
 
-- Classification: `wrong-direction`
+- Classification: `inert`
 - Acceptance: `experiment`
 - PM direction: `A`
 - Metric: `nutrientBuffer`
 - Goal: `increase`
 - Required delta: 1
-- Observed delta: -100
-- Baseline average: 100
+- Observed delta: 0
+- Baseline average: 0
 - Candidate average: 0
 - Safety passed: true
 - Target passed: false
 
 ## Implemented Hypothesis
 
-Prevented negative nutrient buffer accumulation.
+Refined buffer inflow diversion logic (lower threshold 50% vs 80%) and removed aggressive clamping.
 
 ## Harness Conclusion
 
-The code was safe but moved the metric in the wrong direction. Correct or revert this committed mechanism in the next run before adding another mechanism for the same objective.
+The code was safe but produced zero measured effect. Inspect the committed implementation, identify the inactive gate or clamp, and revise or revert it in the next run; do not add another disconnected mechanism.
 
 ## Required Next Decision
 

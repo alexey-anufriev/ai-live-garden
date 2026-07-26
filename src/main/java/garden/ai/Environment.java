@@ -48,9 +48,9 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
         }
         int filling = rootContribution + fungalContribution;
         int intoNutrients = 0;
-        int intoBuffer = Math.max(0, filling);
-        if (nutrientBuffer >= 80) {
-            double ratio = Math.min(1.0, (double)(nutrientBuffer - 80) / 20.0);
+        int intoBuffer = filling;
+        if (nutrientBuffer >= 50) {
+            double ratio = Math.min(1.0, (double)(nutrientBuffer - 50) / 50.0);
             intoNutrients = (int)(intoBuffer * ratio);
             intoBuffer = (int)(intoBuffer * (1.0 - ratio));
         }
