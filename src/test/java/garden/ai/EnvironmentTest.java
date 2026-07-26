@@ -10,21 +10,21 @@ class EnvironmentTest {
         // plantCount=100, animalCount=0.
         // nutrientDelta = 2 + 0/2 - 100/5 = 2 - 20 = -18.
         // releaseRate = 1.
-        // released = 100 / 1 = 100.
-        // newNutrients = 50 - 18 + 100 = 132, clamped to 100.
+        // released = 100 / 2 = 50.
+        // newNutrients = 50 - 18 + 50 = 82.
         Environment next = env.next(1, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        assertThat(next.nutrients()).isEqualTo(100);
+        assertThat(next.nutrients()).isEqualTo(82);
     }
 
     @Test
     void bufferReleasesFasterWhenHigh() {
         Environment env = new Environment(50, 50, 50, 50, 100);
-        // releaseRate = 1. Released = 100.
+        // releaseRate = 1. Released = 100/2 = 50.
         Environment nextHigh = env.next(1, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        assertThat(nextHigh.nutrientBuffer()).isEqualTo(0);
+        assertThat(nextHigh.nutrientBuffer()).isEqualTo(50);
 
         Environment envLow = new Environment(50, 50, 50, 50, 50);
-        // releaseRate = 10. Buffer <= 80, rate = 10. Released = 5.
+        // releaseRate = 10. Buffer <= 80, rate = 10. Released = 50/10 = 5.
         Environment nextLow = envLow.next(1, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
         assertThat(nextLow.nutrientBuffer()).isEqualTo(45);
     }
@@ -32,9 +32,9 @@ class EnvironmentTest {
     @Test
     void bufferReleasesMuchFasterWhenVeryHigh() {
         Environment env = new Environment(50, 50, 50, 50, 95);
-        // releaseRate = 10. With buffer >= 95, rate = 1 (forced). Released = 95 / 1 = 95.
+        // releaseRate = 2 (forced). Released = 95 / 2 = 47.
         Environment nextVeryHigh = env.next(1, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        assertThat(nextVeryHigh.nutrientBuffer()).isEqualTo(0);
+        assertThat(nextVeryHigh.nutrientBuffer()).isEqualTo(48);
     }
 
     @Test

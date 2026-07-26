@@ -354,27 +354,29 @@ class GardenTest {
     @Test
     void extremeHungerReleasesMoreBuffer() {
         // Nutrients < 5, buffer = 100. Should use releaseRate = 2.
-        // With buffer > 80, releaseRate = 2 / 2 = 1.
+        // With buffer >= 95, releaseRate = 2 (forced).
         Environment envHungry = new Environment(50, 50, 50, 2, 100);
         Environment nextHungry = envHungry.next(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0); // 0 plants/animals
-        // nutrients=2 < 5, so buffer release is 100/1 = 100.
-        // nextNutrients = 2 + 2 (default delta) + 100 = 104 (clamped to 100).
-        assertThat(nextHungry.nutrients()).isEqualTo(100);
+        // nutrients=2 < 5, so buffer release is 100/2 = 50.
+        // nextNutrients = 2 + 2 (default delta) + 50 = 54.
+        assertThat(nextHungry.nutrients()).isEqualTo(54);
     }
 
     @Test
     void bufferReleasesMoreNutrientsWhenHungry() {
         Environment envHungry = new Environment(50, 50, 50, 5, 100);
         Environment nextHungry = envHungry.next(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0); // 0 plants/animals
-        // nutrients=5 < 10, so buffer release rate 2, buffer > 80 -> release rate 1.
-        // nextNutrients = 5 + 2 + 100 = 107 (clamped to 100).
-        assertThat(nextHungry.nutrients()).isEqualTo(100);
+        // nutrients=5 >= 5 (not < 5), so releaseRate = 5.
+        // With buffer >= 95, releaseRate = 2.
+        // nextNutrients = 5 + 2 + 100/2 = 57.
+        assertThat(nextHungry.nutrients()).isEqualTo(57);
 
 
         Environment envBalanced = new Environment(50, 50, 50, 50, 100);
         Environment nextBalanced = envBalanced.next(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        // nutrients=50 >= 10, so buffer release is 100/(1) = 100.
-        // nextNutrients = 50 + 2 (default delta) + 100 = 152 (clamped to 100).
+        // nutrients=50 >= 10, so buffer release rate = 10.
+        // With buffer >= 95, releaseRate = 2.
+        // nextNutrients = 50 + 2 (default delta) + 100/2 = 102 (clamped to 100).
         assertThat(nextBalanced.nutrients()).isEqualTo(100);
     }
 

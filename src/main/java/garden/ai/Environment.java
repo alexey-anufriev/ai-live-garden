@@ -42,19 +42,20 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
         // Reduce release rate if mobilizers, releasers, accelerators, recyclers, or distributors are present (lower rate = higher release)
         releaseRate = Math.max(1, releaseRate - (mobilizerCount + releaserCount + acceleratorCount + recyclerCount + distributorCount) * 2);
         if (nutrientBuffer >= 95) {
-            releaseRate = 1;
+            releaseRate = 2;
         } else if (nutrientBuffer >= 80) {
-            releaseRate = Math.max(1, releaseRate / 5);
+            releaseRate = Math.max(2, releaseRate / 5);
         }
         int filling = rootContribution + fungalContribution;
         int intoNutrients = 0;
         int intoBuffer = filling;
-        if (nutrientBuffer >= 95) {
-            intoNutrients = filling;
-            intoBuffer = -filling;
+        if (nutrientBuffer >= 80) {
+            double ratio = Math.min(1.0, (double)(nutrientBuffer - 80) / 20.0);
+            intoNutrients = (int)(filling * ratio);
+            intoBuffer = (int)(filling * (1.0 - ratio)) - (int)(filling * ratio);
         }
         
-        int releasedFromBuffer = nutrientBuffer / releaseRate;
+        int releasedFromBuffer = nutrientBuffer / Math.max(2, releaseRate);
         int syphoned = Math.min(nutrientBuffer, siphonCount * 5);
         int newNutrients = nutrients + nutrientDelta + releasedFromBuffer + syphoned + intoNutrients;
         int newBuffer = nutrientBuffer + intoBuffer - releasedFromBuffer - syphoned;
