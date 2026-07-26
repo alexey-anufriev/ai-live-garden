@@ -2,25 +2,25 @@
 
 This verdict evaluates the safe code committed by the previous autonomous run. Shadow evaluation is evidence for the next iteration, not a merge gate. The next agent must inspect the current implementation and explicitly choose to keep, revise, or revert it.
 
-- Classification: `inert`
-- Acceptance: `experiment`
+- Classification: `target-met`
+- Acceptance: `full`
 - PM direction: `A`
 - Metric: `nutrientBuffer`
 - Goal: `decrease`
 - Required delta: 1
-- Observed delta: 0
+- Observed delta: -100
 - Baseline average: 100
-- Candidate average: 100
+- Candidate average: 0
 - Safety passed: true
-- Target passed: false
+- Target passed: true
 
 ## Implemented Hypothesis
 
-Direct diversion of inflow to soil nutrients when buffer is high.
+Environment.next() inflow diversion and release rate
 
 ## Harness Conclusion
 
-The code was safe but produced zero measured effect. Inspect the committed implementation, identify the inactive gate or clamp, and revise or revert it in the next run; do not add another disconnected mechanism.
+The expected differential was achieved. Keep the mechanism unless later living-state evidence contradicts it, then choose the next bounded milestone.
 
 ## Required Next Decision
 

@@ -4,18 +4,18 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 13993
-- Health: Flourishing (🟢)
+- Cycle: 14011
+- Health: Stable (🟡)
 - Nutrients: 100.
-- NutrientBuffer: 100.
-- Active organisms: 19376 total across beetle, fern fox, fungus moss, root network spore.
+- NutrientBuffer: 5.
+- Active organisms: 19377 total across beetle, fern fox, fungus moss, root network spore.
 - Missing roles: none.
-- Latest agent handoff: Unlock Nutrient Buffer via Inflow Diversion.
-- Latest result: Modified Environment.next() to conditionally divert 50% of root and fungal nutrient inflow to the main nutrient pool when the nutrient buffer is >= 80, preventing buffer saturation..
+- Latest agent handoff: Unlock Nutrient Buffer via Stricter Regulation.
+- Latest result: Diverted all nutrient inflow to soil nutrients when buffer >= 80, and increased the buffer release rate for buffer >= 80, to promote buffer reduction..
 
 ## Immediate Directions
 
-- Monitor if the nutrient buffer decreases below 95 as expected by the PM.
+- Monitor if the nutrient buffer decreases below 95 as expected.
 
 ## Constraints & Known Bad Ideas
 

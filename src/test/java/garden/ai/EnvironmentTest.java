@@ -41,12 +41,12 @@ class EnvironmentTest {
     void nutrientInflowDivertedToNutrientsWhenBufferHigh() {
         Environment env = new Environment(50, 50, 50, 50, 100);
         // rootContribution = 50, fungalContribution = 50. Total filling = 100.
-        // Diversion = 50 into nutrients, 50 into buffer.
+        // Divert 100 into nutrients, 0 into buffer.
         // ReleaseRate = 1 (forced by buffer >= 95). Released = 100.
-        // newNutrients = nutrients(50) + nutrientDelta(-18) + released(100) + syphoned(0) + diverted(50) = 182, clamped to 100.
-        // newBuffer = nutrientBuffer(100) + divertedIntoBuffer(50) - released(100) - syphoned(0) = 50.
+        // newNutrients = nutrients(50) + nutrientDelta(-18) + released(100) + syphoned(0) + diverted(100) = 232, clamped to 100.
+        // newBuffer = nutrientBuffer(100) + divertedIntoBuffer(0) - released(100) - syphoned(0) = 0.
         Environment next = env.next(1, 100, 0, 50, 50, 0, 0, 0, 0, 0, 0, 0, 0);
-        assertThat(next.nutrientBuffer()).isEqualTo(50);
+        assertThat(next.nutrientBuffer()).isEqualTo(0);
         assertThat(next.nutrients()).isEqualTo(100);
     }
 
