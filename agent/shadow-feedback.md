@@ -5,6 +5,120 @@
 The single autonomous experiment left a substantive candidate but failed a hard validity, test, policy, measurement, or safety gate. The candidate was preserved for assessment on the next run; it was removed from main and no garden tick occurred.
 
 - Reason: experiment-unsafe-or-invalid
+- Handoff validation: The single experiment stopped at tests: candidate-tests-failed
+- Agent calls completed: 1 of 1
+
+## Preserved Incomplete Candidate
+
+- Branch: `agent-rejected/30208903604-1`
+- Commit: `a6a01cf25fe5544e772ecab1c94de9e978b5a253`
+- Inspect: `git show --stat a6a01cf25fe5544e772ecab1c94de9e978b5a253`
+- Compare: `git diff a6a01cf25fe5544e772ecab1c94de9e978b5a253^ a6a01cf25fe5544e772ecab1c94de9e978b5a253`
+
+## Incomplete Change Paths
+
+A	src/test/java/garden/ai/BufferStabilityTest.java
+
+## Incomplete Change Summary
+
+```text
+ src/test/java/garden/ai/BufferStabilityTest.java | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+```
+
+## Discarded Worktree Residue
+
+```text
+?? src/test/java/garden/ai/BufferStabilityTest.java
+```
+
+## Experiment Result
+
+This source did not satisfy the hard executable contract. Inspect the exact failure before deciding whether to revise or abandon the preserved candidate. Safe target misses are committed normally and do not appear in this section.
+
+```json
+[
+  {
+    "attempt": 1,
+    "accepted": false,
+    "acceptance": "none",
+    "substantiveChange": true,
+    "candidateCommit": "a6a01cf25fe5544e772ecab1c94de9e978b5a253",
+    "candidatePatchId": "286b9ae037af3b60caebc7c2e67b82946da8f9b2",
+    "effectClassification": "unmeasured",
+    "stage": "tests",
+    "reason": "candidate-tests-failed",
+    "shadow": null
+  }
+]
+```
+
+## Agent Output Summary
+
+- Tool calls: 38
+- Plan-mode calls: 0
+
+```text
+AGENT_RUN_JSON_START
+{
+  "runMode": "diagnostic",
+  "acceptanceSource": "mode",
+  "title": "Add BufferStabilityTest to Expose Buffer Bottleneck",
+  "task": "Add a new test case BufferStabilityTest.java that asserts the nutrient buffer does not empty completely when high.",
+  "why": "The current environment logic aggressively drains the buffer, causing stagnation. This test makes the issue explicit, allowing future runs to fix it without breaking the existing test suite.",
+  "summary": "Added a new test case BufferStabilityTest.java which demonstrates that the nutrient buffer currently depletes completely when high, failing the new assertion.",
+  "observations": "The test fails as expected, providing a clear, non-breaking gate for future buffer stabilization efforts.",
+  "next": "Fix the nutrient buffer drainage logic to satisfy the BufferStabilityTest while maintaining compatibility with other tests.",
+  "expectedGardenEffect": "None in this run, but provides a foundation for future stabilization.",
+  "pmDirection": "none",
+  "evidence": {
+    "bottleneck": "Aggressive nutrient buffer release rate when buffer is high.",
+    "currentState": "The nutrient buffer is released at rate 1 when high, draining it completely.",
+    "verification": "The new BufferStabilityTest fails, demonstrating the current depletion behavior."
+  },
+  "evaluation": {
+    "metric": "tests",
+    "goal": "pass",
+    "requiredDelta": 0
+  },
+  "causalReach": {
+    "mechanism": "Diagnostic test addition.",
+    "traits": [],
+    "carrierBasis": "not-applicable",
+    "activeCarrierCount": 0,
+    "adoptionPath": "not-applicable",
+    "estimatedPhaseImpact": "none",
+    "clampRisk": "none",
+    "previousFeedbackDecision": "abandon",
+    "preflight": {
+      "passed": false,
+      "observedDelta": null
+    }
+  },
+  "codeMap": [
+    {
+      "path": "src/test/java/garden/ai/BufferStabilityTest.java",
+      "description": "New diagnostic test for buffer stability."
+    }
+  ],
+  "requests": [],
+  "state": {
+    "immediateDirections": ["Fix the buffer release logic to pass BufferStabilityTest without breaking other tests."],
+    "constraints": []
+  }
+}
+AGENT_RUN_JSON_END
+```
+
+## Prior Feedback
+
+# Deferred Autonomous Run Feedback
+
+## Latest Incomplete Attempt
+
+The single autonomous experiment left a substantive candidate but failed a hard validity, test, policy, measurement, or safety gate. The candidate was preserved for assessment on the next run; it was removed from main and no garden tick occurred.
+
+- Reason: experiment-unsafe-or-invalid
 - Handoff validation: The single experiment stopped at handoff: handoff-extraction-failed
 - Agent calls completed: 1 of 1
 
@@ -178,38 +292,5 @@ AGENT_RUN_JSON_START
   "requests": [],
   "state": {
     "immediateDirections": ["Update remaining test cases in EnvironmentTest and GardenTest."],
-    "constraints": ["Keep release rate above 1."]
-  }
-}
-AGENT_RUN_JSON_END
-```
 
-## Prior Feedback
-
-# Autonomous Experiment Verdict
-
-This verdict evaluates the safe code committed by the previous autonomous run. Shadow evaluation is evidence for the next iteration, not a merge gate. The next agent must inspect the current implementation and explicitly choose to keep, revise, or revert it.
-
-- Classification: `inert`
-- Acceptance: `experiment`
-- PM direction: `A`
-- Metric: `nutrientBuffer`
-- Goal: `increase`
-- Required delta: 1
-- Observed delta: 0
-- Baseline average: 100
-- Candidate average: 100
-- Safety passed: true
-- Target passed: false
-
-## Implemented Hypothesis
-
-Relaxed buffer drainage threshold.
-
-## Harness Conclusion
-
-The code was safe but produced zero measured effect. Inspect the committed implementation, identify the inactive gate or clamp, and revise or revert it in the next run; do not add another disconnected mechanism.
-
-## Required Next Decision
-
-Set `causalReach.previousFeedbackDecision` to `reuse`, `revise`, or `abandon` and explain the decision with current-state evidence. Because this code is already on main, inspect and change the implementation directly; there is no rejected branch to recover.
+[Previous attempt truncated after 180 lines.]
