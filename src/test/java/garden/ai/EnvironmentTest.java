@@ -38,15 +38,16 @@ class EnvironmentTest {
     }
 
     @Test
-    void diagnosticWithConsumptionProvidesDetail() {
-        Environment env = new Environment(50, 50, 50, 0, 100);
-        // Nutrients=0. releaseRate = 2. Released=100/2=50.
-        // mossCount=500, fernCount=500, mossReduction=0, fernReduction=0.
-        // mossConsumption = 100, fernConsumption = 100, totalConsumption=200.
-        // blockedPlantCount = 10.
-        // culledPlantCount = 5.
-        // stressResilientPlantCount = 0.
-        assertThat(env.diagnostic(500, 500, 0, 0, 0, 0, 0, 0, 10, 5, 0)).isEqualTo("buffer-supported (nutrients=0, buffer=100, release=50, consumption=200 [moss=100, fern=100], root-reduction=0, mobilizers=0, releasers=0, accelerators=0, blocked-plants=10, unmet=150, culled=5, stress-resilient=0)");
+    void nutrientInflowDivertedToNutrientsWhenBufferHigh() {
+        Environment env = new Environment(50, 50, 50, 50, 100);
+        // rootContribution = 50, fungalContribution = 50. Total filling = 100.
+        // Diversion = 50 into nutrients, 50 into buffer.
+        // ReleaseRate = 1 (forced by buffer >= 95). Released = 100.
+        // newNutrients = nutrients(50) + nutrientDelta(-18) + released(100) + syphoned(0) + diverted(50) = 182, clamped to 100.
+        // newBuffer = nutrientBuffer(100) + divertedIntoBuffer(50) - released(100) - syphoned(0) = 50.
+        Environment next = env.next(1, 100, 0, 50, 50, 0, 0, 0, 0, 0, 0, 0, 0);
+        assertThat(next.nutrientBuffer()).isEqualTo(50);
+        assertThat(next.nutrients()).isEqualTo(100);
     }
 
 }

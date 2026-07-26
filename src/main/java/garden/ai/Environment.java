@@ -46,10 +46,18 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
         } else if (nutrientBuffer > 80) {
             releaseRate = Math.max(1, releaseRate / 2);
         }
+        int filling = rootContribution + fungalContribution;
+        int intoNutrients = 0;
+        int intoBuffer = filling;
+        if (nutrientBuffer >= 80) {
+            intoNutrients = Math.max(0, filling / 2);
+            intoBuffer = filling - intoNutrients;
+        }
+        
         int releasedFromBuffer = nutrientBuffer / releaseRate;
         int syphoned = Math.min(nutrientBuffer, siphonCount * 5);
-        int newNutrients = nutrients + nutrientDelta + releasedFromBuffer + syphoned;
-        int newBuffer = nutrientBuffer + rootContribution + fungalContribution - releasedFromBuffer - syphoned;
+        int newNutrients = nutrients + nutrientDelta + releasedFromBuffer + syphoned + intoNutrients;
+        int newBuffer = nutrientBuffer + intoBuffer - releasedFromBuffer - syphoned;
         
         return new Environment(light + lightDelta, moisture + moistureDelta, warmth + warmthDelta, newNutrients, newBuffer);
     }
