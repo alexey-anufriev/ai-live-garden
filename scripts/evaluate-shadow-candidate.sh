@@ -57,6 +57,13 @@ jq -n \
     elif $metric == "nutrients" then $report.final.nutrients
     elif $metric == "nutrientBuffer" then $report.final.nutrientBuffer
     else 0 end;
+  def initial_metric_value($report; $metric):
+    if ($metric | startswith("population.")) then
+      $report.initial.counts[($metric | sub("^population\\."; ""))] // 0
+    elif $metric == "totalOrganisms" then $report.initial.total
+    elif $metric == "nutrients" then $report.initial.nutrients
+    elif $metric == "nutrientBuffer" then $report.initial.nutrientBuffer
+    else 0 end;
   def average_metric($reports; $metric):
     ([$reports[] | metric_value(.; $metric)] | add / length);
   def bounded_environment_metric($metric):
@@ -71,6 +78,7 @@ jq -n \
   ($candidateValue - $baselineValue) as $delta |
   ([$base[] | metric_value(.; $evaluation.metric)]) as $baselineValues |
   ([$candidateRuns[] | metric_value(.; $evaluation.metric)]) as $candidateValues |
+  ([$base[] | initial_metric_value(.; $evaluation.metric)]) as $baselineInitialValues |
   (bounded_environment_metric($evaluation.metric) and
     ([range(0; $candidateRuns | length)] | all(. as $index |
       ($baselineValues[$index] == $candidateValues[$index]) and
@@ -104,6 +112,7 @@ jq -n \
     observedDelta: $delta,
     baselineFinalValues: $baselineValues,
     candidateFinalValues: $candidateValues,
+    baselineInitialValues: $baselineInitialValues,
     observation: (if $terminalSaturated then "terminal-saturated" else "terminal-observable" end),
     seeds: [$candidateRuns[].seed]
   }

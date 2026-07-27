@@ -462,12 +462,13 @@ awk '
   capture && !/^```/ { print }
 ' experiment-feedback.md | jq -e '.current.classification == "inert" and .previous == null and .responseToPrevious == "none" and .continuity == "unavailable" and .escalation == "none"' >/dev/null
 cat > saturated-experiment-ledger.json <<'JSON'
-[{"attempt":1,"accepted":true,"acceptance":"experiment","effectClassification":"measurement-saturated","shadow":{"safetyPassed":true,"targetPassed":false,"baselineAverage":0,"candidateAverage":0,"observedDelta":0,"observation":"terminal-saturated","baselineFinalValues":[0,0],"candidateFinalValues":[0,0]}}]
+[{"attempt":1,"accepted":true,"acceptance":"experiment","effectClassification":"measurement-saturated","shadow":{"safetyPassed":true,"targetPassed":false,"baselineAverage":0,"candidateAverage":0,"observedDelta":0,"observation":"terminal-saturated","baselineInitialValues":[100,100],"baselineFinalValues":[0,0],"candidateFinalValues":[0,0]}}]
 JSON
 jq '.causalReach.previousFeedbackDecision = "revise"' handoff-experiment-unmeasured.json > handoff-experiment-revised.json
 scripts/record-agent-verdict.sh saturated-experiment-ledger.json handoff-experiment-revised.json saturated-experiment-feedback.md experiment-feedback.md >/dev/null
 grep -Fq 'Classification: `measurement-saturated`' saturated-experiment-feedback.md
 grep -Fq 'Measurement: `terminal-saturated`' saturated-experiment-feedback.md
+grep -Fq 'Baseline initial values by seed: 100, 100' saturated-experiment-feedback.md
 grep -Fq 'cannot distinguish this mechanism' saturated-experiment-feedback.md
 awk '
   /^<!-- AGENT-EXPERIMENT-LINEAGE-START -->$/ { capture = 1; next }

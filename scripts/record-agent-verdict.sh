@@ -134,6 +134,7 @@ jq -r --argjson result "$result" --argjson lineage "$lineage" '
   "- Baseline average: " + ($result.shadow.baselineAverage | tostring) + "\n" +
   "- Candidate average: " + ($result.shadow.candidateAverage | tostring) + "\n" +
   "- Measurement: `" + ($result.shadow.observation // "terminal-observable") + "`\n" +
+  "- Baseline initial values by seed: " + (($result.shadow.baselineInitialValues // []) | map(tostring) | join(", ")) + "\n" +
   "- Baseline final values by seed: " + (($result.shadow.baselineFinalValues // []) | map(tostring) | join(", ")) + "\n" +
   "- Candidate final values by seed: " + (($result.shadow.candidateFinalValues // []) | map(tostring) | join(", ")) + "\n" +
   "- Safety passed: " + ($result.shadow.safetyPassed | tostring) + "\n" +
