@@ -161,6 +161,7 @@ jq -r --argjson result "$result" --argjson lineage "$lineage" '
      "## Extended Horizon Diagnostic\n\n" +
      "- Steps: " + ($result.shadow.extendedHorizon.steps | tostring) + "\n" +
      "- Observed delta: " + ($result.shadow.extendedHorizon.observedDelta | tostring) + "\n" +
+     "- Directional seed support: " + (($result.shadow.extendedHorizon.directionalSupport.supporting // 0) | tostring) + " / " + (($result.shadow.extendedHorizon.directionalSupport.total // 0) | tostring) + "\n" +
      "- Safety passed: " + ($result.shadow.extendedHorizon.safetyPassed | tostring) + "\n\n"
    else ""
    end) +

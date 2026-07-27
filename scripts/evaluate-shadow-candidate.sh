@@ -214,14 +214,22 @@ if [[ "$evaluation_policy" == "target" && "${SHADOW_EVALUATION_DIAGNOSTICS_DISAB
       "$0" "$extended_baseline_file" "$handoff_file" "$extended_candidate_file" >/dev/null 2>&1 || true
     if jq -e '.observedDelta | type == "number"' "$extended_result_file" >/dev/null 2>&1; then
       jq --slurpfile extended "$extended_result_file" --argjson steps "$extended_steps" '
-        . + {extendedHorizon: ($extended[0] | {
+        $extended[0] as $window |
+        ([$window.baselineFinalValues, $window.candidateFinalValues] | map(length) | min) as $seedCount |
+        (if $window.goal == "increase" then
+           [range(0; $seedCount) | select($window.candidateFinalValues[.] > $window.baselineFinalValues[.])] | length
+         elif $window.goal == "decrease" then
+           [range(0; $seedCount) | select($window.candidateFinalValues[.] < $window.baselineFinalValues[.])] | length
+         else 0 end) as $supportingSeeds |
+        . + {extendedHorizon: ($window | {
           steps: $steps,
           baselineAverage,
           candidateAverage,
           observedDelta,
           safetyPassed,
           targetPassed,
-          observation
+          observation,
+          directionalSupport: {supporting: $supportingSeeds, total: $seedCount}
         })}
       ' "$result_file" > "${result_file}.extended" && mv "${result_file}.extended" "$result_file"
     else

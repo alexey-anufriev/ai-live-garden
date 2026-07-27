@@ -174,7 +174,7 @@ case "$shadow_policy" in
           increase)
             if awk -v delta="$observed_delta" 'BEGIN { exit !(delta == 0) }'; then
               if jq -e '.observation == "terminal-saturated"' "$shadow_result_file" >/dev/null; then
-                if jq -e '(.trajectoryDelta > 0 and .trajectoryDirectionalSupport.total > 0 and (.trajectoryDirectionalSupport.supporting * 2 > .trajectoryDirectionalSupport.total) and (.trajectoryDirectionalSupport.persistent * 2 > .trajectoryDirectionalSupport.total)) or ((.extendedHorizon.safetyPassed // false) and (.extendedHorizon.observedDelta // 0) > 0)' "$shadow_result_file" >/dev/null; then effect_classification="partial-progress"; else effect_classification="measurement-saturated"; fi
+                if jq -e '(.trajectoryDelta > 0 and .trajectoryDirectionalSupport.total > 0 and (.trajectoryDirectionalSupport.supporting * 2 > .trajectoryDirectionalSupport.total) and (.trajectoryDirectionalSupport.persistent * 2 > .trajectoryDirectionalSupport.total)) or ((.extendedHorizon.safetyPassed // false) and (.extendedHorizon.observedDelta // 0) > 0 and (.extendedHorizon.directionalSupport.total // 0) > 0 and (.extendedHorizon.directionalSupport.supporting * 2 > .extendedHorizon.directionalSupport.total))' "$shadow_result_file" >/dev/null; then effect_classification="partial-progress"; else effect_classification="measurement-saturated"; fi
               else
                 effect_classification="inert"
               fi
@@ -187,7 +187,7 @@ case "$shadow_policy" in
           decrease)
             if awk -v delta="$observed_delta" 'BEGIN { exit !(delta == 0) }'; then
               if jq -e '.observation == "terminal-saturated"' "$shadow_result_file" >/dev/null; then
-                if jq -e '(.trajectoryDelta < 0 and .trajectoryDirectionalSupport.total > 0 and (.trajectoryDirectionalSupport.supporting * 2 > .trajectoryDirectionalSupport.total) and (.trajectoryDirectionalSupport.persistent * 2 > .trajectoryDirectionalSupport.total)) or ((.extendedHorizon.safetyPassed // false) and (.extendedHorizon.observedDelta // 0) < 0)' "$shadow_result_file" >/dev/null; then effect_classification="partial-progress"; else effect_classification="measurement-saturated"; fi
+                if jq -e '(.trajectoryDelta < 0 and .trajectoryDirectionalSupport.total > 0 and (.trajectoryDirectionalSupport.supporting * 2 > .trajectoryDirectionalSupport.total) and (.trajectoryDirectionalSupport.persistent * 2 > .trajectoryDirectionalSupport.total)) or ((.extendedHorizon.safetyPassed // false) and (.extendedHorizon.observedDelta // 0) < 0 and (.extendedHorizon.directionalSupport.total // 0) > 0 and (.extendedHorizon.directionalSupport.supporting * 2 > .extendedHorizon.directionalSupport.total))' "$shadow_result_file" >/dev/null; then effect_classification="partial-progress"; else effect_classification="measurement-saturated"; fi
               else
                 effect_classification="inert"
               fi

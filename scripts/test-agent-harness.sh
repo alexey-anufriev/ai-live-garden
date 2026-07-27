@@ -379,7 +379,7 @@ if (
   echo "A saturated short-window target miss incorrectly passed due to the longer diagnostic." >&2
   exit 1
 fi
-jq -e '.passed == false and .observedDelta == 0 and .extendedHorizon == {steps:10,baselineAverage:100,candidateAverage:90,observedDelta:-10,safetyPassed:true,targetPassed:true,observation:"terminal-observable"}' \
+jq -e '.passed == false and .observedDelta == 0 and .extendedHorizon == {steps:10,baselineAverage:100,candidateAverage:90,observedDelta:-10,safetyPassed:true,targetPassed:true,observation:"terminal-observable",directionalSupport:{supporting:1,total:1}}' \
   "$shadow_fixture/adaptive-horizon-result.json" >/dev/null
 if (
   cd "$shadow_fixture"
