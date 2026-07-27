@@ -12,12 +12,12 @@ public class FungalBeetleSynergyTest {
         // Fungal contribution > 0
         TraitRegistry.MetabolicEffect effect = TraitRegistry.getMetabolicEffect("fungal-beetle-synergizer", 1, beetle, env, 10, 0, 1);
         assertNotNull(effect);
-        assertEquals(2, effect.energyBonus());
+        assertEquals(4, effect.energyBonus());
 
-        // Fungal contribution > 100 to test scaling: 2 + 250/100 = 4
+        // Fungal contribution > 100 to test scaling: 4 + 250/50 = 9
         TraitRegistry.MetabolicEffect effectScaled = TraitRegistry.getMetabolicEffect("fungal-beetle-synergizer", 1, beetle, env, 250, 0, 1);
         assertNotNull(effectScaled);
-        assertEquals(4, effectScaled.energyBonus());
+        assertEquals(9, effectScaled.energyBonus());
 
         // Fungal contribution == 0
         TraitRegistry.MetabolicEffect effectNoFungus = TraitRegistry.getMetabolicEffect("fungal-beetle-synergizer", 1, beetle, env, 0, 0, 1);

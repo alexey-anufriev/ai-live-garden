@@ -544,6 +544,9 @@ public class TraitRegistry {
             String[] fungalTraits = {"nutrient-decomposer", "fungus-soil-enricher", "fungal-network-connector", "fungal-accelerator", "fungal-enhancer", "fungal-buffer-stabilizer", "nutrient-synthesizer", "buffer-tapper", "fungal-nutrient-amplifier", "mass-decomposer", "reproductive-efficiency", "fungal-decomposition-efficiency", "nutrient-dependent-reproduction", "fungal-energy-converter", "mutualist-synergy", "fungal-beetle-specialist", "fungal-nutrient-cycler"};
             return fungalTraits[Math.floorMod(cycle + organism.generation(), fungalTraits.length)];
         }
+        if (childType == OrganismType.BEETLE && SimulationRandom.current().nextDouble() < 0.2) {
+            return "fungal-beetle-synergizer";
+        }
         if (childType == OrganismType.FOX && SimulationRandom.current().nextDouble() < 0.3) {
             double r = SimulationRandom.current().nextDouble();
             if (r < 0.125) return "reproductive-efficiency";
@@ -749,7 +752,7 @@ public class TraitRegistry {
                 break;
             case "fungal-beetle-synergizer":
                 if (organism.type() == OrganismType.BEETLE && fungalContribution > 0) {
-                    int energyGain = 2 + (fungalContribution / 100);
+                    int energyGain = 4 + (fungalContribution / 50);
                     return new MetabolicEffect(0, energyGain, new GardenEvent(cycle, "%s benefited from deep fungal-beetle synergy (+%d).".formatted(organism.id(), energyGain)));
                 }
                 break;
