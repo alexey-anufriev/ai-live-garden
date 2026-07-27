@@ -37,8 +37,8 @@ if [[ "$acceptance" == "experiment" ]]; then
     echo "Experiment acceptance requires a safe measured target miss." >&2
     exit 1
   fi
-  if ! grep -Eq '^(inert|partial-progress|wrong-direction)$' <<<"$verdict"; then
-    echo "Experiment acceptance requires an inert, partial-progress, or wrong-direction verdict." >&2
+  if ! grep -Eq '^(inert|partial-progress|wrong-direction|measurement-saturated)$' <<<"$verdict"; then
+    echo "Experiment acceptance requires an inert, partial-progress, wrong-direction, or measurement-saturated verdict." >&2
     exit 1
   fi
 fi

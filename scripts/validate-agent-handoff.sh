@@ -186,7 +186,7 @@ case "$run_mode" in
         if [[ "$preflight_passed" != "false" ]] || ! jq -e '
           .causalReach.preflight.safetyPassed == true and
           .causalReach.preflight.targetPassed == false and
-          ((.causalReach.preflight.verdict // "") | test("^(inert|partial-progress|wrong-direction)$"))
+          ((.causalReach.preflight.verdict // "") | test("^(inert|partial-progress|wrong-direction|measurement-saturated)$"))
         ' "$handoff_file" >/dev/null; then
           echo "Safe experiment acceptance requires passed=false, safetyPassed=true, targetPassed=false, and a measured verdict." >&2
           exit 1

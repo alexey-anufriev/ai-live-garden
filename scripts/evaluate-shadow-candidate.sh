@@ -59,6 +59,8 @@ jq -n \
     else 0 end;
   def average_metric($reports; $metric):
     ([$reports[] | metric_value(.; $metric)] | add / length);
+  def bounded_environment_metric($metric):
+    $metric == "nutrients" or $metric == "nutrientBuffer";
 
   $baseline[0] as $base |
   $candidate[0] as $candidateRuns |
@@ -67,6 +69,13 @@ jq -n \
   (average_metric($base; $evaluation.metric)) as $baselineValue |
   (average_metric($candidateRuns; $evaluation.metric)) as $candidateValue |
   ($candidateValue - $baselineValue) as $delta |
+  ([$base[] | metric_value(.; $evaluation.metric)]) as $baselineValues |
+  ([$candidateRuns[] | metric_value(.; $evaluation.metric)]) as $candidateValues |
+  (bounded_environment_metric($evaluation.metric) and
+    ([range(0; $candidateRuns | length)] | all(. as $index |
+      ($baselineValues[$index] == $candidateValues[$index]) and
+      (($baselineValues[$index] == 0) or ($baselineValues[$index] == 100))
+    ))) as $terminalSaturated |
   ([range(0; $candidateRuns | length)] | all(. as $index |
     ($candidateRuns[$index].status == "completed") and
     ($candidateRuns[$index].maximumTotal <= $maximum) and
@@ -93,6 +102,9 @@ jq -n \
     baselineAverage: $baselineValue,
     candidateAverage: $candidateValue,
     observedDelta: $delta,
+    baselineFinalValues: $baselineValues,
+    candidateFinalValues: $candidateValues,
+    observation: (if $terminalSaturated then "terminal-saturated" else "terminal-observable" end),
     seeds: [$candidateRuns[].seed]
   }
 ' > "$result_file"

@@ -23,7 +23,7 @@ if [[ -z "$result" ]]; then
   exit 1
 fi
 if ! jq -e --argjson result "$result" '
-  ($result.effectClassification | test("^(target-met|partial-progress|inert|wrong-direction)$")) and
+  ($result.effectClassification | test("^(target-met|partial-progress|inert|measurement-saturated|wrong-direction)$")) and
   ($result.acceptance | test("^(full|experiment)$")) and
   ($result.shadow.safetyPassed == true) and
   (if $result.effectClassification == "target-met" then
@@ -48,6 +48,8 @@ jq -r --argjson result "$result" '
      "The metric moved in the expected direction but missed the target. Revise and build on the proven causal path in the next run."
    elif $verdict == "inert" then
      "The code was safe but produced zero measured effect. Inspect the committed implementation, identify the inactive gate or clamp, and revise or revert it in the next run; do not add another disconnected mechanism."
+   elif $verdict == "measurement-saturated" then
+     "The code was safe, but every baseline and candidate final value landed on the same 0/100 boundary. The final metric cannot distinguish this mechanism from the baseline; inspect the current flow and revise or abandon the existing mechanism rather than treating this as proof that it was inactive."
    else
      "The code was safe but moved the metric in the wrong direction. Correct or revert this committed mechanism in the next run before adding another mechanism for the same objective."
    end) as $nextAction |
@@ -62,6 +64,9 @@ jq -r --argjson result "$result" '
   "- Observed delta: " + ($result.shadow.observedDelta | tostring) + "\n" +
   "- Baseline average: " + ($result.shadow.baselineAverage | tostring) + "\n" +
   "- Candidate average: " + ($result.shadow.candidateAverage | tostring) + "\n" +
+  "- Measurement: `" + ($result.shadow.observation // "terminal-observable") + "`\n" +
+  "- Baseline final values by seed: " + (($result.shadow.baselineFinalValues // []) | map(tostring) | join(", ")) + "\n" +
+  "- Candidate final values by seed: " + (($result.shadow.candidateFinalValues // []) | map(tostring) | join(", ")) + "\n" +
   "- Safety passed: " + ($result.shadow.safetyPassed | tostring) + "\n" +
   "- Target passed: " + ($result.shadow.targetPassed | tostring) + "\n\n" +
   "## Implemented Hypothesis\n\n" + .causalReach.mechanism + "\n\n" +
