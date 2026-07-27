@@ -324,7 +324,7 @@ printf '{"seed":17,"requestedSteps":5,"completedSteps":5,"status":"completed","i
 RUNNER
 chmod +x "$shadow_fixture/saturated-java"
 cat > "$shadow_fixture/saturated-baseline.json" <<'JSON'
-[{"seed":17,"requestedSteps":5,"completedSteps":5,"status":"completed","initial":{"cycle":10,"total":1,"nutrients":0,"nutrientBuffer":0,"counts":{}},"final":{"cycle":15,"total":1,"nutrients":0,"nutrientBuffer":0,"counts":{}},"minimumTotal":1,"maximumTotal":1,"minimumCounts":{},"maximumCounts":{}}]
+[{"seed":17,"requestedSteps":5,"completedSteps":5,"status":"completed","initial":{"cycle":10,"total":1,"nutrients":0,"nutrientBuffer":0,"counts":{}},"final":{"cycle":15,"total":1,"nutrients":0,"nutrientBuffer":0,"counts":{}},"minimumTotal":1,"maximumTotal":1,"minimumCounts":{},"maximumCounts":{},"trajectory":[{"step":1,"final":{"total":1,"nutrients":0,"nutrientBuffer":0,"counts":{}}},{"step":2,"final":{"total":1,"nutrients":0,"nutrientBuffer":0,"counts":{}}},{"step":3,"final":{"total":1,"nutrients":0,"nutrientBuffer":0,"counts":{}}},{"step":4,"final":{"total":1,"nutrients":0,"nutrientBuffer":0,"counts":{}}},{"step":5,"final":{"total":1,"nutrients":0,"nutrientBuffer":0,"counts":{}}}]}]
 JSON
 jq '.evaluation = {metric:"nutrientBuffer",goal:"decrease",requiredDelta:1}' "$shadow_fixture/.agent-run.json" > "$shadow_fixture/saturated-handoff.json"
 if (
@@ -336,7 +336,7 @@ if (
   echo "A terminally saturated target miss incorrectly passed evaluation." >&2
   exit 1
 fi
-jq -e '.passed == false and .observation == "terminal-saturated" and .baselineFinalValues == [0] and .candidateFinalValues == [0]' \
+jq -e '.passed == false and .observation == "terminal-saturated" and .baselineFinalValues == [0] and .candidateFinalValues == [0] and (.trajectory | length) == 1 and .trajectoryDelta == 0' \
   "$shadow_fixture/saturated-result.json" >/dev/null
 if (
   cd "$shadow_fixture"
@@ -477,7 +477,7 @@ awk '
   capture && !/^```/ { print }
 ' experiment-feedback.md | jq -e '.current.classification == "inert" and .previous == null and .responseToPrevious == "none" and .continuity == "unavailable" and .escalation == "none"' >/dev/null
 cat > saturated-experiment-ledger.json <<'JSON'
-[{"attempt":1,"accepted":true,"acceptance":"experiment","effectClassification":"measurement-saturated","shadow":{"safetyPassed":true,"targetPassed":false,"baselineAverage":0,"candidateAverage":0,"observedDelta":0,"observation":"terminal-saturated","baselineInitialValues":[100,100],"baselineFinalValues":[0,0],"candidateFinalValues":[0,0],"trajectory":[{"seed":17,"baseline":[{"step":1,"value":100},{"step":2,"value":0}],"candidate":[{"step":1,"value":100},{"step":2,"value":0}]}]}}]
+[{"attempt":1,"accepted":true,"acceptance":"experiment","effectClassification":"measurement-saturated","shadow":{"safetyPassed":true,"targetPassed":false,"baselineAverage":0,"candidateAverage":0,"observedDelta":0,"observation":"terminal-saturated","baselineInitialValues":[100,100],"baselineFinalValues":[0,0],"candidateFinalValues":[0,0],"trajectoryDelta":0,"trajectory":[{"seed":17,"baseline":[{"step":1,"value":100},{"step":2,"value":0}],"candidate":[{"step":1,"value":100},{"step":2,"value":0}]}]}}]
 JSON
 jq '.causalReach.previousFeedbackDecision = "revise"' handoff-experiment-unmeasured.json > handoff-experiment-revised.json
 scripts/record-agent-verdict.sh saturated-experiment-ledger.json handoff-experiment-revised.json saturated-experiment-feedback.md experiment-feedback.md >/dev/null
@@ -485,8 +485,13 @@ grep -Fq 'Classification: `measurement-saturated`' saturated-experiment-feedback
 grep -Fq 'Measurement: `terminal-saturated`' saturated-experiment-feedback.md
 grep -Fq 'Baseline initial values by seed: 100, 100' saturated-experiment-feedback.md
 grep -Fq '## Bounded Trajectory Evidence' saturated-experiment-feedback.md
+grep -Fq 'Average trajectory delta: 0' saturated-experiment-feedback.md
 grep -Fq 'Seed 17: baseline 100 → 0; candidate 100 → 0' saturated-experiment-feedback.md
 grep -Fq 'cannot distinguish this mechanism' saturated-experiment-feedback.md
+jq '.[0].effectClassification = "partial-progress" | .[0].shadow.trajectoryDelta = -2' \
+  saturated-experiment-ledger.json > trajectory-progress-ledger.json
+scripts/record-agent-verdict.sh trajectory-progress-ledger.json handoff-experiment-revised.json trajectory-progress-feedback.md experiment-feedback.md >/dev/null
+grep -Fq 'final metric was saturated, but the bounded trajectory moved in the expected direction' trajectory-progress-feedback.md
 awk '
   /^<!-- AGENT-EXPERIMENT-LINEAGE-START -->$/ { capture = 1; next }
   /^<!-- AGENT-EXPERIMENT-LINEAGE-END -->$/ { exit }
@@ -767,6 +772,10 @@ if [[ "${SHADOW_FIXTURE_MODE:-full}" == "saturated" ]]; then
   jq -n '{passed:false,safetyPassed:true,targetPassed:false,baselineAverage:0,candidateAverage:0,observedDelta:0,requiredDelta:3,observation:"terminal-saturated",baselineFinalValues:[0,0],candidateFinalValues:[0,0]}' > "$SHADOW_EVALUATION_RESULT_FILE"
   exit 1
 fi
+if [[ "${SHADOW_FIXTURE_MODE:-full}" == "saturated-progress" ]]; then
+  jq -n '{passed:false,safetyPassed:true,targetPassed:false,baselineAverage:0,candidateAverage:0,observedDelta:0,trajectoryDelta:-1,requiredDelta:3,observation:"terminal-saturated",baselineFinalValues:[0,0],candidateFinalValues:[0,0]}' > "$SHADOW_EVALUATION_RESULT_FILE"
+  exit 1
+fi
 if [[ "${SHADOW_FIXTURE_MODE:-full}" == "unsafe" ]]; then
   jq -n '{passed:false,safetyPassed:false,targetPassed:false,baselineAverage:2,candidateAverage:0,observedDelta:-2,requiredDelta:3}' > "$SHADOW_EVALUATION_RESULT_FILE"
   exit 1
@@ -838,6 +847,23 @@ JSON
   grep -Fxq 'retry_required=false' assessment-saturated.outputs
   jq -e '.accepted == true and .acceptance == "experiment" and .effectClassification == "measurement-saturated" and .reason == "accepted-safe-experiment-measurement-saturated"' result-saturated.json >/dev/null
   jq -e '.causalReach.preflight == {"passed":false,"acceptance":"experiment","safetyPassed":true,"targetPassed":false,"verdict":"measurement-saturated","observedDelta":0}' .agent-run.json >/dev/null
+
+  git restore --worktree --staged .
+  rm -f .agent-run.json
+  echo 'package example; class Change { int trajectoryProgress; }' > src/main/java/example/Change.java
+  cat > .agent-run.json <<'JSON'
+{
+  "runMode":"evolution", "pmDirection":"A", "evaluation":{"metric":"nutrientBuffer","goal":"decrease","requiredDelta":3},
+  "evidence":{"verification":"Focused tests pass."},
+  "causalReach":{"preflight":{"passed":false,"observedDelta":null}}
+}
+JSON
+  rm -rf target
+  RUNNER_TEMP="$assessment_fixture/target" GITHUB_OUTPUT=assessment-trajectory-progress.outputs SHADOW_FIXTURE_MODE=saturated-progress \
+    scripts/assess-agent-attempt.sh 1 gemini-artifacts baseline-shadow.json result-trajectory-progress.json >/dev/null
+  grep -Fxq 'accepted=true' assessment-trajectory-progress.outputs
+  jq -e '.accepted == true and .effectClassification == "partial-progress" and .reason == "accepted-safe-experiment-partial-progress"' result-trajectory-progress.json >/dev/null
+  jq -e '.causalReach.preflight.verdict == "partial-progress" and .causalReach.preflight.observedDelta == 0' .agent-run.json >/dev/null
 
   git restore --worktree --staged .
   rm -f .agent-run.json

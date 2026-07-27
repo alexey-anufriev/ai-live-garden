@@ -114,7 +114,11 @@ jq -r --argjson result "$result" --argjson lineage "$lineage" '
   (if $verdict == "target-met" then
      "The expected differential was achieved. Keep the mechanism unless later living-state evidence contradicts it, then choose the next bounded milestone."
    elif $verdict == "partial-progress" then
-     "The metric moved in the expected direction but missed the target. Revise and build on the proven causal path in the next run."
+     if ($result.shadow.observedDelta == 0 and (($result.shadow.trajectoryDelta // 0) != 0)) then
+       "The final metric was saturated, but the bounded trajectory moved in the expected direction before that boundary. Revise and build on the proven causal path in the next run."
+     else
+       "The metric moved in the expected direction but missed the target. Revise and build on the proven causal path in the next run."
+     end
    elif $verdict == "inert" then
      "The code was safe but produced zero measured effect. Inspect the committed implementation, identify the inactive gate or clamp, and revise or revert it in the next run; do not add another disconnected mechanism."
    elif $verdict == "measurement-saturated" then
@@ -142,6 +146,7 @@ jq -r --argjson result "$result" --argjson lineage "$lineage" '
   "## Implemented Hypothesis\n\n" + .causalReach.mechanism + "\n\n" +
   (if ($result.shadow.trajectory // [] | length) > 0 then
      "## Bounded Trajectory Evidence\n\n" +
+     "- Average trajectory delta: " + (($result.shadow.trajectoryDelta // 0) | tostring) + "\n" +
      ($result.shadow.trajectory | map(
        "- Seed " + (.seed | tostring) + ": baseline " +
        (.baseline | map(.value | tostring) | join(" → ")) +
