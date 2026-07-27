@@ -64,6 +64,8 @@ jq -n \
     elif $metric == "nutrients" then $report.initial.nutrients
     elif $metric == "nutrientBuffer" then $report.initial.nutrientBuffer
     else 0 end;
+  def trajectory_values($report; $metric):
+    [($report.trajectory // [])[] | {step:.step, value:metric_value({final:.final}; $metric)}];
   def average_metric($reports; $metric):
     ([$reports[] | metric_value(.; $metric)] | add / length);
   def bounded_environment_metric($metric):
@@ -79,6 +81,14 @@ jq -n \
   ([$base[] | metric_value(.; $evaluation.metric)]) as $baselineValues |
   ([$candidateRuns[] | metric_value(.; $evaluation.metric)]) as $candidateValues |
   ([$base[] | initial_metric_value(.; $evaluation.metric)]) as $baselineInitialValues |
+  ([range(0; $candidateRuns | length) | . as $index |
+    select(($base[$index].trajectory | type) == "array" and ($candidateRuns[$index].trajectory | type) == "array") |
+    {
+      seed: $candidateRuns[$index].seed,
+      baseline: trajectory_values($base[$index]; $evaluation.metric),
+      candidate: trajectory_values($candidateRuns[$index]; $evaluation.metric)
+    }
+  ]) as $trajectory |
   (bounded_environment_metric($evaluation.metric) and
     ([range(0; $candidateRuns | length)] | all(. as $index |
       ($baselineValues[$index] == $candidateValues[$index]) and
@@ -113,6 +123,7 @@ jq -n \
     baselineFinalValues: $baselineValues,
     candidateFinalValues: $candidateValues,
     baselineInitialValues: $baselineInitialValues,
+    trajectory: $trajectory,
     observation: (if $terminalSaturated then "terminal-saturated" else "terminal-observable" end),
     seeds: [$candidateRuns[].seed]
   }

@@ -140,6 +140,15 @@ jq -r --argjson result "$result" --argjson lineage "$lineage" '
   "- Safety passed: " + ($result.shadow.safetyPassed | tostring) + "\n" +
   "- Target passed: " + ($result.shadow.targetPassed | tostring) + "\n\n" +
   "## Implemented Hypothesis\n\n" + .causalReach.mechanism + "\n\n" +
+  (if ($result.shadow.trajectory // [] | length) > 0 then
+     "## Bounded Trajectory Evidence\n\n" +
+     ($result.shadow.trajectory | map(
+       "- Seed " + (.seed | tostring) + ": baseline " +
+       (.baseline | map(.value | tostring) | join(" → ")) +
+       "; candidate " + (.candidate | map(.value | tostring) | join(" → "))
+     ) | join("\n")) + "\n\n"
+   else ""
+   end) +
   "## Experiment Lineage\n\n" +
   "<!-- AGENT-EXPERIMENT-LINEAGE-START -->\n```json\n" + ($lineage | tojson) + "\n```\n<!-- AGENT-EXPERIMENT-LINEAGE-END -->\n\n" +
   "- Continuity: `" + $lineage.continuity + "`\n\n" +
