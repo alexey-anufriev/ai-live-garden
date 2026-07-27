@@ -324,12 +324,13 @@ printf '{"seed":17,"requestedSteps":5,"completedSteps":5,"status":"completed","i
 RUNNER
 chmod +x "$shadow_fixture/saturated-java"
 cat > "$shadow_fixture/saturated-baseline.json" <<'JSON'
-[{"seed":17,"requestedSteps":5,"completedSteps":5,"status":"completed","initial":{"cycle":10,"total":1,"nutrients":0,"nutrientBuffer":0,"counts":{}},"final":{"cycle":15,"total":1,"nutrients":0,"nutrientBuffer":0,"counts":{}},"minimumTotal":1,"maximumTotal":1,"minimumCounts":{},"maximumCounts":{},"trajectory":[{"step":1,"final":{"total":1,"nutrients":0,"nutrientBuffer":0,"counts":{}}},{"step":2,"final":{"total":1,"nutrients":0,"nutrientBuffer":0,"counts":{}}},{"step":3,"final":{"total":1,"nutrients":0,"nutrientBuffer":0,"counts":{}}},{"step":4,"final":{"total":1,"nutrients":0,"nutrientBuffer":0,"counts":{}}},{"step":5,"final":{"total":1,"nutrients":0,"nutrientBuffer":0,"counts":{}}}]}]
+[{"seed":17,"requestedSteps":5,"completedSteps":5,"status":"completed","initial":{"cycle":10,"total":1,"nutrients":0,"nutrientBuffer":0,"counts":{}},"final":{"cycle":15,"total":1,"nutrients":0,"nutrientBuffer":0,"counts":{}},"minimumTotal":1,"maximumTotal":1,"minimumCounts":{},"maximumCounts":{}}]
 JSON
 jq '.evaluation = {metric:"nutrientBuffer",goal:"decrease",requiredDelta:1}' "$shadow_fixture/.agent-run.json" > "$shadow_fixture/saturated-handoff.json"
 if (
   cd "$shadow_fixture"
   SHADOW_SIMULATION_RUNNER="$shadow_fixture/saturated-java" SHADOW_SIMULATION_SEEDS=17 \
+    SHADOW_BASELINE_CLASSES_DIR="$shadow_fixture/target/classes" \
     SHADOW_EVALUATION_RESULT_FILE="$shadow_fixture/saturated-result.json" \
     scripts/evaluate-shadow-candidate.sh "$shadow_fixture/saturated-baseline.json" saturated-handoff.json "$shadow_fixture/saturated-candidate.json" >/dev/null 2>&1
 ); then

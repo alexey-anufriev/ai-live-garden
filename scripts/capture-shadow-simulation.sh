@@ -14,6 +14,7 @@ max_organisms="${SHADOW_MAX_ORGANISMS:-25000}"
 timeout_seconds="${SHADOW_SIMULATION_TIMEOUT_SECONDS:-120}"
 max_parallel_seeds="${SHADOW_SIMULATION_MAX_PARALLEL_SEEDS:-4}"
 simulation_runner="${SHADOW_SIMULATION_RUNNER:-java}"
+simulation_classes_dir="${SHADOW_SIMULATION_CLASSES_DIR:-target/classes}"
 capture_trajectory="${SHADOW_SIMULATION_CAPTURE_TRAJECTORY:-false}"
 
 for value in "$steps" "$max_organisms" "$timeout_seconds" "$max_parallel_seeds"; do
@@ -23,7 +24,7 @@ for value in "$steps" "$max_organisms" "$timeout_seconds" "$max_parallel_seeds";
   fi
 done
 
-if [[ ! -f target/classes/garden/ai/Main.class ]]; then
+if [[ ! -f "${simulation_classes_dir}/garden/ai/Main.class" ]]; then
   echo "Compiled simulation classes are missing; run Maven tests before shadow evaluation." >&2
   exit 1
 fi
@@ -68,7 +69,7 @@ for index in "${!seed_values[@]}"; do
   result_files+=("$result_file")
   (
     timeout --signal=TERM --kill-after=10s "${timeout_seconds}s" \
-      "$simulation_runner" -cp target/classes garden.ai.Main simulate \
+      "$simulation_runner" -cp "$simulation_classes_dir" garden.ai.Main simulate \
         --state "$state_file" --steps "$steps" --seed "$seed" --max-organisms "$max_organisms" > "$result_file"
   ) &
   pids+=("$!")
@@ -116,7 +117,7 @@ if [[ "$capture_trajectory" == "true" ]]; then
     for horizon in $(seq 1 "$steps"); do
       horizon_file="${work_dir}/trajectory-${index}-${horizon}.json"
       if ! timeout --signal=TERM --kill-after=10s "${timeout_seconds}s" \
-          "$simulation_runner" -cp target/classes garden.ai.Main simulate \
+          "$simulation_runner" -cp "$simulation_classes_dir" garden.ai.Main simulate \
             --state "$state_file" --steps "$horizon" --seed "${seed_values[$index]}" --max-organisms "$max_organisms" > "$horizon_file"; then
         echo "Shadow trajectory capture failed for seed ${seed_values[$index]} at horizon ${horizon}." >&2
         exit 1

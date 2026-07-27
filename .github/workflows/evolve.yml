@@ -69,11 +69,10 @@ jobs:
         if: ${{ !cancelled() && steps.harness_contracts.outcome == 'success' && steps.setup_java.outcome == 'success' && steps.baseline_test.outcome == 'success' && steps.observation_window.outputs.ready == 'true' }}
         continue-on-error: true
         shell: bash
-        env:
-          SHADOW_SIMULATION_CAPTURE_TRAJECTORY: "true"
         run: |
           capture_status=0
           scripts/capture-shadow-simulation.sh "${RUNNER_TEMP}/baseline-shadow.json" || capture_status=$?
+          cp -a target/classes "${RUNNER_TEMP}/baseline-shadow-classes"
           cp "${RUNNER_TEMP}/baseline-shadow.json" target/agent-baseline-shadow.json
           exit "$capture_status"
 
@@ -131,6 +130,7 @@ jobs:
           AGENT_BASELINE_TEST_OUTCOME: ${{ steps.baseline_test.outcome }}
           AGENT_BASELINE_POLICY_OUTCOME: ${{ steps.baseline_policy.outcome }}
           AGENT_BASELINE_SHADOW_OUTCOME: ${{ steps.baseline_shadow.outcome }}
+          SHADOW_BASELINE_CLASSES_DIR: ${{ runner.temp }}/baseline-shadow-classes
         run: scripts/assess-agent-attempt.sh 1 gemini-artifacts "${RUNNER_TEMP}/baseline-shadow.json" "${RUNNER_TEMP}/agent-attempt-1.json"
 
       - name: Resolve autonomous experiment

@@ -138,11 +138,29 @@ jq -n \
   }
 ' > "$result_file"
 
-if [[ "${SHADOW_EVALUATION_TRAJECTORY_CAPTURED:-false}" != "true" ]] && \
-    jq -e '.observation == "terminal-saturated" and (.trajectory | length) == 0' "$result_file" >/dev/null && \
-    jq -e 'all(.[]; (.trajectory | type) == "array")' "$baseline_file" >/dev/null; then
-  SHADOW_EVALUATION_TRAJECTORY_CAPTURED=true "$0" "$baseline_file" "$handoff_file" "$candidate_file"
-  exit $?
+if [[ "$evaluation_policy" == "target" && "${SHADOW_EVALUATION_TRAJECTORY_CAPTURED:-false}" != "true" ]] && \
+    jq -e '.observation == "terminal-saturated" and (.trajectory | length) == 0' "$result_file" >/dev/null; then
+  trajectory_baseline_file="$baseline_file"
+  if ! jq -e 'all(.[]; (.trajectory | type) == "array")' "$trajectory_baseline_file" >/dev/null && \
+      [[ -n "${SHADOW_BASELINE_CLASSES_DIR:-}" && -d "${SHADOW_BASELINE_CLASSES_DIR}" ]]; then
+    trajectory_baseline_file="${result_file%.json}-baseline-trajectory.json"
+    if ! SHADOW_SIMULATION_CAPTURE_TRAJECTORY=true \
+        SHADOW_SIMULATION_CLASSES_DIR="$SHADOW_BASELINE_CLASSES_DIR" \
+        scripts/capture-shadow-simulation.sh "$trajectory_baseline_file" >/dev/null; then
+      echo "Baseline trajectory capture was unavailable; retaining terminal saturation evidence." >&2
+      trajectory_baseline_file="$baseline_file"
+    fi
+  fi
+  if jq -e 'all(.[]; (.trajectory | type) == "array")' "$trajectory_baseline_file" >/dev/null; then
+    terminal_result_file="${result_file}.terminal"
+    cp "$result_file" "$terminal_result_file"
+    SHADOW_EVALUATION_TRAJECTORY_CAPTURED=true "$0" "$trajectory_baseline_file" "$handoff_file" "$candidate_file" || true
+    if jq -e '.reason == "candidate-shadow-capture-failed"' "$result_file" >/dev/null; then
+      cp "$terminal_result_file" "$result_file"
+      echo "Candidate trajectory capture was unavailable; retaining terminal saturation evidence." >&2
+    fi
+    rm -f "$terminal_result_file"
+  fi
 fi
 
 cat "$result_file"
