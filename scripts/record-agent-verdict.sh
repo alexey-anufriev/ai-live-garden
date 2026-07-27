@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if (( $# != 3 )); then
-  echo "Usage: $0 ATTEMPT_LEDGER HANDOFF_FILE OUTPUT_FILE" >&2
+if (( $# < 3 || $# > 4 )); then
+  echo "Usage: $0 ATTEMPT_LEDGER HANDOFF_FILE OUTPUT_FILE [PRIOR_FEEDBACK_FILE]" >&2
   exit 2
 fi
 
 ledger_file="$1"
 handoff_file="$2"
 output_file="$3"
+prior_feedback_file="${4:-agent/shadow-feedback.md}"
 
 for required_file in "$ledger_file" "$handoff_file"; do
   if [[ ! -f "$required_file" ]]; then
@@ -40,7 +41,54 @@ mkdir -p "$(dirname "$output_file")"
 temporary_output="$(mktemp "${RUNNER_TEMP:-/tmp}/agent-verdict.XXXXXX")"
 trap 'rm -f "$temporary_output"' EXIT
 
-jq -r --argjson result "$result" '
+previous_experiment='null'
+if [[ -f "$prior_feedback_file" ]]; then
+  prior_lineage="$(awk '
+    /^<!-- AGENT-EXPERIMENT-LINEAGE-START -->$/ { capture = 1; next }
+    /^<!-- AGENT-EXPERIMENT-LINEAGE-END -->$/ { exit }
+    capture && !/^```/ { print }
+  ' "$prior_feedback_file")"
+  if [[ -n "$prior_lineage" ]] && jq -e '.current | type == "object"' >/dev/null 2>&1 <<<"$prior_lineage"; then
+    previous_experiment="$(jq -c '.current' <<<"$prior_lineage")"
+  fi
+fi
+
+candidate_commit="$(jq -r '.candidateCommit // empty' <<<"$result")"
+changed_paths='[]'
+if [[ -n "$candidate_commit" ]] && git cat-file -e "${candidate_commit}^{commit}" 2>/dev/null; then
+  changed_paths="$(git diff-tree --no-commit-id --name-only -r "$candidate_commit" -- src/main src/test pom.xml data/garden-state.txt |
+    jq -R . | jq -s .)"
+fi
+
+current_experiment="$(jq -cn \
+  --arg commit "$candidate_commit" \
+  --argjson paths "$changed_paths" \
+  --argjson result "$result" \
+  --slurpfile handoff "$handoff_file" '
+    {
+      commit: $commit,
+      paths: $paths,
+      mechanism: $handoff[0].causalReach.mechanism,
+      metric: $handoff[0].evaluation.metric,
+      goal: $handoff[0].evaluation.goal,
+      requiredDelta: $handoff[0].evaluation.requiredDelta,
+      classification: $result.effectClassification,
+      observedDelta: $result.shadow.observedDelta,
+      observation: ($result.shadow.observation // "terminal-observable")
+    }
+  ')"
+lineage="$(jq -cn \
+  --argjson current "$current_experiment" \
+  --argjson previous "$previous_experiment" \
+  --slurpfile handoff "$handoff_file" '
+    {
+      current: $current,
+      previous: $previous,
+      responseToPrevious: $handoff[0].causalReach.previousFeedbackDecision
+    }
+  ')"
+
+jq -r --argjson result "$result" --argjson lineage "$lineage" '
   ($result.effectClassification // "unmeasured") as $verdict |
   (if $verdict == "target-met" then
      "The expected differential was achieved. Keep the mechanism unless later living-state evidence contradicts it, then choose the next bounded milestone."
@@ -70,9 +118,11 @@ jq -r --argjson result "$result" '
   "- Safety passed: " + ($result.shadow.safetyPassed | tostring) + "\n" +
   "- Target passed: " + ($result.shadow.targetPassed | tostring) + "\n\n" +
   "## Implemented Hypothesis\n\n" + .causalReach.mechanism + "\n\n" +
+  "## Experiment Lineage\n\n" +
+  "<!-- AGENT-EXPERIMENT-LINEAGE-START -->\n```json\n" + ($lineage | tojson) + "\n```\n<!-- AGENT-EXPERIMENT-LINEAGE-END -->\n\n" +
   "## Harness Conclusion\n\n" + $nextAction + "\n\n" +
   "## Required Next Decision\n\n" +
-  "Set `causalReach.previousFeedbackDecision` to `reuse`, `revise`, or `abandon` and explain the decision with current-state evidence. Because this code is already on main, inspect and change the implementation directly; there is no rejected branch to recover.\n"
+  "Set `causalReach.previousFeedbackDecision` to `reuse`, `revise`, or `abandon` and explain the decision with current-state evidence. The lineage retains only this experiment and its immediate predecessor. When reusing or revising, normally work on the listed prior path; when changing course, explicitly abandon it with evidence. Because this code is already on main, inspect and change the implementation directly; there is no rejected branch to recover.\n"
 ' "$handoff_file" > "$temporary_output"
 
 mv "$temporary_output" "$output_file"

@@ -450,18 +450,65 @@ AGENT_PM_REFERENCE_DATE=2026-07-08 scripts/validate-agent-handoff.sh handoff-exp
 cat > experiment-ledger.json <<'JSON'
 [{"attempt":1,"accepted":true,"acceptance":"experiment","effectClassification":"inert","shadow":{"safetyPassed":true,"targetPassed":false,"baselineAverage":2,"candidateAverage":2,"observedDelta":0}}]
 JSON
-scripts/record-agent-verdict.sh experiment-ledger.json handoff-experiment-unmeasured.json experiment-feedback.md >/dev/null
+scripts/record-agent-verdict.sh experiment-ledger.json handoff-experiment-unmeasured.json experiment-feedback.md "$fixture_root/no-prior-feedback.md" >/dev/null
 grep -Fq '# Autonomous Experiment Verdict' experiment-feedback.md
 grep -Fq 'Classification: `inert`' experiment-feedback.md
 grep -Fq 'Observed delta: 0' experiment-feedback.md
 grep -Fq 'code is already on main' experiment-feedback.md
+awk '
+  /^<!-- AGENT-EXPERIMENT-LINEAGE-START -->$/ { capture = 1; next }
+  /^<!-- AGENT-EXPERIMENT-LINEAGE-END -->$/ { exit }
+  capture && !/^```/ { print }
+' experiment-feedback.md | jq -e '.current.classification == "inert" and .previous == null and .responseToPrevious == "none"' >/dev/null
 cat > saturated-experiment-ledger.json <<'JSON'
 [{"attempt":1,"accepted":true,"acceptance":"experiment","effectClassification":"measurement-saturated","shadow":{"safetyPassed":true,"targetPassed":false,"baselineAverage":0,"candidateAverage":0,"observedDelta":0,"observation":"terminal-saturated","baselineFinalValues":[0,0],"candidateFinalValues":[0,0]}}]
 JSON
-scripts/record-agent-verdict.sh saturated-experiment-ledger.json handoff-experiment-unmeasured.json saturated-experiment-feedback.md >/dev/null
+jq '.causalReach.previousFeedbackDecision = "revise"' handoff-experiment-unmeasured.json > handoff-experiment-revised.json
+scripts/record-agent-verdict.sh saturated-experiment-ledger.json handoff-experiment-revised.json saturated-experiment-feedback.md experiment-feedback.md >/dev/null
 grep -Fq 'Classification: `measurement-saturated`' saturated-experiment-feedback.md
 grep -Fq 'Measurement: `terminal-saturated`' saturated-experiment-feedback.md
 grep -Fq 'cannot distinguish this mechanism' saturated-experiment-feedback.md
+awk '
+  /^<!-- AGENT-EXPERIMENT-LINEAGE-START -->$/ { capture = 1; next }
+  /^<!-- AGENT-EXPERIMENT-LINEAGE-END -->$/ { exit }
+  capture && !/^```/ { print }
+' saturated-experiment-feedback.md | jq -e '.current.classification == "measurement-saturated" and .previous.classification == "inert" and .responseToPrevious == "revise"' >/dev/null
+jq '.causalReach.previousFeedbackDecision = "abandon"' handoff-experiment-unmeasured.json > handoff-experiment-abandoned.json
+scripts/record-agent-verdict.sh experiment-ledger.json handoff-experiment-abandoned.json third-experiment-feedback.md saturated-experiment-feedback.md >/dev/null
+awk '
+  /^<!-- AGENT-EXPERIMENT-LINEAGE-START -->$/ { capture = 1; next }
+  /^<!-- AGENT-EXPERIMENT-LINEAGE-END -->$/ { exit }
+  capture && !/^```/ { print }
+' third-experiment-feedback.md | jq -e '.current.classification == "inert" and .previous.classification == "measurement-saturated" and (.previous | has("previous") | not) and .responseToPrevious == "abandon"' >/dev/null
+
+lineage_fixture="$fixture_root/lineage-fixture"
+mkdir -p "$lineage_fixture/src/main/java/example"
+(
+  cd "$lineage_fixture"
+  git init -q
+  git config user.name fixture
+  git config user.email fixture@example.invalid
+  git config commit.gpgSign false
+  echo 'package example; class Change {}' > src/main/java/example/Change.java
+  git add .
+  git commit -qm baseline
+  echo 'package example; class Change { int lineage; }' > src/main/java/example/Change.java
+  git commit -am 'candidate lineage' -q
+  candidate_commit="$(git rev-parse HEAD)"
+  cat > ledger.json <<JSON
+[{"accepted":true,"acceptance":"experiment","candidateCommit":"${candidate_commit}","effectClassification":"inert","shadow":{"safetyPassed":true,"targetPassed":false,"baselineAverage":2,"candidateAverage":2,"observedDelta":0}}]
+JSON
+  cat > handoff.json <<'JSON'
+{"pmDirection":"none","evaluation":{"metric":"nutrientBuffer","goal":"decrease","requiredDelta":1},"causalReach":{"mechanism":"Fixture lineage mechanism.","previousFeedbackDecision":"none"}}
+JSON
+  "$repository_root/scripts/record-agent-verdict.sh" ledger.json handoff.json feedback.md no-prior.md >/dev/null
+  awk '
+    /^<!-- AGENT-EXPERIMENT-LINEAGE-START -->$/ { capture = 1; next }
+    /^<!-- AGENT-EXPERIMENT-LINEAGE-END -->$/ { exit }
+    capture && !/^```/ { print }
+  ' feedback.md | jq -e --arg commit "$candidate_commit" '.current.commit == $commit and .current.paths == ["src/main/java/example/Change.java"]' >/dev/null
+)
+rm -rf "$lineage_fixture/.git"
 
 cat > attempt-1.json <<'JSON'
 {"attempt":1,"accepted":false,"retryRequired":false,"substantiveChange":true,"candidateCommit":"1111111111111111111111111111111111111111","stageRank":2,"stage":"tests","reason":"candidate-tests-failed","diagnostics":"fixture","shadow":null}
