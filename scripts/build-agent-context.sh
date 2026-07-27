@@ -336,7 +336,7 @@ append_experiment_outcome_history() {
       echo
       echo "### Repeated-Stall Warning"
       echo
-      echo "The three latest experiments for \`${key%%|*}\` / \`${key#*|}\` were inconclusive or adverse. Before another coefficient or adjacent-feature change, inspect the active phase/gate and make one focused diagnostic revision, or explicitly abandon this mechanism."
+      echo "The three latest experiments for \`${key%%|*}\` / \`${key#*|}\` were inconclusive or adverse. Before another coefficient or adjacent-feature change, inspect the active phase/gate and make one focused diagnostic revision, or explicitly abandon this mechanism. This warning is advisory; a safe, evidence-backed new causal direction remains allowed."
     fi
   fi
   echo
