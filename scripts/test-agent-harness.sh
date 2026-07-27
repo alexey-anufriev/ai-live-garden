@@ -54,6 +54,8 @@ grep -Fq 'id: sync_agent_journal' "$workflow_file"
 grep -Fq 'id: accepted_finalization' "$workflow_file"
 grep -Fq 'id: commit_accepted_fallback' "$workflow_file"
 grep -Fq 'id: cleanup_consumed_rejected_candidates' "$workflow_file"
+grep -Fq 'scripts/test-agent-harness.sh 2>&1 | tee "${RUNNER_TEMP}/harness-contracts.log"' "$workflow_file"
+grep -Fq 'AGENT_HARNESS_CONTRACT_LOG: ${{ runner.temp }}/harness-contracts.log' "$workflow_file"
 grep -Fq 'run: scripts/defer-agent-incomplete.sh' "$workflow_file"
 grep -Fq 'run: scripts/publish-rejected-candidate.sh' "$workflow_file"
 grep -Fq 'run: scripts/record-agent-verdict.sh' "$workflow_file"
@@ -80,6 +82,14 @@ if grep -Eq 'id: (shadow_evaluation|shadow_safety_evaluation|shadow_repair_evalu
   echo "The workflow retained a redundant post-assessment shadow/rejection path." >&2
   exit 1
 fi
+
+harness_log="$fixture_root/harness-contracts.log"
+failure_diagnostics="$fixture_root/failure-diagnostics"
+printf 'Harness contract assertion failed: fixture evidence.\n' > "$harness_log"
+AGENT_HARNESS_CONTRACT_LOG="$harness_log" \
+  "$repository_root/scripts/collect-agent-failure-diagnostics.sh" "$failure_diagnostics" >/dev/null
+assert_contains 'Harness contract assertion failed: fixture evidence.' "$failure_diagnostics/harness-contracts.log"
+assert_contains 'Harness-contract output copied to `harness-contracts.log`' "$failure_diagnostics/README.md"
 
 prompt_context="$fixture_root/agent-context.md"
 prompt_metadata="$fixture_root/agent-context.metadata"

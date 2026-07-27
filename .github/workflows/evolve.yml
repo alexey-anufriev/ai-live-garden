@@ -34,7 +34,9 @@ jobs:
       - name: Validate autonomous harness contracts
         id: harness_contracts
         shell: bash
-        run: scripts/test-agent-harness.sh
+        run: |
+          set -o pipefail
+          scripts/test-agent-harness.sh 2>&1 | tee "${RUNNER_TEMP}/harness-contracts.log"
 
       - name: Set up Java
         id: setup_java
@@ -398,6 +400,7 @@ jobs:
           AGENT_BASELINE_SHADOW_FILE: ${{ runner.temp }}/baseline-shadow.json
           AGENT_CANDIDATE_SHADOW_FILE: ${{ runner.temp }}/candidate-shadow.json
           AGENT_SHADOW_EVALUATION_RESULT_FILE: ${{ runner.temp }}/shadow-evaluation-result.json
+          AGENT_HARNESS_CONTRACT_LOG: ${{ runner.temp }}/harness-contracts.log
         run: scripts/collect-agent-failure-diagnostics.sh "${{ runner.temp }}/agent-failure-diagnostics"
 
       - name: Upload failure diagnostics

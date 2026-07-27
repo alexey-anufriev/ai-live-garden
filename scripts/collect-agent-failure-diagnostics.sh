@@ -73,6 +73,10 @@ if [[ -n "${AGENT_BASELINE_POLICY_RESULT_FILE:-}" && -f "$AGENT_BASELINE_POLICY_
   cp "$AGENT_BASELINE_POLICY_RESULT_FILE" "$output_dir/baseline-policy-result.md"
 fi
 
+if [[ -n "${AGENT_HARNESS_CONTRACT_LOG:-}" && -f "$AGENT_HARNESS_CONTRACT_LOG" ]]; then
+  cp "$AGENT_HARNESS_CONTRACT_LOG" "$output_dir/harness-contracts.log"
+fi
+
 for shadow_variable in AGENT_BASELINE_SHADOW_FILE AGENT_CANDIDATE_SHADOW_FILE AGENT_SHADOW_EVALUATION_RESULT_FILE; do
   shadow_file="${!shadow_variable:-}"
   if [[ -n "$shadow_file" && -f "$shadow_file" ]]; then
@@ -141,6 +145,9 @@ fi
   fi
   if [[ -f "$output_dir/baseline-policy-result.md" ]]; then
     echo "- Baseline worktree policy result copied to \`baseline-policy-result.md\`"
+  fi
+  if [[ -f "$output_dir/harness-contracts.log" ]]; then
+    echo "- Harness-contract output copied to \`harness-contracts.log\`"
   fi
   if [[ -f "$output_dir/shadow-evaluation-result.json" ]]; then
     echo "- Shadow evaluation result copied to \`shadow-evaluation-result.json\`"
