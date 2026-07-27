@@ -94,9 +94,17 @@ jq -n \
       candidate: trajectory_values($candidateRuns[$index]; $evaluation.metric)
     }
   ]) as $trajectory |
-  (if ($trajectory | length) == 0 then 0
-   else ($trajectory | map((([.candidate[].value] | add) - ([.baseline[].value] | add))) | add / length)
+  ($trajectory | map(. + {
+    delta: (([.candidate[].value] | add) - ([.baseline[].value] | add))
+  })) as $trajectoryBySeed |
+  (if ($trajectoryBySeed | length) == 0 then 0
+   else ($trajectoryBySeed | map(.delta) | add / length)
    end) as $trajectoryDelta |
+  (if $evaluation.goal == "increase" then
+     [$trajectoryBySeed[] | select(.delta > 0)] | length
+   elif $evaluation.goal == "decrease" then
+     [$trajectoryBySeed[] | select(.delta < 0)] | length
+   else 0 end) as $trajectorySupportingSeeds |
   (bounded_environment_metric($evaluation.metric) and
     ([range(0; $candidateRuns | length)] | all(. as $index |
       ($baselineValues[$index] == $candidateValues[$index]) and
@@ -131,8 +139,12 @@ jq -n \
     baselineFinalValues: $baselineValues,
     candidateFinalValues: $candidateValues,
     baselineInitialValues: $baselineInitialValues,
-    trajectory: $trajectory,
+    trajectory: $trajectoryBySeed,
     trajectoryDelta: $trajectoryDelta,
+    trajectoryDirectionalSupport: {
+      supporting: $trajectorySupportingSeeds,
+      total: ($trajectoryBySeed | length)
+    },
     observation: (if $terminalSaturated then "terminal-saturated" else "terminal-observable" end),
     seeds: [$candidateRuns[].seed]
   }
