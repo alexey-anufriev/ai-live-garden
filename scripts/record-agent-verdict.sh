@@ -81,19 +81,30 @@ lineage="$(jq -cn \
   --argjson current "$current_experiment" \
   --argjson previous "$previous_experiment" \
   --slurpfile handoff "$handoff_file" '
+    def stalled($experiment):
+      $experiment.classification == "inert" or
+      $experiment.classification == "measurement-saturated" or
+      $experiment.classification == "wrong-direction";
     ($handoff[0].causalReach.previousFeedbackDecision) as $decision |
     ($current.paths // []) as $currentPaths |
     ($previous.paths // []) as $previousPaths |
+    (if $previous == null or ($previousPaths | length) == 0 then "unavailable"
+     elif $decision == "abandon" then "abandoned"
+     elif $decision == "reuse" or $decision == "revise" then
+       if any($currentPaths[]; . as $path | $previousPaths | index($path)) then "matched" else "diverged" end
+     else "unavailable"
+     end) as $continuity |
     {
       current: $current,
       previous: $previous,
       responseToPrevious: $decision,
-      continuity:
-        (if $previous == null or ($previousPaths | length) == 0 then "unavailable"
-         elif $decision == "abandon" then "abandoned"
-         elif $decision == "reuse" or $decision == "revise" then
-           if any($currentPaths[]; . as $path | $previousPaths | index($path)) then "matched" else "diverged" end
-         else "unavailable"
+      continuity: $continuity,
+      escalation:
+        (if $previous != null and $continuity == "matched" and
+            $current.metric == $previous.metric and $current.goal == $previous.goal and
+            stalled($current) and stalled($previous)
+         then "diagnose-or-abandon"
+         else "none"
          end)
     }
   ')"
@@ -131,6 +142,7 @@ jq -r --argjson result "$result" --argjson lineage "$lineage" '
   "## Experiment Lineage\n\n" +
   "<!-- AGENT-EXPERIMENT-LINEAGE-START -->\n```json\n" + ($lineage | tojson) + "\n```\n<!-- AGENT-EXPERIMENT-LINEAGE-END -->\n\n" +
   "- Continuity: `" + $lineage.continuity + "`\n\n" +
+  "- Escalation: `" + $lineage.escalation + "`\n\n" +
   "## Harness Conclusion\n\n" + $nextAction + "\n\n" +
   "## Required Next Decision\n\n" +
   "Set `causalReach.previousFeedbackDecision` to `reuse`, `revise`, or `abandon` and explain the decision with current-state evidence. The lineage retains only this experiment and its immediate predecessor. When reusing or revising, normally work on the listed prior path; when changing course, explicitly abandon it with evidence. Because this code is already on main, inspect and change the implementation directly; there is no rejected branch to recover.\n"
