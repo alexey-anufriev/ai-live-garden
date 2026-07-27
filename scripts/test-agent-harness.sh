@@ -676,6 +676,36 @@ if AGENT_PM_REFERENCE_DATE=2026-07-08 scripts/validate-agent-handoff.sh handoff-
   echo "Evolution handoff ignored supplied previous feedback." >&2
   exit 1
 fi
+cp handoff-active.json handoff-normalized-feedback.json
+AGENT_PM_REFERENCE_DATE=2026-07-08 \
+  scripts/normalize-agent-handoff.sh handoff-normalized-feedback.json 2>/dev/null
+jq -e '
+  .causalReach.previousFeedbackDecision == "revise" and
+  .causalReach.feedbackReference == "continuity unavailable: inspect agent/shadow-feedback.md" and
+  (.harnessNormalization.applied |
+    index("recovered missing feedback reference with unavailable continuity") != null)
+' handoff-normalized-feedback.json >/dev/null
+AGENT_PM_REFERENCE_DATE=2026-07-08 \
+  scripts/validate-agent-handoff.sh handoff-normalized-feedback.json >/dev/null
+cat > agent/shadow-feedback.md <<'MARKDOWN'
+# Autonomous Experiment Verdict
+
+<!-- AGENT-EXPERIMENT-LINEAGE-START -->
+```json
+{"current":{"mechanism":"Prior fungal gate"},"previous":null}
+```
+<!-- AGENT-EXPERIMENT-LINEAGE-END -->
+MARKDOWN
+cp handoff-active.json handoff-lineage-reference.json
+AGENT_PM_REFERENCE_DATE=2026-07-08 \
+  scripts/normalize-agent-handoff.sh handoff-lineage-reference.json 2>/dev/null
+jq -e '
+  .causalReach.feedbackReference == "mechanism: Prior fungal gate" and
+  (.harnessNormalization.applied |
+    index("recovered feedback reference from structured lineage") != null)
+' handoff-lineage-reference.json >/dev/null
+AGENT_PM_REFERENCE_DATE=2026-07-08 \
+  scripts/validate-agent-handoff.sh handoff-lineage-reference.json >/dev/null
 jq '.causalReach.previousFeedbackDecision = "revise" | .causalReach.feedbackReference = "path: src/main/java/garden/ai/Fixture.java; revise the prior gate"' handoff-active.json > handoff-feedback-decision.json
 AGENT_PM_REFERENCE_DATE=2026-07-08 scripts/validate-agent-handoff.sh handoff-feedback-decision.json >/dev/null
 rm agent/shadow-feedback.md

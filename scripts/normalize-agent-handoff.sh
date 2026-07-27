@@ -147,6 +147,29 @@ elif [[ ! -f agent/shadow-feedback.md \
   record_change "cleared feedback decision because no feedback is present"
 fi
 
+feedback_reference="$(jq -r '.causalReach.feedbackReference // "none"' "$handoff_file")"
+if [[ -f agent/shadow-feedback.md \
+    && ( -z "$feedback_reference" || "$feedback_reference" == "none" ) ]]; then
+  prior_lineage="$(awk '
+    /^<!-- AGENT-EXPERIMENT-LINEAGE-START -->$/ { capture = 1; next }
+    /^<!-- AGENT-EXPERIMENT-LINEAGE-END -->$/ { exit }
+    capture && !/^```/ { print }
+  ' agent/shadow-feedback.md)"
+  prior_mechanism="$(jq -r '.current.mechanism // empty' <<<"$prior_lineage" 2>/dev/null || true)"
+  if [[ -n "$prior_mechanism" ]]; then
+    normalized_reference="mechanism: ${prior_mechanism}"
+    normalization_description="recovered feedback reference from structured lineage"
+  else
+    normalized_reference="continuity unavailable: inspect agent/shadow-feedback.md"
+    normalization_description="recovered missing feedback reference with unavailable continuity"
+  fi
+  rewrite '.causalReach.feedbackReference = $reference' --arg reference "$normalized_reference"
+  record_change "$normalization_description"
+elif [[ ! -f agent/shadow-feedback.md && "$feedback_reference" != "none" ]]; then
+  rewrite '.causalReach.feedbackReference = "none"'
+  record_change "cleared feedback reference because no feedback is present"
+fi
+
 if (( ${#changes[@]} > 0 )); then
   changes_json="$(printf '%s\n' "${changes[@]}" | jq -R . | jq -s .)"
   rewrite '.harnessNormalization = {applied: $changes}' --argjson changes "$changes_json"
