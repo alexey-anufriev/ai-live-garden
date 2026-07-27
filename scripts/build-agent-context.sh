@@ -298,6 +298,36 @@ append_shadow_feedback() {
   echo
 }
 
+append_experiment_outcome_history() {
+  local commit lineage row count
+  echo "## Recent Experiment Outcomes"
+  echo
+  echo "This is a bounded history derived from committed verdicts. Use it to avoid repeating an inconclusive mechanism without a concrete revision or abandonment."
+  echo
+  echo "| Commit | Classification | Metric | Goal | Delta | Decision | Reference |"
+  echo "| --- | --- | --- | --- | ---: | --- | --- |"
+  count=0
+  while IFS= read -r commit; do
+    [[ -n "$commit" ]] || continue
+    lineage="$(git show "${commit}:agent/shadow-feedback.md" 2>/dev/null | awk '
+      /^<!-- AGENT-EXPERIMENT-LINEAGE-START -->$/ { capture = 1; next }
+      /^<!-- AGENT-EXPERIMENT-LINEAGE-END -->$/ { exit }
+      capture && !/^```/ { print }
+    ' || true)"
+    [[ -n "$lineage" ]] || continue
+    row="$(jq -r '[.current.classification, .current.metric, .current.goal, (.current.observedDelta | tostring), .responseToPrevious, (.current.feedbackReference // "none")] | @tsv' <<<"$lineage" 2>/dev/null || true)"
+    [[ -n "$row" ]] || continue
+    IFS=$'\t' read -r classification metric goal delta decision reference <<<"$row"
+    echo "| ${commit:0:12} | ${classification} | ${metric} | ${goal} | ${delta} | ${decision} | ${reference} |"
+    count=$((count + 1))
+    (( count >= 5 )) && break
+  done < <(git log --format='%H' -n 30 -- agent/shadow-feedback.md 2>/dev/null)
+  if (( count == 0 )); then
+    echo "| — | No committed experiment verdicts yet | — | — | — | — | — |"
+  fi
+  echo
+}
+
 autonomous_commits() {
   git log --grep='^feat: autonomous garden evolution' --format='%H' -n "${1:-3}" 2>/dev/null || true
 }
@@ -577,6 +607,7 @@ JSON
   append_baseline_test_result
   append_baseline_policy_result
   append_baseline_shadow_result
+  append_experiment_outcome_history
   append_garden_digest
   echo "## Recent Active Journal Entries"
   echo

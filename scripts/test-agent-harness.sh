@@ -158,6 +158,7 @@ grep -Fq '## Baseline Shadow Simulation' "$prompt_outputs"
 grep -Fq '| 17 | 5 | completed | 10 | 20 | 9 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 2 | 9 |' "$prompt_outputs"
 grep -Fq 'scripts/evaluate-shadow-candidate.sh target/agent-baseline-shadow.json' "$prompt_outputs"
 grep -Fq '## Previous Autonomous Feedback' "$prompt_outputs"
+grep -Fq '## Recent Experiment Outcomes' "$prompt_outputs"
 grep -Fq 'Previous candidate observed delta: 0.' "$prompt_outputs"
 grep -Fq 'Immediate predecessor marker.' "$prompt_outputs"
 if grep -Fq 'Recursively embedded old marker' "$prompt_outputs"; then
