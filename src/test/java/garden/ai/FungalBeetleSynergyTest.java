@@ -26,6 +26,8 @@ public class FungalBeetleSynergyTest {
 
         // Fungal contribution == 0
         TraitRegistry.MetabolicEffect effectNoFungus = TraitRegistry.getMetabolicEffect("fungal-beetle-synergizer", 1, beetle, env, 0, 0, 1);
-        assertNull(effectNoFungus);
+        assertNotNull(effectNoFungus);
+        assertEquals(8, effectNoFungus.energyBonus());
+        assertEquals(-1, effectNoFungus.metabolismChange());
     }
 }

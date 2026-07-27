@@ -759,8 +759,8 @@ public class TraitRegistry {
                 if (environment.nutrients() < 25) return new MetabolicEffect(-1, 0, new GardenEvent(cycle, "%s scouted for prey in scarce conditions.".formatted(organism.id())));
                 break;
             case "fungal-beetle-synergizer":
-                if (organism.type() == OrganismType.BEETLE && fungalContribution > 0) {
-                    int energyGain = 8 + (fungalContribution / 25);
+                if (organism.type() == OrganismType.BEETLE) {
+                    int energyGain = 8 + (Math.max(0, fungalContribution) / 25);
                     return new MetabolicEffect(-1, energyGain, new GardenEvent(cycle, "%s benefited from deep fungal-beetle synergy (+%d energy, -1 metabolism).".formatted(organism.id(), energyGain)));
                 }
                 break;

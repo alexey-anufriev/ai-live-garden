@@ -9,24 +9,24 @@ This verdict evaluates the safe code committed by the previous autonomous run. S
 - Goal: `increase`
 - Required delta: 1
 - Observed delta: 0
-- Baseline average: 2593
-- Candidate average: 2593
+- Baseline average: 2602
+- Candidate average: 2602
 - Measurement: `terminal-observable`
-- Baseline initial values by seed: 2590, 2590
-- Baseline final values by seed: 2593, 2593
-- Candidate final values by seed: 2593, 2593
+- Baseline initial values by seed: 2599, 2599
+- Baseline final values by seed: 2602, 2602
+- Candidate final values by seed: 2602, 2602
 - Safety passed: true
 - Target passed: false
 
 ## Implemented Hypothesis
 
-Increased trait mutation probability and allowed for broader trait assignment to beetles.
+Relaxed metabolic benefit condition in TraitRegistry.java.
 
 ## Experiment Lineage
 
 <!-- AGENT-EXPERIMENT-LINEAGE-START -->
 ```json
-{"current":{"commit":"6c32658daa336799adefe42a95632dc2ff77b92f","paths":["src/main/java/garden/ai/TraitRegistry.java"],"mechanism":"Increased trait mutation probability and allowed for broader trait assignment to beetles.","feedbackReference":"mechanism: Enhanced 'fungal-beetle-synergizer' trait provides both energy gain and reproduction threshold reduction.","metric":"population.BEETLE","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"previous":{"commit":"2ae4c9cf27f763666df8ba93a0118bb63b2dd766","paths":["src/main/java/garden/ai/TraitRegistry.java","src/test/java/garden/ai/FungalBeetleSynergyTest.java"],"mechanism":"Enhanced 'fungal-beetle-synergizer' trait provides both energy gain and reproduction threshold reduction.","feedbackReference":"mechanism: Increased fungal-beetle synergy energy gain and enabled beetle adoption path.","metric":"population.BEETLE","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"responseToPrevious":"revise","continuity":"matched","escalation":"diagnose-or-abandon"}
+{"current":{"commit":"a9db439bbb9964168a10aedb7a520079fab06726","paths":["src/main/java/garden/ai/TraitRegistry.java","src/test/java/garden/ai/FungalBeetleSynergyTest.java"],"mechanism":"Relaxed metabolic benefit condition in TraitRegistry.java.","feedbackReference":"mechanism: Increased trait mutation probability and allowed for broader trait assignment to beetles.","metric":"population.BEETLE","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"previous":{"commit":"6c32658daa336799adefe42a95632dc2ff77b92f","paths":["src/main/java/garden/ai/TraitRegistry.java"],"mechanism":"Increased trait mutation probability and allowed for broader trait assignment to beetles.","feedbackReference":"mechanism: Enhanced 'fungal-beetle-synergizer' trait provides both energy gain and reproduction threshold reduction.","metric":"population.BEETLE","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"responseToPrevious":"revise","continuity":"matched","escalation":"diagnose-or-abandon"}
 ```
 <!-- AGENT-EXPERIMENT-LINEAGE-END -->
 
