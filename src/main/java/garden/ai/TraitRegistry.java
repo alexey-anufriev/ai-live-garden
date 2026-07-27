@@ -547,8 +547,13 @@ public class TraitRegistry {
             String[] fungalTraits = {"nutrient-decomposer", "fungus-soil-enricher", "fungal-network-connector", "fungal-accelerator", "fungal-enhancer", "fungal-buffer-stabilizer", "nutrient-synthesizer", "buffer-tapper", "fungal-nutrient-amplifier", "mass-decomposer", "reproductive-efficiency", "fungal-decomposition-efficiency", "nutrient-dependent-reproduction", "fungal-energy-converter", "mutualist-synergy", "fungal-beetle-specialist", "fungal-nutrient-cycler"};
             return fungalTraits[Math.floorMod(cycle + organism.generation(), fungalTraits.length)];
         }
-        if (childType == OrganismType.BEETLE && SimulationRandom.current().nextDouble() < 0.2) {
-            return "fungal-beetle-synergizer";
+        if (childType == OrganismType.BEETLE) {
+            if (environment.nutrients() < 40 && SimulationRandom.current().nextDouble() < 0.3) {
+                return "metabolic-efficiency";
+            }
+            if (SimulationRandom.current().nextDouble() < 0.5) {
+                return "fungal-beetle-synergizer";
+            }
         }
         if (childType == OrganismType.FOX && SimulationRandom.current().nextDouble() < 0.3) {
             double r = SimulationRandom.current().nextDouble();
