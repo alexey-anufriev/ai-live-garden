@@ -69,6 +69,8 @@ jobs:
         if: ${{ !cancelled() && steps.harness_contracts.outcome == 'success' && steps.setup_java.outcome == 'success' && steps.baseline_test.outcome == 'success' && steps.observation_window.outputs.ready == 'true' }}
         continue-on-error: true
         shell: bash
+        env:
+          SHADOW_SIMULATION_CAPTURE_TRAJECTORY: "true"
         run: |
           capture_status=0
           scripts/capture-shadow-simulation.sh "${RUNNER_TEMP}/baseline-shadow.json" || capture_status=$?

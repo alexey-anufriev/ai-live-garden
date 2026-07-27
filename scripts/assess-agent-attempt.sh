@@ -174,7 +174,7 @@ case "$shadow_policy" in
           increase)
             if awk -v delta="$observed_delta" 'BEGIN { exit !(delta == 0) }'; then
               if jq -e '.observation == "terminal-saturated"' "$shadow_result_file" >/dev/null; then
-                effect_classification="measurement-saturated"
+                if jq -e '.trajectoryDelta > 0' "$shadow_result_file" >/dev/null; then effect_classification="partial-progress"; else effect_classification="measurement-saturated"; fi
               else
                 effect_classification="inert"
               fi
@@ -187,7 +187,7 @@ case "$shadow_policy" in
           decrease)
             if awk -v delta="$observed_delta" 'BEGIN { exit !(delta == 0) }'; then
               if jq -e '.observation == "terminal-saturated"' "$shadow_result_file" >/dev/null; then
-                effect_classification="measurement-saturated"
+                if jq -e '.trajectoryDelta < 0' "$shadow_result_file" >/dev/null; then effect_classification="partial-progress"; else effect_classification="measurement-saturated"; fi
               else
                 effect_classification="inert"
               fi

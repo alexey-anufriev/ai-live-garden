@@ -19,7 +19,12 @@ if [[ -z "$baseline_file" || ! -f "$baseline_file" ]]; then
 fi
 
 AGENT_HANDOFF_ALLOW_UNVERIFIED_PREFLIGHT=true scripts/validate-agent-handoff.sh "$handoff_file" >/dev/null
-if ! scripts/capture-shadow-simulation.sh "$candidate_file" >/dev/null; then
+if [[ "${SHADOW_EVALUATION_TRAJECTORY_CAPTURED:-false}" == "true" ]]; then
+  capture_command=(env SHADOW_SIMULATION_CAPTURE_TRAJECTORY=true scripts/capture-shadow-simulation.sh "$candidate_file")
+else
+  capture_command=(scripts/capture-shadow-simulation.sh "$candidate_file")
+fi
+if ! "${capture_command[@]}" >/dev/null; then
   jq -n \
     --slurpfile handoff "$handoff_file" \
     --arg policy "$evaluation_policy" '
@@ -89,6 +94,9 @@ jq -n \
       candidate: trajectory_values($candidateRuns[$index]; $evaluation.metric)
     }
   ]) as $trajectory |
+  (if ($trajectory | length) == 0 then 0
+   else ($trajectory | map((([.candidate[].value] | add) - ([.baseline[].value] | add))) | add / length)
+   end) as $trajectoryDelta |
   (bounded_environment_metric($evaluation.metric) and
     ([range(0; $candidateRuns | length)] | all(. as $index |
       ($baselineValues[$index] == $candidateValues[$index]) and
@@ -124,10 +132,18 @@ jq -n \
     candidateFinalValues: $candidateValues,
     baselineInitialValues: $baselineInitialValues,
     trajectory: $trajectory,
+    trajectoryDelta: $trajectoryDelta,
     observation: (if $terminalSaturated then "terminal-saturated" else "terminal-observable" end),
     seeds: [$candidateRuns[].seed]
   }
 ' > "$result_file"
+
+if [[ "${SHADOW_EVALUATION_TRAJECTORY_CAPTURED:-false}" != "true" ]] && \
+    jq -e '.observation == "terminal-saturated" and (.trajectory | length) == 0' "$result_file" >/dev/null && \
+    jq -e 'all(.[]; (.trajectory | type) == "array")' "$baseline_file" >/dev/null; then
+  SHADOW_EVALUATION_TRAJECTORY_CAPTURED=true "$0" "$baseline_file" "$handoff_file" "$candidate_file"
+  exit $?
+fi
 
 cat "$result_file"
 if ! jq -e '.passed == true' "$result_file" >/dev/null; then
