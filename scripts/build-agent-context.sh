@@ -299,7 +299,8 @@ append_shadow_feedback() {
 }
 
 append_experiment_outcome_history() {
-  local commit lineage row count
+  local commit lineage row count key
+  local -a outcome_keys outcome_classifications
   echo "## Recent Experiment Outcomes"
   echo
   echo "This is a bounded history derived from committed verdicts. Use it to avoid repeating an inconclusive mechanism without a concrete revision or abandonment."
@@ -319,11 +320,24 @@ append_experiment_outcome_history() {
     [[ -n "$row" ]] || continue
     IFS=$'\t' read -r classification metric goal delta decision reference <<<"$row"
     echo "| ${commit:0:12} | ${classification} | ${metric} | ${goal} | ${delta} | ${decision} | ${reference} |"
+    outcome_keys+=("${metric}|${goal}")
+    outcome_classifications+=("$classification")
     count=$((count + 1))
     (( count >= 5 )) && break
   done < <(git log --format='%H' -n 30 -- agent/shadow-feedback.md 2>/dev/null)
   if (( count == 0 )); then
     echo "| — | No committed experiment verdicts yet | — | — | — | — | — |"
+  elif (( count >= 3 )); then
+    key="${outcome_keys[0]}"
+    if [[ "${outcome_keys[1]}" == "$key" && "${outcome_keys[2]}" == "$key" ]] && \
+        [[ "${outcome_classifications[0]}" =~ ^(inert|measurement-saturated|wrong-direction)$ ]] && \
+        [[ "${outcome_classifications[1]}" =~ ^(inert|measurement-saturated|wrong-direction)$ ]] && \
+        [[ "${outcome_classifications[2]}" =~ ^(inert|measurement-saturated|wrong-direction)$ ]]; then
+      echo
+      echo "### Repeated-Stall Warning"
+      echo
+      echo "The three latest experiments for \`${key%%|*}\` / \`${key#*|}\` were inconclusive or adverse. Before another coefficient or adjacent-feature change, inspect the active phase/gate and make one focused diagnostic revision, or explicitly abandon this mechanism."
+    fi
   fi
   echo
 }
