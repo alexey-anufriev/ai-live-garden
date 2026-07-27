@@ -69,6 +69,7 @@ current_experiment="$(jq -cn \
       commit: $commit,
       paths: $paths,
       mechanism: $handoff[0].causalReach.mechanism,
+      feedbackReference: ($handoff[0].causalReach.feedbackReference // "none"),
       metric: $handoff[0].evaluation.metric,
       goal: $handoff[0].evaluation.goal,
       requiredDelta: $handoff[0].evaluation.requiredDelta,
@@ -161,7 +162,7 @@ jq -r --argjson result "$result" --argjson lineage "$lineage" '
   "- Escalation: `" + $lineage.escalation + "`\n\n" +
   "## Harness Conclusion\n\n" + $nextAction + "\n\n" +
   "## Required Next Decision\n\n" +
-  "Set `causalReach.previousFeedbackDecision` to `reuse`, `revise`, or `abandon` and explain the decision with current-state evidence. The lineage retains only this experiment and its immediate predecessor. When reusing or revising, normally work on the listed prior path; when changing course, explicitly abandon it with evidence. Because this code is already on main, inspect and change the implementation directly; there is no rejected branch to recover.\n"
+  "Set `causalReach.previousFeedbackDecision` to `reuse`, `revise`, or `abandon`, and set `causalReach.feedbackReference` to the exact predecessor mechanism/path being continued or the mechanism being abandoned. Explain the decision with current-state evidence. The lineage retains only this experiment and its immediate predecessor. When reusing or revising, normally work on the listed prior path; when changing course, explicitly abandon it with evidence. Because this code is already on main, inspect and change the implementation directly; there is no rejected branch to recover.\n"
 ' "$handoff_file" > "$temporary_output"
 
 mv "$temporary_output" "$output_file"

@@ -166,6 +166,7 @@ if grep -Fq 'Recursively embedded old marker' "$prompt_outputs"; then
 fi
 grep -Fq 'observedDelta = candidateAverage - baselineAverage' "$prompt_outputs"
 grep -Fq 'mandatory decision input, not optional history' "$prompt_outputs"
+grep -Fq 'causalReach.feedbackReference' "$prompt_outputs"
 grep -Fq '## Current Causal Reach Diagnostics' "$prompt_outputs"
 grep -Fq 'causalReach' "$prompt_outputs"
 assert_contains 'legacy plan has no machine-readable acceptance sidecar' "$prompt_outputs"
@@ -429,7 +430,7 @@ handoff() {
     pmDirection:$direction,
     evidence:{bottleneck:"fixture",currentState:"fixture",verification:"preflight observedDelta meets target"},
     evaluation:{metric:$metric,goal:$goal,requiredDelta:$delta},
-    causalReach:(if $mode == "evolution" then {mechanism:"global fixture",traits:[],carrierBasis:"not-applicable",activeCarrierCount:0,adoptionPath:"not-applicable",estimatedPhaseImpact:"fixture impact 1",clampRisk:"none",previousFeedbackDecision:"none",preflight:{passed:true,observedDelta:(if $goal == "decrease" then -$delta elif $goal == "preserve" then 0 else $delta end)}} else null end),
+    causalReach:(if $mode == "evolution" then {mechanism:"global fixture",traits:[],carrierBasis:"not-applicable",activeCarrierCount:0,adoptionPath:"not-applicable",estimatedPhaseImpact:"fixture impact 1",clampRisk:"none",previousFeedbackDecision:"none",feedbackReference:"none",preflight:{passed:true,observedDelta:(if $goal == "decrease" then -$delta elif $goal == "preserve" then 0 else $delta end)}} else null end),
     codeMap:[],requests:[],state:{immediateDirections:[],constraints:[]}
   }' > "$output"
 }
@@ -613,7 +614,7 @@ if AGENT_PM_REFERENCE_DATE=2026-07-08 scripts/validate-agent-handoff.sh handoff-
   echo "Evolution handoff ignored supplied previous feedback." >&2
   exit 1
 fi
-jq '.causalReach.previousFeedbackDecision = "revise"' handoff-active.json > handoff-feedback-decision.json
+jq '.causalReach.previousFeedbackDecision = "revise" | .causalReach.feedbackReference = "path: src/main/java/garden/ai/Fixture.java; revise the prior gate"' handoff-active.json > handoff-feedback-decision.json
 AGENT_PM_REFERENCE_DATE=2026-07-08 scripts/validate-agent-handoff.sh handoff-feedback-decision.json >/dev/null
 rm agent/shadow-feedback.md
 handoff A population.BEETLE increase 1 handoff-pm.json evolution pm

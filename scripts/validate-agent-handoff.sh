@@ -125,12 +125,13 @@ case "$run_mode" in
       ((.causalReach.estimatedPhaseImpact // "") | type == "string" and length > 0) and
       ((.causalReach.clampRisk // "") | type == "string" and test("^(none|lower|upper|unknown)$")) and
       ((.causalReach.previousFeedbackDecision // "") | type == "string" and test("^(none|reuse|revise|abandon)$")) and
+      ((.causalReach.feedbackReference // "none") | type == "string" and length > 0) and
       (.causalReach.preflight | type == "object") and
       (.causalReach.preflight.passed | type == "boolean") and
       (((.causalReach.preflight.acceptance // "full") | type == "string" and test("^(full|experiment)$"))) and
       ((.causalReach.preflight.observedDelta | type == "number") or .causalReach.preflight.observedDelta == null)
     ' "$handoff_file" >/dev/null; then
-      echo "Evolution handoff requires structured causalReach evidence, including traits, carrier basis, phase impact, clamp risk, prior-feedback decision, and preflight result." >&2
+      echo "Evolution handoff requires structured causalReach evidence, including traits, carrier basis, phase impact, clamp risk, prior-feedback decision/reference, and preflight result." >&2
       exit 1
     fi
 
@@ -165,12 +166,21 @@ case "$run_mode" in
     esac
 
     feedback_decision="$(jq -r '.causalReach.previousFeedbackDecision' "$handoff_file")"
+    feedback_reference="$(jq -r '.causalReach.feedbackReference // "none"' "$handoff_file")"
     if [[ -f "agent/shadow-feedback.md" && "$feedback_decision" == "none" ]]; then
       echo "A supplied previous rejection requires causalReach.previousFeedbackDecision to be reuse, revise, or abandon." >&2
       exit 1
     fi
+    if [[ -f "agent/shadow-feedback.md" && "$feedback_reference" == "none" ]]; then
+      echo "A supplied previous feedback report requires causalReach.feedbackReference to identify the reused/revised or abandoned mechanism/path." >&2
+      exit 1
+    fi
     if [[ ! -f "agent/shadow-feedback.md" && "$feedback_decision" != "none" ]]; then
       echo "causalReach.previousFeedbackDecision must be none when no previous feedback is supplied." >&2
+      exit 1
+    fi
+    if [[ ! -f "agent/shadow-feedback.md" && "$feedback_reference" != "none" ]]; then
+      echo "causalReach.feedbackReference must be none when no previous feedback is supplied." >&2
       exit 1
     fi
 
