@@ -33,4 +33,12 @@ if (( age_days < 0 || age_days > max_age_days )); then
   exit 0
 fi
 
+sidecar="${latest_plan%.md}.json"
+if [[ -f "$sidecar" ]]; then
+  freshness="$(scripts/check-pm-plan-freshness.sh "$sidecar")"
+  if [[ "$(jq -r '.status' <<<"$freshness")" == "stale" ]]; then
+    exit 0
+  fi
+fi
+
 echo "$latest_plan"

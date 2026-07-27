@@ -63,7 +63,8 @@ render_plan() {
 }
 
 render_plan > "$dated_plan"
-jq -S . "$plan_file" > "$dated_json_sidecar"
+state_snapshot="$(scripts/capture-garden-state-snapshot.sh)"
+jq -S --argjson stateSnapshot "$state_snapshot" '.stateSnapshot = $stateSnapshot' "$plan_file" > "$dated_json_sidecar"
 rm -f "$plan_file"
 
 echo "Rendered project plan to ${dated_plan} with machine-readable sidecar ${dated_json_sidecar}."

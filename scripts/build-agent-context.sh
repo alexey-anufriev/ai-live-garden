@@ -361,6 +361,8 @@ append_project_manager_direction() {
   local latest_plan
   local active_plan
   local active_plan_sidecar
+  local latest_plan_sidecar
+  local plan_freshness
   latest_plan="$(find agent/plans -maxdepth 1 -type f -name '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].md' -print 2>/dev/null | sort -V | tail -n 1)"
   active_plan="$(scripts/find-active-agent-plan.sh)"
 
@@ -380,7 +382,17 @@ append_project_manager_direction() {
     sed -n '1,220p' "$active_plan"
     echo '```'
   elif [[ -n "$latest_plan" ]]; then
-    echo "The newest PM plan, \`${latest_plan}\`, is outside the active same-day window (maximum age \`${AGENT_PM_PLAN_MAX_AGE_DAYS:-0}\` day(s)) and is continuity context only. It is not binding because its state signals may no longer describe the living garden. Choose one focused bottleneck-first improvement from current state and set \`pmDirection\` to \`none\`."
+    latest_plan_sidecar="${latest_plan%.md}.json"
+    if [[ -f "$latest_plan_sidecar" ]]; then
+      plan_freshness="$(scripts/check-pm-plan-freshness.sh "$latest_plan_sidecar")"
+      if [[ "$(jq -r '.status' <<<"$plan_freshness")" == "stale" ]]; then
+        echo "The newest PM plan, \`${latest_plan}\`, is same-day but stale against the committed garden state. Its material drift signals are: \`$(jq -r '.reasons | join(", ")' <<<"$plan_freshness")\`. Treat it as continuity context only, choose a focused bottleneck-first improvement from current state, and set \`pmDirection\` to \`none\`."
+      else
+        echo "The newest PM plan, \`${latest_plan}\`, is outside the active same-day window (maximum age \`${AGENT_PM_PLAN_MAX_AGE_DAYS:-0}\` day(s)) and is continuity context only. It is not binding because its state signals may no longer describe the living garden. Choose one focused bottleneck-first improvement from current state and set \`pmDirection\` to \`none\`."
+      fi
+    else
+      echo "The newest PM plan, \`${latest_plan}\`, is outside the active same-day window (maximum age \`${AGENT_PM_PLAN_MAX_AGE_DAYS:-0}\` day(s)) and is continuity context only. It is not binding because its state signals may no longer describe the living garden. Choose one focused bottleneck-first improvement from current state and set \`pmDirection\` to \`none\`."
+    fi
   else
     echo "No active Project Manager direction exists. Choose one focused bottleneck-first improvement from current state and set \`pmDirection\` to \`none\`."
   fi

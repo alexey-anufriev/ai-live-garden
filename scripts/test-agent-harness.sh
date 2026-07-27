@@ -359,6 +359,7 @@ rm -rf "$shadow_fixture"
 
 mkdir -p "$fixture_root/scripts" "$fixture_root/agent/plans" "$fixture_root/artifacts"
 for script in find-active-agent-plan.sh agent-substantive-changes.sh validate-agent-handoff.sh count-garden-trait-carriers.sh \
+  capture-garden-state-snapshot.sh check-pm-plan-freshness.sh \
   derive-agent-validation-policy.sh report-complexity-budget.sh normalize-agent-handoff.sh extract-agent-handoff.sh \
   inspect-agent-gemini-output.sh validate-agent-worktree.sh write-output-file.sh \
   sync-agent-preflight-handoff.sh resolve-agent-attempts.sh assess-agent-attempt.sh \
@@ -1087,15 +1088,25 @@ chmod +x "$observation_fixture/scripts/check-agent-observation-window.sh"
 )
 
 plan_fixture="$fixture_root/plan-fixture"
-mkdir -p "$plan_fixture/scripts" "$plan_fixture/agent/plans"
+mkdir -p "$plan_fixture/scripts" "$plan_fixture/agent/plans" "$plan_fixture/data"
 cp "$repository_root/scripts/validate-project-plan.sh" "$repository_root/scripts/render-project-plan.sh" \
-  "$repository_root/scripts/validate-project-plan-worktree.sh" "$plan_fixture/scripts/"
+  "$repository_root/scripts/validate-project-plan-worktree.sh" "$repository_root/scripts/capture-garden-state-snapshot.sh" \
+  "$repository_root/scripts/check-pm-plan-freshness.sh" "$repository_root/scripts/find-active-agent-plan.sh" "$plan_fixture/scripts/"
 chmod +x "$plan_fixture/scripts/"*.sh
 (
   cd "$plan_fixture"
   git init -q
   git config user.name fixture
   git config user.email fixture@example.invalid
+  cat > data/garden-state.txt <<'STATE'
+cycle=10
+light=50
+moisture=50
+warmth=50
+nutrients=50
+nutrientBuffer=0
+organism=fox-1|FOX|1|1|1|
+STATE
   touch agent/plans/.gitkeep
   git add .
   git commit -qm baseline
@@ -1117,8 +1128,12 @@ chmod +x "$plan_fixture/scripts/"*.sh
   PROJECT_PLAN_EXPECTED_DATE=2026-07-19 scripts/render-project-plan.sh .project-plan.json >/dev/null
   [[ -f agent/plans/2026-07-19.md ]]
   [[ -f agent/plans/2026-07-19.json ]]
-  jq -e '.directions[0].shadowAcceptance.goal == "preserve"' agent/plans/2026-07-19.json >/dev/null
+  jq -e '.directions[0].shadowAcceptance.goal == "preserve" and .stateSnapshot.environment.nutrientBuffer == 0' agent/plans/2026-07-19.json >/dev/null
+  scripts/check-pm-plan-freshness.sh agent/plans/2026-07-19.json | jq -e '.status == "fresh"' >/dev/null
   scripts/validate-project-plan-worktree.sh >/dev/null
+  sed -i 's/^nutrientBuffer=0$/nutrientBuffer=100/' data/garden-state.txt
+  scripts/check-pm-plan-freshness.sh agent/plans/2026-07-19.json | jq -e '.status == "stale" and (.reasons | index("environment.nutrientBuffer"))' >/dev/null
+  [[ -z "$(AGENT_PM_REFERENCE_DATE=2026-07-19 scripts/find-active-agent-plan.sh)" ]]
 )
 
 echo "Agent harness regression tests passed."
