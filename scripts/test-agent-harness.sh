@@ -350,6 +350,36 @@ if (
 fi
 jq -e '.passed == false and .observation == "terminal-saturated" and .baselineFinalValues == [0] and .candidateFinalValues == [0] and (.trajectory | length) == 1 and .trajectoryDelta == 0 and .trajectoryDirectionalSupport == {"supporting":0,"persistent":0,"total":1}' \
   "$shadow_fixture/saturated-result.json" >/dev/null
+mkdir -p "$shadow_fixture/baseline-classes/garden/ai"
+touch "$shadow_fixture/baseline-classes/garden/ai/Main.class"
+cat > "$shadow_fixture/adaptive-horizon-java" <<'RUNNER'
+#!/usr/bin/env bash
+set -euo pipefail
+classes=""
+steps=""
+while (( $# > 0 )); do
+  if [[ "$1" == "-cp" ]]; then classes="$2"; shift 2; continue; fi
+  if [[ "$1" == "--steps" ]]; then steps="$2"; shift 2; continue; fi
+  shift
+done
+buffer=0
+if [[ "$steps" == "10" && "$classes" == *"baseline-classes"* ]]; then buffer=100; fi
+if [[ "$steps" == "10" && "$classes" != *"baseline-classes"* ]]; then buffer=90; fi
+printf '{"seed":17,"requestedSteps":%s,"completedSteps":%s,"status":"completed","initial":{"cycle":10,"total":1,"nutrients":0,"nutrientBuffer":0,"counts":{}},"final":{"cycle":15,"total":1,"nutrients":0,"nutrientBuffer":%s,"counts":{}},"minimumTotal":1,"maximumTotal":1,"minimumCounts":{},"maximumCounts":{}}\n' "$steps" "$steps" "$buffer"
+RUNNER
+chmod +x "$shadow_fixture/adaptive-horizon-java"
+if (
+  cd "$shadow_fixture"
+  SHADOW_SIMULATION_RUNNER="$shadow_fixture/adaptive-horizon-java" SHADOW_SIMULATION_SEEDS=17 \
+    SHADOW_BASELINE_CLASSES_DIR="$shadow_fixture/baseline-classes" \
+    SHADOW_EVALUATION_RESULT_FILE="$shadow_fixture/adaptive-horizon-result.json" \
+    scripts/evaluate-shadow-candidate.sh "$shadow_fixture/saturated-baseline.json" saturated-handoff.json "$shadow_fixture/adaptive-horizon-candidate.json" >/dev/null 2>&1
+); then
+  echo "A saturated short-window target miss incorrectly passed due to the longer diagnostic." >&2
+  exit 1
+fi
+jq -e '.passed == false and .observedDelta == 0 and .extendedHorizon == {steps:10,baselineAverage:100,candidateAverage:90,observedDelta:-10,safetyPassed:true,targetPassed:true,observation:"terminal-observable"}' \
+  "$shadow_fixture/adaptive-horizon-result.json" >/dev/null
 if (
   cd "$shadow_fixture"
   SHADOW_SIMULATION_RUNNER="$shadow_fixture/fake-java" \
