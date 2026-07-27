@@ -78,6 +78,13 @@ jq -n \
     else 0 end;
   def trajectory_values($report; $metric):
     [($report.trajectory // [])[] | {step:.step, value:metric_value({final:.final}; $metric)}];
+  def directional_checkpoints($trajectory; $goal):
+    ($trajectory | ([.baseline | length, .candidate | length] | min) as $count |
+      if $goal == "increase" then
+        [range(0; $count) | select($trajectory.candidate[.].value > $trajectory.baseline[.].value)] | length
+      elif $goal == "decrease" then
+        [range(0; $count) | select($trajectory.candidate[.].value < $trajectory.baseline[.].value)] | length
+      else 0 end);
   def average_metric($reports; $metric):
     ([$reports[] | metric_value(.; $metric)] | add / length);
   def bounded_environment_metric($metric):
@@ -101,17 +108,25 @@ jq -n \
       candidate: trajectory_values($candidateRuns[$index]; $evaluation.metric)
     }
   ]) as $trajectory |
-  ($trajectory | map(. + {
-    delta: (([.candidate[].value] | add) - ([.baseline[].value] | add))
-  })) as $trajectoryBySeed |
+  ($trajectory | map(. as $seedTrajectory |
+    ([.baseline | length, .candidate | length] | min) as $checkpointCount |
+    . + {
+      delta: (([.candidate[].value] | add) - ([.baseline[].value] | add)),
+      directionalCheckpoints: directional_checkpoints($seedTrajectory; $evaluation.goal),
+      requiredDirectionalCheckpoints: (($checkpointCount + 1) / 2 | floor)
+    }
+  )) as $trajectoryBySeed |
   (if ($trajectoryBySeed | length) == 0 then 0
    else ($trajectoryBySeed | map(.delta) | add / length)
    end) as $trajectoryDelta |
   (if $evaluation.goal == "increase" then
      [$trajectoryBySeed[] | select(.delta > 0)] | length
-   elif $evaluation.goal == "decrease" then
+  elif $evaluation.goal == "decrease" then
      [$trajectoryBySeed[] | select(.delta < 0)] | length
    else 0 end) as $trajectorySupportingSeeds |
+  ([$trajectoryBySeed[] |
+    select(.requiredDirectionalCheckpoints > 0 and .directionalCheckpoints >= .requiredDirectionalCheckpoints)
+  ] | length) as $trajectoryPersistentSeeds |
   (bounded_environment_metric($evaluation.metric) and
     ([range(0; $candidateRuns | length)] | all(. as $index |
       ($baselineValues[$index] == $candidateValues[$index]) and
@@ -150,6 +165,7 @@ jq -n \
     trajectoryDelta: $trajectoryDelta,
     trajectoryDirectionalSupport: {
       supporting: $trajectorySupportingSeeds,
+      persistent: $trajectoryPersistentSeeds,
       total: ($trajectoryBySeed | length)
     },
     observation: (if $terminalSaturated then "terminal-saturated" else "terminal-observable" end),

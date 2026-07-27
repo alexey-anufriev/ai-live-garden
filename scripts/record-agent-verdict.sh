@@ -149,6 +149,7 @@ jq -r --argjson result "$result" --argjson lineage "$lineage" '
      "## Bounded Trajectory Evidence\n\n" +
      "- Average trajectory delta: " + (($result.shadow.trajectoryDelta // 0) | tostring) + "\n" +
      "- Directional seed support: " + (($result.shadow.trajectoryDirectionalSupport.supporting // 0) | tostring) + " / " + (($result.shadow.trajectoryDirectionalSupport.total // 0) | tostring) + "\n" +
+     "- Persistent directional support: " + (($result.shadow.trajectoryDirectionalSupport.persistent // 0) | tostring) + " / " + (($result.shadow.trajectoryDirectionalSupport.total // 0) | tostring) + "\n" +
      ($result.shadow.trajectory | map(
        "- Seed " + (.seed | tostring) + ": baseline " +
        (.baseline | map(.value | tostring) | join(" → ")) +

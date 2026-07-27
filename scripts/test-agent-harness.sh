@@ -348,7 +348,7 @@ if (
   echo "A terminally saturated target miss incorrectly passed evaluation." >&2
   exit 1
 fi
-jq -e '.passed == false and .observation == "terminal-saturated" and .baselineFinalValues == [0] and .candidateFinalValues == [0] and (.trajectory | length) == 1 and .trajectoryDelta == 0 and .trajectoryDirectionalSupport == {"supporting":0,"total":1}' \
+jq -e '.passed == false and .observation == "terminal-saturated" and .baselineFinalValues == [0] and .candidateFinalValues == [0] and (.trajectory | length) == 1 and .trajectoryDelta == 0 and .trajectoryDirectionalSupport == {"supporting":0,"persistent":0,"total":1}' \
   "$shadow_fixture/saturated-result.json" >/dev/null
 if (
   cd "$shadow_fixture"
@@ -489,7 +489,7 @@ awk '
   capture && !/^```/ { print }
 ' experiment-feedback.md | jq -e '.current.classification == "inert" and .previous == null and .responseToPrevious == "none" and .continuity == "unavailable" and .escalation == "none"' >/dev/null
 cat > saturated-experiment-ledger.json <<'JSON'
-[{"attempt":1,"accepted":true,"acceptance":"experiment","effectClassification":"measurement-saturated","shadow":{"safetyPassed":true,"targetPassed":false,"baselineAverage":0,"candidateAverage":0,"observedDelta":0,"observation":"terminal-saturated","baselineInitialValues":[100,100],"baselineFinalValues":[0,0],"candidateFinalValues":[0,0],"trajectoryDelta":0,"trajectoryDirectionalSupport":{"supporting":0,"total":1},"trajectory":[{"seed":17,"baseline":[{"step":1,"value":100},{"step":2,"value":0}],"candidate":[{"step":1,"value":100},{"step":2,"value":0}]}]}}]
+[{"attempt":1,"accepted":true,"acceptance":"experiment","effectClassification":"measurement-saturated","shadow":{"safetyPassed":true,"targetPassed":false,"baselineAverage":0,"candidateAverage":0,"observedDelta":0,"observation":"terminal-saturated","baselineInitialValues":[100,100],"baselineFinalValues":[0,0],"candidateFinalValues":[0,0],"trajectoryDelta":0,"trajectoryDirectionalSupport":{"supporting":0,"persistent":0,"total":1},"trajectory":[{"seed":17,"baseline":[{"step":1,"value":100},{"step":2,"value":0}],"candidate":[{"step":1,"value":100},{"step":2,"value":0}]}]}}]
 JSON
 jq '.causalReach.previousFeedbackDecision = "revise"' handoff-experiment-unmeasured.json > handoff-experiment-revised.json
 scripts/record-agent-verdict.sh saturated-experiment-ledger.json handoff-experiment-revised.json saturated-experiment-feedback.md experiment-feedback.md >/dev/null
@@ -499,9 +499,10 @@ grep -Fq 'Baseline initial values by seed: 100, 100' saturated-experiment-feedba
 grep -Fq '## Bounded Trajectory Evidence' saturated-experiment-feedback.md
 grep -Fq 'Average trajectory delta: 0' saturated-experiment-feedback.md
 grep -Fq 'Directional seed support: 0 / 1' saturated-experiment-feedback.md
+grep -Fq 'Persistent directional support: 0 / 1' saturated-experiment-feedback.md
 grep -Fq 'Seed 17: baseline 100 → 0; candidate 100 → 0' saturated-experiment-feedback.md
 grep -Fq 'cannot distinguish this mechanism' saturated-experiment-feedback.md
-jq '.[0].effectClassification = "partial-progress" | .[0].shadow.trajectoryDelta = -2 | .[0].shadow.trajectoryDirectionalSupport = {supporting:1,total:1}' \
+jq '.[0].effectClassification = "partial-progress" | .[0].shadow.trajectoryDelta = -2 | .[0].shadow.trajectoryDirectionalSupport = {supporting:1,persistent:1,total:1}' \
   saturated-experiment-ledger.json > trajectory-progress-ledger.json
 scripts/record-agent-verdict.sh trajectory-progress-ledger.json handoff-experiment-revised.json trajectory-progress-feedback.md experiment-feedback.md >/dev/null
 grep -Fq 'final metric was saturated, but the bounded trajectory moved in the expected direction' trajectory-progress-feedback.md
@@ -786,11 +787,11 @@ if [[ "${SHADOW_FIXTURE_MODE:-full}" == "saturated" ]]; then
   exit 1
 fi
 if [[ "${SHADOW_FIXTURE_MODE:-full}" == "saturated-progress" ]]; then
-  jq -n '{passed:false,safetyPassed:true,targetPassed:false,baselineAverage:0,candidateAverage:0,observedDelta:0,trajectoryDelta:-1,trajectoryDirectionalSupport:{supporting:2,total:2},requiredDelta:3,observation:"terminal-saturated",baselineFinalValues:[0,0],candidateFinalValues:[0,0]}' > "$SHADOW_EVALUATION_RESULT_FILE"
+  jq -n '{passed:false,safetyPassed:true,targetPassed:false,baselineAverage:0,candidateAverage:0,observedDelta:0,trajectoryDelta:-1,trajectoryDirectionalSupport:{supporting:2,persistent:2,total:2},requiredDelta:3,observation:"terminal-saturated",baselineFinalValues:[0,0],candidateFinalValues:[0,0]}' > "$SHADOW_EVALUATION_RESULT_FILE"
   exit 1
 fi
 if [[ "${SHADOW_FIXTURE_MODE:-full}" == "saturated-weak-progress" ]]; then
-  jq -n '{passed:false,safetyPassed:true,targetPassed:false,baselineAverage:0,candidateAverage:0,observedDelta:0,trajectoryDelta:-1,trajectoryDirectionalSupport:{supporting:1,total:2},requiredDelta:3,observation:"terminal-saturated",baselineFinalValues:[0,0],candidateFinalValues:[0,0]}' > "$SHADOW_EVALUATION_RESULT_FILE"
+  jq -n '{passed:false,safetyPassed:true,targetPassed:false,baselineAverage:0,candidateAverage:0,observedDelta:0,trajectoryDelta:-1,trajectoryDirectionalSupport:{supporting:1,persistent:1,total:2},requiredDelta:3,observation:"terminal-saturated",baselineFinalValues:[0,0],candidateFinalValues:[0,0]}' > "$SHADOW_EVALUATION_RESULT_FILE"
   exit 1
 fi
 if [[ "${SHADOW_FIXTURE_MODE:-full}" == "unsafe" ]]; then
