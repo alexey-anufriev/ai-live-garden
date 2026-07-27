@@ -305,8 +305,8 @@ append_experiment_outcome_history() {
   echo
   echo "This is a bounded history derived from committed verdicts. Use it to avoid repeating an inconclusive mechanism without a concrete revision or abandonment."
   echo
-  echo "| Commit | Classification | Metric | Goal | Delta | Decision | Reference |"
-  echo "| --- | --- | --- | --- | ---: | --- | --- |"
+  echo "| Commit | Classification | Metric | Goal | Delta | Decision | Continuity | Reference |"
+  echo "| --- | --- | --- | --- | ---: | --- | --- | --- |"
   count=0
   while IFS= read -r commit; do
     [[ -n "$commit" ]] || continue
@@ -316,17 +316,17 @@ append_experiment_outcome_history() {
       capture && !/^```/ { print }
     ' || true)"
     [[ -n "$lineage" ]] || continue
-    row="$(jq -r '[.current.classification, .current.metric, .current.goal, (.current.observedDelta | tostring), .responseToPrevious, (.current.feedbackReference // "none")] | @tsv' <<<"$lineage" 2>/dev/null || true)"
+    row="$(jq -r '[.current.classification, .current.metric, .current.goal, (.current.observedDelta | tostring), .responseToPrevious, .continuity, (.current.feedbackReference // "none")] | @tsv' <<<"$lineage" 2>/dev/null || true)"
     [[ -n "$row" ]] || continue
-    IFS=$'\t' read -r classification metric goal delta decision reference <<<"$row"
-    echo "| ${commit:0:12} | ${classification} | ${metric} | ${goal} | ${delta} | ${decision} | ${reference} |"
+    IFS=$'\t' read -r classification metric goal delta decision continuity reference <<<"$row"
+    echo "| ${commit:0:12} | ${classification} | ${metric} | ${goal} | ${delta} | ${decision} | ${continuity} | ${reference} |"
     outcome_keys+=("${metric}|${goal}")
     outcome_classifications+=("$classification")
     count=$((count + 1))
     (( count >= 5 )) && break
   done < <(git log --format='%H' -n 30 -- agent/shadow-feedback.md 2>/dev/null)
   if (( count == 0 )); then
-    echo "| — | No committed experiment verdicts yet | — | — | — | — | — |"
+    echo "| — | No committed experiment verdicts yet | — | — | — | — | — | — |"
   elif (( count >= 3 )); then
     key="${outcome_keys[0]}"
     if [[ "${outcome_keys[1]}" == "$key" && "${outcome_keys[2]}" == "$key" ]] && \
