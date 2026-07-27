@@ -1,0 +1,94 @@
+{
+  "antiPatterns": [
+    "Ignoring resource turnover rates",
+    "Over-focusing on buffer management"
+  ],
+  "date": "2026-07-27",
+  "directions": [
+    {
+      "acceptanceSignal": "Active nutrients are consumed more consistently.",
+      "avoid": "Mechanisms that re-introduce a sluggish buffer.",
+      "expectedGardenEffect": "Higher growth rates for FUNGUS and ROOT_NETWORK.",
+      "label": "A",
+      "shadowAcceptance": {
+        "goal": "increase",
+        "metric": "nutrients",
+        "requiredDelta": 1
+      },
+      "title": "Enhance Nutrient Cycling Efficiency",
+      "why": "With the buffer empty, the ecosystem must process incoming nutrients directly and efficiently."
+    },
+    {
+      "acceptanceSignal": "Fox population remains between 150-300.",
+      "avoid": "Over-aggressive culling traits.",
+      "expectedGardenEffect": "Stable, sustainable fox population.",
+      "label": "B",
+      "shadowAcceptance": {
+        "goal": "increase",
+        "metric": "population.FOX",
+        "requiredDelta": 1
+      },
+      "title": "Stabilize Fox Reproductive Resilience",
+      "why": "The fox population is low (206) and needs to remain resilient to prevent extinction."
+    },
+    {
+      "acceptanceSignal": "Fungal and beetle population growth rates become more correlated.",
+      "avoid": "Predatory traits that undermine beetle gains.",
+      "expectedGardenEffect": "More consistent growth in both populations.",
+      "label": "C",
+      "shadowAcceptance": {
+        "goal": "increase",
+        "metric": "population.FUNGUS",
+        "requiredDelta": 1
+      },
+      "title": "Optimize Fungal-Beetle Synergy",
+      "why": "Strengthening the interaction between these foundational organisms improves overall nutrient turnover."
+    },
+    {
+      "acceptanceSignal": "Nutrients do not fluctuate wildly.",
+      "avoid": "Mechanisms that assume an infinite nutrient supply.",
+      "expectedGardenEffect": "Stable nutrient availability.",
+      "label": "D",
+      "shadowAcceptance": {
+        "goal": "preserve",
+        "metric": "nutrients",
+        "requiredDelta": 1
+      },
+      "title": "Monitor Nutrient Flow Sustainability",
+      "why": "Without a buffer, the ecosystem is more sensitive to nutrient inflow fluctuations."
+    }
+  ],
+  "review": {
+    "overallMark": "achieved",
+    "previousPlanDate": "2026-07-26",
+    "results": [
+      {
+        "evidence": "NutrientBuffer decreased from 100 to 0.",
+        "label": "A",
+        "mark": "achieved"
+      },
+      {
+        "evidence": "Fox population is 206, within the target range of 150-300.",
+        "label": "B",
+        "mark": "achieved"
+      },
+      {
+        "evidence": "Fungal population increased from 6343 to 6501.",
+        "label": "C",
+        "mark": "achieved"
+      },
+      {
+        "evidence": "Beetle population is 2522, above the threshold of 2200.",
+        "label": "D",
+        "mark": "achieved"
+      }
+    ],
+    "summary": "The ecosystem successfully drained the nutrient buffer (from 100 to 0) and stabilized the fox population at a sustainable level, validating the previous strategy."
+  },
+  "stateSignals": [
+    "NutrientBuffer at 0",
+    "Fox population stable at 206",
+    "Fungal population growing at 6501"
+  ],
+  "thesis": "The ecosystem has successfully drained the nutrient buffer and stabilized the fox population. With the bottleneck removed, the priority shifts to optimizing the active nutrient cycle and reinforcing the foundational synergies between fungi, roots, and beetles to ensure sustainable growth without relying on a buffer."
+}
