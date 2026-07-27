@@ -4,18 +4,18 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 14193
-- Health: Stable (🟡)
+- Cycle: 14376
+- Health: Flourishing (🟢)
 - Nutrients: 100.
-- NutrientBuffer: 0.
-- Active organisms: 18925 total across beetle, fern fox, fungus moss, root network spore.
+- NutrientBuffer: 100.
+- Active organisms: 18370 total across beetle, fern fox, fungus moss, root network spore.
 - Missing roles: none.
-- Latest agent handoff: Unlock Nutrient Buffer via Effective Siphon.
-- Latest result: Modified Environment.java to increase buffer siphon rate from * 5 to * 6, and added a test case to EnvironmentTest.java to verify the siphon effectiveness..
+- Latest agent handoff: Enhance Nutrient Cycling Efficiency.
+- Latest result: Modified `Environment.next()` to dynamically split incoming nutrients into the active pool based on buffer levels, and updated `EnvironmentTest.java` and `GardenTest.java` to reflect the new, more responsive nutrient distribution logic..
 
 ## Immediate Directions
 
-- Monitor buffer levels to ensure they do not crash to zero unnecessarily.
+- Monitor nutrient buffer levels to ensure they respond effectively to system demands.
 
 ## Constraints & Known Bad Ideas
 

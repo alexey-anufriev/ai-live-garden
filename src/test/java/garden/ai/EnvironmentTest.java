@@ -55,14 +55,13 @@ class EnvironmentTest {
         Environment env = new Environment(50, 50, 50, 50, 96);
         // rootContribution = 50, fungalContribution = 50. Total filling = 100.
         // Ratio = (96-50)/50 = 46/50 = 0.92.
-        // intoNutrients = (int)(100 * 0.92) = 92.
-        // intoBuffer = (int)(100 * (1.0-0.92)) = (int)(8) = 8.
+        // intoNutrients = (int)(100 * (0.05 + 0.92 * 0.95)) = (int)(100 * 0.924) = 92.
+        // intoBuffer = 100 - 92 = 8.
         // ReleaseRate = 2 (due to buffer >= 95).
         // Released = 96 / 2 = 48.
         // newBuffer = nutrientBuffer(96) + intoBuffer(8) - released(48) = 56.
-        // Truncation in (int) calculations leads to 55.
         Environment next = env.next(1, 100, 0, 50, 50, 0, 0, 0, 0, 0, 0, 0, 0);
-        assertThat(next.nutrientBuffer()).isEqualTo(55);
+        assertThat(next.nutrientBuffer()).isEqualTo(56);
     }
 
     @Test

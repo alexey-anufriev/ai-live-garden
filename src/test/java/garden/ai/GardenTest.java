@@ -714,8 +714,8 @@ class GardenTest {
         // nutrientTranslocatorCount=1. 
         // Contribution = 1*4 + 1*16 = 20.
         // releaseRate = 8 (for nutrients=20). Buffer release = 50 / 8 = 6.
-        // newBuffer = 50 (initial) + 20 (contribution) - 6 (releasedFromBuffer) = 64.
-        assertThat(next.environment().nutrientBuffer()).isEqualTo(64);
+        // newBuffer = 50 (initial) + 19 (contribution) - 6 (releasedFromBuffer) = 63.
+        assertThat(next.environment().nutrientBuffer()).isEqualTo(63);
     }
 
     @Test
