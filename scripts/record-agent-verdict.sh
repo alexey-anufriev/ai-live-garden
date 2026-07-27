@@ -156,6 +156,13 @@ jq -r --argjson result "$result" --argjson lineage "$lineage" '
      ) | join("\n")) + "\n\n"
    else ""
    end) +
+  (if ($result.shadow.extendedHorizon // null) != null then
+     "## Extended Horizon Diagnostic\n\n" +
+     "- Steps: " + ($result.shadow.extendedHorizon.steps | tostring) + "\n" +
+     "- Observed delta: " + ($result.shadow.extendedHorizon.observedDelta | tostring) + "\n" +
+     "- Safety passed: " + ($result.shadow.extendedHorizon.safetyPassed | tostring) + "\n\n"
+   else ""
+   end) +
   "## Experiment Lineage\n\n" +
   "<!-- AGENT-EXPERIMENT-LINEAGE-START -->\n```json\n" + ($lineage | tojson) + "\n```\n<!-- AGENT-EXPERIMENT-LINEAGE-END -->\n\n" +
   "- Continuity: `" + $lineage.continuity + "`\n\n" +

@@ -7,9 +7,16 @@ candidate_file="${3:-${RUNNER_TEMP:-/tmp}/candidate-shadow.json}"
 result_file="${SHADOW_EVALUATION_RESULT_FILE:-${RUNNER_TEMP:-/tmp}/shadow-evaluation-result.json}"
 max_organisms="${SHADOW_MAX_ORGANISMS:-25000}"
 evaluation_policy="${SHADOW_EVALUATION_POLICY:-target}"
+extended_steps="${SHADOW_EXTENDED_DIAGNOSTIC_STEPS:-10}"
+primary_steps="${SHADOW_SIMULATION_STEPS:-5}"
 
 if [[ "$evaluation_policy" != "target" && "$evaluation_policy" != "safety" ]]; then
   echo "SHADOW_EVALUATION_POLICY must be target or safety." >&2
+  exit 2
+fi
+
+if ! [[ "$extended_steps" =~ ^[1-9][0-9]*$ && "$primary_steps" =~ ^[1-9][0-9]*$ ]]; then
+  echo "Shadow diagnostic horizons must be positive integers." >&2
   exit 2
 fi
 
@@ -173,6 +180,41 @@ if [[ "$evaluation_policy" == "target" && "${SHADOW_EVALUATION_TRAJECTORY_CAPTUR
     fi
     rm -f "$terminal_result_file"
   fi
+fi
+
+if [[ "$evaluation_policy" == "target" && "${SHADOW_EVALUATION_DIAGNOSTICS_DISABLED:-false}" != "true" ]] && \
+    (( extended_steps > primary_steps )) && \
+    [[ -n "${SHADOW_BASELINE_CLASSES_DIR:-}" && -d "${SHADOW_BASELINE_CLASSES_DIR}" ]] && \
+    jq -e '.observation == "terminal-saturated" and (.trajectoryDirectionalSupport.total == 0 or (.trajectoryDirectionalSupport.supporting * 2 <= .trajectoryDirectionalSupport.total))' "$result_file" >/dev/null; then
+  extended_baseline_file="${result_file%.json}-baseline-${extended_steps}-step.json"
+  extended_candidate_file="${result_file%.json}-candidate-${extended_steps}-step.json"
+  extended_result_file="${result_file%.json}-extended-${extended_steps}-step.json"
+  if SHADOW_SIMULATION_STEPS="$extended_steps" \
+      SHADOW_SIMULATION_CLASSES_DIR="$SHADOW_BASELINE_CLASSES_DIR" \
+      scripts/capture-shadow-simulation.sh "$extended_baseline_file" >/dev/null; then
+    SHADOW_EVALUATION_DIAGNOSTICS_DISABLED=true \
+      SHADOW_SIMULATION_STEPS="$extended_steps" \
+      SHADOW_EVALUATION_RESULT_FILE="$extended_result_file" \
+      "$0" "$extended_baseline_file" "$handoff_file" "$extended_candidate_file" >/dev/null 2>&1 || true
+    if jq -e '.observedDelta | type == "number"' "$extended_result_file" >/dev/null 2>&1; then
+      jq --slurpfile extended "$extended_result_file" --argjson steps "$extended_steps" '
+        . + {extendedHorizon: ($extended[0] | {
+          steps: $steps,
+          baselineAverage,
+          candidateAverage,
+          observedDelta,
+          safetyPassed,
+          targetPassed,
+          observation
+        })}
+      ' "$result_file" > "${result_file}.extended" && mv "${result_file}.extended" "$result_file"
+    else
+      echo "Extended shadow diagnostic was unavailable; retaining bounded-window evidence." >&2
+    fi
+  else
+    echo "Extended shadow diagnostic was unavailable; retaining bounded-window evidence." >&2
+  fi
+  rm -f "$extended_baseline_file" "$extended_candidate_file" "$extended_result_file"
 fi
 
 cat "$result_file"
