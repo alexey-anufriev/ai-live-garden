@@ -226,10 +226,17 @@ cat > "$shadow_fixture/fake-java" <<'RUNNER'
 #!/usr/bin/env bash
 set -euo pipefail
 seed=""
+steps=""
 while (( $# > 0 )); do
   if [[ "$1" == "--seed" ]]; then
     seed="$2"
-    break
+    shift 2
+    continue
+  fi
+  if [[ "$1" == "--steps" ]]; then
+    steps="$2"
+    shift 2
+    continue
   fi
   shift
 done
@@ -244,7 +251,7 @@ if [[ "$seed" == "43" ]]; then
 else
   sleep 0.05
 fi
-printf '{"seed":%s,"status":"completed","final":{"total":1,"nutrients":1,"nutrientBuffer":1,"counts":{}},"maximumTotal":1}\n' "$seed"
+printf '{"seed":%s,"requestedSteps":%s,"completedSteps":%s,"status":"completed","final":{"total":1,"nutrients":1,"nutrientBuffer":1,"counts":{}},"maximumTotal":1}\n' "$seed" "$steps" "$steps"
 RUNNER
 chmod +x "$shadow_fixture/fake-java"
 (
@@ -254,6 +261,14 @@ chmod +x "$shadow_fixture/fake-java"
     "$repository_root/scripts/capture-shadow-simulation.sh" "$shadow_fixture/result.json" >/dev/null
 )
 [[ "$(jq -c '[.[].seed]' "$shadow_fixture/result.json")" == '[43,17]' ]]
+(
+  cd "$shadow_fixture"
+  SHADOW_SIMULATION_RUNNER="$shadow_fixture/fake-java" \
+    SHADOW_SIMULATION_SEEDS=17 \
+    SHADOW_SIMULATION_CAPTURE_TRAJECTORY=true \
+    "$repository_root/scripts/capture-shadow-simulation.sh" "$shadow_fixture/trajectory.json" >/dev/null
+)
+jq -e '.[0].trajectory | length == 5 and .[0].step == 1 and .[4].step == 5' "$shadow_fixture/trajectory.json" >/dev/null
 if (
   cd "$shadow_fixture"
   SHADOW_SIMULATION_RUNNER="$shadow_fixture/fake-java" \

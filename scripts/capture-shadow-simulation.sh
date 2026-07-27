@@ -14,6 +14,7 @@ max_organisms="${SHADOW_MAX_ORGANISMS:-25000}"
 timeout_seconds="${SHADOW_SIMULATION_TIMEOUT_SECONDS:-120}"
 max_parallel_seeds="${SHADOW_SIMULATION_MAX_PARALLEL_SEEDS:-4}"
 simulation_runner="${SHADOW_SIMULATION_RUNNER:-java}"
+capture_trajectory="${SHADOW_SIMULATION_CAPTURE_TRAJECTORY:-false}"
 
 for value in "$steps" "$max_organisms" "$timeout_seconds" "$max_parallel_seeds"; do
   if ! [[ "$value" =~ ^[1-9][0-9]*$ ]]; then
@@ -25,6 +26,11 @@ done
 if [[ ! -f target/classes/garden/ai/Main.class ]]; then
   echo "Compiled simulation classes are missing; run Maven tests before shadow evaluation." >&2
   exit 1
+fi
+
+if [[ "$capture_trajectory" != "true" && "$capture_trajectory" != "false" ]]; then
+  echo "SHADOW_SIMULATION_CAPTURE_TRAJECTORY must be true or false." >&2
+  exit 2
 fi
 
 mkdir -p "$(dirname "$output_file")"
@@ -102,5 +108,31 @@ jq -s '.' "${result_files[@]}" > "$output_file"
 if [[ "$failed" == "true" ]]; then
   echo "Captured failed shadow simulation diagnostics in ${output_file}." >&2
   exit 1
+fi
+
+if [[ "$capture_trajectory" == "true" ]]; then
+  for index in "${!seed_values[@]}"; do
+    trajectory_file="${work_dir}/trajectory-${index}.jsonl"
+    for horizon in $(seq 1 "$steps"); do
+      horizon_file="${work_dir}/trajectory-${index}-${horizon}.json"
+      if ! timeout --signal=TERM --kill-after=10s "${timeout_seconds}s" \
+          "$simulation_runner" -cp target/classes garden.ai.Main simulate \
+            --state "$state_file" --steps "$horizon" --seed "${seed_values[$index]}" --max-organisms "$max_organisms" > "$horizon_file"; then
+        echo "Shadow trajectory capture failed for seed ${seed_values[$index]} at horizon ${horizon}." >&2
+        exit 1
+      fi
+      if ! jq -e --argjson horizon "$horizon" '
+          .status == "completed" and .completedSteps == $horizon and (.final | type == "object")
+        ' "$horizon_file" >/dev/null; then
+        echo "Shadow trajectory capture returned incomplete data for seed ${seed_values[$index]} at horizon ${horizon}." >&2
+        exit 1
+      fi
+      jq -c --argjson horizon "$horizon" '{step:$horizon, final:.final}' "$horizon_file" >> "$trajectory_file"
+    done
+    enriched_file="${work_dir}/enriched-${index}.json"
+    jq --slurpfile trajectory "$trajectory_file" '. + {trajectory:$trajectory}' "${result_files[$index]}" > "$enriched_file"
+    mv "$enriched_file" "${result_files[$index]}"
+  done
+  jq -s '.' "${result_files[@]}" > "$output_file"
 fi
 echo "Captured shadow simulation metrics in ${output_file}."
