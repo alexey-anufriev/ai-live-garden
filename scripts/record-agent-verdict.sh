@@ -81,10 +81,20 @@ lineage="$(jq -cn \
   --argjson current "$current_experiment" \
   --argjson previous "$previous_experiment" \
   --slurpfile handoff "$handoff_file" '
+    ($handoff[0].causalReach.previousFeedbackDecision) as $decision |
+    ($current.paths // []) as $currentPaths |
+    ($previous.paths // []) as $previousPaths |
     {
       current: $current,
       previous: $previous,
-      responseToPrevious: $handoff[0].causalReach.previousFeedbackDecision
+      responseToPrevious: $decision,
+      continuity:
+        (if $previous == null or ($previousPaths | length) == 0 then "unavailable"
+         elif $decision == "abandon" then "abandoned"
+         elif $decision == "reuse" or $decision == "revise" then
+           if any($currentPaths[]; . as $path | $previousPaths | index($path)) then "matched" else "diverged" end
+         else "unavailable"
+         end)
     }
   ')"
 
@@ -120,6 +130,7 @@ jq -r --argjson result "$result" --argjson lineage "$lineage" '
   "## Implemented Hypothesis\n\n" + .causalReach.mechanism + "\n\n" +
   "## Experiment Lineage\n\n" +
   "<!-- AGENT-EXPERIMENT-LINEAGE-START -->\n```json\n" + ($lineage | tojson) + "\n```\n<!-- AGENT-EXPERIMENT-LINEAGE-END -->\n\n" +
+  "- Continuity: `" + $lineage.continuity + "`\n\n" +
   "## Harness Conclusion\n\n" + $nextAction + "\n\n" +
   "## Required Next Decision\n\n" +
   "Set `causalReach.previousFeedbackDecision` to `reuse`, `revise`, or `abandon` and explain the decision with current-state evidence. The lineage retains only this experiment and its immediate predecessor. When reusing or revising, normally work on the listed prior path; when changing course, explicitly abandon it with evidence. Because this code is already on main, inspect and change the implementation directly; there is no rejected branch to recover.\n"

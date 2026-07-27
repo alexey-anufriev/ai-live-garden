@@ -459,7 +459,7 @@ awk '
   /^<!-- AGENT-EXPERIMENT-LINEAGE-START -->$/ { capture = 1; next }
   /^<!-- AGENT-EXPERIMENT-LINEAGE-END -->$/ { exit }
   capture && !/^```/ { print }
-' experiment-feedback.md | jq -e '.current.classification == "inert" and .previous == null and .responseToPrevious == "none"' >/dev/null
+' experiment-feedback.md | jq -e '.current.classification == "inert" and .previous == null and .responseToPrevious == "none" and .continuity == "unavailable"' >/dev/null
 cat > saturated-experiment-ledger.json <<'JSON'
 [{"attempt":1,"accepted":true,"acceptance":"experiment","effectClassification":"measurement-saturated","shadow":{"safetyPassed":true,"targetPassed":false,"baselineAverage":0,"candidateAverage":0,"observedDelta":0,"observation":"terminal-saturated","baselineFinalValues":[0,0],"candidateFinalValues":[0,0]}}]
 JSON
@@ -472,14 +472,14 @@ awk '
   /^<!-- AGENT-EXPERIMENT-LINEAGE-START -->$/ { capture = 1; next }
   /^<!-- AGENT-EXPERIMENT-LINEAGE-END -->$/ { exit }
   capture && !/^```/ { print }
-' saturated-experiment-feedback.md | jq -e '.current.classification == "measurement-saturated" and .previous.classification == "inert" and .responseToPrevious == "revise"' >/dev/null
+' saturated-experiment-feedback.md | jq -e '.current.classification == "measurement-saturated" and .previous.classification == "inert" and .responseToPrevious == "revise" and .continuity == "unavailable"' >/dev/null
 jq '.causalReach.previousFeedbackDecision = "abandon"' handoff-experiment-unmeasured.json > handoff-experiment-abandoned.json
 scripts/record-agent-verdict.sh experiment-ledger.json handoff-experiment-abandoned.json third-experiment-feedback.md saturated-experiment-feedback.md >/dev/null
 awk '
   /^<!-- AGENT-EXPERIMENT-LINEAGE-START -->$/ { capture = 1; next }
   /^<!-- AGENT-EXPERIMENT-LINEAGE-END -->$/ { exit }
   capture && !/^```/ { print }
-' third-experiment-feedback.md | jq -e '.current.classification == "inert" and .previous.classification == "measurement-saturated" and (.previous | has("previous") | not) and .responseToPrevious == "abandon"' >/dev/null
+' third-experiment-feedback.md | jq -e '.current.classification == "inert" and .previous.classification == "measurement-saturated" and (.previous | has("previous") | not) and .responseToPrevious == "abandon" and .continuity == "unavailable"' >/dev/null
 
 lineage_fixture="$fixture_root/lineage-fixture"
 mkdir -p "$lineage_fixture/src/main/java/example"
@@ -507,6 +507,33 @@ JSON
     /^<!-- AGENT-EXPERIMENT-LINEAGE-END -->$/ { exit }
     capture && !/^```/ { print }
   ' feedback.md | jq -e --arg commit "$candidate_commit" '.current.commit == $commit and .current.paths == ["src/main/java/example/Change.java"]' >/dev/null
+  jq '.causalReach.previousFeedbackDecision = "revise"' handoff.json > revised-handoff.json
+  "$repository_root/scripts/record-agent-verdict.sh" ledger.json revised-handoff.json revised-feedback.md feedback.md >/dev/null
+  awk '
+    /^<!-- AGENT-EXPERIMENT-LINEAGE-START -->$/ { capture = 1; next }
+    /^<!-- AGENT-EXPERIMENT-LINEAGE-END -->$/ { exit }
+    capture && !/^```/ { print }
+  ' revised-feedback.md | jq -e '.continuity == "matched"' >/dev/null
+  echo 'package example; class Other {}' > src/main/java/example/Other.java
+  git add src/main/java/example/Other.java
+  git commit -qm 'diverged lineage candidate'
+  diverged_commit="$(git rev-parse HEAD)"
+  cat > diverged-ledger.json <<JSON
+[{"accepted":true,"acceptance":"experiment","candidateCommit":"${diverged_commit}","effectClassification":"inert","shadow":{"safetyPassed":true,"targetPassed":false,"baselineAverage":2,"candidateAverage":2,"observedDelta":0}}]
+JSON
+  "$repository_root/scripts/record-agent-verdict.sh" diverged-ledger.json revised-handoff.json diverged-feedback.md feedback.md >/dev/null
+  awk '
+    /^<!-- AGENT-EXPERIMENT-LINEAGE-START -->$/ { capture = 1; next }
+    /^<!-- AGENT-EXPERIMENT-LINEAGE-END -->$/ { exit }
+    capture && !/^```/ { print }
+  ' diverged-feedback.md | jq -e '.continuity == "diverged"' >/dev/null
+  jq '.causalReach.previousFeedbackDecision = "abandon"' handoff.json > abandoned-handoff.json
+  "$repository_root/scripts/record-agent-verdict.sh" ledger.json abandoned-handoff.json abandoned-feedback.md revised-feedback.md >/dev/null
+  awk '
+    /^<!-- AGENT-EXPERIMENT-LINEAGE-START -->$/ { capture = 1; next }
+    /^<!-- AGENT-EXPERIMENT-LINEAGE-END -->$/ { exit }
+    capture && !/^```/ { print }
+  ' abandoned-feedback.md | jq -e '.continuity == "abandoned"' >/dev/null
 )
 rm -rf "$lineage_fixture/.git"
 
