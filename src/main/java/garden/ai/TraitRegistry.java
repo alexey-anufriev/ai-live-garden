@@ -535,6 +535,9 @@ public class TraitRegistry {
                 if (organism.type() == OrganismType.ROOT_NETWORK && fungalContribution > 0) modifier -= 3;
                 if (organism.type() == OrganismType.FOX && (rootNetworkCount > 0 || fungalContribution > 0)) modifier -= 3;
                 break;
+            case "fungal-beetle-synergizer":
+                if (organism.type() == OrganismType.BEETLE && fungalContribution > 0) modifier -= 2;
+                break;
         }
         return modifier;
     }
@@ -752,8 +755,8 @@ public class TraitRegistry {
                 break;
             case "fungal-beetle-synergizer":
                 if (organism.type() == OrganismType.BEETLE && fungalContribution > 0) {
-                    int energyGain = 4 + (fungalContribution / 50);
-                    return new MetabolicEffect(0, energyGain, new GardenEvent(cycle, "%s benefited from deep fungal-beetle synergy (+%d).".formatted(organism.id(), energyGain)));
+                    int energyGain = 8 + (fungalContribution / 25);
+                    return new MetabolicEffect(-1, energyGain, new GardenEvent(cycle, "%s benefited from deep fungal-beetle synergy (+%d energy, -1 metabolism).".formatted(organism.id(), energyGain)));
                 }
                 break;
         }

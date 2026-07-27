@@ -4,19 +4,24 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 14454
-- Health: Flourishing (🟢)
+- Cycle: 14497
+- Health: Stable (🟡)
 - Nutrients: 100.
-- NutrientBuffer: 100.
-- Active organisms: 18388 total across beetle, fern fox, fungus moss, root network spore.
+- NutrientBuffer: 0.
+- Active organisms: 18399 total across beetle, fern fox, fungus moss, root network spore.
 - Missing roles: none.
 - Latest agent handoff: Optimize Fungal-Beetle Synergy.
-- Latest result: Modified TraitRegistry.java to increase energy gain for the fungal-beetle-synergizer trait and enabled beetle adoption via TraitRegistry.getMutationTrait. Updated FungalBeetleSynergyTest.java to reflect the new energy gain..
+- Latest result: Increased energy bonus and added reproduction threshold reduction to 'fungal-beetle-synergizer' trait in TraitRegistry.java, and updated FungalBeetleSynergyTest.java..
 
 ## Immediate Directions
 
-- Monitor beetle census trends to observe the cumulative effect on decomposition and nutrient cycling stability.
+- Prefer outcome-changing work with visible consequences for future ticks of the current or recoverable garden.
+- Consolidate or connect existing mechanics before adding another named adaptation, diagnostic, renderer line, event log, or test-only change.
+- Focus on recovery pathways for missing ecological roles, nutrient-buffer usefulness, population balance, and clearer state transitions.
 
 ## Constraints & Known Bad Ideas
 
-- None.
+- Do not attempt to fix the simulation in one run.
+- Do not add another named adaptation merely because recent runs did so.
+- Do not add another observability-only or tests-only change merely because it is easy to validate.
+- Do not treat the full nutrient buffer as proof of health while nutrients are zero or ecological roles are absent.
