@@ -79,11 +79,13 @@ jq -n \
   def trajectory_values($report; $metric):
     [($report.trajectory // [])[] | {step:.step, value:metric_value({final:.final}; $metric)}];
   def directional_checkpoints($trajectory; $goal):
-    ($trajectory | ([.baseline | length, .candidate | length] | min) as $count |
+    ($trajectory | ([(.baseline | length), (.candidate | length)] | min) as $count |
       if $goal == "increase" then
-        [range(0; $count) | select($trajectory.candidate[.].value > $trajectory.baseline[.].value)] | length
+        [range(0; $count) as $checkpoint |
+          select($trajectory.candidate[$checkpoint].value > $trajectory.baseline[$checkpoint].value)] | length
       elif $goal == "decrease" then
-        [range(0; $count) | select($trajectory.candidate[.].value < $trajectory.baseline[.].value)] | length
+        [range(0; $count) as $checkpoint |
+          select($trajectory.candidate[$checkpoint].value < $trajectory.baseline[$checkpoint].value)] | length
       else 0 end);
   def average_metric($reports; $metric):
     ([$reports[] | metric_value(.; $metric)] | add / length);
@@ -109,7 +111,7 @@ jq -n \
     }
   ]) as $trajectory |
   ($trajectory | map(. as $seedTrajectory |
-    ([.baseline | length, .candidate | length] | min) as $checkpointCount |
+    ([(.baseline | length), (.candidate | length)] | min) as $checkpointCount |
     . + {
       delta: (([.candidate[].value] | add) - ([.baseline[].value] | add)),
       directionalCheckpoints: directional_checkpoints($seedTrajectory; $evaluation.goal),

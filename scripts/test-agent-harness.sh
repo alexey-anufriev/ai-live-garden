@@ -5,6 +5,21 @@ repository_root="$(cd "$(dirname "$0")/.." && pwd)"
 fixture_root="$(mktemp -d)"
 trap 'rm -rf "$fixture_root"' EXIT
 
+harness_error_report() {
+  local exit_code="$1"
+  local line="$2"
+  local command="$3"
+  trap - ERR
+  echo "Harness contract failed at line ${line}: ${command}" >&2
+  exit "$exit_code"
+}
+trap 'harness_error_report "$?" "$LINENO" "$BASH_COMMAND"' ERR
+
+init_fixture_repository() {
+  git init -q
+  git config commit.gpgSign false
+}
+
 assert_contains() {
   local expected="$1"
   local file="$2"
@@ -332,7 +347,17 @@ jq -e '.passed == true and .policy == "safety" and .targetPassed == true' \
   "$shadow_fixture/safety-result.json" >/dev/null
 cat > "$shadow_fixture/saturated-java" <<'RUNNER'
 #!/usr/bin/env bash
-printf '{"seed":17,"requestedSteps":5,"completedSteps":5,"status":"completed","initial":{"cycle":10,"total":1,"nutrients":0,"nutrientBuffer":0,"counts":{}},"final":{"cycle":15,"total":1,"nutrients":0,"nutrientBuffer":0,"counts":{}},"minimumTotal":1,"maximumTotal":1,"minimumCounts":{},"maximumCounts":{}}\n'
+set -euo pipefail
+steps=""
+while (( $# > 0 )); do
+  if [[ "$1" == "--steps" ]]; then
+    steps="$2"
+    shift 2
+    continue
+  fi
+  shift
+done
+printf '{"seed":17,"requestedSteps":%s,"completedSteps":%s,"status":"completed","initial":{"cycle":10,"total":1,"nutrients":0,"nutrientBuffer":0,"counts":{}},"final":{"cycle":15,"total":1,"nutrients":0,"nutrientBuffer":0,"counts":{}},"minimumTotal":1,"maximumTotal":1,"minimumCounts":{},"maximumCounts":{}}\n' "$steps" "$steps"
 RUNNER
 chmod +x "$shadow_fixture/saturated-java"
 cat > "$shadow_fixture/saturated-baseline.json" <<'JSON'
@@ -341,16 +366,22 @@ JSON
 jq '.evaluation = {metric:"nutrientBuffer",goal:"decrease",requiredDelta:1}' "$shadow_fixture/.agent-run.json" > "$shadow_fixture/saturated-handoff.json"
 if (
   cd "$shadow_fixture"
-  SHADOW_SIMULATION_RUNNER="$shadow_fixture/saturated-java" SHADOW_SIMULATION_SEEDS=17 \
+    SHADOW_SIMULATION_RUNNER="$shadow_fixture/saturated-java" SHADOW_SIMULATION_SEEDS=17 \
     SHADOW_BASELINE_CLASSES_DIR="$shadow_fixture/target/classes" \
     SHADOW_EVALUATION_RESULT_FILE="$shadow_fixture/saturated-result.json" \
-    scripts/evaluate-shadow-candidate.sh "$shadow_fixture/saturated-baseline.json" saturated-handoff.json "$shadow_fixture/saturated-candidate.json" >/dev/null 2>&1
+    scripts/evaluate-shadow-candidate.sh "$shadow_fixture/saturated-baseline.json" saturated-handoff.json "$shadow_fixture/saturated-candidate.json" \
+      >/dev/null 2>"$shadow_fixture/saturated-evaluation.log"
 ); then
   echo "A terminally saturated target miss incorrectly passed evaluation." >&2
   exit 1
 fi
-jq -e '.passed == false and .observation == "terminal-saturated" and .baselineFinalValues == [0] and .candidateFinalValues == [0] and (.trajectory | length) == 1 and .trajectoryDelta == 0 and .trajectoryDirectionalSupport == {"supporting":0,"persistent":0,"total":1}' \
-  "$shadow_fixture/saturated-result.json" >/dev/null
+if ! jq -e '.passed == false and .observation == "terminal-saturated" and .baselineFinalValues == [0] and .candidateFinalValues == [0] and (.trajectory | length) == 1 and .trajectoryDelta == 0 and .trajectoryDirectionalSupport == {"supporting":0,"persistent":0,"total":1}' \
+    "$shadow_fixture/saturated-result.json" >/dev/null; then
+  echo "Unexpected saturated shadow result:" >&2
+  sed -n '1,240p' "$shadow_fixture/saturated-result.json" >&2
+  sed -n '1,240p' "$shadow_fixture/saturated-evaluation.log" >&2
+  exit 1
+fi
 mkdir -p "$shadow_fixture/baseline-classes/garden/ai"
 touch "$shadow_fixture/baseline-classes/garden/ai/Main.class"
 cat > "$shadow_fixture/adaptive-horizon-java" <<'RUNNER'
@@ -444,7 +475,7 @@ cat > "$fixture_root/agent/plans/2026-07-08.json" <<'JSON'
 JSON
 
 cd "$fixture_root"
-git init -q
+init_fixture_repository
 
 handoff() {
   local direction="$1"
@@ -554,10 +585,9 @@ lineage_fixture="$fixture_root/lineage-fixture"
 mkdir -p "$lineage_fixture/src/main/java/example"
 (
   cd "$lineage_fixture"
-  git init -q
+  init_fixture_repository
   git config user.name fixture
   git config user.email fixture@example.invalid
-  git config commit.gpgSign false
   echo 'package example; class Change {}' > src/main/java/example/Change.java
   git add .
   git commit -qm baseline
@@ -838,7 +868,7 @@ SCRIPT
 chmod +x "$assessment_fixture/scripts/"*.sh
 (
   cd "$assessment_fixture"
-  git init -q
+  init_fixture_repository
   git config user.name fixture
   git config user.email fixture@example.invalid
   echo 'package example; class Change {}' > src/main/java/example/Change.java
@@ -971,7 +1001,7 @@ Older feedback marker.
 FEEDBACK
 (
   cd "$incomplete_fixture"
-  git init -q
+  init_fixture_repository
   git config user.name fixture
   git config user.email fixture@example.invalid
   git add scripts src/main/java/example/Change.java agent/shadow-feedback.md
@@ -1033,7 +1063,7 @@ cp "$repository_root/scripts/sync-agent-journal-paths.sh" \
 chmod +x "$journal_sync_fixture/scripts/"*.sh
 (
   cd "$journal_sync_fixture"
-  git init -q
+  init_fixture_repository
   git config user.name fixture
   git config user.email fixture@example.invalid
   echo 'package example; class Change {}' > src/main/java/example/Change.java
@@ -1132,7 +1162,7 @@ cp "$repository_root/scripts/prepare-accepted-candidate-fallback.sh" \
 chmod +x "$fallback_fixture/scripts/"*.sh
 (
   cd "$fallback_fixture"
-  git init -q
+  init_fixture_repository
   git config user.name fixture
   git config user.email fixture@example.invalid
   echo 'package example; class Change {}' > src/main/java/example/Change.java
@@ -1185,7 +1215,7 @@ cp "$repository_root/scripts/check-agent-observation-window.sh" "$observation_fi
 chmod +x "$observation_fixture/scripts/check-agent-observation-window.sh"
 (
   cd "$observation_fixture"
-  git init -q
+  init_fixture_repository
   git config user.name fixture
   git config user.email fixture@example.invalid
   touch state
@@ -1204,7 +1234,7 @@ cp "$repository_root/scripts/validate-project-plan.sh" "$repository_root/scripts
 chmod +x "$plan_fixture/scripts/"*.sh
 (
   cd "$plan_fixture"
-  git init -q
+  init_fixture_repository
   git config user.name fixture
   git config user.email fixture@example.invalid
   cat > data/garden-state.txt <<'STATE'
