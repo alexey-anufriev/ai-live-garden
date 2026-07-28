@@ -4,33 +4,33 @@ This verdict evaluates the safe code committed by the previous autonomous run. S
 
 - Classification: `inert`
 - Acceptance: `experiment`
-- PM direction: `none`
-- Metric: `population.BEETLE`
+- PM direction: `A`
+- Metric: `population.FUNGUS`
 - Goal: `increase`
 - Required delta: 1
 - Observed delta: 0
-- Baseline average: 2701
-- Candidate average: 2701
+- Baseline average: 6014
+- Candidate average: 6014
 - Measurement: `terminal-observable`
-- Baseline initial values by seed: 2697, 2697
-- Baseline final values by seed: 2701, 2701
-- Candidate final values by seed: 2701, 2701
+- Baseline initial values by seed: 6019, 6019
+- Baseline final values by seed: 6014, 6014
+- Candidate final values by seed: 6014, 6014
 - Safety passed: true
 - Target passed: false
 
 ## Implemented Hypothesis
 
-Consistent application of the fungal-beetle-synergizer modifier.
+Increased metabolic energy bonus for 'fungal-metabolic-amplifier'.
 
 ## Experiment Lineage
 
 <!-- AGENT-EXPERIMENT-LINEAGE-START -->
 ```json
-{"current":{"commit":"141d1e7329037b164d9cfc5fd276b7e783539f84","paths":["src/main/java/garden/ai/TraitRegistry.java"],"mechanism":"Consistent application of the fungal-beetle-synergizer modifier.","feedbackReference":"mechanism: Root network high-nutrient to fungal succession.","metric":"population.BEETLE","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"previous":{"commit":"9b71d2badd7561b1ca11acfe48adc90e62e46eab","paths":["src/main/java/garden/ai/OrganismType.java","src/test/java/garden/ai/OrganismTypeSuccessionTest.java"],"mechanism":"Root network high-nutrient to fungal succession.","feedbackReference":"mechanism: Removing the 'emergency-colonizer' trait from descendant beetles during the reproduction phase to free a trait slot.","metric":"population.FUNGUS","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"responseToPrevious":"revise","continuity":"diverged","escalation":"none"}
+{"current":{"commit":"e74a87b6d9d82ee1c678033fdd01df387a3b1edc","paths":["src/main/java/garden/ai/TraitRegistry.java","src/test/java/garden/ai/FungalMetabolicAmplifierTest.java"],"mechanism":"Increased metabolic energy bonus for 'fungal-metabolic-amplifier'.","feedbackReference":"mechanism: Consistent application of the fungal-beetle-synergizer modifier.","metric":"population.FUNGUS","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"previous":{"commit":"141d1e7329037b164d9cfc5fd276b7e783539f84","paths":["src/main/java/garden/ai/TraitRegistry.java"],"mechanism":"Consistent application of the fungal-beetle-synergizer modifier.","feedbackReference":"mechanism: Root network high-nutrient to fungal succession.","metric":"population.BEETLE","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"responseToPrevious":"revise","continuity":"matched","escalation":"none"}
 ```
 <!-- AGENT-EXPERIMENT-LINEAGE-END -->
 
-- Continuity: `diverged`
+- Continuity: `matched`
 
 - Escalation: `none`
 

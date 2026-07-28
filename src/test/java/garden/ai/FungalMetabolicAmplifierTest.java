@@ -39,6 +39,6 @@ public class FungalMetabolicAmplifierTest {
         
         TraitRegistry.MetabolicEffect effect = TraitRegistry.getMetabolicEffect("fungal-metabolic-amplifier", 1, fungus, env, 0, 0);
         
-        assertEquals(15, effect.energyBonus(), "Fungal metabolic amplifier should provide an energy bonus of 15");
+        assertEquals(30, effect.energyBonus(), "Fungal metabolic amplifier should provide an energy bonus of 30");
     }
 }
