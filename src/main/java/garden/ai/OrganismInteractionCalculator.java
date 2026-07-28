@@ -443,6 +443,7 @@ public class OrganismInteractionCalculator {
                 Organism child = organism.child(childId, childType, TraitRegistry.getMutationTrait(context.cycle(), organism, childType, context.environment()));
                 
                 if (childType == OrganismType.BEETLE) {
+                    child = child.withoutTrait("emergency-colonizer");
                     if (beetleCount < 200) {
                         child = child.withTrait("beetle-recovery").withTrait("prolific").withTrait("resourceful-breeder");
                     }
