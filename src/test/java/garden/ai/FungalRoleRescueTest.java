@@ -47,4 +47,21 @@ public class FungalRoleRescueTest {
         long fungusCount = next.organisms().stream().filter(o -> o.type() == OrganismType.FUNGUS).count();
         assertEquals(1, fungusCount, "Fungus should be rescued at energy 4");
     }
+
+    @Test
+    public void testFungusRoleRescueWithExistingFungusBelowThreshold() {
+        // Create garden with 1 root network and 1 fungus (less than 2000)
+        List<Organism> organisms = new java.util.ArrayList<>();
+        Organism root = Organism.of("root-1", OrganismType.ROOT_NETWORK, 100, 5, "listens-below");
+        organisms.add(root);
+        organisms.add(Organism.of("fungus-1", OrganismType.FUNGUS, 1, 1, "listens-below"));
+        Garden garden = new Garden(1, 102, new Environment(50, 64, 43, 58, 50), organisms, List.of());
+
+        // Advance reproduction
+        Garden next = garden.nextCycle();
+
+        // Verify more fungus was created (rescue triggered)
+        long fungusCount = next.organisms().stream().filter(o -> o.type() == OrganismType.FUNGUS).count();
+        assertEquals(2, fungusCount, "Fungus should be rescued");
+    }
 }

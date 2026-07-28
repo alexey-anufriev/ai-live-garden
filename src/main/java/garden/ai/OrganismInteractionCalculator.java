@@ -409,7 +409,7 @@ public class OrganismInteractionCalculator {
             OrganismType childType = TraitRegistry.offspringType(organism, context.cycle(), organism.generation(), context.environment());
             
             // Fungal role rescue mechanism
-            if (fungusCount == 0 && organism.type() == OrganismType.ROOT_NETWORK) {
+            if (fungusCount < 2000 && organism.type() == OrganismType.ROOT_NETWORK) {
                 childType = OrganismType.FUNGUS;
             }
 
