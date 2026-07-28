@@ -536,7 +536,7 @@ public class TraitRegistry {
                 if (organism.type() == OrganismType.FOX && (rootNetworkCount > 0 || fungalContribution > 0)) modifier -= 3;
                 break;
             case "fungal-beetle-synergizer":
-                if (organism.type() == OrganismType.BEETLE && fungalContribution > 0) modifier -= 2;
+                if (organism.type() == OrganismType.BEETLE) modifier -= 2;
                 break;
         }
         return modifier;

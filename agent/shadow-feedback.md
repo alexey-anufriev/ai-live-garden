@@ -4,29 +4,29 @@ This verdict evaluates the safe code committed by the previous autonomous run. S
 
 - Classification: `inert`
 - Acceptance: `experiment`
-- PM direction: `A`
-- Metric: `population.FUNGUS`
+- PM direction: `none`
+- Metric: `population.BEETLE`
 - Goal: `increase`
 - Required delta: 1
 - Observed delta: 0
-- Baseline average: 6044
-- Candidate average: 6044
+- Baseline average: 2701
+- Candidate average: 2701
 - Measurement: `terminal-observable`
-- Baseline initial values by seed: 6049, 6049
-- Baseline final values by seed: 6044, 6044
-- Candidate final values by seed: 6044, 6044
+- Baseline initial values by seed: 2697, 2697
+- Baseline final values by seed: 2701, 2701
+- Candidate final values by seed: 2701, 2701
 - Safety passed: true
 - Target passed: false
 
 ## Implemented Hypothesis
 
-Root network high-nutrient to fungal succession.
+Consistent application of the fungal-beetle-synergizer modifier.
 
 ## Experiment Lineage
 
 <!-- AGENT-EXPERIMENT-LINEAGE-START -->
 ```json
-{"current":{"commit":"9b71d2badd7561b1ca11acfe48adc90e62e46eab","paths":["src/main/java/garden/ai/OrganismType.java","src/test/java/garden/ai/OrganismTypeSuccessionTest.java"],"mechanism":"Root network high-nutrient to fungal succession.","feedbackReference":"mechanism: Removing the 'emergency-colonizer' trait from descendant beetles during the reproduction phase to free a trait slot.","metric":"population.FUNGUS","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"previous":{"commit":"7c8323361dc216c860982e2e8dc971e7b89b4730","paths":["src/main/java/garden/ai/OrganismInteractionCalculator.java"],"mechanism":"Removing the 'emergency-colonizer' trait from descendant beetles during the reproduction phase to free a trait slot.","feedbackReference":"mechanism: Relaxed metabolic benefit condition in TraitRegistry.java.","metric":"population.BEETLE","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"responseToPrevious":"revise","continuity":"diverged","escalation":"none"}
+{"current":{"commit":"141d1e7329037b164d9cfc5fd276b7e783539f84","paths":["src/main/java/garden/ai/TraitRegistry.java"],"mechanism":"Consistent application of the fungal-beetle-synergizer modifier.","feedbackReference":"mechanism: Root network high-nutrient to fungal succession.","metric":"population.BEETLE","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"previous":{"commit":"9b71d2badd7561b1ca11acfe48adc90e62e46eab","paths":["src/main/java/garden/ai/OrganismType.java","src/test/java/garden/ai/OrganismTypeSuccessionTest.java"],"mechanism":"Root network high-nutrient to fungal succession.","feedbackReference":"mechanism: Removing the 'emergency-colonizer' trait from descendant beetles during the reproduction phase to free a trait slot.","metric":"population.FUNGUS","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"responseToPrevious":"revise","continuity":"diverged","escalation":"none"}
 ```
 <!-- AGENT-EXPERIMENT-LINEAGE-END -->
 
