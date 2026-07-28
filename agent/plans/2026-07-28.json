@@ -1,0 +1,113 @@
+{
+  "antiPatterns": [
+    "Ignoring fungal decline.",
+    "Re-introducing a large, stagnant nutrient buffer."
+  ],
+  "date": "2026-07-28",
+  "directions": [
+    {
+      "acceptanceSignal": "Fungal population count increases in next ticks.",
+      "avoid": "Over-focusing on predatory or overly aggressive turnover traits.",
+      "expectedGardenEffect": "Fungal population growth rate becomes positive and stable.",
+      "label": "A",
+      "shadowAcceptance": {
+        "goal": "increase",
+        "metric": "population.FUNGUS",
+        "requiredDelta": 1
+      },
+      "title": "Stabilize Fungal Population Growth",
+      "why": "The fungal population has declined recently, which may hinder efficient nutrient cycling."
+    },
+    {
+      "acceptanceSignal": "More efficient nutrient utilization by plants.",
+      "avoid": "Mechanisms that create a new stagnant nutrient buffer.",
+      "expectedGardenEffect": "Improved conversion of active nutrients to plant biomass.",
+      "label": "B",
+      "shadowAcceptance": {
+        "goal": "decrease",
+        "metric": "nutrients",
+        "requiredDelta": 1
+      },
+      "title": "Enhance Root Network Nutrient Uptake Efficiency",
+      "why": "The root network is growing strongly and can serve as a better conduit for nutrient intake."
+    },
+    {
+      "acceptanceSignal": "Beetle population remains above 2500.",
+      "avoid": "Traits that drastically increase beetle mortality.",
+      "expectedGardenEffect": "Stable, productive beetle population.",
+      "label": "C",
+      "shadowAcceptance": {
+        "goal": "preserve",
+        "metric": "population.BEETLE",
+        "requiredDelta": 1
+      },
+      "title": "Sustain Beetle Population Productivity",
+      "why": "The beetle population is currently healthy and serves as a vital component in the nutrient cycle."
+    },
+    {
+      "acceptanceSignal": "Fox population stays within 150-300.",
+      "avoid": "Excessive population control traits that could lead to local extinction.",
+      "expectedGardenEffect": "Fox population remains stable and resilient.",
+      "label": "D",
+      "shadowAcceptance": {
+        "goal": "preserve",
+        "metric": "population.FOX",
+        "requiredDelta": 1
+      },
+      "title": "Monitor Fox Demographic Resilience",
+      "why": "The fox population is low but stable; ensure this remains robust against environmental fluctuations."
+    }
+  ],
+  "review": {
+    "overallMark": "partially achieved",
+    "previousPlanDate": "2026-07-27",
+    "results": [
+      {
+        "evidence": "Root network increased from 6403 to 7012, but fungal population decreased from 6501 to 6079.",
+        "label": "A",
+        "mark": "partially achieved"
+      },
+      {
+        "evidence": "Fox population remains stable at 206.",
+        "label": "B",
+        "mark": "achieved"
+      },
+      {
+        "evidence": "Beetle population grew from 2522 to 2674.",
+        "label": "C",
+        "mark": "achieved"
+      },
+      {
+        "evidence": "Nutrients remain stable at 100.",
+        "label": "D",
+        "mark": "achieved"
+      }
+    ],
+    "summary": "The fox and beetle populations remain stable or growing, but the fungal population has declined, suggesting a bottleneck in the fungal-nutrient-cycling link."
+  },
+  "stateSignals": [
+    "Fungal population decline despite robust beetle and root network growth.",
+    "High nutrient levels (100) indicate potential for better turnover."
+  ],
+  "stateSnapshot": {
+    "cycle": 14683,
+    "environment": {
+      "light": 98,
+      "moisture": 99,
+      "nutrientBuffer": 0,
+      "nutrients": 100,
+      "warmth": 100
+    },
+    "populations": {
+      "BEETLE": 2674,
+      "FERN": 3,
+      "FOX": 206,
+      "FUNGUS": 6079,
+      "MOSS": 2497,
+      "ROOT_NETWORK": 7012,
+      "SPORE": 1
+    },
+    "totalOrganisms": 18472
+  },
+  "thesis": "The ecosystem has successfully managed the buffer and stabilized the fox population. With a healthy beetle population and stable fox numbers, the focus shifts to reversing the fungal population decline, which appears to be the current bottleneck for nutrient turnover, while leveraging the robust growth of the root network to support overall ecological stability."
+}
