@@ -47,4 +47,14 @@ public class OrganismTypeSuccessionTest {
         assertEquals(OrganismType.BEETLE, OrganismType.HARE.offspringType(0, 0, warm));
         assertEquals(OrganismType.HARE, OrganismType.HARE.offspringType(0, 0, cold));
     }
+
+    @Test
+    public void testRootNetworkSuccession() {
+        Environment lowNutrients = new Environment(50, 50, 50, 10, 50); // nutrients 10
+        Environment highNutrients = new Environment(50, 50, 50, 90, 50); // nutrients 90
+        Environment moderateNutrients = new Environment(50, 50, 50, 50, 50); // nutrients 50
+        assertEquals(OrganismType.FUNGUS, OrganismType.ROOT_NETWORK.offspringType(0, 0, lowNutrients));
+        assertEquals(OrganismType.FUNGUS, OrganismType.ROOT_NETWORK.offspringType(0, 0, highNutrients));
+        assertEquals(OrganismType.ROOT_NETWORK, OrganismType.ROOT_NETWORK.offspringType(0, 0, moderateNutrients));
+    }
 }
