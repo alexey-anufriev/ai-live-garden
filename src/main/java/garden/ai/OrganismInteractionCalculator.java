@@ -512,9 +512,9 @@ public class OrganismInteractionCalculator {
     public static int reproductionThreshold(Organism organism, Environment environment, int fungalContribution, List<Organism> organisms) {
         int threshold = 15;
         if (organism.type() == OrganismType.FUNGUS) {
-            threshold = 12;
+            threshold = 8;
             if (environment.nutrientBuffer() > 50) {
-                threshold -= 2;
+                threshold -= 4;
             }
         } else if (organism.type() == OrganismType.ROOT_NETWORK) {
             threshold = 14;
