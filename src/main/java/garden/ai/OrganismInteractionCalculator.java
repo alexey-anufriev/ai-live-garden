@@ -216,7 +216,8 @@ public class OrganismInteractionCalculator {
             if (organism.type() == OrganismType.FOX) {
                 trait = TraitRegistry.getMutationTrait(cycle, organism, organism.type(), environment);
             } else if (organism.type() == OrganismType.FUNGUS || organism.type() == OrganismType.ROOT_NETWORK) {
-                trait = "metabolic-resilience";
+                String[] resilienceTraits = {"metabolic-resilience", "stress-resilient"};
+                trait = resilienceTraits[Math.floorMod(cycle + organism.generation(), resilienceTraits.length)];
             } else {
                 String[] resilienceTraits = {"hardy", "dormancy", "metabolic-resilience"};
                 trait = resilienceTraits[Math.floorMod(cycle + organism.generation(), resilienceTraits.length)];
