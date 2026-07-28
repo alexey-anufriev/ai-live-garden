@@ -517,6 +517,12 @@ public class OrganismInteractionCalculator {
             if (environment.nutrientBuffer() > 50) {
                 threshold -= 4;
             }
+            long fungusCount = organisms.stream().filter(o -> o.type() == OrganismType.FUNGUS).count();
+            if (fungusCount < 4000) {
+                threshold -= 3;
+            } else if (fungusCount < 6000) {
+                threshold -= 1;
+            }
         } else if (organism.type() == OrganismType.ROOT_NETWORK) {
             threshold = 14;
             if (environment.nutrientBuffer() > 80) {

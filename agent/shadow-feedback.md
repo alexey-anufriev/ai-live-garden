@@ -4,33 +4,33 @@ This verdict evaluates the safe code committed by the previous autonomous run. S
 
 - Classification: `inert`
 - Acceptance: `experiment`
-- PM direction: `none`
-- Metric: `population.BEETLE`
+- PM direction: `A`
+- Metric: `population.FUNGUS`
 - Goal: `increase`
 - Required delta: 1
 - Observed delta: 0
-- Baseline average: 2776
-- Candidate average: 2776
+- Baseline average: 5884
+- Candidate average: 5884
 - Measurement: `terminal-observable`
-- Baseline initial values by seed: 2770, 2770
-- Baseline final values by seed: 2776, 2776
-- Candidate final values by seed: 2776, 2776
+- Baseline initial values by seed: 5890, 5890
+- Baseline final values by seed: 5884, 5884
+- Candidate final values by seed: 5884, 5884
 - Safety passed: true
 - Target passed: false
 
 ## Implemented Hypothesis
 
-Relaxing the beetle population bottleneck on essential reproductive trait assignment.
+Reduced fungal reproduction threshold when population count is < 6000.
 
 ## Experiment Lineage
 
 <!-- AGENT-EXPERIMENT-LINEAGE-START -->
 ```json
-{"current":{"commit":"506a816f0e0ea7db7901fbefa3744ae70ed6d7f5","paths":["src/main/java/garden/ai/OrganismInteractionCalculator.java"],"mechanism":"Relaxing the beetle population bottleneck on essential reproductive trait assignment.","feedbackReference":"mechanism: Added 'nutrient-demand-regulator' to the mutation pool.","metric":"population.BEETLE","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"previous":{"commit":"8925d71c504bdf0df8b74c99a719366517c0f98c","paths":["src/main/java/garden/ai/TraitRegistry.java"],"mechanism":"Added 'nutrient-demand-regulator' to the mutation pool.","feedbackReference":"mechanism: Enabling FUNGUS to adapt the 'stress-resilient' trait when under stress, which directly mitigates overcrowding penalty in `TraitRegistry.isPlantStressed`.","metric":"population.FUNGUS","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"responseToPrevious":"revise","continuity":"diverged","escalation":"none"}
+{"current":{"commit":"6ac10fa8187904b05c50135e4e4226e918d4e1f9","paths":["src/main/java/garden/ai/OrganismInteractionCalculator.java","src/test/java/garden/ai/FungalDecompositionReproductionTest.java","src/test/java/garden/ai/FungalReproductionThresholdTest.java"],"mechanism":"Reduced fungal reproduction threshold when population count is < 6000.","feedbackReference":"mechanism: Lowered baseline and buffer-dependent reproduction thresholds for FUNGUS.","metric":"population.FUNGUS","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"previous":{"commit":"506a816f0e0ea7db7901fbefa3744ae70ed6d7f5","paths":["src/main/java/garden/ai/OrganismInteractionCalculator.java"],"mechanism":"Relaxing the beetle population bottleneck on essential reproductive trait assignment.","feedbackReference":"mechanism: Added 'nutrient-demand-regulator' to the mutation pool.","metric":"population.BEETLE","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"responseToPrevious":"abandon","continuity":"abandoned","escalation":"none"}
 ```
 <!-- AGENT-EXPERIMENT-LINEAGE-END -->
 
-- Continuity: `diverged`
+- Continuity: `abandoned`
 
 - Escalation: `none`
 
