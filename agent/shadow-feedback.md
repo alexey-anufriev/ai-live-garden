@@ -4,35 +4,35 @@ This verdict evaluates the safe code committed by the previous autonomous run. S
 
 - Classification: `inert`
 - Acceptance: `experiment`
-- PM direction: `A`
+- PM direction: `none`
 - Metric: `population.FUNGUS`
 - Goal: `increase`
 - Required delta: 1
 - Observed delta: 0
-- Baseline average: 5945
-- Candidate average: 5945
+- Baseline average: 5928
+- Candidate average: 5928
 - Measurement: `terminal-observable`
-- Baseline initial values by seed: 5950, 5950
-- Baseline final values by seed: 5945, 5945
-- Candidate final values by seed: 5945, 5945
+- Baseline initial values by seed: 5934, 5934
+- Baseline final values by seed: 5928, 5928
+- Candidate final values by seed: 5928, 5928
 - Safety passed: true
 - Target passed: false
 
 ## Implemented Hypothesis
 
-Enabling FUNGUS to adapt the 'stress-resilient' trait when under stress, which directly mitigates overcrowding penalty in `TraitRegistry.isPlantStressed`.
+Added 'nutrient-demand-regulator' to the mutation pool.
 
 ## Experiment Lineage
 
 <!-- AGENT-EXPERIMENT-LINEAGE-START -->
 ```json
-{"current":{"commit":"bcea93ecec80fc33cca44dd8b828c524709b1ff0","paths":["src/main/java/garden/ai/OrganismInteractionCalculator.java"],"mechanism":"Enabling FUNGUS to adapt the 'stress-resilient' trait when under stress, which directly mitigates overcrowding penalty in `TraitRegistry.isPlantStressed`.","feedbackReference":"mechanism: Lowered baseline and buffer-dependent reproduction thresholds for FUNGUS.","metric":"population.FUNGUS","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"previous":{"commit":"67d89586dc9805354b7888987ca98e1d159de78f","paths":["src/main/java/garden/ai/OrganismInteractionCalculator.java","src/test/java/garden/ai/FungalDecompositionReproductionTest.java","src/test/java/garden/ai/FungalReproductionThresholdTest.java"],"mechanism":"Lowered baseline and buffer-dependent reproduction thresholds for FUNGUS.","feedbackReference":"mechanism: Proactive root-to-fungal succession rescue mechanism.","metric":"population.FUNGUS","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"responseToPrevious":"revise","continuity":"matched","escalation":"diagnose-or-abandon"}
+{"current":{"commit":"8925d71c504bdf0df8b74c99a719366517c0f98c","paths":["src/main/java/garden/ai/TraitRegistry.java"],"mechanism":"Added 'nutrient-demand-regulator' to the mutation pool.","feedbackReference":"mechanism: Enabling FUNGUS to adapt the 'stress-resilient' trait when under stress, which directly mitigates overcrowding penalty in `TraitRegistry.isPlantStressed`.","metric":"population.FUNGUS","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"previous":{"commit":"bcea93ecec80fc33cca44dd8b828c524709b1ff0","paths":["src/main/java/garden/ai/OrganismInteractionCalculator.java"],"mechanism":"Enabling FUNGUS to adapt the 'stress-resilient' trait when under stress, which directly mitigates overcrowding penalty in `TraitRegistry.isPlantStressed`.","feedbackReference":"mechanism: Lowered baseline and buffer-dependent reproduction thresholds for FUNGUS.","metric":"population.FUNGUS","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"responseToPrevious":"revise","continuity":"diverged","escalation":"none"}
 ```
 <!-- AGENT-EXPERIMENT-LINEAGE-END -->
 
-- Continuity: `matched`
+- Continuity: `diverged`
 
-- Escalation: `diagnose-or-abandon`
+- Escalation: `none`
 
 ## Harness Conclusion
 
