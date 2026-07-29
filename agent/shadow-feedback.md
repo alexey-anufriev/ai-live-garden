@@ -20,19 +20,19 @@ This verdict evaluates the safe code committed by the previous autonomous run. S
 
 ## Implemented Hypothesis
 
-Increased `typeBirthBudget` for FUNGUS.
+Increased nutrient threshold for FUNGUS colonization.
 
 ## Experiment Lineage
 
 <!-- AGENT-EXPERIMENT-LINEAGE-START -->
 ```json
-{"current":{"commit":"2e14c15f0666d823bc63fe09f3850ce84d172cb1","paths":["src/main/java/garden/ai/OrganismInteractionCalculator.java","src/test/java/garden/ai/PopulationDynamicsTest.java"],"mechanism":"Increased `typeBirthBudget` for FUNGUS.","feedbackReference":"mechanism: Lowering the reproductive threshold for FUNGUS at higher population densities.","metric":"population.FUNGUS","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"previous":{"commit":"917b4b3b8267d8f74c7f55785b89d48df0a22639","paths":["src/main/java/garden/ai/OrganismInteractionCalculator.java","src/test/java/garden/ai/FungalDecompositionReproductionTest.java","src/test/java/garden/ai/FungalReproductionThresholdTest.java"],"mechanism":"Lowering the reproductive threshold for FUNGUS at higher population densities.","feedbackReference":"mechanism: Increased nutrient and nutrientBuffer capacity in Environment.","metric":"population.FUNGUS","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"responseToPrevious":"revise","continuity":"matched","escalation":"diagnose-or-abandon"}
+{"current":{"commit":"8a1ef8be4d979e68b342f62fed1db846ac05ee9c","paths":["src/main/java/garden/ai/OrganismType.java"],"mechanism":"Increased nutrient threshold for FUNGUS colonization.","feedbackReference":"mechanism: Increased `typeBirthBudget` for FUNGUS.","metric":"population.FUNGUS","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"previous":{"commit":"2e14c15f0666d823bc63fe09f3850ce84d172cb1","paths":["src/main/java/garden/ai/OrganismInteractionCalculator.java","src/test/java/garden/ai/PopulationDynamicsTest.java"],"mechanism":"Increased `typeBirthBudget` for FUNGUS.","feedbackReference":"mechanism: Lowering the reproductive threshold for FUNGUS at higher population densities.","metric":"population.FUNGUS","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"responseToPrevious":"abandon","continuity":"abandoned","escalation":"none"}
 ```
 <!-- AGENT-EXPERIMENT-LINEAGE-END -->
 
-- Continuity: `matched`
+- Continuity: `abandoned`
 
-- Escalation: `diagnose-or-abandon`
+- Escalation: `none`
 
 ## Harness Conclusion
 

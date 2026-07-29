@@ -106,7 +106,7 @@ public enum OrganismType {
         if (this == FERN && environment.moisture() < 30) {
             return SPORE;
         }
-        if (this == ROOT_NETWORK && environment.nutrients() < 25) {
+        if (this == ROOT_NETWORK && environment.nutrients() < 30) {
             return FUNGUS;
         }
         if (this == ROOT_NETWORK && environment.nutrients() > 75) {
