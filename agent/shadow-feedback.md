@@ -4,33 +4,33 @@ This verdict evaluates the safe code committed by the previous autonomous run. S
 
 - Classification: `inert`
 - Acceptance: `experiment`
-- PM direction: `none`
-- Metric: `population.BEETLE`
+- PM direction: `A`
+- Metric: `population.FUNGUS`
 - Goal: `increase`
 - Required delta: 1
 - Observed delta: 0
-- Baseline average: 2884
-- Candidate average: 2884
+- Baseline average: 5843
+- Candidate average: 5843
 - Measurement: `terminal-observable`
-- Baseline initial values by seed: 2883, 2883
-- Baseline final values by seed: 2884, 2884
-- Candidate final values by seed: 2884, 2884
+- Baseline initial values by seed: 5843, 5843
+- Baseline final values by seed: 5843, 5843
+- Candidate final values by seed: 5843, 5843
 - Safety passed: true
 - Target passed: false
 
 ## Implemented Hypothesis
 
-Increased metabolic bonus and energy gain for 'fungal-beetle-synergizer' trait.
+Dynamic buffer-bonus in fungal nutrient contribution.
 
 ## Experiment Lineage
 
 <!-- AGENT-EXPERIMENT-LINEAGE-START -->
 ```json
-{"current":{"commit":"34ea5c401e3d9fc20583b3924935c361e78e2a6f","paths":["src/main/java/garden/ai/TraitRegistry.java","src/test/java/garden/ai/FungalBeetleSynergyTest.java"],"mechanism":"Increased metabolic bonus and energy gain for 'fungal-beetle-synergizer' trait.","feedbackReference":"mechanism: Reduced fungal reproduction threshold when population count is < 6000.","metric":"population.BEETLE","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"previous":{"commit":"6ac10fa8187904b05c50135e4e4226e918d4e1f9","paths":["src/main/java/garden/ai/OrganismInteractionCalculator.java","src/test/java/garden/ai/FungalDecompositionReproductionTest.java","src/test/java/garden/ai/FungalReproductionThresholdTest.java"],"mechanism":"Reduced fungal reproduction threshold when population count is < 6000.","feedbackReference":"mechanism: Lowered baseline and buffer-dependent reproduction thresholds for FUNGUS.","metric":"population.FUNGUS","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"responseToPrevious":"revise","continuity":"diverged","escalation":"none"}
+{"current":{"commit":"d9cc8c03b57d1f99a409f53ad3164410e1215757","paths":["src/main/java/garden/ai/TraitRegistry.java","src/test/java/garden/ai/OrganismInteractionCalculatorTest.java"],"mechanism":"Dynamic buffer-bonus in fungal nutrient contribution.","feedbackReference":"mechanism: Increased metabolic bonus and energy gain for 'fungal-beetle-synergizer' trait.","metric":"population.FUNGUS","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"previous":{"commit":"34ea5c401e3d9fc20583b3924935c361e78e2a6f","paths":["src/main/java/garden/ai/TraitRegistry.java","src/test/java/garden/ai/FungalBeetleSynergyTest.java"],"mechanism":"Increased metabolic bonus and energy gain for 'fungal-beetle-synergizer' trait.","feedbackReference":"mechanism: Reduced fungal reproduction threshold when population count is < 6000.","metric":"population.BEETLE","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"responseToPrevious":"revise","continuity":"matched","escalation":"none"}
 ```
 <!-- AGENT-EXPERIMENT-LINEAGE-END -->
 
-- Continuity: `diverged`
+- Continuity: `matched`
 
 - Escalation: `none`
 

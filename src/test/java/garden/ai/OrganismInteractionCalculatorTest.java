@@ -180,5 +180,25 @@ class OrganismInteractionCalculatorTest {
         int budget = OrganismInteractionCalculator.typeBirthBudget(OrganismType.BEETLE, organisms, env);
         assertThat(budget).isEqualTo(0);
     }
+
+    @Test
+    void highBufferIncreasesFungalNutrientContribution() {
+        Environment lowBufferEnv = new Environment(50, 50, 50, 50, 10);
+        Environment highBufferEnv = new Environment(50, 50, 50, 50, 100);
+
+        // Setup: just one fungus
+        List<Organism> organisms = List.of(Organism.of("fungus-1", OrganismType.FUNGUS, 10, 1));
+
+        OrganismInteractionCalculator.EnvironmentalDynamicsContext lowContext = new OrganismInteractionCalculator.EnvironmentalDynamicsContext(
+                organisms, lowBufferEnv, 1, new ArrayList<>());
+        OrganismInteractionCalculator.EnvironmentalDynamicsContext highContext = new OrganismInteractionCalculator.EnvironmentalDynamicsContext(
+                organisms, highBufferEnv, 1, new ArrayList<>());
+
+        OrganismInteractionCalculator.EnvironmentalDynamicsResult lowResult = OrganismInteractionCalculator.calculateEnvironmentalDynamics(lowContext);
+        OrganismInteractionCalculator.EnvironmentalDynamicsResult highResult = OrganismInteractionCalculator.calculateEnvironmentalDynamics(highContext);
+
+        // Fungal contribution is increased by the buffer, leading to more nutrients
+        assertThat(highResult.nextEnvironment().nutrients()).isGreaterThan(lowResult.nextEnvironment().nutrients());
     }
+}
 
