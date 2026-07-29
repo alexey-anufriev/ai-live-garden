@@ -383,8 +383,9 @@ public class OrganismInteractionCalculator {
         }
         // Beetle-specific density restriction linked to buffer
         if (childType == OrganismType.BEETLE && total >= DENSITY_PRESSURE_MINIMUM_POPULATION) {
-            if (environment.nutrientBuffer() < 25) return 0;
-            if (environment.nutrientBuffer() < 50) return 1;
+            // Allow some reproduction even with low nutrient buffer
+            if (environment.nutrientBuffer() < 25) return 1;
+            if (environment.nutrientBuffer() < 50) return 2;
             if (typeCount > 3000) return 0;
             if (typeCount * 3 > total) return 1;
         }

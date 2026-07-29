@@ -76,8 +76,8 @@ class PopulationDynamicsTest {
             organisms.add(Organism.of("moss-" + i, OrganismType.MOSS, 50, 1));
         }
 
-        assertThat(OrganismInteractionCalculator.typeBirthBudget(OrganismType.BEETLE, organisms, lowBuffer)).isEqualTo(0);
-        assertThat(OrganismInteractionCalculator.typeBirthBudget(OrganismType.BEETLE, organisms, medBuffer)).isEqualTo(1);
+        assertThat(OrganismInteractionCalculator.typeBirthBudget(OrganismType.BEETLE, organisms, lowBuffer)).isEqualTo(1);
+        assertThat(OrganismInteractionCalculator.typeBirthBudget(OrganismType.BEETLE, organisms, medBuffer)).isEqualTo(2);
         assertThat(OrganismInteractionCalculator.typeBirthBudget(OrganismType.BEETLE, organisms, highBuffer)).isEqualTo(3);
     }
 
