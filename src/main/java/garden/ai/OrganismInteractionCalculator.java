@@ -547,7 +547,11 @@ public class OrganismInteractionCalculator {
         }
         
         if (environment.nutrients() < 25) {
-            threshold += 5;
+            if (organism.type() == OrganismType.FUNGUS) {
+                threshold += 1;
+            } else {
+                threshold += 5;
+            }
         } else if (environment.nutrients() > 60) {
             if (organism.type() == OrganismType.FOX || organism.type() == OrganismType.FUNGUS || organism.type() == OrganismType.ROOT_NETWORK) {
                 threshold -= 2;

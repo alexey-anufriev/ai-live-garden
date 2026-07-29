@@ -65,6 +65,19 @@ class EnvironmentTest {
     }
 
     @Test
+    void lowBufferNutrientInflowIsLow() {
+        Environment env = new Environment(50, 50, 50, 50, 10);
+        // filling = 50+50 = 100.
+        // ReleaseRate = 8.
+        // Released = 10 / 8 = 1.
+        // intoNutrients = 100 / 4 = 25.
+        // nutrientDelta = 2 + 0/2 - 100/5 = -18.
+        // newNutrients = 50 - 18 + 1 + 25 = 58.
+        Environment next = env.next(1, 100, 0, 50, 50, 0, 0, 0, 0, 0, 0, 0, 0);
+        assertThat(next.nutrients()).isEqualTo(58);
+    }
+
+    @Test
     void siphonReducesBufferEffectively() {
         // Environment with buffer 100.
         Environment env = new Environment(50, 50, 50, 50, 100);
