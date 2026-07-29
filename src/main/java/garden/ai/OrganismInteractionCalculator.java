@@ -548,7 +548,7 @@ public class OrganismInteractionCalculator {
         
         if (environment.nutrients() < 25) {
             if (organism.type() == OrganismType.FUNGUS) {
-                threshold += 1;
+                threshold -= 1;
             } else {
                 threshold += 5;
             }
