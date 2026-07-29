@@ -322,8 +322,8 @@ public class TraitRegistry {
         int absencePressure = (context.beetleCount() == 0) ? 10 : 0;
         int decompositionPressure = Math.max(beetlePressure, absencePressure);
 
-        int baseContribution = (context.nutrientBuffer() == 0) ? (int)(context.fungusCount() * 2) : 0;
-        return (int) (context.fungusCount() * 2 * bufferBonus +
+        int baseContribution = (context.nutrientBuffer() == 0) ? (int)(context.fungusCount() * 10) : 0;
+        return (int) (baseContribution + context.fungusCount() * 2 * bufferBonus +
                       context.decomposerCount() * (30 + decayPressure) * bufferBonus +
                       context.soilEnricherCount() * 10 * bufferBonus +
                       context.networkConnectorCount() * connectorBonus * bufferBonus +

@@ -20,19 +20,19 @@ This verdict evaluates the safe code committed by the previous autonomous run. S
 
 ## Implemented Hypothesis
 
-Base fungal nutrient contribution addition
+Added base fungal nutrient contribution when nutrientBuffer == 0 in TraitRegistry.calculateFungal.
 
 ## Experiment Lineage
 
 <!-- AGENT-EXPERIMENT-LINEAGE-START -->
 ```json
-{"current":{"commit":"e62a018b5336666ba88900adbccc7551c6d9c908","paths":["src/main/java/garden/ai/TraitRegistry.java"],"mechanism":"Base fungal nutrient contribution addition","feedbackReference":"mechanism: Inherent growth logic for FUNGUS added in calculatePassiveChanges.","metric":"nutrientBuffer","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"previous":{"commit":"49768e56783278d0c00cd8a8e9901876d0b6bde0","paths":["src/main/java/garden/ai/TraitRegistry.java","src/test/java/garden/ai/FungalCrowdingTest.java"],"mechanism":"Immunity to crowding stress for FUNGUS in TraitRegistry.","feedbackReference":"mechanism: Inherent growth logic for FUNGUS added in calculatePassiveChanges.","metric":"population.FUNGUS","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"responseToPrevious":"revise","continuity":"matched","escalation":"none"}
+{"current":{"commit":"1e788952c46e0faa12ea7dc9d18029c3c2e84bb7","paths":["src/main/java/garden/ai/TraitRegistry.java"],"mechanism":"Added base fungal nutrient contribution when nutrientBuffer == 0 in TraitRegistry.calculateFungal.","feedbackReference":"mechanism: Base fungal nutrient contribution addition","metric":"nutrientBuffer","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"previous":{"commit":"e62a018b5336666ba88900adbccc7551c6d9c908","paths":["src/main/java/garden/ai/TraitRegistry.java"],"mechanism":"Base fungal nutrient contribution addition","feedbackReference":"mechanism: Inherent growth logic for FUNGUS added in calculatePassiveChanges.","metric":"nutrientBuffer","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"responseToPrevious":"revise","continuity":"matched","escalation":"diagnose-or-abandon"}
 ```
 <!-- AGENT-EXPERIMENT-LINEAGE-END -->
 
 - Continuity: `matched`
 
-- Escalation: `none`
+- Escalation: `diagnose-or-abandon`
 
 ## Harness Conclusion
 
