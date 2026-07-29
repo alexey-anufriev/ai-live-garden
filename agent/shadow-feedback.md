@@ -20,19 +20,19 @@ This verdict evaluates the safe code committed by the previous autonomous run. S
 
 ## Implemented Hypothesis
 
-Lowering the reproductive threshold for FUNGUS at higher population densities.
+Increased `typeBirthBudget` for FUNGUS.
 
 ## Experiment Lineage
 
 <!-- AGENT-EXPERIMENT-LINEAGE-START -->
 ```json
-{"current":{"commit":"917b4b3b8267d8f74c7f55785b89d48df0a22639","paths":["src/main/java/garden/ai/OrganismInteractionCalculator.java","src/test/java/garden/ai/FungalDecompositionReproductionTest.java","src/test/java/garden/ai/FungalReproductionThresholdTest.java"],"mechanism":"Lowering the reproductive threshold for FUNGUS at higher population densities.","feedbackReference":"mechanism: Increased nutrient and nutrientBuffer capacity in Environment.","metric":"population.FUNGUS","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"previous":{"commit":"4ce9c6b1b76f99c90140672bb28494bfedfdf108","paths":["src/main/java/garden/ai/Environment.java","src/test/java/garden/ai/EnvironmentTest.java","src/test/java/garden/ai/GardenTest.java","src/test/java/garden/ai/NutrientBottleneckTest.java"],"mechanism":"Increased nutrient and nutrientBuffer capacity in Environment.","feedbackReference":"mechanism: Relaxed reproduction constraints for beetles in `OrganismInteractionCalculator.java`.","metric":"population.FUNGUS","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"responseToPrevious":"revise","continuity":"diverged","escalation":"none"}
+{"current":{"commit":"2e14c15f0666d823bc63fe09f3850ce84d172cb1","paths":["src/main/java/garden/ai/OrganismInteractionCalculator.java","src/test/java/garden/ai/PopulationDynamicsTest.java"],"mechanism":"Increased `typeBirthBudget` for FUNGUS.","feedbackReference":"mechanism: Lowering the reproductive threshold for FUNGUS at higher population densities.","metric":"population.FUNGUS","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"previous":{"commit":"917b4b3b8267d8f74c7f55785b89d48df0a22639","paths":["src/main/java/garden/ai/OrganismInteractionCalculator.java","src/test/java/garden/ai/FungalDecompositionReproductionTest.java","src/test/java/garden/ai/FungalReproductionThresholdTest.java"],"mechanism":"Lowering the reproductive threshold for FUNGUS at higher population densities.","feedbackReference":"mechanism: Increased nutrient and nutrientBuffer capacity in Environment.","metric":"population.FUNGUS","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"responseToPrevious":"revise","continuity":"matched","escalation":"diagnose-or-abandon"}
 ```
 <!-- AGENT-EXPERIMENT-LINEAGE-END -->
 
-- Continuity: `diverged`
+- Continuity: `matched`
 
-- Escalation: `none`
+- Escalation: `diagnose-or-abandon`
 
 ## Harness Conclusion
 

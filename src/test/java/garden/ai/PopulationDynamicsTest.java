@@ -57,9 +57,16 @@ class PopulationDynamicsTest {
                 Organism.of("moss-1", OrganismType.MOSS, 10, 1));
 
         assertThat(OrganismInteractionCalculator.typeBirthBudget(OrganismType.FOX, balanced, env)).isEqualTo(6);
-        assertThat(OrganismInteractionCalculator.typeBirthBudget(OrganismType.FUNGUS, balanced, env)).isEqualTo(6);
+        assertThat(OrganismInteractionCalculator.typeBirthBudget(OrganismType.FUNGUS, balanced, env)).isEqualTo(12);
         assertThat(OrganismInteractionCalculator.typeBirthBudget(OrganismType.ROOT_NETWORK, balanced, env)).isEqualTo(6);
         assertThat(OrganismInteractionCalculator.typeBirthBudget(OrganismType.MOSS, balanced, env)).isEqualTo(3);
+
+        // Test high population threshold
+        List<Organism> denseFungi = new ArrayList<>();
+        for (int i = 0; i < 9000; i++) {
+            denseFungi.add(Organism.of("fungus-" + i, OrganismType.FUNGUS, 10, 1));
+        }
+        assertThat(OrganismInteractionCalculator.typeBirthBudget(OrganismType.FUNGUS, denseFungi, env)).isEqualTo(0);
     }
 
     @Test

@@ -4,18 +4,20 @@ Compact current memory for future autonomous runs.
 
 ## Current Garden State
 
-- Cycle: 15096
+- Cycle: 15114
 - Health: Flourishing (🟢)
 - Nutrients: 200.
 - NutrientBuffer: 200.
-- Active organisms: 18574 total across beetle, fern fox, fungus moss, root network spore.
+- Active organisms: 18595 total across beetle, fern fox, fungus moss, root network spore.
 - Missing roles: none.
-- Latest agent handoff: Enhance Fungal Population Resilience.
-- Latest result: Increased the fungal population threshold for reproduction in OrganismInteractionCalculator.reproductionThreshold, making it easier for fungi to reproduce at higher population levels. Updated FungalReproductionThresholdTest and FungalDecompositionReproductionTest to reflect the new population dynamics..
+- Latest agent handoff: Boost Fungal Birth Budget.
+- Latest result: Modified `typeBirthBudget` in `OrganismInteractionCalculator.java` to increase the FUNGUS birth budget from 6 to 12 when population is below 8000, while maintaining density pressure constraints. Updated `PopulationDynamicsTest.java` to verify the new behavior..
 
 ## Immediate Directions
 
-- Monitor fungal population stability.
+- Prefer outcome-changing work with visible consequences for future ticks of the current or recoverable garden.
+- Consolidate or connect existing mechanics before adding another named adaptation, diagnostic, renderer line, event log, or test-only change.
+- Focus on recovery pathways for missing ecological roles, nutrient-buffer usefulness, population balance, and clearer state transitions.
 
 ## Constraints & Known Bad Ideas
 

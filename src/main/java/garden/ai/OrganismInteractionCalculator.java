@@ -390,8 +390,10 @@ public class OrganismInteractionCalculator {
             if (typeCount * 3 > total) return 1;
         }
 
-        if (childType == OrganismType.FUNGUS
-                || childType == OrganismType.ROOT_NETWORK) {
+        if (childType == OrganismType.FUNGUS) {
+            return (typeCount < 8000) ? 12 : FUNCTIONAL_TYPE_BIRTH_BUDGET;
+        }
+        if (childType == OrganismType.ROOT_NETWORK) {
             return FUNCTIONAL_TYPE_BIRTH_BUDGET;
         }
         return COMMON_TYPE_BIRTH_BUDGET;
