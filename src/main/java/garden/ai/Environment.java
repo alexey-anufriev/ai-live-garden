@@ -160,6 +160,6 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
     }
 
     private static int clamp(int value) {
-        return Math.clamp(value, 0, 100);
+        return Math.clamp(value, 0, 200);
     }
 }

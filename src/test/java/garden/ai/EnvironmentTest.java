@@ -43,11 +43,11 @@ class EnvironmentTest {
         // rootContribution = 50, fungalContribution = 50. Total filling = 100.
         // Divert 100 into nutrients, 0 into buffer.
         // ReleaseRate = 2 (forced by buffer >= 95). Released = 100 / 2 = 50.
-        // newNutrients = nutrients(50) + nutrientDelta(-18) + released(50) + syphoned(0) + diverted(100) = 182, clamped to 100.
+        // newNutrients = nutrients(50) + nutrientDelta(-18) + released(50) + syphoned(0) + diverted(100) = 182, not clamped.
         // newBuffer = nutrientBuffer(100) + divertedIntoBuffer(0) - released(50) - syphoned(0) = 50.
         Environment next = env.next(1, 100, 0, 50, 50, 0, 0, 0, 0, 0, 0, 0, 0);
         assertThat(next.nutrientBuffer()).isEqualTo(50);
-        assertThat(next.nutrients()).isEqualTo(100);
+        assertThat(next.nutrients()).isEqualTo(182);
     }
 
     @Test

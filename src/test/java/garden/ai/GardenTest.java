@@ -376,8 +376,8 @@ class GardenTest {
         Environment nextBalanced = envBalanced.next(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
         // nutrients=50 >= 10, so buffer release rate = 10.
         // With buffer >= 95, releaseRate = 2.
-        // nextNutrients = 50 + 2 (default delta) + 100/2 = 102 (clamped to 100).
-        assertThat(nextBalanced.nutrients()).isEqualTo(100);
+        // nextNutrients = 50 + 2 (default delta) + 100/2 = 102 (not clamped).
+        assertThat(nextBalanced.nutrients()).isEqualTo(102);
     }
 
     @Test
