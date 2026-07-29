@@ -20,7 +20,7 @@ public class FungalReproductionThresholdTest {
         int highBufferThreshold = OrganismInteractionCalculator.reproductionThreshold(fungus, highBufferEnv, 0, manyFungi);
 
         assertThat(highBufferThreshold).isEqualTo(lowBufferThreshold - 4);
-        assertThat(highBufferThreshold).isEqualTo(8 - 4);
+        assertThat(highBufferThreshold).isEqualTo(8 - 4 - 1);
     }
 
     @Test
@@ -36,14 +36,20 @@ public class FungalReproductionThresholdTest {
     }
 
     @Test
-    void fungalReproductionThresholdLoweredWithModeratePopulation() {
+    void fungalReproductionThresholdBoundaries() {
         Organism fungus = Organism.of("fungus-1", OrganismType.FUNGUS, 10, 1);
         Environment env = new Environment(50, 50, 50, 50, 10);
         
-        List<Organism> midPop = new ArrayList<>();
-        for (int i = 0; i < 5000; i++) midPop.add(Organism.of("fungus-" + i, OrganismType.FUNGUS, 10, 1));
+        List<Organism> pop4999 = new ArrayList<>();
+        for (int i = 0; i < 4999; i++) pop4999.add(Organism.of("fungus-" + i, OrganismType.FUNGUS, 10, 1));
         
-        int threshold = OrganismInteractionCalculator.reproductionThreshold(fungus, env, 0, midPop);
-        assertThat(threshold).isEqualTo(8 - 1);
+        int threshold4999 = OrganismInteractionCalculator.reproductionThreshold(fungus, env, 0, pop4999);
+        assertThat(threshold4999).isEqualTo(8 - 3);
+
+        List<Organism> pop5000 = new ArrayList<>();
+        for (int i = 0; i < 5000; i++) pop5000.add(Organism.of("fungus-" + i, OrganismType.FUNGUS, 10, 1));
+        
+        int threshold5000 = OrganismInteractionCalculator.reproductionThreshold(fungus, env, 0, pop5000);
+        assertThat(threshold5000).isEqualTo(8 - 1);
     }
 }

@@ -519,9 +519,9 @@ public class OrganismInteractionCalculator {
                 threshold -= 4;
             }
             long fungusCount = organisms.stream().filter(o -> o.type() == OrganismType.FUNGUS).count();
-            if (fungusCount < 4000) {
+            if (fungusCount < 5000) {
                 threshold -= 3;
-            } else if (fungusCount < 6000) {
+            } else if (fungusCount < 8000) {
                 threshold -= 1;
             }
         } else if (organism.type() == OrganismType.ROOT_NETWORK) {
