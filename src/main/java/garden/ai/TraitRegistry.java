@@ -214,8 +214,9 @@ public class TraitRegistry {
     boolean isDeepRooting = organism.traits().contains("deep-rooting") && environment.moisture() < 30;
     boolean isStressResilient = organism.traits().contains("stress-resilient");
     boolean isStressAvoidant = organism.traits().contains("stress-avoidance");
+    boolean isFungal = organism.type() == OrganismType.FUNGUS;
     boolean crowded = allOrganisms.stream().filter(o -> o.type().isPlant()).count() > 5000;
-    return (!environment.favorsPlants() || crowded) && !isResilient && !isDormant && !isDeepRooting && !isStressResilient && !isStressAvoidant;
+    return (!environment.favorsPlants() || (crowded && !isFungal)) && !isResilient && !isDormant && !isDeepRooting && !isStressResilient && !isStressAvoidant;
     }
 
     public static boolean isAnimalStarving(Organism organism, Environment environment, List<Organism> allOrganisms) {

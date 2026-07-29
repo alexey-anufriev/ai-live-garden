@@ -20,19 +20,19 @@ This verdict evaluates the safe code committed by the previous autonomous run. S
 
 ## Implemented Hypothesis
 
-Inherent growth logic for FUNGUS added in calculatePassiveChanges.
+Immunity to crowding stress for FUNGUS in TraitRegistry.
 
 ## Experiment Lineage
 
 <!-- AGENT-EXPERIMENT-LINEAGE-START -->
 ```json
-{"current":{"commit":"6f08f3b41c00a213e984dfa722ead7a6e7b00d6a","paths":["src/main/java/garden/ai/OrganismInteractionCalculator.java","src/test/java/garden/ai/FungalGrowthTest.java"],"mechanism":"Inherent growth logic for FUNGUS added in calculatePassiveChanges.","feedbackReference":"mechanism: Direct reduction of FUNGUS reproduction threshold during nutrient scarcity.","metric":"population.FUNGUS","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"previous":{"commit":"9744e927715c58dbfebbb118c02a787bb634f508","paths":["src/main/java/garden/ai/OrganismInteractionCalculator.java","src/test/java/garden/ai/FungalReproductionSensitivityTest.java"],"mechanism":"Direct reduction of FUNGUS reproduction threshold during nutrient scarcity.","feedbackReference":"mechanism: Increased nutrient availability and reduced reproduction threshold penalty for FUNGUS in nutrient-scarce environments.","metric":"population.FUNGUS","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"responseToPrevious":"revise","continuity":"matched","escalation":"diagnose-or-abandon"}
+{"current":{"commit":"49768e56783278d0c00cd8a8e9901876d0b6bde0","paths":["src/main/java/garden/ai/TraitRegistry.java","src/test/java/garden/ai/FungalCrowdingTest.java"],"mechanism":"Immunity to crowding stress for FUNGUS in TraitRegistry.","feedbackReference":"mechanism: Inherent growth logic for FUNGUS added in calculatePassiveChanges.","metric":"population.FUNGUS","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"previous":{"commit":"6f08f3b41c00a213e984dfa722ead7a6e7b00d6a","paths":["src/main/java/garden/ai/OrganismInteractionCalculator.java","src/test/java/garden/ai/FungalGrowthTest.java"],"mechanism":"Inherent growth logic for FUNGUS added in calculatePassiveChanges.","feedbackReference":"mechanism: Direct reduction of FUNGUS reproduction threshold during nutrient scarcity.","metric":"population.FUNGUS","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"responseToPrevious":"revise","continuity":"diverged","escalation":"none"}
 ```
 <!-- AGENT-EXPERIMENT-LINEAGE-END -->
 
-- Continuity: `matched`
+- Continuity: `diverged`
 
-- Escalation: `diagnose-or-abandon`
+- Escalation: `none`
 
 ## Harness Conclusion
 
