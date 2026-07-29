@@ -136,6 +136,12 @@ public class OrganismInteractionCalculator {
             if (organism.type() == OrganismType.MOSS && context.environment().moisture() > 60) {
                 growth += 1;
             }
+            if (organism.type() == OrganismType.FUNGUS && context.environment().nutrients() > 25) {
+                growth += 1;
+            }
+            if (organism.type() == OrganismType.FUNGUS && context.environment().nutrients() < 10) {
+                growth += 1;
+            }
             // Trait-based growth
             for (String trait : organism.traits()) {
                 TraitRegistry.PlantGrowthEffect effect = TraitRegistry.getPlantGrowthEffect(trait, context.cycle(), organism, context.environment(), context.allOrganisms(), context.contribution().fungalContribution());
