@@ -5,32 +5,32 @@ This verdict evaluates the safe code committed by the previous autonomous run. S
 - Classification: `inert`
 - Acceptance: `experiment`
 - PM direction: `none`
-- Metric: `population.FUNGUS`
+- Metric: `nutrientBuffer`
 - Goal: `increase`
 - Required delta: 1
 - Observed delta: 0
-- Baseline average: 5843
-- Candidate average: 5843
+- Baseline average: 200
+- Candidate average: 200
 - Measurement: `terminal-observable`
-- Baseline initial values by seed: 5843, 5843
-- Baseline final values by seed: 5843, 5843
-- Candidate final values by seed: 5843, 5843
+- Baseline initial values by seed: 0, 0
+- Baseline final values by seed: 200, 200
+- Candidate final values by seed: 200, 200
 - Safety passed: true
 - Target passed: false
 
 ## Implemented Hypothesis
 
-Immunity to crowding stress for FUNGUS in TraitRegistry.
+Base fungal nutrient contribution addition
 
 ## Experiment Lineage
 
 <!-- AGENT-EXPERIMENT-LINEAGE-START -->
 ```json
-{"current":{"commit":"49768e56783278d0c00cd8a8e9901876d0b6bde0","paths":["src/main/java/garden/ai/TraitRegistry.java","src/test/java/garden/ai/FungalCrowdingTest.java"],"mechanism":"Immunity to crowding stress for FUNGUS in TraitRegistry.","feedbackReference":"mechanism: Inherent growth logic for FUNGUS added in calculatePassiveChanges.","metric":"population.FUNGUS","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"previous":{"commit":"6f08f3b41c00a213e984dfa722ead7a6e7b00d6a","paths":["src/main/java/garden/ai/OrganismInteractionCalculator.java","src/test/java/garden/ai/FungalGrowthTest.java"],"mechanism":"Inherent growth logic for FUNGUS added in calculatePassiveChanges.","feedbackReference":"mechanism: Direct reduction of FUNGUS reproduction threshold during nutrient scarcity.","metric":"population.FUNGUS","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"responseToPrevious":"revise","continuity":"diverged","escalation":"none"}
+{"current":{"commit":"e62a018b5336666ba88900adbccc7551c6d9c908","paths":["src/main/java/garden/ai/TraitRegistry.java"],"mechanism":"Base fungal nutrient contribution addition","feedbackReference":"mechanism: Inherent growth logic for FUNGUS added in calculatePassiveChanges.","metric":"nutrientBuffer","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"previous":{"commit":"49768e56783278d0c00cd8a8e9901876d0b6bde0","paths":["src/main/java/garden/ai/TraitRegistry.java","src/test/java/garden/ai/FungalCrowdingTest.java"],"mechanism":"Immunity to crowding stress for FUNGUS in TraitRegistry.","feedbackReference":"mechanism: Inherent growth logic for FUNGUS added in calculatePassiveChanges.","metric":"population.FUNGUS","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"responseToPrevious":"revise","continuity":"matched","escalation":"none"}
 ```
 <!-- AGENT-EXPERIMENT-LINEAGE-END -->
 
-- Continuity: `diverged`
+- Continuity: `matched`
 
 - Escalation: `none`
 
