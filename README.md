@@ -55,14 +55,14 @@ This is still an experiment. Do not store valuable secrets or production code in
 
 ## Current Garden State
 <!-- AI-LIVE-GARDEN:STATE-START -->
-**Garden Health:** 🟢 Flourishing — all essential roles are viable without recent collapse, dominance, or resource exhaustion.
-At cycle 15078, the garden has this committed shape:
+**Garden Health:** 🟡 Stable — the garden remains viable but one or more roles or resources have limited resilience.
+At cycle 15083, the garden has this committed shape:
 
 ### Organisms
 
-- Total: 18554
+- Total: 18560
 - Breakdown:
-  - Beetle: 2917
+  - Beetle: 2923
   - Fern: 3
   - Fox: 206
   - Fungus: 5843
@@ -75,13 +75,13 @@ At cycle 15078, the garden has this committed shape:
 ### Garden Characteristics
 
 - Version: 2
-- Cycle: 15078
-- Next id: 217545
+- Cycle: 15083
+- Next id: 217576
 - Light: 100
 - Moisture: 100
-- Warmth: 100
-- Nutrients: 100
-- Nutrient buffer: 100
+- Warmth: 105
+- Nutrients: 200
+- Nutrient buffer: 0
 - Missing roles: none
 
 ![Garden trends](agent/garden-trends.svg)
