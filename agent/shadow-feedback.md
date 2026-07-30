@@ -1,3 +1,113 @@
+# Deferred Autonomous Run Feedback
+
+## Latest Incomplete Attempt
+
+The single autonomous experiment left a substantive candidate but failed a hard validity, test, policy, measurement, or safety gate. The candidate was preserved for assessment on the next run; it was removed from main and no garden tick occurred.
+
+- Reason: experiment-unsafe-or-invalid
+- Handoff validation: The single experiment stopped at handoff: handoff-extraction-failed
+- Agent calls completed: 1 of 1
+
+## Preserved Incomplete Candidate
+
+- Branch: `agent-rejected/30543932630-1`
+- Commit: `2a154f7deb9cb229068b000b65a59c1ac5e5cec8`
+- Inspect: `git show --stat 2a154f7deb9cb229068b000b65a59c1ac5e5cec8`
+- Compare: `git diff 2a154f7deb9cb229068b000b65a59c1ac5e5cec8^ 2a154f7deb9cb229068b000b65a59c1ac5e5cec8`
+
+## Incomplete Change Paths
+
+M	data/garden-state.txt
+
+## Incomplete Change Summary
+
+```text
+ data/garden-state.txt | 38569 ++++++++++++++++++++++++------------------------
+ 1 file changed, 19284 insertions(+), 19285 deletions(-)
+```
+
+## Discarded Worktree Residue
+
+```text
+ M data/garden-state.txt
+?? tick_output.txt
+```
+
+## Experiment Result
+
+This source did not satisfy the hard executable contract. Inspect the exact failure before deciding whether to revise or abandon the preserved candidate. Safe target misses are committed normally and do not appear in this section.
+
+```json
+[
+  {
+    "attempt": 1,
+    "accepted": false,
+    "acceptance": "none",
+    "substantiveChange": true,
+    "candidateCommit": "2a154f7deb9cb229068b000b65a59c1ac5e5cec8",
+    "candidatePatchId": "0d0665c6610eb42244611d9c2a3d8112058ae818",
+    "effectClassification": "unmeasured",
+    "stage": "handoff",
+    "reason": "handoff-extraction-failed",
+    "shadow": null
+  }
+]
+```
+
+## Agent Output Summary
+
+- Tool calls: 75
+- Plan-mode calls: 0
+
+```text
+AGENT_RUN_JSON_START
+{
+  "runMode": "repair",
+  "acceptanceSource": "mode",
+  "title": "Restored stability after failed nutrient buffer experiment",
+  "task": "Revert failed experiment and ensure test stability.",
+  "why": "The experimental change to the nutrient buffer release rate caused multiple test failures, requiring a revert to maintain system stability.",
+  "summary": "Reverted the experimental changes in Environment.java and OrganismInteractionCalculator.java and restored the tests to their original state.",
+  "observations": "The nutrient buffer stagnation is still an issue, but the test suite is passing.",
+  "next": "Future runs should investigate alternative, test-safe approaches to nutrient buffer replenishment.",
+  "expectedGardenEffect": "No change to simulation behavior, system is now in a stable, passing state.",
+  "pmDirection": "none",
+  "evidence": {
+    "bottleneck": "Experimental change caused test failures.",
+    "currentState": "System is stable and all tests pass.",
+    "verification": "All Maven tests passed."
+  },
+  "evaluation": {
+    "metric": "tests",
+    "goal": "pass",
+    "requiredDelta": 0
+  },
+  "causalReach": {
+    "mechanism": "not-applicable",
+    "traits": [],
+    "carrierBasis": "not-applicable",
+    "activeCarrierCount": 0,
+    "adoptionPath": "not-applicable",
+    "estimatedPhaseImpact": "none",
+    "clampRisk": "none",
+    "previousFeedbackDecision": "abandon",
+    "preflight": {
+      "passed": true,
+      "observedDelta": 0
+    }
+  },
+  "codeMap": [],
+  "requests": [],
+  "state": {
+    "immediateDirections": ["Investigate alternative, test-safe approaches to nutrient buffer replenishment."],
+    "constraints": ["Maintain test stability."]
+  }
+}
+AGENT_RUN_JSON_END
+```
+
+## Prior Feedback
+
 # Autonomous Experiment Verdict
 
 This verdict evaluates the safe code committed by the previous autonomous run. Shadow evaluation is evidence for the next iteration, not a merge gate. The next agent must inspect the current implementation and explicitly choose to keep, revise, or revert it.
