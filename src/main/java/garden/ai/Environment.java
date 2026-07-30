@@ -34,6 +34,9 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
         int consumption = Math.max(0, plantCount / 5 - plantConsumptionReduction - rootConsumptionReduction);
         if (nutrients >= 190) {
             consumption += 20;
+            if (nutrientBuffer >= 190) {
+                consumption += 20;
+            }
         }
         int nutrientDelta = 2 + animalCount / 2 - consumption;
         
