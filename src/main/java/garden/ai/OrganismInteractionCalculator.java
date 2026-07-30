@@ -60,6 +60,8 @@ public class OrganismInteractionCalculator {
         long siphonCount = TraitRegistry.count(context.organisms(), "buffer-siphon");
         
         int reductionFactor = context.environment().nutrients() < 10 ? 1 : 5;
+        long beetleCount = context.organisms().stream().filter(o -> o.type() == OrganismType.BEETLE).count();
+        if (beetleCount > 2000) reductionFactor += 5;
         int plantConsumptionReduction = (int) ((mossConserverCount + mossScavengerCount + fernConserverCount) / reductionFactor);
         Environment nextEnvironment = context.environment().next(context.nextCycle(), (int) plantCount, (int) animalCount, contribution.rootContribution(), contribution.fungalContribution(), plantConsumptionReduction, (int) demandRegulatorCount / 2, (int) (mobilizerCount + fungalNutrientMobilizerCount), (int) releaserCount, (int) acceleratorCount, (int) recyclerCount, (int) distributorCount, (int) siphonCount);
         

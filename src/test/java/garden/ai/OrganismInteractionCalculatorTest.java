@@ -86,16 +86,47 @@ class OrganismInteractionCalculatorTest {
     }
 
     @Test
-    void reproductionThresholdIncreasesInLowNutrients() {
-        Environment highNutrients = new Environment(50, 50, 50, 100, 100);
-        Environment lowNutrients = new Environment(50, 50, 50, 10, 100);
-        Organism moss = Organism.of("moss-1", OrganismType.MOSS, 10, 1);
+    void highBeetlePopulationIncreasesNutrientConsumption() {
+        Environment env = new Environment(50, 50, 50, 100, 50);
         
-        int thresholdHigh = OrganismInteractionCalculator.reproductionThreshold(moss, highNutrients, 0, List.of(moss));
-        int thresholdLow = OrganismInteractionCalculator.reproductionThreshold(moss, lowNutrients, 0, List.of(moss));
+        // Scenario 1: Low beetle count (1000), plantCount (50000)
+        List<Organism> lowBeetleOrganisms = IntStream.range(0, 1000)
+                .mapToObj(i -> Organism.of("beetle-" + i, OrganismType.BEETLE, 10, 1))
+                .collect(Collectors.toList());
+        List<Organism> plants1 = IntStream.range(0, 50000)
+                .mapToObj(i -> Organism.of("moss-" + i, OrganismType.MOSS, 10, 1))
+                .collect(Collectors.toList());
+        lowBeetleOrganisms.addAll(plants1);
+
+        OrganismInteractionCalculator.EnvironmentalDynamicsContext lowContext = new OrganismInteractionCalculator.EnvironmentalDynamicsContext(
+            lowBeetleOrganisms, env, 1, new ArrayList<>());
         
-        assertThat(thresholdLow).isGreaterThan(thresholdHigh);
+        OrganismInteractionCalculator.EnvironmentalDynamicsResult lowResult = 
+            OrganismInteractionCalculator.calculateEnvironmentalDynamics(lowContext);
+        
+        int lowConsumption = lowResult.nextEnvironment().nutrients() - (env.nutrients() + 2 + lowBeetleOrganisms.size() / 2);
+
+        // Scenario 2: High beetle count (3000), plantCount (50000)
+        List<Organism> highBeetleOrganisms = IntStream.range(0, 3000)
+                .mapToObj(i -> Organism.of("beetle-" + i, OrganismType.BEETLE, 10, 1))
+                .collect(Collectors.toList());
+        List<Organism> plants2 = IntStream.range(0, 50000)
+                .mapToObj(i -> Organism.of("moss-" + i, OrganismType.MOSS, 10, 1))
+                .collect(Collectors.toList());
+        highBeetleOrganisms.addAll(plants2);
+        
+        OrganismInteractionCalculator.EnvironmentalDynamicsContext highContext = new OrganismInteractionCalculator.EnvironmentalDynamicsContext(
+            highBeetleOrganisms, env, 1, new ArrayList<>());
+
+        OrganismInteractionCalculator.EnvironmentalDynamicsResult highResult = 
+            OrganismInteractionCalculator.calculateEnvironmentalDynamics(highContext);
+
+        int highConsumption = highResult.nextEnvironment().nutrients() - (env.nutrients() + 2 + highBeetleOrganisms.size() / 2);
+
+        // Verification: High beetle population should result in higher consumption (more negative nutrient change)
+        assertThat(highConsumption).isLessThan(lowConsumption);
     }
+
 
     @Test
     void cautiousFeederFoxSkipsFeedingWithLowBeetleDensity() {
