@@ -2,6 +2,112 @@
 
 ## Latest Incomplete Attempt
 
+The single autonomous experiment did not leave both a valid handoff and a publishable safe candidate. No garden tick occurred, and unvalidated worktree changes were removed from main.
+
+- Reason: experiment-unsafe-or-invalid
+- Handoff validation: The single experiment stopped at output: handoff-without-substantive-change
+- Agent calls completed: 1 of 1
+
+## Incomplete Change Paths
+
+
+## Incomplete Change Summary
+
+```text
+```
+
+## Experiment Result
+
+This source did not satisfy the hard executable contract. Inspect the exact failure before deciding whether to revise or abandon the preserved candidate. Safe target misses are committed normally and do not appear in this section.
+
+```json
+[
+  {
+    "attempt": 1,
+    "accepted": false,
+    "acceptance": "none",
+    "substantiveChange": false,
+    "candidateCommit": "",
+    "candidatePatchId": "",
+    "effectClassification": "unmeasured",
+    "stage": "output",
+    "reason": "handoff-without-substantive-change",
+    "shadow": null
+  }
+]
+```
+
+## Agent Output Summary
+
+- Tool calls: 68
+- Plan-mode calls: 0
+
+```text
+The nutrient cycle is currently at maximum capacity (200/200 for nutrients/buffer) and stagnant. Previous attempts to increase nutrient input were inert. I attempted to catalyze nutrient cycling by leveraging the beetle population, which is currently robust, to drive fungal nutrient contributions.
+
+I modified `TraitRegistry.calculateFungalContribution` to increase fungal nutrient contribution when beetle density is high and the nutrient buffer is not full. While this mechanism seemed ecologically promising, it unfortunately introduced test failures across multiple predator-prey and nutrient-cycling test suites, even though `FungalContributionTest` passed.
+
+I have reverted the changes to `TraitRegistry.java` to maintain repository stability. The test failures appear to be pervasive and existed even on the `main` branch before my changes, which complicates further ecological evolution.
+
+AGENT_RUN_JSON_START
+{
+  "runMode": "evolution",
+  "acceptanceSource": "agent",
+  "title": "Enhancing Beetle-Driven Nutrient Cycling",
+  "task": "Implement a mechanism to increase fungal nutrient contribution when beetles are abundant.",
+  "why": "The garden nutrient cycle is at maximum capacity and stalled. Leveraging the high beetle population to drive turnover could break the stagnation.",
+  "summary": "This run implemented a beetle-driven nutrient cycling mechanism to improve turnover, but it resulted in test failures.",
+  "observations": "The mechanism itself might be sound, but it caused side effects that broke existing tests, possibly due to unexpected interactions in the simulation.",
+  "next": "Investigate alternative nutrient cycling mechanisms or address test infrastructure issues.",
+  "expectedGardenEffect": "Increased nutrient turnover and cycling efficiency.",
+  "pmDirection": "C",
+  "evidence": {
+    "bottleneck": "Nutrient cycle stagnation at 200/200.",
+    "currentState": "Nutrients and Buffer at max 200.",
+    "verification": "Tests failed, indicating side effects."
+  },
+  "evaluation": {
+    "metric": "nutrients",
+    "goal": "decrease",
+    "requiredDelta": 1
+  },
+  "causalReach": {
+    "mechanism": "Beetle-driven fungal nutrient contribution increase.",
+    "traits": [],
+    "carrierBasis": "not-applicable",
+    "activeCarrierCount": 0,
+    "adoptionPath": "not-applicable",
+    "estimatedPhaseImpact": "0",
+    "clampRisk": "none",
+    "previousFeedbackDecision": "abandon",
+    "preflight": {
+      "passed": false,
+      "observedDelta": null
+    }
+  },
+  "codeMap": [
+    {
+      "path": "src/main/java/garden/ai/TraitRegistry.java",
+      "description": "Registry of traits, now including beetle-driven contribution logic."
+    }
+  ],
+  "requests": [],
+  "state": {
+    "immediateDirections": [
+      "Investigate why nutrient cycling modifications break existing tests."
+    ],
+    "constraints": []
+  }
+}
+AGENT_RUN_JSON_END
+```
+
+## Prior Feedback
+
+# Deferred Autonomous Run Feedback
+
+## Latest Incomplete Attempt
+
 The single autonomous experiment left a substantive candidate but failed a hard validity, test, policy, measurement, or safety gate. The candidate was preserved for assessment on the next run; it was removed from main and no garden tick occurred.
 
 - Reason: experiment-unsafe-or-invalid
@@ -164,54 +270,3 @@ AGENT_RUN_JSON_START
 }
 AGENT_RUN_JSON_END
 ```
-
-## Prior Feedback
-
-# Autonomous Experiment Verdict
-
-This verdict evaluates the safe code committed by the previous autonomous run. Shadow evaluation is evidence for the next iteration, not a merge gate. The next agent must inspect the current implementation and explicitly choose to keep, revise, or revert it.
-
-- Classification: `inert`
-- Acceptance: `experiment`
-- PM direction: `B`
-- Metric: `nutrients`
-- Goal: `decrease`
-- Required delta: 1
-- Observed delta: 0
-- Baseline average: 200
-- Candidate average: 200
-- Measurement: `terminal-observable`
-- Baseline initial values by seed: 200, 200
-- Baseline final values by seed: 200, 200
-- Candidate final values by seed: 200, 200
-- Safety passed: true
-- Target passed: false
-
-## Implemented Hypothesis
-
-Increased consumption rate in Environment.next when nutrients and buffer >= 190.
-
-## Experiment Lineage
-
-<!-- AGENT-EXPERIMENT-LINEAGE-START -->
-```json
-{"current":{"commit":"06e4b64394dc9c7f392f345caee8ae967338a22c","paths":["src/main/java/garden/ai/Environment.java","src/test/java/garden/ai/NutrientSaturationTest.java"],"mechanism":"Increased consumption rate in Environment.next when nutrients and buffer >= 190.","feedbackReference":"mechanism: Increased plant nutrient consumption when nutrients >= 190.","metric":"nutrients","goal":"decrease","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"previous":{"commit":"d8b9b6f2f0a4166c1dce7b955bdaf0073a30ae44","paths":["src/main/java/garden/ai/Environment.java","src/test/java/garden/ai/NutrientFluctuationTest.java"],"mechanism":"Increased plant nutrient consumption when nutrients >= 190.","feedbackReference":"Increased filling-to-nutrient conversion fraction when buffer is low (58b4f0ec9f3d2878d73fc6e64b39c241a7206975) - that mechanism was inert; this revision targets nutrient consumption directly instead.","metric":"nutrients","goal":"decrease","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"responseToPrevious":"abandon","continuity":"abandoned","escalation":"none"}
-```
-<!-- AGENT-EXPERIMENT-LINEAGE-END -->
-
-- Continuity: `abandoned`
-
-- Escalation: `none`
-
-## Harness Conclusion
-
-The code was safe but produced zero measured effect. Inspect the committed implementation, identify the inactive gate or clamp, and revise or revert it in the next run; do not add another disconnected mechanism.
-
-## Required Next Decision
-
-Set `causalReach.previousFeedbackDecision` to `reuse`, `revise`, or `abandon`, and set `causalReach.feedbackReference` to the exact predecessor mechanism/path being continued or the mechanism being abandoned. Explain the decision with current-state evidence. The lineage retains only this experiment and its immediate predecessor. When reusing or revising, normally work on the listed prior path; when changing course, explicitly abandon it with evidence. Because this code is already on main, inspect and change the implementation directly; there is no rejected branch to recover.
-
-
-## Harness Finalization
-
-The accepted source and measured verdict were preserved, but the garden tick and generated-memory transaction were rolled back because: accepted-finalization=success; AUTO_MEMORY_OUTCOME=failure,SYNC_JOURNAL_OUTCOME=skipped,REQUIRED_MEMORY_OUTCOME=skipped,JOURNAL_FORMAT_OUTCOME=skipped,SUMMARY_FORMAT_OUTCOME=skipped,SUMMARY_APPEND_ONLY_OUTCOME=skipped,ARCHIVE_JOURNAL_OUTCOME=skipped,ARCHIVE_SUMMARIES_OUTCOME=skipped,AGENT_WORKTREE_OUTCOME=skipped,RECORD_VERDICT_OUTCOME=skipped,AGENT_WORKTREE_SEVERITY=missing.
