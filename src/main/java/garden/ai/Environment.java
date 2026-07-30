@@ -47,7 +47,7 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
             releaseRate = Math.max(2, releaseRate / 5);
         }
         int filling = rootContribution + fungalContribution;
-        int intoNutrients = nutrientBuffer < 10 ? filling / 20 : (nutrientBuffer < 50 ? filling / 4 : filling / 20);
+        int intoNutrients = nutrientBuffer < 10 ? filling / 4 : (nutrientBuffer < 50 ? filling / 4 : filling / 20);
         int intoBuffer = filling - intoNutrients;
         if (nutrientBuffer >= 50) {
             double ratio = Math.min(1.0, (double)(nutrientBuffer - 50) / 50.0);
