@@ -31,7 +31,11 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
         int lightDelta = cycle % 2 == 0 ? 3 : -2;
         int moistureDelta = cycle % 3 == 0 ? 4 : -1;
         int warmthDelta = cycle % 5 == 0 ? -3 : 2;
-        int nutrientDelta = 2 + animalCount / 2 - Math.max(0, plantCount / 5 - plantConsumptionReduction - rootConsumptionReduction);
+        int consumption = Math.max(0, plantCount / 5 - plantConsumptionReduction - rootConsumptionReduction);
+        if (nutrients >= 190) {
+            consumption += 20;
+        }
+        int nutrientDelta = 2 + animalCount / 2 - consumption;
         
         int releaseRate = nutrients < 5 ? 2 : (nutrients < 10 ? 5 : (nutrients < 50 ? 8 : 10));
         // Force buffer release when nutrients are low

@@ -4,9 +4,9 @@ This verdict evaluates the safe code committed by the previous autonomous run. S
 
 - Classification: `inert`
 - Acceptance: `experiment`
-- PM direction: `none`
+- PM direction: `B`
 - Metric: `nutrients`
-- Goal: `increase`
+- Goal: `decrease`
 - Required delta: 1
 - Observed delta: 0
 - Baseline average: 200
@@ -20,17 +20,17 @@ This verdict evaluates the safe code committed by the previous autonomous run. S
 
 ## Implemented Hypothesis
 
-Increase filling-to-nutrient conversion fraction when buffer is low.
+Increased plant nutrient consumption when nutrients >= 190.
 
 ## Experiment Lineage
 
 <!-- AGENT-EXPERIMENT-LINEAGE-START -->
 ```json
-{"current":{"commit":"58b4f0ec9f3d2878d73fc6e64b39c241a7206975","paths":["src/main/java/garden/ai/Environment.java","src/test/java/garden/ai/EnvironmentTest.java","src/test/java/garden/ai/NutrientBufferTest.java"],"mechanism":"Increase filling-to-nutrient conversion fraction when buffer is low.","feedbackReference":"continuity unavailable: inspect agent/shadow-feedback.md","metric":"nutrients","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"previous":null,"responseToPrevious":"revise","continuity":"unavailable","escalation":"none"}
+{"current":{"commit":"d8b9b6f2f0a4166c1dce7b955bdaf0073a30ae44","paths":["src/main/java/garden/ai/Environment.java","src/test/java/garden/ai/NutrientFluctuationTest.java"],"mechanism":"Increased plant nutrient consumption when nutrients >= 190.","feedbackReference":"Increased filling-to-nutrient conversion fraction when buffer is low (58b4f0ec9f3d2878d73fc6e64b39c241a7206975) - that mechanism was inert; this revision targets nutrient consumption directly instead.","metric":"nutrients","goal":"decrease","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"previous":{"commit":"58b4f0ec9f3d2878d73fc6e64b39c241a7206975","paths":["src/main/java/garden/ai/Environment.java","src/test/java/garden/ai/EnvironmentTest.java","src/test/java/garden/ai/NutrientBufferTest.java"],"mechanism":"Increase filling-to-nutrient conversion fraction when buffer is low.","feedbackReference":"continuity unavailable: inspect agent/shadow-feedback.md","metric":"nutrients","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"responseToPrevious":"revise","continuity":"matched","escalation":"none"}
 ```
 <!-- AGENT-EXPERIMENT-LINEAGE-END -->
 
-- Continuity: `unavailable`
+- Continuity: `matched`
 
 - Escalation: `none`
 
