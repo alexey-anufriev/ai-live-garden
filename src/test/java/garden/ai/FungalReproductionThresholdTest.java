@@ -11,7 +11,7 @@ public class FungalReproductionThresholdTest {
     void fungalReproductionThresholdLoweredWithHighBuffer() {
         Organism fungus = Organism.of("fungus-1", OrganismType.FUNGUS, 10, 1);
         List<Organism> manyFungi = new ArrayList<>();
-        for (int i = 0; i < 6000; i++) manyFungi.add(Organism.of("fungus-" + i, OrganismType.FUNGUS, 10, 1));
+        for (int i = 0; i < 8000; i++) manyFungi.add(Organism.of("fungus-" + i, OrganismType.FUNGUS, 10, 1));
         
         Environment lowBufferEnv = new Environment(50, 50, 50, 50, 10);
         Environment highBufferEnv = new Environment(50, 50, 50, 50, 100);
@@ -40,16 +40,16 @@ public class FungalReproductionThresholdTest {
         Organism fungus = Organism.of("fungus-1", OrganismType.FUNGUS, 10, 1);
         Environment env = new Environment(50, 50, 50, 50, 10);
         
-        List<Organism> pop4999 = new ArrayList<>();
-        for (int i = 0; i < 4999; i++) pop4999.add(Organism.of("fungus-" + i, OrganismType.FUNGUS, 10, 1));
+        List<Organism> pop6999 = new ArrayList<>();
+        for (int i = 0; i < 6999; i++) pop6999.add(Organism.of("fungus-" + i, OrganismType.FUNGUS, 10, 1));
         
-        int threshold4999 = OrganismInteractionCalculator.reproductionThreshold(fungus, env, 0, pop4999);
-        assertThat(threshold4999).isEqualTo(8 - 3);
+        int threshold6999 = OrganismInteractionCalculator.reproductionThreshold(fungus, env, 0, pop6999);
+        assertThat(threshold6999).isEqualTo(8 - 3);
 
-        List<Organism> pop5000 = new ArrayList<>();
-        for (int i = 0; i < 5000; i++) pop5000.add(Organism.of("fungus-" + i, OrganismType.FUNGUS, 10, 1));
+        List<Organism> pop7000 = new ArrayList<>();
+        for (int i = 0; i < 7000; i++) pop7000.add(Organism.of("fungus-" + i, OrganismType.FUNGUS, 10, 1));
         
-        int threshold5000 = OrganismInteractionCalculator.reproductionThreshold(fungus, env, 0, pop5000);
-        assertThat(threshold5000).isEqualTo(8 - 1);
+        int threshold7000 = OrganismInteractionCalculator.reproductionThreshold(fungus, env, 0, pop7000);
+        assertThat(threshold7000).isEqualTo(8 - 1);
     }
 }

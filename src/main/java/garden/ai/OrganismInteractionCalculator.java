@@ -419,7 +419,7 @@ public class OrganismInteractionCalculator {
             OrganismType childType = TraitRegistry.offspringType(organism, context.cycle(), organism.generation(), context.environment());
             
             // Fungal role rescue mechanism
-            if (fungusCount < 2000 && organism.type() == OrganismType.ROOT_NETWORK) {
+            if (fungusCount < 3000 && organism.type() == OrganismType.ROOT_NETWORK) {
                 childType = OrganismType.FUNGUS;
             }
 
@@ -527,9 +527,9 @@ public class OrganismInteractionCalculator {
                 threshold -= 4;
             }
             long fungusCount = organisms.stream().filter(o -> o.type() == OrganismType.FUNGUS).count();
-            if (fungusCount < 5000) {
+            if (fungusCount < 7000) {
                 threshold -= 3;
-            } else if (fungusCount < 8000) {
+            } else if (fungusCount < 10000) {
                 threshold -= 1;
             }
         } else if (organism.type() == OrganismType.ROOT_NETWORK) {

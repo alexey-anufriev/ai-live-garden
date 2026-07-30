@@ -15,10 +15,10 @@ public class FungalDecompositionReproductionTest {
         
         // Reproduction threshold is normally 8 for FUNGUS
         // With "fungal-decomposition-efficiency", it should be 8 - 8 = 0.
-        // Population count is 6000. New logic: 6000 < 8000 is true, so threshold -= 1.
-        // 0 - 1 = -1.
+        // Population count is 6000. New logic: 6000 < 7000 is true, so threshold -= 3.
+        // 0 - 3 = -3.
         int threshold = OrganismInteractionCalculator.reproductionThreshold(fungus, env, fungalContribution, manyFungi);
-        assertEquals(-1, threshold);
+        assertEquals(-3, threshold);
     }
 
     @Test
@@ -32,9 +32,9 @@ public class FungalDecompositionReproductionTest {
         int fungalContribution = 10;
         // Reproduction threshold normally 8 for FUNGUS
         // Base 8 - 4 (buffer > 50) - 2 (nutrients > 60) - 12 (modifier) - 5 (global modifier) = -15.
-        // Plus population adjustment: -1.
-        // -15 - 1 = -16.
+        // Plus population adjustment: -3.
+        // -15 - 3 = -18.
         int threshold = OrganismInteractionCalculator.reproductionThreshold(fungus, env, fungalContribution, manyFungi);
-        assertEquals(-16, threshold);
+        assertEquals(-18, threshold);
     }
 }
