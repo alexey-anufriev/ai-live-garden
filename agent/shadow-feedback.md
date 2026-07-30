@@ -2,6 +2,78 @@
 
 ## Latest Incomplete Attempt
 
+The single autonomous experiment left a substantive candidate but failed a hard validity, test, policy, measurement, or safety gate. The candidate was preserved for assessment on the next run; it was removed from main and no garden tick occurred.
+
+- Reason: experiment-unsafe-or-invalid
+- Handoff validation: The single experiment stopped at handoff: handoff-extraction-failed
+- Agent calls completed: 1 of 1
+
+## Preserved Incomplete Candidate
+
+- Branch: `agent-rejected/30535939809-1`
+- Commit: `4cb0956d99f0b4e32119dbeda28b26629514db28`
+- Inspect: `git show --stat 4cb0956d99f0b4e32119dbeda28b26629514db28`
+- Compare: `git diff 4cb0956d99f0b4e32119dbeda28b26629514db28^ 4cb0956d99f0b4e32119dbeda28b26629514db28`
+
+## Incomplete Change Paths
+
+M	data/garden-state.txt
+M	src/main/java/garden/ai/OrganismInteractionCalculator.java
+M	src/test/java/garden/ai/OrganismInteractionCalculatorTest.java
+
+## Incomplete Change Summary
+
+```text
+ data/garden-state.txt                              | 38593 ++++++++++---------
+ .../garden/ai/OrganismInteractionCalculator.java   |     2 +-
+ .../ai/OrganismInteractionCalculatorTest.java      |    13 +
+ 3 files changed, 19311 insertions(+), 19297 deletions(-)
+```
+
+## Discarded Worktree Residue
+
+```text
+ M data/garden-state.txt
+ M src/main/java/garden/ai/OrganismInteractionCalculator.java
+ M src/test/java/garden/ai/OrganismInteractionCalculatorTest.java
+```
+
+## Experiment Result
+
+This source did not satisfy the hard executable contract. Inspect the exact failure before deciding whether to revise or abandon the preserved candidate. Safe target misses are committed normally and do not appear in this section.
+
+```json
+[
+  {
+    "attempt": 1,
+    "accepted": false,
+    "acceptance": "none",
+    "substantiveChange": true,
+    "candidateCommit": "4cb0956d99f0b4e32119dbeda28b26629514db28",
+    "candidatePatchId": "181716f10954fb3f0db0808d48f58cb46e07a7f9",
+    "effectClassification": "unmeasured",
+    "stage": "handoff",
+    "reason": "handoff-extraction-failed",
+    "shadow": null
+  }
+]
+```
+
+## Agent Output Summary
+
+- Tool calls: 25
+- Plan-mode calls: 0
+
+```text
+The population birth budget was identified as a bottleneck in the stable, flourishing garden, as it was strictly capped by `MAX_TOTAL_BIRTH_BUDGET = 24`, regardless of available resources. I increased this limit to 60 in `src/main/java/garden/ai/OrganismInteractionCalculator.java` and verified the change by adding a new test case in `src/test/java/garden/ai/OrganismInteractionCalculatorTest.java` that confirms the birth budget scales with nutrient and buffer availability. All tests passed, and the system is ready to accommodate higher population growth in future cycles.
+```
+
+## Prior Feedback
+
+# Deferred Autonomous Run Feedback
+
+## Latest Incomplete Attempt
+
 The single autonomous experiment did not leave both a valid handoff and a publishable safe candidate. No garden tick occurred, and unvalidated worktree changes were removed from main.
 
 - Reason: experiment-unsafe-or-invalid
@@ -88,54 +160,3 @@ AGENT_RUN_JSON_START
 }
 AGENT_RUN_JSON_END
 ```
-
-## Prior Feedback
-
-# Autonomous Experiment Verdict
-
-This verdict evaluates the safe code committed by the previous autonomous run. Shadow evaluation is evidence for the next iteration, not a merge gate. The next agent must inspect the current implementation and explicitly choose to keep, revise, or revert it.
-
-- Classification: `inert`
-- Acceptance: `experiment`
-- PM direction: `none`
-- Metric: `nutrientBuffer`
-- Goal: `increase`
-- Required delta: 1
-- Observed delta: 0
-- Baseline average: 200
-- Candidate average: 200
-- Measurement: `terminal-observable`
-- Baseline initial values by seed: 0, 0
-- Baseline final values by seed: 200, 200
-- Candidate final values by seed: 200, 200
-- Safety passed: true
-- Target passed: false
-
-## Implemented Hypothesis
-
-Enhanced nutrient buffer inflow diversion rate
-
-## Experiment Lineage
-
-<!-- AGENT-EXPERIMENT-LINEAGE-START -->
-```json
-{"current":{"commit":"d5529c7bd88d5cb170db7097ca26a5cde3951673","paths":["src/main/java/garden/ai/Environment.java","src/test/java/garden/ai/EnvironmentTest.java"],"mechanism":"Enhanced nutrient buffer inflow diversion rate","feedbackReference":"mechanism: Base fungal nutrient contribution addition","metric":"nutrientBuffer","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"previous":{"commit":"1e788952c46e0faa12ea7dc9d18029c3c2e84bb7","paths":["src/main/java/garden/ai/TraitRegistry.java"],"mechanism":"Added base fungal nutrient contribution when nutrientBuffer == 0 in TraitRegistry.calculateFungal.","feedbackReference":"mechanism: Base fungal nutrient contribution addition","metric":"nutrientBuffer","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"responseToPrevious":"revise","continuity":"diverged","escalation":"none"}
-```
-<!-- AGENT-EXPERIMENT-LINEAGE-END -->
-
-- Continuity: `diverged`
-
-- Escalation: `none`
-
-## Harness Conclusion
-
-The code was safe but produced zero measured effect. Inspect the committed implementation, identify the inactive gate or clamp, and revise or revert it in the next run; do not add another disconnected mechanism.
-
-## Required Next Decision
-
-Set `causalReach.previousFeedbackDecision` to `reuse`, `revise`, or `abandon`, and set `causalReach.feedbackReference` to the exact predecessor mechanism/path being continued or the mechanism being abandoned. Explain the decision with current-state evidence. The lineage retains only this experiment and its immediate predecessor. When reusing or revising, normally work on the listed prior path; when changing course, explicitly abandon it with evidence. Because this code is already on main, inspect and change the implementation directly; there is no rejected branch to recover.
-
-
-## Harness Finalization
-
-The accepted source and measured verdict were preserved, but the garden tick and generated-memory transaction were rolled back because: accepted-finalization=success; AUTO_MEMORY_OUTCOME=failure,SYNC_JOURNAL_OUTCOME=skipped,REQUIRED_MEMORY_OUTCOME=skipped,JOURNAL_FORMAT_OUTCOME=skipped,SUMMARY_FORMAT_OUTCOME=skipped,SUMMARY_APPEND_ONLY_OUTCOME=skipped,ARCHIVE_JOURNAL_OUTCOME=skipped,ARCHIVE_SUMMARIES_OUTCOME=skipped,AGENT_WORKTREE_OUTCOME=skipped,RECORD_VERDICT_OUTCOME=skipped,AGENT_WORKTREE_SEVERITY=missing.
