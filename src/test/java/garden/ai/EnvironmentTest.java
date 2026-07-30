@@ -38,6 +38,18 @@ class EnvironmentTest {
     }
 
     @Test
+    void bufferAccumulatesFasterWhenEmpty() {
+        Environment env = new Environment(50, 50, 50, 0, 0); // buffer=0
+        // root=50, fungal=50, filling=100.
+        // New: intoNutrients = 100/20 = 5. intoBuffer = 100-5 = 95.
+        // newNutrients = nutrients(0) + delta(2) + released(0) + syphoned(0) + intoNutrients(5) = 7.
+        // newBuffer = buffer(0) + intoBuffer(95) - released(0) - syphoned(0) = 95.
+        Environment next = env.next(1, 0, 0, 50, 50, 0, 0, 0, 0, 0, 0, 0, 0);
+        assertThat(next.nutrientBuffer()).isEqualTo(95);
+        assertThat(next.nutrients()).isEqualTo(7);
+    }
+
+    @Test
     void nutrientInflowDivertedToNutrientsWhenBufferHigh() {
         Environment env = new Environment(50, 50, 50, 50, 100);
         // rootContribution = 50, fungalContribution = 50. Total filling = 100.

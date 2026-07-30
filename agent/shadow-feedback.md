@@ -20,19 +20,19 @@ This verdict evaluates the safe code committed by the previous autonomous run. S
 
 ## Implemented Hypothesis
 
-Added base fungal nutrient contribution when nutrientBuffer == 0 in TraitRegistry.calculateFungal.
+Enhanced nutrient buffer inflow diversion rate
 
 ## Experiment Lineage
 
 <!-- AGENT-EXPERIMENT-LINEAGE-START -->
 ```json
-{"current":{"commit":"1e788952c46e0faa12ea7dc9d18029c3c2e84bb7","paths":["src/main/java/garden/ai/TraitRegistry.java"],"mechanism":"Added base fungal nutrient contribution when nutrientBuffer == 0 in TraitRegistry.calculateFungal.","feedbackReference":"mechanism: Base fungal nutrient contribution addition","metric":"nutrientBuffer","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"previous":{"commit":"e62a018b5336666ba88900adbccc7551c6d9c908","paths":["src/main/java/garden/ai/TraitRegistry.java"],"mechanism":"Base fungal nutrient contribution addition","feedbackReference":"mechanism: Inherent growth logic for FUNGUS added in calculatePassiveChanges.","metric":"nutrientBuffer","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"responseToPrevious":"revise","continuity":"matched","escalation":"diagnose-or-abandon"}
+{"current":{"commit":"d5529c7bd88d5cb170db7097ca26a5cde3951673","paths":["src/main/java/garden/ai/Environment.java","src/test/java/garden/ai/EnvironmentTest.java"],"mechanism":"Enhanced nutrient buffer inflow diversion rate","feedbackReference":"mechanism: Base fungal nutrient contribution addition","metric":"nutrientBuffer","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"previous":{"commit":"1e788952c46e0faa12ea7dc9d18029c3c2e84bb7","paths":["src/main/java/garden/ai/TraitRegistry.java"],"mechanism":"Added base fungal nutrient contribution when nutrientBuffer == 0 in TraitRegistry.calculateFungal.","feedbackReference":"mechanism: Base fungal nutrient contribution addition","metric":"nutrientBuffer","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"responseToPrevious":"revise","continuity":"diverged","escalation":"none"}
 ```
 <!-- AGENT-EXPERIMENT-LINEAGE-END -->
 
-- Continuity: `matched`
+- Continuity: `diverged`
 
-- Escalation: `diagnose-or-abandon`
+- Escalation: `none`
 
 ## Harness Conclusion
 
@@ -42,3 +42,7 @@ The code was safe but produced zero measured effect. Inspect the committed imple
 
 Set `causalReach.previousFeedbackDecision` to `reuse`, `revise`, or `abandon`, and set `causalReach.feedbackReference` to the exact predecessor mechanism/path being continued or the mechanism being abandoned. Explain the decision with current-state evidence. The lineage retains only this experiment and its immediate predecessor. When reusing or revising, normally work on the listed prior path; when changing course, explicitly abandon it with evidence. Because this code is already on main, inspect and change the implementation directly; there is no rejected branch to recover.
 
+
+## Harness Finalization
+
+The accepted source and measured verdict were preserved, but the garden tick and generated-memory transaction were rolled back because: accepted-finalization=success; AUTO_MEMORY_OUTCOME=failure,SYNC_JOURNAL_OUTCOME=skipped,REQUIRED_MEMORY_OUTCOME=skipped,JOURNAL_FORMAT_OUTCOME=skipped,SUMMARY_FORMAT_OUTCOME=skipped,SUMMARY_APPEND_ONLY_OUTCOME=skipped,ARCHIVE_JOURNAL_OUTCOME=skipped,ARCHIVE_SUMMARIES_OUTCOME=skipped,AGENT_WORKTREE_OUTCOME=skipped,RECORD_VERDICT_OUTCOME=skipped,AGENT_WORKTREE_SEVERITY=missing.
