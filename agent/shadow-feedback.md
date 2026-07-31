@@ -2,41 +2,56 @@
 
 This verdict evaluates the safe code committed by the previous autonomous run. Shadow evaluation is evidence for the next iteration, not a merge gate. The next agent must inspect the current implementation and explicitly choose to keep, revise, or revert it.
 
-- Classification: `inert`
+- Classification: `measurement-saturated`
 - Acceptance: `experiment`
-- PM direction: `none`
+- PM direction: `B`
 - Metric: `nutrientBuffer`
-- Goal: `increase`
+- Goal: `decrease`
 - Required delta: 1
 - Observed delta: 0
-- Baseline average: 200
-- Candidate average: 200
-- Measurement: `terminal-observable`
-- Baseline initial values by seed: 0, 0
-- Baseline final values by seed: 200, 200
-- Candidate final values by seed: 200, 200
+- Baseline average: 0
+- Candidate average: 0
+- Measurement: `terminal-saturated`
+- Baseline initial values by seed: 200, 200
+- Baseline final values by seed: 0, 0
+- Candidate final values by seed: 0, 0
 - Safety passed: true
 - Target passed: false
 
 ## Implemented Hypothesis
 
-Direct buffer filling in Environment.next.
+Increased nutrient release rate via buffer-release-optimizer trait efficiency.
+
+## Bounded Trajectory Evidence
+
+- Average trajectory delta: 0
+- Directional seed support: 0 / 2
+- Persistent directional support: 0 / 2
+- Seed 17: baseline 0 → 200 → 0 → 200 → 0; candidate 0 → 200 → 0 → 200 → 0
+- Seed 43: baseline 0 → 200 → 0 → 200 → 0; candidate 0 → 200 → 0 → 200 → 0
+
+## Extended Horizon Diagnostic
+
+- Steps: 10
+- Observed delta: 0
+- Directional seed support: 0 / 2
+- Safety passed: true
 
 ## Experiment Lineage
 
 <!-- AGENT-EXPERIMENT-LINEAGE-START -->
 ```json
-{"current":{"commit":"2c70e6288a691bbee48b129e4777a3ce5c777c05","paths":["data/garden-state.txt","src/main/java/garden/ai/Environment.java","src/test/java/garden/ai/EnvironmentTest.java"],"mechanism":"Direct buffer filling in Environment.next.","feedbackReference":"mechanism: Increased nutrient consumption factor when beetleCount > 2000.","metric":"nutrientBuffer","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"previous":{"commit":"e6ea4cf44d0ee76e6f49e6b1cebe61bf45c44d8f","paths":["src/main/java/garden/ai/OrganismInteractionCalculator.java","src/test/java/garden/ai/OrganismInteractionCalculatorTest.java"],"mechanism":"Increased nutrient consumption factor when beetleCount > 2000.","feedbackReference":"continuity unavailable: inspect agent/shadow-feedback.md","metric":"nutrients","goal":"decrease","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"responseToPrevious":"revise","continuity":"diverged","escalation":"none"}
+{"current":{"commit":"585907520d2f2634ca4596dee578fcb5aff5d756","paths":["src/main/java/garden/ai/Environment.java","src/main/java/garden/ai/OrganismInteractionCalculator.java"],"mechanism":"Increased nutrient release rate via buffer-release-optimizer trait efficiency.","feedbackReference":"mechanism: Direct buffer filling in Environment.next.","metric":"nutrientBuffer","goal":"decrease","requiredDelta":1,"classification":"measurement-saturated","observedDelta":0,"observation":"terminal-saturated"},"previous":{"commit":"2c70e6288a691bbee48b129e4777a3ce5c777c05","paths":["data/garden-state.txt","src/main/java/garden/ai/Environment.java","src/test/java/garden/ai/EnvironmentTest.java"],"mechanism":"Direct buffer filling in Environment.next.","feedbackReference":"mechanism: Increased nutrient consumption factor when beetleCount > 2000.","metric":"nutrientBuffer","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"responseToPrevious":"revise","continuity":"matched","escalation":"none"}
 ```
 <!-- AGENT-EXPERIMENT-LINEAGE-END -->
 
-- Continuity: `diverged`
+- Continuity: `matched`
 
 - Escalation: `none`
 
 ## Harness Conclusion
 
-The code was safe but produced zero measured effect. Inspect the committed implementation, identify the inactive gate or clamp, and revise or revert it in the next run; do not add another disconnected mechanism.
+The code was safe, but every baseline and candidate final value landed on the same 0/100 boundary. The final metric cannot distinguish this mechanism from the baseline; inspect the current flow and revise or abandon the existing mechanism rather than treating this as proof that it was inactive.
 
 ## Required Next Decision
 

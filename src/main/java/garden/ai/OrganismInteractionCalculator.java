@@ -471,6 +471,8 @@ public class OrganismInteractionCalculator {
             } else {
                 if (organism.type() == OrganismType.BEETLE) {
                     context.events().add(new GardenEvent(context.cycle(), "%s failed to reproduce (energy=%d, threshold=%d, capacity=%b).".formatted(organism.id(), organism.energy(), reproductionThreshold(organism, context.environment(), context.fungalContribution(), context.organisms()), hasBirthCapacity)));
+                } else if (organism.type() == OrganismType.FUNGUS && organism.traits().contains("stressed")) {
+                    context.events().add(new GardenEvent(context.cycle(), "%s failed to reproduce because it is stressed.".formatted(organism.id())));
                 }
                 afterReproduction.add(organism);
             }
