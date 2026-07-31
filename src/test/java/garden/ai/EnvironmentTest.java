@@ -41,12 +41,12 @@ class EnvironmentTest {
     void bufferAccumulatesFasterWhenEmpty() {
         Environment env = new Environment(50, 50, 50, 0, 0); // buffer=0
         // root=50, fungal=50, filling=100.
-        // New: intoNutrients = 100/4 = 25. intoBuffer = 100-25 = 75.
-        // newNutrients = nutrients(0) + delta(2) + released(0) + syphoned(0) + intoNutrients(25) = 27.
-        // newBuffer = buffer(0) + intoBuffer(75) - released(0) - syphoned(0) = 75.
+        // New: intoNutrients = 0. intoBuffer = 100.
+        // newNutrients = nutrients(0) + delta(2) + released(0) + syphoned(0) + intoNutrients(0) = 2.
+        // newBuffer = buffer(0) + intoBuffer(100) - released(0) - syphoned(0) = 100.
         Environment next = env.next(1, 0, 0, 50, 50, 0, 0, 0, 0, 0, 0, 0, 0);
-        assertThat(next.nutrientBuffer()).isEqualTo(75);
-        assertThat(next.nutrients()).isEqualTo(27);
+        assertThat(next.nutrientBuffer()).isEqualTo(100);
+        assertThat(next.nutrients()).isEqualTo(2);
     }
 
     @Test

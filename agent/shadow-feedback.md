@@ -4,15 +4,15 @@ This verdict evaluates the safe code committed by the previous autonomous run. S
 
 - Classification: `inert`
 - Acceptance: `experiment`
-- PM direction: `C`
-- Metric: `nutrients`
-- Goal: `decrease`
+- PM direction: `none`
+- Metric: `nutrientBuffer`
+- Goal: `increase`
 - Required delta: 1
 - Observed delta: 0
 - Baseline average: 200
 - Candidate average: 200
 - Measurement: `terminal-observable`
-- Baseline initial values by seed: 200, 200
+- Baseline initial values by seed: 0, 0
 - Baseline final values by seed: 200, 200
 - Candidate final values by seed: 200, 200
 - Safety passed: true
@@ -20,17 +20,17 @@ This verdict evaluates the safe code committed by the previous autonomous run. S
 
 ## Implemented Hypothesis
 
-Increased nutrient consumption factor when beetleCount > 2000.
+Direct buffer filling in Environment.next.
 
 ## Experiment Lineage
 
 <!-- AGENT-EXPERIMENT-LINEAGE-START -->
 ```json
-{"current":{"commit":"e6ea4cf44d0ee76e6f49e6b1cebe61bf45c44d8f","paths":["src/main/java/garden/ai/OrganismInteractionCalculator.java","src/test/java/garden/ai/OrganismInteractionCalculatorTest.java"],"mechanism":"Increased nutrient consumption factor when beetleCount > 2000.","feedbackReference":"continuity unavailable: inspect agent/shadow-feedback.md","metric":"nutrients","goal":"decrease","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"previous":null,"responseToPrevious":"revise","continuity":"unavailable","escalation":"none"}
+{"current":{"commit":"2c70e6288a691bbee48b129e4777a3ce5c777c05","paths":["data/garden-state.txt","src/main/java/garden/ai/Environment.java","src/test/java/garden/ai/EnvironmentTest.java"],"mechanism":"Direct buffer filling in Environment.next.","feedbackReference":"mechanism: Increased nutrient consumption factor when beetleCount > 2000.","metric":"nutrientBuffer","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"previous":{"commit":"e6ea4cf44d0ee76e6f49e6b1cebe61bf45c44d8f","paths":["src/main/java/garden/ai/OrganismInteractionCalculator.java","src/test/java/garden/ai/OrganismInteractionCalculatorTest.java"],"mechanism":"Increased nutrient consumption factor when beetleCount > 2000.","feedbackReference":"continuity unavailable: inspect agent/shadow-feedback.md","metric":"nutrients","goal":"decrease","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"responseToPrevious":"revise","continuity":"diverged","escalation":"none"}
 ```
 <!-- AGENT-EXPERIMENT-LINEAGE-END -->
 
-- Continuity: `unavailable`
+- Continuity: `diverged`
 
 - Escalation: `none`
 
