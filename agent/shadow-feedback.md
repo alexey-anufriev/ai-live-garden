@@ -5,32 +5,32 @@ This verdict evaluates the safe code committed by the previous autonomous run. S
 - Classification: `inert`
 - Acceptance: `experiment`
 - PM direction: `none`
-- Metric: `nutrientBuffer`
+- Metric: `population.FUNGUS`
 - Goal: `increase`
 - Required delta: 1
 - Observed delta: 0
-- Baseline average: 200
-- Candidate average: 200
+- Baseline average: 5746
+- Candidate average: 5746
 - Measurement: `terminal-observable`
-- Baseline initial values by seed: 0, 0
-- Baseline final values by seed: 200, 200
-- Candidate final values by seed: 200, 200
+- Baseline initial values by seed: 5746, 5746
+- Baseline final values by seed: 5746, 5746
+- Candidate final values by seed: 5746, 5746
 - Safety passed: true
 - Target passed: false
 
 ## Implemented Hypothesis
 
-Increased base fungal contribution multiplier.
+Reproduction threshold management
 
 ## Experiment Lineage
 
 <!-- AGENT-EXPERIMENT-LINEAGE-START -->
 ```json
-{"current":{"commit":"a3fd7dc711e6f880bfff5c9a8284f62c9b69fbab","paths":["src/main/java/garden/ai/TraitRegistry.java","src/test/java/garden/ai/FungalContributionTest.java"],"mechanism":"Increased base fungal contribution multiplier.","feedbackReference":"mechanism: Increased nutrient release rate via buffer-release-optimizer trait efficiency.","metric":"nutrientBuffer","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"previous":{"commit":"585907520d2f2634ca4596dee578fcb5aff5d756","paths":["src/main/java/garden/ai/Environment.java","src/main/java/garden/ai/OrganismInteractionCalculator.java"],"mechanism":"Increased nutrient release rate via buffer-release-optimizer trait efficiency.","feedbackReference":"mechanism: Direct buffer filling in Environment.next.","metric":"nutrientBuffer","goal":"decrease","requiredDelta":1,"classification":"measurement-saturated","observedDelta":0,"observation":"terminal-saturated"},"responseToPrevious":"revise","continuity":"diverged","escalation":"none"}
+{"current":{"commit":"7cc3592a9ab56c8a39a57ed3a6cf1ff30dc6fa6e","paths":["data/garden-state.txt","src/test/java/garden/ai/DiagnosticFungalReproductionTest.java"],"mechanism":"Reproduction threshold management","feedbackReference":"mechanism: Increased base fungal contribution multiplier.","metric":"population.FUNGUS","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"previous":{"commit":"a3fd7dc711e6f880bfff5c9a8284f62c9b69fbab","paths":["src/main/java/garden/ai/TraitRegistry.java","src/test/java/garden/ai/FungalContributionTest.java"],"mechanism":"Increased base fungal contribution multiplier.","feedbackReference":"mechanism: Increased nutrient release rate via buffer-release-optimizer trait efficiency.","metric":"nutrientBuffer","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"responseToPrevious":"abandon","continuity":"abandoned","escalation":"none"}
 ```
 <!-- AGENT-EXPERIMENT-LINEAGE-END -->
 
-- Continuity: `diverged`
+- Continuity: `abandoned`
 
 - Escalation: `none`
 
