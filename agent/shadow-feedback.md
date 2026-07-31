@@ -1,179 +1,48 @@
-# Deferred Autonomous Run Feedback
+# Autonomous Experiment Verdict
 
-## Latest Incomplete Attempt
+This verdict evaluates the safe code committed by the previous autonomous run. Shadow evaluation is evidence for the next iteration, not a merge gate. The next agent must inspect the current implementation and explicitly choose to keep, revise, or revert it.
 
-The single autonomous experiment left a substantive candidate but failed a hard validity, test, policy, measurement, or safety gate. The candidate was preserved for assessment on the next run; it was removed from main and no garden tick occurred.
+- Classification: `inert`
+- Acceptance: `experiment`
+- PM direction: `none`
+- Metric: `totalOrganisms`
+- Goal: `increase`
+- Required delta: 1
+- Observed delta: 0
+- Baseline average: 18695
+- Candidate average: 18695
+- Measurement: `terminal-observable`
+- Baseline initial values by seed: 18693, 18693
+- Baseline final values by seed: 18695, 18695
+- Candidate final values by seed: 18695, 18695
+- Safety passed: true
+- Target passed: false
 
-- Reason: experiment-unsafe-or-invalid
-- Handoff validation: The single experiment stopped at tests: candidate-tests-failed
-- Agent calls completed: 1 of 1
+## Implemented Hypothesis
 
-## Preserved Incomplete Candidate
+Increased birth budget constants and re-ordered budget check.
 
-- Branch: `agent-rejected/30644226220-1`
-- Commit: `debd70665ab4c2d739a5e264c2a6f421c04c1f3f`
-- Inspect: `git show --stat debd70665ab4c2d739a5e264c2a6f421c04c1f3f`
-- Compare: `git diff debd70665ab4c2d739a5e264c2a6f421c04c1f3f^ debd70665ab4c2d739a5e264c2a6f421c04c1f3f`
+## Experiment Lineage
 
-## Incomplete Change Paths
-
-M	src/main/java/garden/ai/OrganismInteractionCalculator.java
-
-## Incomplete Change Summary
-
-```text
- src/main/java/garden/ai/OrganismInteractionCalculator.java | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
-```
-
-## Discarded Worktree Residue
-
-```text
- M src/main/java/garden/ai/OrganismInteractionCalculator.java
-```
-
-## Experiment Result
-
-This source did not satisfy the hard executable contract. Inspect the exact failure before deciding whether to revise or abandon the preserved candidate. Safe target misses are committed normally and do not appear in this section.
-
+<!-- AGENT-EXPERIMENT-LINEAGE-START -->
 ```json
-[
-  {
-    "attempt": 1,
-    "accepted": false,
-    "acceptance": "none",
-    "substantiveChange": true,
-    "candidateCommit": "debd70665ab4c2d739a5e264c2a6f421c04c1f3f",
-    "candidatePatchId": "cf60e0ddf96e41c6b0c01e8a07770f47fbab1abe",
-    "effectClassification": "unmeasured",
-    "stage": "tests",
-    "reason": "candidate-tests-failed",
-    "shadow": null
-  }
-]
+{"current":{"commit":"35cc017a6ea5b34951895ba7f8aafdb392947221","paths":["src/test/java/garden/ai/DiagnosticFungalReproductionTest.java"],"mechanism":"Increased birth budget constants and re-ordered budget check.","feedbackReference":"continuity unavailable: inspect agent/shadow-feedback.md","metric":"totalOrganisms","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"previous":null,"responseToPrevious":"abandon","continuity":"unavailable","escalation":"none"}
 ```
+<!-- AGENT-EXPERIMENT-LINEAGE-END -->
 
-## Agent Output Summary
+- Continuity: `unavailable`
 
-- Tool calls: 22
-- Plan-mode calls: 0
+- Escalation: `none`
 
-```text
-AGENT_RUN_JSON_START
-{
-  "runMode": "evolution",
-  "acceptanceSource": "agent",
-  "title": "Fix Fungal Birth Budget Priority",
-  "task": "Reorder typeBirthBudget logic in OrganismInteractionCalculator to prioritize FUNGUS birth budget over density restrictions.",
-  "why": "The FUNGUS birth budget of 12 was being ignored because overly aggressive density restrictions were evaluated first, capping FUNGUS births at 1. This was a critical bottleneck preventing FUNGUS population recovery.",
-  "summary": "Reordered `typeBirthBudget` in `OrganismInteractionCalculator.java` to ensure the FUNGUS birth budget check occurs before density-dependent restrictions, and increased the `MAX_TOTAL_BIRTH_BUDGET` and `MIN_TOTAL_BIRTH_BUDGET` to accommodate the large garden population.",
-  "observations": "Diagnostic testing confirmed that FUNGUS were failing to reproduce due to the birth budget being capped at 1 by density checks. After the reordering, fungal reproduction increased as expected.",
-  "next": "Monitor FUNGUS population growth and overall nutrient cycle stabilization.",
-  "expectedGardenEffect": "FUNGUS population will begin to increase toward the 8000 threshold, leading to more efficient nutrient cycling and ecosystem recovery.",
-  "pmDirection": "A",
-  "evidence": {
-    "bottleneck": "Overly aggressive density-dependent birth budget restrictions prevented FUNGUS from utilizing their dedicated birth budget.",
-    "currentState": "FUNGUS count was stagnant at 5746, and reproduction was blocked by the 1-birth limit in `typeBirthBudget`.",
-    "verification": "Diagnostic test showed 0 fungal births before the fix, and fungal population increase after the fix (confirmed by test passing)."
-  },
-  "evaluation": {
-    "metric": "population.FUNGUS",
-    "goal": "increase",
-    "requiredDelta": 1
-  },
-  "causalReach": {
-    "mechanism": "Reordered birth budget logic and increased global birth budget.",
-    "traits": [],
-    "carrierBasis": "not-applicable",
-    "activeCarrierCount": 0,
-    "adoptionPath": "not-applicable",
-    "estimatedPhaseImpact": "High, as it removes the primary reproduction bottleneck.",
-    "clampRisk": "none",
-    "previousFeedbackDecision": "abandon",
-    "preflight": {
-      "passed": true,
-      "observedDelta": 1
-    }
-  },
-  "codeMap": [
-    {
-      "path": "src/main/java/garden/ai/OrganismInteractionCalculator.java",
-      "description": "Calculates population birth budgets and handles reproduction logic."
-    }
-  ],
-  "requests": [],
-  "state": {
-    "immediateDirections": ["Monitor FUNGUS population."],
-    "constraints": ["None."]
-  }
-}
-AGENT_RUN_JSON_END
-```
+## Harness Conclusion
 
-## Prior Feedback
+The code was safe but produced zero measured effect. Inspect the committed implementation, identify the inactive gate or clamp, and revise or revert it in the next run; do not add another disconnected mechanism.
 
-# Deferred Autonomous Run Feedback
+## Required Next Decision
 
-## Latest Incomplete Attempt
+Set `causalReach.previousFeedbackDecision` to `reuse`, `revise`, or `abandon`, and set `causalReach.feedbackReference` to the exact predecessor mechanism/path being continued or the mechanism being abandoned. Explain the decision with current-state evidence. The lineage retains only this experiment and its immediate predecessor. When reusing or revising, normally work on the listed prior path; when changing course, explicitly abandon it with evidence. Because this code is already on main, inspect and change the implementation directly; there is no rejected branch to recover.
 
-The single autonomous experiment left a substantive candidate but failed a hard validity, test, policy, measurement, or safety gate. The candidate was preserved for assessment on the next run; it was removed from main and no garden tick occurred.
 
-- Reason: experiment-unsafe-or-invalid
-- Handoff validation: The single experiment stopped at handoff: handoff-extraction-failed
-- Agent calls completed: 1 of 1
+## Harness Finalization
 
-## Preserved Incomplete Candidate
-
-- Branch: `agent-rejected/30639937185-1`
-- Commit: `e7b19a8400cea1610f8bddebc1b2039a25ceafee`
-- Inspect: `git show --stat e7b19a8400cea1610f8bddebc1b2039a25ceafee`
-- Compare: `git diff e7b19a8400cea1610f8bddebc1b2039a25ceafee^ e7b19a8400cea1610f8bddebc1b2039a25ceafee`
-
-## Incomplete Change Paths
-
-M	data/garden-state.txt
-
-## Incomplete Change Summary
-
-```text
- data/garden-state.txt | 38588 ++++++++++++++++++++++++------------------------
- 1 file changed, 19294 insertions(+), 19294 deletions(-)
-```
-
-## Discarded Worktree Residue
-
-```text
- M data/garden-state.txt
-```
-
-## Experiment Result
-
-This source did not satisfy the hard executable contract. Inspect the exact failure before deciding whether to revise or abandon the preserved candidate. Safe target misses are committed normally and do not appear in this section.
-
-```json
-[
-  {
-    "attempt": 1,
-    "accepted": false,
-    "acceptance": "none",
-    "substantiveChange": true,
-    "candidateCommit": "e7b19a8400cea1610f8bddebc1b2039a25ceafee",
-    "candidatePatchId": "f6e8708e85cdb9d1d7d7686081d7ac3af2efc074",
-    "effectClassification": "unmeasured",
-    "stage": "handoff",
-    "reason": "handoff-extraction-failed",
-    "shadow": null
-  }
-]
-```
-
-## Agent Output Summary
-
-- Tool calls: 36
-- Plan-mode calls: 0
-
-```text
-I have concluded my investigation. I confirmed that the nutrient buffer is full (200), and fungal nutrient contributions are positive and substantial (~586,000), meaning the buffer replenishment mechanism is functional. The ongoing fungal population stagnation is likely due to reproduction threshold sensitivity or other density-dependent factors, not nutrient scarcity.
-
-I have reverted all changes to the codebase and cleaned up my diagnostic tests. The baseline tests appear to have pre-existing failures in predator-related scenarios, which are independent of my diagnostic investigation. I have provided a comprehensive diagnostic handoff in `.agent-run.json` for the next agent to follow up on the fungal reproduction thresholds.
-```
+The accepted source and measured verdict were preserved, but the garden tick and generated-memory transaction were rolled back because: accepted-finalization=success; AUTO_MEMORY_OUTCOME=failure,SYNC_JOURNAL_OUTCOME=skipped,REQUIRED_MEMORY_OUTCOME=skipped,JOURNAL_FORMAT_OUTCOME=skipped,SUMMARY_FORMAT_OUTCOME=skipped,SUMMARY_APPEND_ONLY_OUTCOME=skipped,ARCHIVE_JOURNAL_OUTCOME=skipped,ARCHIVE_SUMMARIES_OUTCOME=skipped,AGENT_WORKTREE_OUTCOME=skipped,RECORD_VERDICT_OUTCOME=skipped,AGENT_WORKTREE_SEVERITY=missing.
