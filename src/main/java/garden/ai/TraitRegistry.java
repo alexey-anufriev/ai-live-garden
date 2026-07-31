@@ -340,8 +340,7 @@ public class TraitRegistry {
                       context.fungalGardenerCount() * 5 +
                       context.fungalFertilizerCount() * 7 +
                       context.fungalDecomposerMimicCount() * 5 +
-                      context.massDecomposerCount() * decayPressure * 10 +
-                      baseContribution) + synergizerBonus;
+                      context.massDecomposerCount() * decayPressure * 10) + synergizerBonus;
     }
 
     public record BiteEffect(int biteSize, List<GardenEvent> events) {}
