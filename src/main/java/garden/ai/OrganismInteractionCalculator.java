@@ -138,7 +138,7 @@ public class OrganismInteractionCalculator {
             if (organism.type() == OrganismType.MOSS && context.environment().moisture() > 60) {
                 growth += 1;
             }
-            if (organism.type() == OrganismType.FUNGUS && context.environment().nutrients() > 25) {
+            if (organism.type() == OrganismType.FUNGUS && context.environment().nutrients() > 10) {
                 growth += 1;
             }
             if (organism.type() == OrganismType.FUNGUS && context.environment().nutrients() < 10) {
