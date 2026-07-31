@@ -4,29 +4,29 @@ This verdict evaluates the safe code committed by the previous autonomous run. S
 
 - Classification: `inert`
 - Acceptance: `experiment`
-- PM direction: `none`
-- Metric: `nutrientBuffer`
+- PM direction: `A`
+- Metric: `population.FUNGUS`
 - Goal: `increase`
 - Required delta: 1
 - Observed delta: 0
-- Baseline average: 200
-- Candidate average: 200
+- Baseline average: 5746
+- Candidate average: 5746
 - Measurement: `terminal-observable`
-- Baseline initial values by seed: 0, 0
-- Baseline final values by seed: 200, 200
-- Candidate final values by seed: 200, 200
+- Baseline initial values by seed: 5746, 5746
+- Baseline final values by seed: 5746, 5746
+- Candidate final values by seed: 5746, 5746
 - Safety passed: true
 - Target passed: false
 
 ## Implemented Hypothesis
 
-Adjusted Environment.next to only force aggressive buffer release when the nutrient buffer is sufficiently filled.
+TraitRegistry.isPlantStressed logic modification to immune FUNGUS from environmental and crowding stress.
 
 ## Experiment Lineage
 
 <!-- AGENT-EXPERIMENT-LINEAGE-START -->
 ```json
-{"current":{"commit":"505745c9b4e674f3a0e41355c50d707e90f907bc","paths":["src/main/java/garden/ai/Environment.java","src/test/java/garden/ai/EnvironmentTest.java"],"mechanism":"Adjusted Environment.next to only force aggressive buffer release when the nutrient buffer is sufficiently filled.","feedbackReference":"mechanism: Increased birth budget constants and re-ordered budget check.","metric":"nutrientBuffer","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"previous":{"commit":"35cc017a6ea5b34951895ba7f8aafdb392947221","paths":["src/test/java/garden/ai/DiagnosticFungalReproductionTest.java"],"mechanism":"Increased birth budget constants and re-ordered budget check.","feedbackReference":"continuity unavailable: inspect agent/shadow-feedback.md","metric":"totalOrganisms","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"responseToPrevious":"revise","continuity":"diverged","escalation":"none"}
+{"current":{"commit":"08a5a4bcd8cf27a74b377519927ae12cc27c591e","paths":["data/garden-state.txt","src/main/java/garden/ai/TraitRegistry.java"],"mechanism":"TraitRegistry.isPlantStressed logic modification to immune FUNGUS from environmental and crowding stress.","feedbackReference":"mechanism: Adjusted Environment.next to only force aggressive buffer release when the nutrient buffer is sufficiently filled.","metric":"population.FUNGUS","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"previous":{"commit":"505745c9b4e674f3a0e41355c50d707e90f907bc","paths":["src/main/java/garden/ai/Environment.java","src/test/java/garden/ai/EnvironmentTest.java"],"mechanism":"Adjusted Environment.next to only force aggressive buffer release when the nutrient buffer is sufficiently filled.","feedbackReference":"mechanism: Increased birth budget constants and re-ordered budget check.","metric":"nutrientBuffer","goal":"increase","requiredDelta":1,"classification":"inert","observedDelta":0,"observation":"terminal-observable"},"responseToPrevious":"revise","continuity":"diverged","escalation":"none"}
 ```
 <!-- AGENT-EXPERIMENT-LINEAGE-END -->
 
