@@ -129,4 +129,16 @@ public class FungalContributionTest {
         // Count: 1 FUNGUS (2 * 2 = 4), 1 amplifier (30 bonus) = 34
         assertEquals(34, garden.fungalContribution());
     }
+
+    @Test
+    public void testFungalContributionWithEmptyBuffer() {
+        Organism fungus1 = Organism.of("fungus-1", OrganismType.FUNGUS, 10, 1);
+        // buffer = 0
+        Garden garden = new Garden(1, 1, new Environment(50, 50, 50, 50, 0), List.of(fungus1), List.of());
+        
+        // Count: 1 FUNGUS.
+        // baseContribution = (1 * 50) = 50.
+        // fungalContribution = 50 (base) + (1 * 2 * 1 (bufferBonus)) + 50 (base) = 102.
+        assertEquals(102, garden.fungalContribution());
+    }
 }
