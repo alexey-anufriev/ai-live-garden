@@ -41,8 +41,8 @@ public record Environment(int light, int moisture, int warmth, int nutrients, in
         int nutrientDelta = 2 + animalCount / 2 - consumption;
         
         int releaseRate = nutrients < 5 ? 2 : (nutrients < 10 ? 5 : (nutrients < 50 ? 8 : 10));
-        // Force buffer release when nutrients are low
-        if (nutrients < 10) {
+        // Force buffer release when nutrients are low, but only if the buffer is reasonably full
+        if (nutrients < 10 && nutrientBuffer > 20) {
             releaseRate = (nutrients == 0) ? 1 : 2;
         }
         

@@ -90,14 +90,16 @@ class EnvironmentTest {
     }
 
     @Test
-    void siphonReducesBufferEffectively() {
-        // Environment with buffer 100.
-        Environment env = new Environment(50, 50, 50, 50, 100);
-        // siphonCount = 10. Syphoned = min(100, 10 * 6) = 60.
-        // ReleaseRate = 2. Released = 100 / 2 = 50.
-        // newBuffer = 100 + intoBuffer(0) - 50 - 60 = -10, clamped to 0.
-        Environment next = env.next(1, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10);
-        assertThat(next.nutrientBuffer()).isEqualTo(0);
+    void lowNutrientsShouldNotForceBufferExhaustion() {
+        // Environment with low nutrients(0), low buffer(10), and low filling(10).
+        Environment env = new Environment(50, 50, 50, 0, 10);
+        // filling = 10.
+        // releaseRate = 2.
+        // Released = 10 / 2 = 5.
+        // intoBuffer = 10 - (10/4 = 2) = 8.
+        // newBuffer = 10(buffer) + 8(intoBuffer) - 5(released) = 13.
+        // The buffer accumulates.
+        Environment next = env.next(1, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0);
+        assertThat(next.nutrientBuffer()).isGreaterThan(10);
     }
-
 }
