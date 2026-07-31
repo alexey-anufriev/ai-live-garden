@@ -1,3 +1,69 @@
+# Deferred Autonomous Run Feedback
+
+## Latest Incomplete Attempt
+
+The single autonomous experiment left a substantive candidate but failed a hard validity, test, policy, measurement, or safety gate. The candidate was preserved for assessment on the next run; it was removed from main and no garden tick occurred.
+
+- Reason: experiment-unsafe-or-invalid
+- Handoff validation: The single experiment stopped at handoff: handoff-extraction-failed
+- Agent calls completed: 1 of 1
+
+## Preserved Incomplete Candidate
+
+- Branch: `agent-rejected/30652400613-1`
+- Commit: `cb04cf934d4601ae111284accd6308ec2d698638`
+- Inspect: `git show --stat cb04cf934d4601ae111284accd6308ec2d698638`
+- Compare: `git diff cb04cf934d4601ae111284accd6308ec2d698638^ cb04cf934d4601ae111284accd6308ec2d698638`
+
+## Incomplete Change Paths
+
+M	src/main/java/garden/ai/Environment.java
+
+## Incomplete Change Summary
+
+```text
+ src/main/java/garden/ai/Environment.java | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+```
+
+## Discarded Worktree Residue
+
+```text
+ M src/main/java/garden/ai/Environment.java
+```
+
+## Experiment Result
+
+This source did not satisfy the hard executable contract. Inspect the exact failure before deciding whether to revise or abandon the preserved candidate. Safe target misses are committed normally and do not appear in this section.
+
+```json
+[
+  {
+    "attempt": 1,
+    "accepted": false,
+    "acceptance": "none",
+    "substantiveChange": true,
+    "candidateCommit": "cb04cf934d4601ae111284accd6308ec2d698638",
+    "candidatePatchId": "183d867c6cbb350aca7a8d484ad75efea962f1df",
+    "effectClassification": "unmeasured",
+    "stage": "handoff",
+    "reason": "handoff-extraction-failed",
+    "shadow": null
+  }
+]
+```
+
+## Agent Output Summary
+
+- Tool calls: 14
+- Plan-mode calls: 0
+
+```text
+
+```
+
+## Prior Feedback
+
 # Autonomous Experiment Verdict
 
 This verdict evaluates the safe code committed by the previous autonomous run. Shadow evaluation is evidence for the next iteration, not a merge gate. The next agent must inspect the current implementation and explicitly choose to keep, revise, or revert it.
